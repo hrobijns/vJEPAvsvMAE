@@ -1,0 +1,15 @@
+[project]
+name = "vjepa-vmae-comparison"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "einops>=0.8.2",
+    "matplotlib>=3.11.1",
+    "numpy<2",
+    "pyyaml>=6.0.3",
+    "the-well>=1.2.0",
+    "torch>=2.2.2,<2.3 ; sys_platform == 'darwin'",
+    "torch>=2.4 ; sys_platform == 'linux'",
+    "wandb>=0.28.1",
+]

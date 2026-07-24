@@ -1,0 +1,84 @@
+# vJEPA vs vMAE on The Well
+
+Controlled comparison of a latent-prediction objective (V-JEPA-style) against a
+pixel-reconstruction objective (VideoMAE-style) with **identical encoders**, on
+2D physics simulations from [The Well](https://polymathic-ai.org/the_well/).
+End goal: test whether the JEPA objective encodes more physical variables in
+its latent space (probing suite = step 2, separate from this repo's step-1
+training infrastructure).
+
+## Design
+
+Both objectives share everything except the head:
+
+| shared | ViT-S encoder (384d × 12), 2×16×16 tubelet patches, tube masking @ 0.9, T=8 clips at native resolution, per-channel z-score norm (Well stats), AdamW + cosine, same batch/steps |
+|---|---|
+| **MAE** | 4-layer decoder (192d) → MSE on masked patches (`norm_pix`) |
+| **JEPA** | EMA target encoder (0.996→1.0) + 6-layer predictor (384d) → smooth-L1 on layer-normed target features at masked positions |
+
+Datasets (per-dataset model pairs, 6 runs): `active_matter` (11ch, 256×256),
+`shear_flow` (4ch, 256×128, incompressible NS), `rayleigh_benard` (4ch, 512×128).
+`turbulent_radiative_layer_2D` is used only as a local smoke-test dataset.
+
+## Quickstart
+
+```bash
+uv sync
+
+# local smoke test (downloads ~700 MB, first file only)
+uv run the-well-download --base-path ~/well_data --dataset turbulent_radiative_layer_2D --split train --first-only
+uv run python -m src.train --config configs/debug_mae.yaml
+uv run python -m src.train --config configs/debug_jepa.yaml
+
+# real runs (on RunPod, see below)
+uv run python -m src.train --config configs/active_matter_jepa.yaml
+```
+
+Checkpoints land in `runs/<run_name>/`: `latest.pt` (full resume state, saved
+every 1k steps) and `encoder_{025,050,075,100}pct.pt` (encoder-only milestones
+for the step-2 probing study).
+
+## CSD3 workflow (plan of record)
+
+Wilkes3 A100s, partition `ampere`. Put repo + data in `/rds/user/$USER/hpc-work`
+(home quota is too small). Edit the `#SBATCH -A` account in
+[csd3/slurm_train.sh](csd3/slurm_train.sh), then:
+
+```bash
+bash scripts/download_data.sh /rds/user/$USER/hpc-work/well_data  # tmux, login node
+mkdir -p logs
+sbatch csd3/slurm_train.sh configs/active_matter_jepa.yaml
+sbatch csd3/slurm_train.sh configs/active_matter_mae.yaml
+```
+
+Jobs killed at walltime resume on resubmission. Compute nodes log W&B offline;
+sync from a login node with `uv run wandb sync --sync-all`.
+
+## RunPod workflow (alternative)
+
+1. Create a **network volume** (≥700 GB) and a pod with 1× A100 80GB
+   (PyTorch CUDA base image), volume mounted at `/workspace`.
+2. Clone this repo into `/workspace`, then:
+   ```bash
+   export WANDB_API_KEY=...
+   bash runpod/setup.sh
+   bash scripts/download_data.sh /workspace/data   # ~525 GB, hours
+   ```
+3. Smoke test on GPU, then launch pairs smallest-first inside tmux:
+   ```bash
+   tmux new -s train
+   uv run python -m src.train --config configs/active_matter_jepa.yaml
+   uv run python -m src.train --config configs/active_matter_mae.yaml
+   # then shear_flow pair, then rayleigh_benard pair
+   ```
+   Re-running the same command auto-resumes from `runs/<name>/latest.pt`
+   (spot-interruption safe).
+
+## Repo map
+
+- [src/data/well.py](src/data/well.py) — Well → (C,T,H,W) clip dataset
+- [src/masking.py](src/masking.py) — shared tube masking
+- [src/models/vit.py](src/models/vit.py) — shared ViT encoder
+- [src/objectives/mae.py](src/objectives/mae.py), [src/objectives/jepa.py](src/objectives/jepa.py) — the two heads
+- [src/train.py](src/train.py) — unified entrypoint
+- [scripts/gen_configs.py](scripts/gen_configs.py) — regenerates `configs/`
