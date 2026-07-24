@@ -8,7 +8,9 @@ BASE_PATH="${1:?usage: download_data.sh <base_path>}"
 for dataset in active_matter shear_flow rayleigh_benard; do
     for split in train valid; do
         echo "=== downloading $dataset/$split ==="
-        uv run the-well-download --base-path "$BASE_PATH" --dataset "$dataset" --split "$split" --parallel
+        # --no-parallel: the parallel path needs curl >= 7.66, older than some
+        # cluster login nodes (e.g. CSD3) provide
+        uv run the-well-download --base-path "$BASE_PATH" --dataset "$dataset" --split "$split" --no-parallel
     done
 done
 
