@@ -13,4 +13,9 @@ wheels/
 runs/
 wandb/
 *.pt
+!checkpoints/*.pt
+local_data/
+local_runs/
+local_analysis*.json
+analysis_*.json
 .DS_Store

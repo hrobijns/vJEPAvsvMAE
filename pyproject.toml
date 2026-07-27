@@ -10,6 +10,6 @@ dependencies = [
     "pyyaml>=6.0.3",
     "the-well>=1.2.0",
     "torch>=2.2.2,<2.3 ; sys_platform == 'darwin'",
-    "torch>=2.4 ; sys_platform == 'linux'",
+    "torch>=2.4,<2.7 ; sys_platform == 'linux'",
     "wandb>=0.28.1",
 ]

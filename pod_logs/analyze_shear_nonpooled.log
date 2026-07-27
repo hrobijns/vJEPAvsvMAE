@@ -1,0 +1,64 @@
+building probe dataset...
+896 clips total; token probe uses first 24
+
+=== runs/shear_flow_jepa/encoder_100pct.pt ===
+  -- per-token LINEAR probe (no pooling) --
+    block_1      enstrophy=0.811  tracer_grad=0.870  advective_flux=0.905
+    block_2      enstrophy=0.865  tracer_grad=0.933  advective_flux=0.920
+    block_3      enstrophy=0.817  tracer_grad=0.924  advective_flux=0.856
+    block_4      enstrophy=0.743  tracer_grad=0.903  advective_flux=0.684
+    block_5      enstrophy=0.611  tracer_grad=0.817  advective_flux=0.395
+    block_6      enstrophy=0.467  tracer_grad=0.650  advective_flux=0.187
+    block_7      enstrophy=0.410  tracer_grad=0.564  advective_flux=0.115
+    block_8      enstrophy=0.374  tracer_grad=0.536  advective_flux=0.098
+    block_9      enstrophy=0.333  tracer_grad=0.506  advective_flux=0.089
+    block_10     enstrophy=0.330  tracer_grad=0.488  advective_flux=0.083
+    block_11     enstrophy=0.319  tracer_grad=0.488  advective_flux=0.079
+    block_12     enstrophy=0.293  tracer_grad=0.472  advective_flux=0.074
+    final_norm   enstrophy=0.296  tracer_grad=0.463  advective_flux=0.027
+  -- pooled NONLINEAR (MLP) probe --
+    block_1      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.868
+    block_2      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.806
+    block_3      enstrophy=1.000  tracer_grad=0.997  advective_flux=0.860
+    block_4      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.775
+    block_5      enstrophy=0.999  tracer_grad=0.993  advective_flux=0.737
+    block_6      enstrophy=1.000  tracer_grad=0.995  advective_flux=0.811
+    block_7      enstrophy=1.000  tracer_grad=0.992  advective_flux=0.794
+    block_8      enstrophy=1.000  tracer_grad=0.995  advective_flux=0.869
+    block_9      enstrophy=0.999  tracer_grad=0.994  advective_flux=0.812
+    block_10     enstrophy=0.999  tracer_grad=0.977  advective_flux=0.774
+    block_11     enstrophy=0.999  tracer_grad=0.994  advective_flux=0.875
+    block_12     enstrophy=0.999  tracer_grad=0.987  advective_flux=0.807
+    final_norm   enstrophy=0.999  tracer_grad=0.984  advective_flux=0.770
+
+=== runs/shear_flow_mae/encoder_100pct.pt ===
+  -- per-token LINEAR probe (no pooling) --
+    block_1      enstrophy=0.764  tracer_grad=0.925  advective_flux=0.943
+    block_2      enstrophy=0.809  tracer_grad=0.950  advective_flux=0.957
+    block_3      enstrophy=0.828  tracer_grad=0.961  advective_flux=0.940
+    block_4      enstrophy=0.835  tracer_grad=0.959  advective_flux=0.907
+    block_5      enstrophy=0.850  tracer_grad=0.956  advective_flux=0.872
+    block_6      enstrophy=0.844  tracer_grad=0.951  advective_flux=0.831
+    block_7      enstrophy=0.829  tracer_grad=0.942  advective_flux=0.807
+    block_8      enstrophy=0.824  tracer_grad=0.938  advective_flux=0.777
+    block_9      enstrophy=0.816  tracer_grad=0.935  advective_flux=0.747
+    block_10     enstrophy=0.812  tracer_grad=0.933  advective_flux=0.732
+    block_11     enstrophy=0.804  tracer_grad=0.932  advective_flux=0.706
+    block_12     enstrophy=0.801  tracer_grad=0.928  advective_flux=0.692
+    final_norm   enstrophy=0.739  tracer_grad=0.930  advective_flux=0.681
+  -- pooled NONLINEAR (MLP) probe --
+    block_1      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.878
+    block_2      enstrophy=1.000  tracer_grad=0.999  advective_flux=0.797
+    block_3      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.852
+    block_4      enstrophy=1.000  tracer_grad=0.999  advective_flux=0.729
+    block_5      enstrophy=0.998  tracer_grad=0.996  advective_flux=0.769
+    block_6      enstrophy=0.999  tracer_grad=1.000  advective_flux=0.717
+    block_7      enstrophy=1.000  tracer_grad=0.997  advective_flux=0.792
+    block_8      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.881
+    block_9      enstrophy=1.000  tracer_grad=0.998  advective_flux=0.805
+    block_10     enstrophy=0.999  tracer_grad=0.995  advective_flux=0.774
+    block_11     enstrophy=0.999  tracer_grad=0.999  advective_flux=0.881
+    block_12     enstrophy=0.999  tracer_grad=0.999  advective_flux=0.803
+    final_norm   enstrophy=1.000  tracer_grad=0.998  advective_flux=0.782
+
+wrote /workspace/analysis_shear_nonpooled.json

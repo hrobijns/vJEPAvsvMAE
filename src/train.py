@@ -20,7 +20,7 @@ import numpy as np
 import torch
 import yaml
 
-from src.data.well import ClipSpec, WellClipDataset
+from src.data.well import ClipSpec, MemmapClipDataset, WellClipDataset
 from src.models.vit import build_encoder
 from src.objectives.jepa import JEPAModel
 from src.objectives.mae import MAEModel
@@ -84,6 +84,8 @@ def main():
     ap.add_argument("--config", required=True)
     ap.add_argument("--data-root", default=None, help="overrides data.base_path")
     ap.add_argument("--steps", type=int, default=None, help="overrides total_steps")
+    ap.add_argument("--lr", type=float, default=None, help="overrides optim.lr")
+    ap.add_argument("--mask-ratio", type=float, default=None, help="overrides objective.mask_ratio")
     ap.add_argument("--out", default=None, help="overrides output dir")
     ap.add_argument("--no-wandb", action="store_true")
     args = ap.parse_args()
@@ -93,6 +95,10 @@ def main():
         cfg["data"]["base_path"] = args.data_root
     if args.steps:
         cfg["optim"]["total_steps"] = args.steps
+    if args.lr:
+        cfg["optim"]["lr"] = args.lr
+    if args.mask_ratio:
+        cfg["objective"]["mask_ratio"] = args.mask_ratio
 
     run_name = cfg["run_name"]
     out_dir = Path(args.out or cfg.get("out_dir", "runs")) / run_name
@@ -103,7 +109,8 @@ def main():
     set_seed(cfg.get("seed", 0))
 
     dcfg = cfg["data"]
-    dataset = WellClipDataset(
+    dataset_cls = MemmapClipDataset if dcfg.get("memmap", False) else WellClipDataset
+    dataset = dataset_cls(
         base_path=os.path.expanduser(dcfg["base_path"]),
         dataset_name=dcfg["dataset_name"],
         split="train",
@@ -165,7 +172,8 @@ def main():
             g["lr"] = lr
 
         batch = next(batches)
-        clip = batch["clip"].to(device, non_blocking=True)
+        # memmaps store fp16 to halve host->device bytes; cast on-GPU
+        clip = batch["clip"].to(device, non_blocking=True).float()
 
         with torch.autocast("cuda", torch.bfloat16, enabled=use_amp):
             loss, metrics = model(clip)

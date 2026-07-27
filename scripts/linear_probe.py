@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.data.well import ClipSpec, WellClipDataset
+from src.data.well import ClipSpec, MemmapClipDataset, WellClipDataset
 from src.models.vit import build_encoder
 
 
@@ -52,6 +52,13 @@ def main():
     ap.add_argument("--split", default="valid")
     ap.add_argument("--n-clips", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
+    ap.add_argument(
+        "--target",
+        default="energy",
+        choices=["energy", "channels"],
+        help="energy: global mean squared magnitude; channels: per-channel "
+        "mean squared magnitude (harder, avg R^2 over channels)",
+    )
     args = ap.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -60,12 +67,13 @@ def main():
     encoder = build_encoder(spec, cfg.get("encoder", {})).to(device).eval()
     encoder.load_state_dict(ckpt["encoder"])
 
-    dataset = WellClipDataset(
-        base_path=os.path.expanduser(args.data_root),
-        dataset_name=cfg["data"]["dataset_name"],
-        split=args.split,
-        n_frames=cfg["data"].get("n_frames", 8),
-    )
+    base = os.path.expanduser(args.data_root)
+    name = cfg["data"]["dataset_name"]
+    n_frames = cfg["data"].get("n_frames", 8)
+    try:
+        dataset = MemmapClipDataset(base, name, args.split, n_frames)
+    except FileNotFoundError:
+        dataset = WellClipDataset(base, name, args.split, n_frames)
     n = min(args.n_clips, len(dataset))
     idx = torch.linspace(0, len(dataset) - 1, n).long().tolist()
 
@@ -74,19 +82,24 @@ def main():
         for start in range(0, n, args.batch_size):
             clips = torch.stack(
                 [dataset[i]["clip"] for i in idx[start : start + args.batch_size]]
-            ).to(device)
+            ).to(device).float()
             f = encoder(clips)  # (B, N, D), no masking
             feats.append(f.mean(dim=1).float().cpu())
             pix_means.append(clips.mean(dim=(2, 3, 4)).float().cpu())
-            targets.append((clips**2).mean(dim=(1, 2, 3, 4)).float().cpu())
+            if args.target == "energy":
+                targets.append((clips**2).mean(dim=(1, 2, 3, 4)).float().cpu())
+            else:
+                targets.append((clips**2).mean(dim=(2, 3, 4)).float().cpu())  # (B, C)
 
     x = torch.cat(feats)
     xb = torch.cat(pix_means)
     y = torch.cat(targets)
+    if y.ndim == 1:
+        y = y.unsqueeze(1)
 
-    r2_encoder = ridge_r2(x, y)
-    r2_baseline = ridge_r2(xb, y)
-    print(f"probe target: mean squared field magnitude ({n} clips, {args.split})")
+    r2_encoder = sum(ridge_r2(x, y[:, j]) for j in range(y.size(1))) / y.size(1)
+    r2_baseline = sum(ridge_r2(xb, y[:, j]) for j in range(y.size(1))) / y.size(1)
+    print(f"probe target: {args.target} ({y.size(1)} target(s), {n} clips, {args.split})")
     print(f"encoder features R^2:   {r2_encoder:.4f}  (dim {x.size(1)})")
     print(f"pixel-mean baseline R^2: {r2_baseline:.4f}  (dim {xb.size(1)})")
     verdict = "PASS" if r2_encoder > r2_baseline else "FAIL"

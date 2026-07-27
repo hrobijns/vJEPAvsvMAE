@@ -10,7 +10,8 @@ data:
   base_path: /workspace/data
   dataset_name: shear_flow
   n_frames: 8
-  num_workers: 8
+  num_workers: 16
+  memmap: true
 encoder:
   patch_t: 2
   patch_h: 16

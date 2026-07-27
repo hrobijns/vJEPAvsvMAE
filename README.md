@@ -7,6 +7,61 @@ End goal: test whether the JEPA objective encodes more physical variables in
 its latent space (probing suite = step 2, separate from this repo's step-1
 training infrastructure).
 
+## Pretrained encoders
+
+[`checkpoints/`](checkpoints/) has the final (100k-step) trained encoder for
+all 6 runs — one JEPA and one MAE encoder per dataset:
+
+| file | dataset | objective | params |
+|---|---|---|---|
+| `active_matter_jepa.pt` / `active_matter_mae.pt` | active_matter (11ch, 256×256) | JEPA / MAE | 23.5M |
+| `shear_flow_jepa.pt` / `shear_flow_mae.pt` | shear_flow (4ch, 256×512) | JEPA / MAE | 23.5M |
+| `rayleigh_benard_jepa.pt` / `rayleigh_benard_mae.pt` | rayleigh_benard (4ch, 512×128) | JEPA / MAE | 23.5M |
+
+Each `.pt` bundles the trained weights **and** the exact config used to
+produce them (architecture, LR, mask ratio, objective hyperparameters) — it's
+self-contained, no separate config file needed.
+
+**Load one:**
+
+```python
+from scripts.load_encoder import load_encoder
+
+encoder, config, spec = load_encoder("checkpoints/active_matter_jepa.pt")
+# encoder: ViT-S in eval() mode. spec: ClipSpec(n_channels, n_frames, height, width)
+# clip: (B, C, T, H, W) tensor, z-score normalized per The Well's own stats
+features = encoder(clip)  # (B, n_tokens, 384) — no masking applied at inference
+```
+
+`uv run python scripts/load_encoder.py checkpoints/<name>.pt` runs this as a
+standalone sanity check (loads + random forward pass).
+
+To probe what these encoders actually learned — layer-wise physics decodability,
+pooled vs. per-token comparisons — see [scripts/analyze_encoders.py](scripts/analyze_encoders.py)
+and [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py).
+Both need the corresponding dataset's memmap (see "Reproducing" below) or can
+be pointed at your own tensors of the same shape.
+
+**How they were trained**: 100k steps, AdamW + cosine LR (JEPA 1e-4, MAE 5e-5 —
+picked via a small LR sweep on active_matter, see [Design](#design) below),
+tube masking at 0.9, on a single A100. See git history / [scripts/gen_configs.py](scripts/gen_configs.py)
+for the exact config that produced each checkpoint.
+
+## Reproducing from scratch
+
+```bash
+uv sync
+bash scripts/download_data.sh /path/to/data   # ~525 GB, hours — see RunPod workflow below
+uv run python scripts/preprocess_memmap.py --base /path/to/data --dataset active_matter --split train
+uv run python scripts/preprocess_memmap.py --base /path/to/data --dataset active_matter --split valid
+uv run python -m src.train --config configs/active_matter_jepa.yaml --data-root /path/to/data
+```
+
+Repeat `preprocess_memmap.py` + `train.py` for `shear_flow` and `rayleigh_benard`
+(configs already exist for both objectives × all 3 datasets). Each run takes
+roughly 6–11 hours on a single A100; see the RunPod/CSD3 workflows below for
+running on rented or cluster GPUs.
+
 ## Design
 
 Both objectives share everything except the head:
@@ -76,9 +131,14 @@ sync from a login node with `uv run wandb sync --sync-all`.
 
 ## Repo map
 
+- [checkpoints/](checkpoints/) — 6 pretrained encoders (see above)
 - [src/data/well.py](src/data/well.py) — Well → (C,T,H,W) clip dataset
 - [src/masking.py](src/masking.py) — shared tube masking
 - [src/models/vit.py](src/models/vit.py) — shared ViT encoder
 - [src/objectives/mae.py](src/objectives/mae.py), [src/objectives/jepa.py](src/objectives/jepa.py) — the two heads
 - [src/train.py](src/train.py) — unified entrypoint
 - [scripts/gen_configs.py](scripts/gen_configs.py) — regenerates `configs/`
+- [scripts/preprocess_memmap.py](scripts/preprocess_memmap.py) — Well HDF5 → fast fp16 memmap (needed before training/analysis)
+- [scripts/load_encoder.py](scripts/load_encoder.py) — load a checkpoint + sanity-check forward pass
+- [scripts/linear_probe.py](scripts/linear_probe.py) — ridge-probe frozen features against physics targets
+- [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — layer-wise pooled/non-pooled physics probing (the JEPA-vs-MAE comparison)

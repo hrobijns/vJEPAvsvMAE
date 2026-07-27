@@ -1,0 +1,38 @@
+building probe dataset: 3 offsets/traj, horizon=16
+525 samples total
+  enstrophy: mean=0.0029 std=0.0025
+  nematic_order: mean=1.2451 std=0.3744
+  flow_align: mean=0.0040 std=0.0514
+  future_enstrophy: mean=0.0032 std=0.0026
+
+=== runs/active_matter_jepa/encoder_100pct.pt ===
+  block_1      enstrophy=0.985  nematic_order=0.993  flow_align=0.444  future_enstrophy=0.898
+  block_2      enstrophy=0.989  nematic_order=0.994  flow_align=0.384  future_enstrophy=0.917
+  block_3      enstrophy=0.985  nematic_order=0.995  flow_align=0.240  future_enstrophy=0.924
+  block_4      enstrophy=0.986  nematic_order=0.995  flow_align=0.136  future_enstrophy=0.916
+  block_5      enstrophy=0.983  nematic_order=0.994  flow_align=0.034  future_enstrophy=0.905
+  block_6      enstrophy=0.978  nematic_order=0.990  flow_align=-0.058  future_enstrophy=0.904
+  block_7      enstrophy=0.977  nematic_order=0.990  flow_align=-0.213  future_enstrophy=0.909
+  block_8      enstrophy=0.978  nematic_order=0.989  flow_align=-0.221  future_enstrophy=0.914
+  block_9      enstrophy=0.976  nematic_order=0.989  flow_align=-0.297  future_enstrophy=0.902
+  block_10     enstrophy=0.976  nematic_order=0.988  flow_align=-0.219  future_enstrophy=0.901
+  block_11     enstrophy=0.977  nematic_order=0.986  flow_align=-0.228  future_enstrophy=0.911
+  block_12     enstrophy=0.976  nematic_order=0.990  flow_align=-0.222  future_enstrophy=0.910
+  final_norm   enstrophy=0.974  nematic_order=0.991  flow_align=-0.200  future_enstrophy=0.910
+
+=== runs/active_matter_mae/encoder_100pct.pt ===
+  block_1      enstrophy=0.993  nematic_order=0.996  flow_align=0.364  future_enstrophy=0.920
+  block_2      enstrophy=0.993  nematic_order=0.998  flow_align=0.421  future_enstrophy=0.926
+  block_3      enstrophy=0.992  nematic_order=0.998  flow_align=0.411  future_enstrophy=0.928
+  block_4      enstrophy=0.991  nematic_order=0.999  flow_align=0.365  future_enstrophy=0.925
+  block_5      enstrophy=0.987  nematic_order=0.998  flow_align=0.363  future_enstrophy=0.929
+  block_6      enstrophy=0.984  nematic_order=0.998  flow_align=0.299  future_enstrophy=0.928
+  block_7      enstrophy=0.980  nematic_order=0.998  flow_align=0.295  future_enstrophy=0.928
+  block_8      enstrophy=0.982  nematic_order=0.997  flow_align=0.341  future_enstrophy=0.931
+  block_9      enstrophy=0.981  nematic_order=0.997  flow_align=0.352  future_enstrophy=0.930
+  block_10     enstrophy=0.979  nematic_order=0.998  flow_align=0.317  future_enstrophy=0.931
+  block_11     enstrophy=0.981  nematic_order=0.998  flow_align=0.281  future_enstrophy=0.930
+  block_12     enstrophy=0.978  nematic_order=0.997  flow_align=0.249  future_enstrophy=0.929
+  final_norm   enstrophy=0.976  nematic_order=0.997  flow_align=0.256  future_enstrophy=0.926
+
+wrote /workspace/analysis_am_100pct.json

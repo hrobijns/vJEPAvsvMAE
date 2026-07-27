@@ -38,12 +38,9 @@ class MAEDecoder(nn.Module):
         """Returns predicted patch pixels at masked positions: (B, Nm, patch_dim)."""
         b = visible_feats.size(0)
         n_tokens = self.pos_embed.size(1)
-        x = self.mask_token.expand(b, n_tokens, -1).clone()
-        x.scatter_(
-            1,
-            keep_idx.unsqueeze(-1).expand(-1, -1, x.size(-1)),
-            self.proj(visible_feats),
-        )
+        vis = self.proj(visible_feats)  # may be bf16 under autocast
+        x = self.mask_token.to(vis.dtype).expand(b, n_tokens, -1).clone()
+        x.scatter_(1, keep_idx.unsqueeze(-1).expand(-1, -1, x.size(-1)), vis)
         x = x + self.pos_embed
         for blk in self.blocks:
             x = blk(x)

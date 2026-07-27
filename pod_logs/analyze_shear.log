@@ -1,0 +1,38 @@
+building probe dataset: 1 offsets/traj, horizon=16
+896 samples total
+  enstrophy: mean=0.0002 std=0.0004
+  tracer_grad: mean=0.0016 std=0.0019
+  advective_flux: mean=-0.0000 std=0.0000
+  future_enstrophy: mean=0.0015 std=0.0022
+
+=== runs/shear_flow_jepa/encoder_100pct.pt ===
+  block_1      enstrophy=0.995  tracer_grad=0.989  advective_flux=0.667  future_enstrophy=0.960
+  block_2      enstrophy=0.996  tracer_grad=0.992  advective_flux=0.782  future_enstrophy=0.969
+  block_3      enstrophy=0.997  tracer_grad=0.991  advective_flux=0.807  future_enstrophy=0.985
+  block_4      enstrophy=0.996  tracer_grad=0.990  advective_flux=0.809  future_enstrophy=0.979
+  block_5      enstrophy=0.996  tracer_grad=0.989  advective_flux=0.808  future_enstrophy=0.974
+  block_6      enstrophy=0.995  tracer_grad=0.985  advective_flux=0.801  future_enstrophy=0.977
+  block_7      enstrophy=0.992  tracer_grad=0.984  advective_flux=0.784  future_enstrophy=0.978
+  block_8      enstrophy=0.992  tracer_grad=0.982  advective_flux=0.780  future_enstrophy=0.975
+  block_9      enstrophy=0.991  tracer_grad=0.982  advective_flux=0.765  future_enstrophy=0.975
+  block_10     enstrophy=0.989  tracer_grad=0.981  advective_flux=0.760  future_enstrophy=0.973
+  block_11     enstrophy=0.986  tracer_grad=0.979  advective_flux=0.751  future_enstrophy=0.972
+  block_12     enstrophy=0.987  tracer_grad=0.979  advective_flux=0.754  future_enstrophy=0.972
+  final_norm   enstrophy=0.988  tracer_grad=0.979  advective_flux=0.759  future_enstrophy=0.974
+
+=== runs/shear_flow_mae/encoder_100pct.pt ===
+  block_1      enstrophy=0.992  tracer_grad=0.991  advective_flux=0.699  future_enstrophy=0.966
+  block_2      enstrophy=0.996  tracer_grad=0.994  advective_flux=0.771  future_enstrophy=0.975
+  block_3      enstrophy=0.995  tracer_grad=0.993  advective_flux=0.780  future_enstrophy=0.977
+  block_4      enstrophy=0.996  tracer_grad=0.993  advective_flux=0.792  future_enstrophy=0.980
+  block_5      enstrophy=0.996  tracer_grad=0.993  advective_flux=0.792  future_enstrophy=0.982
+  block_6      enstrophy=0.995  tracer_grad=0.993  advective_flux=0.793  future_enstrophy=0.978
+  block_7      enstrophy=0.995  tracer_grad=0.993  advective_flux=0.796  future_enstrophy=0.980
+  block_8      enstrophy=0.995  tracer_grad=0.993  advective_flux=0.792  future_enstrophy=0.979
+  block_9      enstrophy=0.995  tracer_grad=0.993  advective_flux=0.791  future_enstrophy=0.979
+  block_10     enstrophy=0.994  tracer_grad=0.993  advective_flux=0.790  future_enstrophy=0.979
+  block_11     enstrophy=0.993  tracer_grad=0.992  advective_flux=0.789  future_enstrophy=0.979
+  block_12     enstrophy=0.993  tracer_grad=0.992  advective_flux=0.787  future_enstrophy=0.978
+  final_norm   enstrophy=0.992  tracer_grad=0.992  advective_flux=0.791  future_enstrophy=0.978
+
+wrote /workspace/analysis_shear_100pct.json

@@ -1,0 +1,41 @@
+[2026-07-24 22:50:00] SWEEP: training sweep_jepa_lr5e-5
+training complete
+[2026-07-24 23:21:21] SWEEP: probing sweep_jepa_lr5e-5
+[2026-07-24 23:23:53] SWEEP: sweep_jepa_lr5e-5 done
+[2026-07-24 23:23:54] SWEEP: training sweep_jepa_lr1e-4
+training complete
+[2026-07-24 23:59:14] SWEEP: probing sweep_jepa_lr1e-4
+[2026-07-25 00:02:09] SWEEP: sweep_jepa_lr1e-4 done
+[2026-07-25 00:02:09] SWEEP: training sweep_jepa_lr2e-4
+training complete
+[2026-07-25 00:37:47] SWEEP: probing sweep_jepa_lr2e-4
+[2026-07-25 00:40:42] SWEEP: sweep_jepa_lr2e-4 done
+[2026-07-25 00:40:42] SWEEP: training sweep_jepa_lr4e-4
+training complete
+[2026-07-25 01:12:00] SWEEP: probing sweep_jepa_lr4e-4
+[2026-07-25 01:15:05] SWEEP: sweep_jepa_lr4e-4 done
+[2026-07-25 01:15:05] SWEEP: training sweep_mae_lr5e-5
+training complete
+[2026-07-25 01:52:29] SWEEP: probing sweep_mae_lr5e-5
+[2026-07-25 01:55:48] SWEEP: sweep_mae_lr5e-5 done
+[2026-07-25 01:55:48] SWEEP: training sweep_mae_lr1e-4
+training complete
+[2026-07-25 02:25:29] SWEEP: probing sweep_mae_lr1e-4
+[2026-07-25 02:28:35] SWEEP: sweep_mae_lr1e-4 done
+[2026-07-25 02:28:35] SWEEP: training sweep_mae_lr2e-4
+training complete
+[2026-07-25 02:59:45] SWEEP: probing sweep_mae_lr2e-4
+[2026-07-25 03:02:24] SWEEP: sweep_mae_lr2e-4 done
+[2026-07-25 03:02:24] SWEEP: training sweep_mae_lr4e-4
+training complete
+[2026-07-25 03:32:48] SWEEP: probing sweep_mae_lr4e-4
+[2026-07-25 03:36:06] SWEEP: sweep_mae_lr4e-4 done
+[2026-07-25 03:36:06] SWEEP: SWEEP COMPLETE
+jepa lr=5e-5 | step 5000/5000 lr=5.00e-05 loss=0.0754 target_feat_std=0.9322 context_feat_std=0.9308 pred_feat_std=0.8438 clips/s=211.2 | encoder features R^2:   0.9971  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+jepa lr=1e-4 | step 5000/5000 lr=1.00e-04 loss=0.0609 target_feat_std=0.9391 context_feat_std=0.9290 pred_feat_std=0.8672 clips/s=194.0 | encoder features R^2:   0.9960  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+jepa lr=2e-4 | step 5000/5000 lr=2.00e-04 loss=0.0601 target_feat_std=0.9244 context_feat_std=0.8901 pred_feat_std=0.8555 clips/s=209.0 | encoder features R^2:   0.9945  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+jepa lr=4e-4 | step 5000/5000 lr=4.00e-04 loss=0.0551 target_feat_std=0.8857 context_feat_std=0.8603 pred_feat_std=0.8203 clips/s=217.5 | encoder features R^2:   0.9945  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+mae lr=5e-5 | step 5000/5000 lr=5.00e-05 loss=0.5733 clips/s=167.4 | encoder features R^2:   0.9947  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+mae lr=1e-4 | step 5000/5000 lr=1.00e-04 loss=0.4579 clips/s=225.4 | encoder features R^2:   0.9959  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+mae lr=2e-4 | step 5000/5000 lr=2.00e-04 loss=0.3733 clips/s=228.1 | encoder features R^2:   0.9943  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 
+mae lr=4e-4 | step 5000/5000 lr=4.00e-04 loss=0.3063 clips/s=219.5 | encoder features R^2:   0.9940  (dim 384) pixel-mean baseline R^2: 0.0272  (dim 11) 

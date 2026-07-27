@@ -20,7 +20,9 @@ OBJECTIVES = {
         },
     },
     "mae": {
-        "lr": 2.0e-4,
+        # 5e-5 chosen by per-channel probe R^2 on the active_matter LR sweep
+        # (2026-07-25); matches VideoMAE's canonical LR scaled to batch 64.
+        "lr": 5.0e-5,
         "objective": {
             "mask_ratio": 0.9,
             "decoder_dim": 192,
@@ -48,7 +50,8 @@ def make(dataset: str, objective: str, debug: bool = False) -> dict:
             "base_path": "~/well_data" if debug else "/workspace/data",
             "dataset_name": "turbulent_radiative_layer_2D" if debug else dataset,
             "n_frames": 8,
-            "num_workers": 0 if debug else 8,
+            "num_workers": 0 if debug else 16,
+            "memmap": not debug,
         },
         "encoder": {
             "patch_t": 2,

@@ -11,6 +11,7 @@ data:
   dataset_name: turbulent_radiative_layer_2D
   n_frames: 8
   num_workers: 0
+  memmap: false
 encoder:
   patch_t: 2
   patch_h: 16

@@ -1,0 +1,38 @@
+building probe dataset: 1 offsets/traj, horizon=16
+1400 samples total
+  enstrophy: mean=0.0000 std=0.0000
+  buoyancy_grad: mean=0.0606 std=0.0019
+  convective_flux: mean=0.0000 std=0.0000
+  future_enstrophy: mean=0.0007 std=0.0018
+
+=== runs/rayleigh_benard_jepa/encoder_100pct.pt ===
+  block_1      enstrophy=0.471  buoyancy_grad=0.999  convective_flux=0.590  future_enstrophy=0.417
+  block_2      enstrophy=0.475  buoyancy_grad=1.000  convective_flux=0.599  future_enstrophy=0.425
+  block_3      enstrophy=0.526  buoyancy_grad=1.000  convective_flux=0.652  future_enstrophy=0.443
+  block_4      enstrophy=0.696  buoyancy_grad=1.000  convective_flux=0.820  future_enstrophy=0.526
+  block_5      enstrophy=0.758  buoyancy_grad=1.000  convective_flux=0.860  future_enstrophy=0.597
+  block_6      enstrophy=0.773  buoyancy_grad=1.000  convective_flux=0.868  future_enstrophy=0.619
+  block_7      enstrophy=0.774  buoyancy_grad=1.000  convective_flux=0.870  future_enstrophy=0.628
+  block_8      enstrophy=0.759  buoyancy_grad=1.000  convective_flux=0.862  future_enstrophy=0.622
+  block_9      enstrophy=0.753  buoyancy_grad=1.000  convective_flux=0.861  future_enstrophy=0.612
+  block_10     enstrophy=0.740  buoyancy_grad=1.000  convective_flux=0.852  future_enstrophy=0.608
+  block_11     enstrophy=0.668  buoyancy_grad=0.999  convective_flux=0.806  future_enstrophy=0.503
+  block_12     enstrophy=0.628  buoyancy_grad=0.999  convective_flux=0.781  future_enstrophy=0.441
+  final_norm   enstrophy=0.621  buoyancy_grad=0.999  convective_flux=0.777  future_enstrophy=0.443
+
+=== runs/rayleigh_benard_mae/encoder_100pct.pt ===
+  block_1      enstrophy=0.463  buoyancy_grad=1.000  convective_flux=0.581  future_enstrophy=0.428
+  block_2      enstrophy=0.465  buoyancy_grad=1.000  convective_flux=0.586  future_enstrophy=0.428
+  block_3      enstrophy=0.467  buoyancy_grad=1.000  convective_flux=0.588  future_enstrophy=0.429
+  block_4      enstrophy=0.466  buoyancy_grad=1.000  convective_flux=0.588  future_enstrophy=0.431
+  block_5      enstrophy=0.465  buoyancy_grad=1.000  convective_flux=0.587  future_enstrophy=0.431
+  block_6      enstrophy=0.465  buoyancy_grad=1.000  convective_flux=0.587  future_enstrophy=0.430
+  block_7      enstrophy=0.465  buoyancy_grad=1.000  convective_flux=0.587  future_enstrophy=0.430
+  block_8      enstrophy=0.465  buoyancy_grad=1.000  convective_flux=0.586  future_enstrophy=0.429
+  block_9      enstrophy=0.464  buoyancy_grad=1.000  convective_flux=0.586  future_enstrophy=0.430
+  block_10     enstrophy=0.464  buoyancy_grad=1.000  convective_flux=0.585  future_enstrophy=0.427
+  block_11     enstrophy=0.461  buoyancy_grad=1.000  convective_flux=0.583  future_enstrophy=0.427
+  block_12     enstrophy=0.461  buoyancy_grad=1.000  convective_flux=0.583  future_enstrophy=0.429
+  final_norm   enstrophy=0.462  buoyancy_grad=1.000  convective_flux=0.584  future_enstrophy=0.429
+
+wrote /workspace/analysis_rb_100pct.json
