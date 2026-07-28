@@ -1,0 +1,274 @@
+{
+  "runs/active_matter_jepa/encoder_100pct.pt": {
+    "n_layers": 13,
+    "n_samples": 525,
+    "layers": [
+      {
+        "enstrophy": 0.9845182418823242,
+        "vorticity_signed": -0.04371178150177002,
+        "divergence": -0.23135712146759033,
+        "nematic_order": 0.9925982713699341,
+        "flow_align": 0.44401232004165647,
+        "order_grad_mag": 0.9927640557289124,
+        "strain_order_align": 0.9953938126564026,
+        "future_enstrophy": 0.8975025177001953
+      },
+      {
+        "enstrophy": 0.9886616110801697,
+        "vorticity_signed": -0.07421622276306153,
+        "divergence": -0.2528683185577393,
+        "nematic_order": 0.9941197156906127,
+        "flow_align": 0.3837569832801819,
+        "order_grad_mag": 0.9945136547088623,
+        "strain_order_align": 0.9970712184906005,
+        "future_enstrophy": 0.9172024130821228
+      },
+      {
+        "enstrophy": 0.9849358677864075,
+        "vorticity_signed": -0.08924198150634766,
+        "divergence": -0.25474593639373777,
+        "nematic_order": 0.9954349398612976,
+        "flow_align": 0.24030719995498656,
+        "order_grad_mag": 0.9943731188774109,
+        "strain_order_align": 0.9962537169456482,
+        "future_enstrophy": 0.924390971660614
+      },
+      {
+        "enstrophy": 0.9864435076713562,
+        "vorticity_signed": -0.16876370906829835,
+        "divergence": -0.3234118938446045,
+        "nematic_order": 0.9945287585258484,
+        "flow_align": 0.13636412620544433,
+        "order_grad_mag": 0.9923122525215149,
+        "strain_order_align": 0.9964791059494018,
+        "future_enstrophy": 0.9164382219314575
+      },
+      {
+        "enstrophy": 0.9827912330627442,
+        "vorticity_signed": -0.14722630977630616,
+        "divergence": -0.4501019477844238,
+        "nematic_order": 0.9940163254737854,
+        "flow_align": 0.03395761251449585,
+        "order_grad_mag": 0.9909093260765076,
+        "strain_order_align": 0.9954057693481445,
+        "future_enstrophy": 0.9049189925193787
+      },
+      {
+        "enstrophy": 0.9782058000564575,
+        "vorticity_signed": -0.1830730438232422,
+        "divergence": -0.43086516857147217,
+        "nematic_order": 0.9904900550842285,
+        "flow_align": -0.057533442974090576,
+        "order_grad_mag": 0.9876030445098877,
+        "strain_order_align": 0.9950857043266297,
+        "future_enstrophy": 0.9041998863220215
+      },
+      {
+        "enstrophy": 0.9769277215003968,
+        "vorticity_signed": -0.22330896854400634,
+        "divergence": -0.559842324256897,
+        "nematic_order": 0.9903952479362488,
+        "flow_align": -0.21305147409439087,
+        "order_grad_mag": 0.9837746024131775,
+        "strain_order_align": 0.9942715167999268,
+        "future_enstrophy": 0.90882648229599
+      },
+      {
+        "enstrophy": 0.9778519749641419,
+        "vorticity_signed": -0.23781428337097169,
+        "divergence": -0.5166448593139649,
+        "nematic_order": 0.9893669128417969,
+        "flow_align": -0.22066980600357056,
+        "order_grad_mag": 0.982164740562439,
+        "strain_order_align": 0.994495403766632,
+        "future_enstrophy": 0.913523006439209
+      },
+      {
+        "enstrophy": 0.9764310240745544,
+        "vorticity_signed": -0.27814273834228515,
+        "divergence": -0.5867264270782471,
+        "nematic_order": 0.9886120796203614,
+        "flow_align": -0.29739118814468385,
+        "order_grad_mag": 0.9838088631629944,
+        "strain_order_align": 0.993689751625061,
+        "future_enstrophy": 0.9015714883804321
+      },
+      {
+        "enstrophy": 0.9757147431373596,
+        "vorticity_signed": -0.2983557224273682,
+        "divergence": -0.6217653512954712,
+        "nematic_order": 0.9879921436309814,
+        "flow_align": -0.21912931203842162,
+        "order_grad_mag": 0.9827507734298706,
+        "strain_order_align": 0.9934014797210693,
+        "future_enstrophy": 0.901360023021698
+      },
+      {
+        "enstrophy": 0.9770674109458923,
+        "vorticity_signed": -0.26194448471069337,
+        "divergence": -0.6461842775344848,
+        "nematic_order": 0.9856684565544128,
+        "flow_align": -0.22819353342056276,
+        "order_grad_mag": 0.9810033082962036,
+        "strain_order_align": 0.9934726476669311,
+        "future_enstrophy": 0.9107171416282653
+      },
+      {
+        "enstrophy": 0.97596595287323,
+        "vorticity_signed": -0.2733571767807007,
+        "divergence": -0.6191188097000122,
+        "nematic_order": 0.9895405054092408,
+        "flow_align": -0.22175852060317994,
+        "order_grad_mag": 0.9783594608306885,
+        "strain_order_align": 0.9937086224555969,
+        "future_enstrophy": 0.9098065614700317
+      },
+      {
+        "enstrophy": 0.97420574426651,
+        "vorticity_signed": -0.2739982843399048,
+        "divergence": -0.6123995065689087,
+        "nematic_order": 0.9907441735267639,
+        "flow_align": -0.20029155015945435,
+        "order_grad_mag": 0.9788002848625184,
+        "strain_order_align": 0.9928801774978637,
+        "future_enstrophy": 0.9103748083114624
+      }
+    ]
+  },
+  "runs/active_matter_mae/encoder_100pct.pt": {
+    "n_layers": 13,
+    "n_samples": 525,
+    "layers": [
+      {
+        "enstrophy": 0.9925257921218872,
+        "vorticity_signed": -0.10077199935913086,
+        "divergence": -0.19884884357452393,
+        "nematic_order": 0.9957510352134704,
+        "flow_align": 0.3640359044075012,
+        "order_grad_mag": 0.9906033039093017,
+        "strain_order_align": 0.9973216414451599,
+        "future_enstrophy": 0.9200723886489868
+      },
+      {
+        "enstrophy": 0.9933844447135926,
+        "vorticity_signed": -0.10789220333099366,
+        "divergence": -0.21562345027923585,
+        "nematic_order": 0.9981994390487671,
+        "flow_align": 0.420931875705719,
+        "order_grad_mag": 0.9964084982872009,
+        "strain_order_align": 0.9978737115859986,
+        "future_enstrophy": 0.9258956909179688
+      },
+      {
+        "enstrophy": 0.9919607281684876,
+        "vorticity_signed": -0.07015384435653686,
+        "divergence": -0.2023761749267578,
+        "nematic_order": 0.9981730341911316,
+        "flow_align": 0.41050597429275515,
+        "order_grad_mag": 0.9970009684562683,
+        "strain_order_align": 0.9976882934570312,
+        "future_enstrophy": 0.9280043840408325
+      },
+      {
+        "enstrophy": 0.9905247449874878,
+        "vorticity_signed": -0.06676398515701294,
+        "divergence": -0.23982503414154052,
+        "nematic_order": 0.9985717296600342,
+        "flow_align": 0.3652351975440979,
+        "order_grad_mag": 0.9966240763664246,
+        "strain_order_align": 0.9973400235176086,
+        "future_enstrophy": 0.925389540195465
+      },
+      {
+        "enstrophy": 0.9867264747619628,
+        "vorticity_signed": -0.04953067302703858,
+        "divergence": -0.20352511405944823,
+        "nematic_order": 0.9984538197517395,
+        "flow_align": 0.36300101280212405,
+        "order_grad_mag": 0.9966859698295594,
+        "strain_order_align": 0.9973629951477051,
+        "future_enstrophy": 0.9290453791618347
+      },
+      {
+        "enstrophy": 0.9843804478645325,
+        "vorticity_signed": -0.058661353588104245,
+        "divergence": -0.17705247402191163,
+        "nematic_order": 0.9981917023658753,
+        "flow_align": 0.29921363592147826,
+        "order_grad_mag": 0.9962533593177796,
+        "strain_order_align": 0.9968633890151978,
+        "future_enstrophy": 0.9275982618331909
+      },
+      {
+        "enstrophy": 0.9804901719093323,
+        "vorticity_signed": -0.0565339207649231,
+        "divergence": -0.1889254093170166,
+        "nematic_order": 0.9975947737693787,
+        "flow_align": 0.2951455354690552,
+        "order_grad_mag": 0.9959749817848206,
+        "strain_order_align": 0.9965174317359924,
+        "future_enstrophy": 0.9277069211006165
+      },
+      {
+        "enstrophy": 0.9816914796829224,
+        "vorticity_signed": -0.06249930858612061,
+        "divergence": -0.23309500217437745,
+        "nematic_order": 0.9972492218017578,
+        "flow_align": 0.34092146158218384,
+        "order_grad_mag": 0.9959300279617309,
+        "strain_order_align": 0.995864725112915,
+        "future_enstrophy": 0.9310625672340394
+      },
+      {
+        "enstrophy": 0.9807132363319397,
+        "vorticity_signed": -0.07397304773330689,
+        "divergence": -0.2625508546829224,
+        "nematic_order": 0.9974744319915771,
+        "flow_align": 0.3518195152282715,
+        "order_grad_mag": 0.9961287021636963,
+        "strain_order_align": 0.9950947880744934,
+        "future_enstrophy": 0.9302418470382691
+      },
+      {
+        "enstrophy": 0.979016900062561,
+        "vorticity_signed": -0.06020662784576416,
+        "divergence": -0.26193525791168215,
+        "nematic_order": 0.9976306319236755,
+        "flow_align": 0.3168399572372437,
+        "order_grad_mag": 0.9958660364151001,
+        "strain_order_align": 0.9950734496116638,
+        "future_enstrophy": 0.930695903301239
+      },
+      {
+        "enstrophy": 0.9806998252868653,
+        "vorticity_signed": -0.04672758579254151,
+        "divergence": -0.220369291305542,
+        "nematic_order": 0.9978866696357727,
+        "flow_align": 0.2805179715156555,
+        "order_grad_mag": 0.9958226203918457,
+        "strain_order_align": 0.9946801662445068,
+        "future_enstrophy": 0.9303717613220215
+      },
+      {
+        "enstrophy": 0.9784122586250306,
+        "vorticity_signed": -0.0550499439239502,
+        "divergence": -0.19876694679260254,
+        "nematic_order": 0.9973758697509766,
+        "flow_align": 0.24898382425308227,
+        "order_grad_mag": 0.9952040433883667,
+        "strain_order_align": 0.9927402377128601,
+        "future_enstrophy": 0.9285887956619263
+      },
+      {
+        "enstrophy": 0.9760447025299073,
+        "vorticity_signed": -0.05465395450592041,
+        "divergence": -0.20866262912750244,
+        "nematic_order": 0.9974833011627198,
+        "flow_align": 0.2564468502998352,
+        "order_grad_mag": 0.9939173102378845,
+        "strain_order_align": 0.9914747834205627,
+        "future_enstrophy": 0.9264611005783081
+      }
+    ]
+  }
+}

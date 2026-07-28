@@ -45,6 +45,42 @@ def tube_mask(
     return keep_idx, mask_idx, mask
 
 
+def causal_temporal_mask(
+    batch_size: int,
+    grid_t: int,
+    grid_h: int,
+    grid_w: int,
+    n_context_groups: int,
+    device: torch.device,
+):
+    """Deterministic contiguous split: the first `n_context_groups` temporal
+    groups are fully visible, the rest fully masked — for sliding-window
+    forecast probing (no training uses this mask; out-of-distribution
+    relative to tube_mask's spatially-random pattern).
+
+    Same (keep_idx, mask_idx, mask) convention/shapes as tube_mask, but
+    identical across the batch (no randomness).
+    """
+    if not 0 < n_context_groups < grid_t:
+        raise ValueError(f"n_context_groups {n_context_groups} must leave both visible and masked groups (grid_t={grid_t})")
+
+    n_spatial = grid_h * grid_w
+    n_tokens = grid_t * n_spatial
+    spatial = torch.arange(n_spatial, device=device)
+
+    keep_t = torch.arange(n_context_groups, device=device)
+    mask_t = torch.arange(n_context_groups, grid_t, device=device)
+    keep_idx_1d = (keep_t.unsqueeze(1) * n_spatial + spatial.unsqueeze(0)).flatten()
+    mask_idx_1d = (mask_t.unsqueeze(1) * n_spatial + spatial.unsqueeze(0)).flatten()
+
+    keep_idx = keep_idx_1d.unsqueeze(0).expand(batch_size, -1)
+    mask_idx = mask_idx_1d.unsqueeze(0).expand(batch_size, -1)
+
+    mask = torch.zeros(batch_size, n_tokens, dtype=torch.bool, device=device)
+    mask[:, mask_idx_1d] = True
+    return keep_idx, mask_idx, mask
+
+
 def gather_tokens(tokens: torch.Tensor, idx: torch.Tensor) -> torch.Tensor:
     """Gather along token dim. tokens: (B, N, D), idx: (B, K) -> (B, K, D)."""
     return torch.gather(tokens, 1, idx.unsqueeze(-1).expand(-1, -1, tokens.size(-1)))

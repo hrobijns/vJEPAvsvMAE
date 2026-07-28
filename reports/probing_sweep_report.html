@@ -1,0 +1,382 @@
+<title>JEPA vs MAE — Broad Probing Sweep</title>
+<style>
+  :root {
+    --bg: #EEF1EF;
+    --surface: #F8FAF9;
+    --surface-2: #E4E9E6;
+    --ink: #1B2422;
+    --muted: #5B6660;
+    --line: #D2D8D3;
+    --jepa: #5B4B8A;
+    --mae: #B5672E;
+    --jepa-fill: rgba(91, 75, 138, 0.14);
+    --mae-fill: rgba(181, 103, 46, 0.14);
+    --good: #3E7A52;
+    --warn: #A8501E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161A;
+      --surface: #181D22;
+      --surface-2: #20262C;
+      --ink: #DEE4E0;
+      --muted: #8B968F;
+      --line: #2A3138;
+      --jepa: #A392D6;
+      --mae: #E2954F;
+      --jepa-fill: rgba(163, 146, 214, 0.14);
+      --mae-fill: rgba(226, 149, 79, 0.14);
+      --good: #6FBE8A;
+      --warn: #E0925C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161A; --surface: #181D22; --surface-2: #20262C; --ink: #DEE4E0;
+    --muted: #8B968F; --line: #2A3138; --jepa: #A392D6; --mae: #E2954F;
+    --jepa-fill: rgba(163, 146, 214, 0.14); --mae-fill: rgba(226, 149, 79, 0.14);
+    --good: #6FBE8A; --warn: #E0925C;
+  }
+  :root[data-theme="light"] {
+    --bg: #EEF1EF; --surface: #F8FAF9; --surface-2: #E4E9E6; --ink: #1B2422;
+    --muted: #5B6660; --line: #D2D8D3; --jepa: #5B4B8A; --mae: #B5672E;
+    --jepa-fill: rgba(91, 75, 138, 0.14); --mae-fill: rgba(181, 103, 46, 0.14);
+    --good: #3E7A52; --warn: #A8501E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0 20px 100px;
+  }
+  .num { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+  main { max-width: 880px; margin: 0 auto; }
+
+  header.masthead {
+    padding: 56px 0 28px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin: 0 0 10px;
+  }
+  h1 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 40px; line-height: 1.12; margin: 0 0 14px; font-weight: 400;
+    text-wrap: balance; letter-spacing: -0.01em;
+  }
+  .subtitle {
+    font-size: 17px; color: var(--muted); max-width: 62ch; margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 12.5px; padding: 5px 11px; border-radius: 100px;
+    border: 1px solid var(--line); color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin: 0 0 8px;
+  }
+  h2 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 27px; font-weight: 400; margin: 0 0 6px; text-wrap: balance;
+  }
+  h3 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 19px; font-weight: 400; margin: 28px 0 10px;
+  }
+  .lede { color: var(--muted); font-size: 15.5px; max-width: 68ch; margin: 0 0 24px; }
+  p { max-width: 70ch; }
+
+  .legend { display: flex; gap: 20px; margin: 4px 0 22px; font-size: 13.5px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .dot.jepa { background: var(--jepa); }
+  .dot.mae { background: var(--mae); }
+
+  .exec-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+  .exec-list li {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; display: flex; gap: 14px; align-items: baseline;
+  }
+  .exec-list .tag {
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight: 700; padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .tag.reversal { background: var(--jepa-fill); color: var(--jepa); }
+  .tag.regime { background: var(--surface-2); color: var(--ink); }
+  .tag.forecast { background: var(--mae-fill); color: var(--mae); }
+  .tag.caveat { color: var(--warn); background: rgba(168,80,30,0.12); }
+
+  .cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  @media (max-width: 720px) { .cardgrid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px;
+  }
+  .card h4 {
+    font-size: 14px; margin: 0 0 2px; font-weight: 600;
+  }
+  .card .target-name {
+    font-family: ui-monospace, monospace; font-size: 12.5px; color: var(--muted); margin: 0 0 14px;
+  }
+  .spark-wrap { position: relative; }
+  .spark-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .endvals { display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; }
+  .endvals .v { font-family: ui-monospace, monospace; font-weight: 600; }
+  .endvals .v.jepa { color: var(--jepa); }
+  .endvals .v.mae { color: var(--mae); }
+  .winner { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .winner b { color: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table-wrap { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line); border-radius: 10px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  thead th {
+    background: var(--surface-2); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { font-family: ui-monospace, monospace; text-align: right; }
+  td.obj-jepa { color: var(--jepa); font-weight: 600; }
+  td.obj-mae { color: var(--mae); font-weight: 600; }
+  .neg { color: var(--muted); font-style: italic; }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--warn);
+    border-radius: 6px; padding: 14px 18px; font-size: 14.5px; margin: 18px 0; color: var(--ink);
+  }
+  .callout.good { border-left-color: var(--good); }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  ol.steps, ul.steps { padding-left: 22px; }
+  ol.steps li, ul.steps li { margin-bottom: 12px; max-width: 68ch; }
+  ol.steps li strong, ul.steps li strong { color: var(--ink); }
+
+  footer { padding: 40px 0 0; color: var(--muted); font-size: 13px; }
+</style>
+
+<main>
+
+<header class="masthead">
+  <p class="eyebrow">vJEPA vs vMAE on The Well — probing sweep</p>
+  <h1>Does latent prediction encode more physics than pixel reconstruction?</h1>
+  <p class="subtitle">A lean, linear-probe-only sweep across all 3 trained dataset pairs — broadened physical quantities (pooled and per-token), regime probing, and a sliding-window forecast test — run to check whether the JEPA/MAE asymmetry found earlier is a general trend or a one-off.</p>
+  <div class="meta-row">
+    <span class="chip">3 datasets</span>
+    <span class="chip">2 objectives</span>
+    <span class="chip">13 layers probed each</span>
+    <span class="chip">linear ridge probes only</span>
+    <span class="chip">single seed</span>
+  </div>
+</header>
+
+<section>
+  <p class="section-label">Executive summary</p>
+  <h2>Four findings</h2>
+  <ul class="exec-list">
+    <li>
+      <span class="tag reversal">Confirmed</span>
+      <span>The <strong>relational-quantity reversal holds and sharpens</strong> at the per-token level: MAE retains velocity&ndash;order-tensor coupling far better than JEPA on active_matter and shear_flow, while JEPA is the one that builds up buoyancy&ndash;flow coupling on rayleigh_benard — MAE stays near-zero there throughout depth. Two independent quantities on rayleigh_benard now confirm the reversal, not one.</span>
+    </li>
+    <li>
+      <span class="tag regime">New</span>
+      <span>Both objectives <strong>strongly encode which physical regime they're looking at</strong> (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — R&sup2; mostly 0.6&ndash;1.0, shuffled-label controls collapse to negative. This is essentially objective-agnostic: not a JEPA/MAE story.</span>
+    </li>
+    <li>
+      <span class="tag forecast">New</span>
+      <span>On short-horizon forecasting, <strong>JEPA's predictor rarely beats a naive "assume nothing changes" baseline</strong>, and MAE's pixel-space forecast is substantially worse still — often failing outright. Neither model does much genuine forecasting yet at this scale/horizon.</span>
+    </li>
+    <li>
+      <span class="tag caveat">Caveat</span>
+      <span>Pooled (whole-clip-averaged) <code class="num">vorticity</code> and <code class="num">divergence</code> are <strong>close to meaningless by construction</strong> — a periodic domain's curl/divergence integrates to ≈0 — producing negative or undefined R&sup2; regardless of what the encoder knows. Always check the per-token version before trusting a pooled negative result.</span>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <p class="section-label">Finding 1 — deepened</p>
+  <h2>The reversal, at every layer</h2>
+  <p class="lede">For each dataset's <em>relational</em> quantity (a cross-channel physical coupling — velocity with the local order/tracer/buoyancy field), each token's own feature vector is linearly probed against that quantity computed at the same location, at every depth from block 1 to the final layer. No pooling on either side.</p>
+
+  <div class="legend"><span><i class="dot jepa"></i>JEPA</span><span><i class="dot mae"></i>MAE</span></div>
+
+  <div class="cardgrid">
+    <div class="card">
+      <h4>active_matter</h4>
+      <p class="target-name">flow_align = v·D (velocity · order tensor)</p>
+      <div class="spark-wrap">
+        <svg viewBox="0 0 220 56" width="100%" height="56">
+          <line x1="4" y1="52" x2="216" y2="52" stroke="var(--line)" stroke-width="1"/>
+          <polyline points="4.0,8.8 21.7,7.6 39.3,9.0 57.0,13.8 74.7,17.6 92.3,21.7 110.0,23.4 127.7,25.2 145.3,25.1 163.0,25.5 180.7,26.1 198.3,26.7 216.0,27.6" fill="none" stroke="var(--mae)" stroke-width="2"/>
+          <polyline points="4.0,7.7 21.7,8.1 39.3,12.2 57.0,17.9 74.7,26.0 92.3,33.4 110.0,38.6 127.7,41.8 145.3,43.0 163.0,44.3 180.7,45.7 198.3,45.8 216.0,46.4" fill="none" stroke="var(--jepa)" stroke-width="2"/>
+          <circle cx="216.0" cy="46.4" r="3" fill="var(--jepa)"/>
+          <circle cx="216.0" cy="27.6" r="3" fill="var(--mae)"/>
+        </svg>
+        <div class="spark-labels"><span>block 1</span><span>final</span></div>
+      </div>
+      <div class="endvals"><span class="v jepa">0.107</span><span class="v mae">0.466</span></div>
+      <p class="winner">MAE retains <b>4.4×</b> more signal at final layer</p>
+    </div>
+
+    <div class="card">
+      <h4>shear_flow</h4>
+      <p class="target-name">advective_flux = v·&nabla;tracer</p>
+      <div class="spark-wrap">
+        <svg viewBox="0 0 220 56" width="100%" height="56">
+          <line x1="4" y1="52" x2="216" y2="52" stroke="var(--line)" stroke-width="1"/>
+          <polyline points="4.0,7.9 21.7,7.6 39.3,8.6 57.0,10.4 74.7,12.4 92.3,14.7 110.0,16.2 127.7,18.0 145.3,19.7 163.0,20.6 180.7,21.9 198.3,22.6 216.0,23.2" fill="none" stroke="var(--mae)" stroke-width="2"/>
+          <polyline points="4.0,10.0 21.7,9.5 39.3,12.7 57.0,21.6 74.7,34.9 92.3,44.0 110.0,46.6 127.7,47.2 145.3,47.5 163.0,47.8 180.7,47.9 198.3,48.2 216.0,50.3" fill="none" stroke="var(--jepa)" stroke-width="2"/>
+          <circle cx="216.0" cy="50.3" r="3" fill="var(--jepa)"/>
+          <circle cx="216.0" cy="23.2" r="3" fill="var(--mae)"/>
+        </svg>
+        <div class="spark-labels"><span>block 1</span><span>final</span></div>
+      </div>
+      <div class="endvals"><span class="v jepa">0.036</span><span class="v mae">0.610</span></div>
+      <p class="winner">MAE retains <b>17×</b> more signal at final layer</p>
+    </div>
+
+    <div class="card">
+      <h4>rayleigh_benard</h4>
+      <p class="target-name">convective_flux = v<sub>y</sub>·buoyancy</p>
+      <div class="spark-wrap">
+        <svg viewBox="0 0 220 56" width="100%" height="56">
+          <line x1="4" y1="52" x2="216" y2="52" stroke="var(--line)" stroke-width="1"/>
+          <polyline points="4.0,51.5 21.7,51.4 39.3,51.5 57.0,51.5 74.7,51.5 92.3,51.6 110.0,51.6 127.7,51.6 145.3,51.8 163.0,51.8 180.7,51.8 198.3,51.8 216.0,51.8" fill="none" stroke="var(--mae)" stroke-width="2"/>
+          <polyline points="4.0,47.5 21.7,41.3 39.3,25.2 57.0,14.2 74.7,11.1 92.3,8.6 110.0,7.6 127.7,9.4 145.3,12.8 163.0,16.0 180.7,25.4 198.3,32.3 216.0,33.8" fill="none" stroke="var(--jepa)" stroke-width="2"/>
+          <circle cx="216.0" cy="33.8" r="3" fill="var(--jepa)"/>
+          <circle cx="216.0" cy="51.8" r="3" fill="var(--mae)"/>
+        </svg>
+        <div class="spark-labels"><span>block 1</span><span>final</span></div>
+      </div>
+      <div class="endvals"><span class="v jepa">0.150</span><span class="v mae">0.002</span></div>
+      <p class="winner">JEPA retains <b>75×</b> more signal — reversed</p>
+    </div>
+  </div>
+
+  <h3>A second, independent confirmation on rayleigh_benard</h3>
+  <p class="lede">A new bounded quantity (velocity–buoyancy coherence: cosine-similarity-like coupling, not just the raw flux) was added specifically to check the reversal wasn't an artifact of one formula. Same story, if anything cleaner:</p>
+  <div class="cardgrid" style="grid-template-columns: 1fr;">
+    <div class="card">
+      <h4>rayleigh_benard</h4>
+      <p class="target-name">velocity_buoyancy_coherence = v<sub>y</sub>·b / (|v|&middot;|b|)</p>
+      <div class="spark-wrap">
+        <svg viewBox="0 0 220 56" width="100%" height="56">
+          <line x1="4" y1="52" x2="216" y2="52" stroke="var(--line)" stroke-width="1"/>
+          <polyline points="4.0,51.3 21.7,51.3 39.3,51.3 57.0,51.3 74.7,51.4 92.3,51.4 110.0,51.6 127.7,51.6 145.3,51.6 163.0,51.7 180.7,51.7 198.3,51.7 216.0,51.7" fill="none" stroke="var(--mae)" stroke-width="2"/>
+          <polyline points="4.0,46.8 21.7,39.8 39.3,22.3 57.0,11.7 74.7,8.6 92.3,7.6 110.0,7.6 127.7,9.5 145.3,12.9 163.0,16.0 180.7,25.2 198.3,31.6 216.0,33.1" fill="none" stroke="var(--jepa)" stroke-width="2"/>
+          <circle cx="216.0" cy="33.1" r="3" fill="var(--jepa)"/>
+          <circle cx="216.0" cy="51.7" r="3" fill="var(--mae)"/>
+        </svg>
+        <div class="spark-labels"><span>block 1</span><span>final</span></div>
+      </div>
+      <div class="endvals"><span class="v jepa">0.127</span><span class="v mae">0.002</span></div>
+      <p class="winner">JEPA retains <b>64×</b> more signal — same reversal, different formula</p>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <strong>Read on the mechanism</strong>
+    On active_matter/shear_flow, JEPA starts roughly level with MAE near the input and then <em>actively discards</em> the relational signal with depth. On rayleigh_benard, it's the opposite shape: JEPA <em>builds up</em> the buoyancy-coupling representation through the first ~7 layers before a late partial decay, while MAE never picks it up at all. The candidate explanation from the earlier deep-dive still holds: rayleigh_benard's buoyancy-velocity coupling is the variable that <em>drives</em> the system's own dynamics (convection is the buoyancy force acting on velocity), so a latent-prediction objective that must forecast forward has direct incentive to represent it — where in the other two datasets the analogous coupling is comparatively incidental to what's being forecast.
+  </div>
+
+  <h3>What doesn't show the effect</h3>
+  <p>Not every relational-looking quantity splits this cleanly. <code class="num">okubo_weiss</code> (vorticity vs. strain balance) is close to a wash on rayleigh_benard at the per-token final layer (JEPA 0.819 vs MAE 0.895 — MAE slightly ahead, opposite direction from convective_flux). The reversal is real and now well-evidenced, but it isn't a universal law that "JEPA wins every relational quantity on rayleigh_benard" — treat it as a strong trend on the two quantities most tied to the system's own driving physics, not a blanket rule.</p>
+</section>
+
+<section>
+  <h2>Finding 2 — regime probing</h2>
+  <p class="lede">A new probe this sweep: does the pooled representation know which physical regime a trajectory belongs to (Reynolds/Schmidt number, Rayleigh/Prandtl number, activity/alignment strength) — parameters that are fixed per-trajectory and never shown to the model as labels. One feature vector per trajectory, ridge-probed against the (log-scaled where appropriate) regime value, with a shuffled-label control run alongside to catch leakage.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dataset</th><th>Parameter</th><th class="num">JEPA R&sup2;</th><th class="num">MAE R&sup2;</th><th class="num">shuffled control (both ≈)</th></tr></thead>
+      <tbody>
+        <tr><td>active_matter</td><td class="num">α (activity)</td><td class="num obj-jepa">0.990</td><td class="num obj-mae">0.998</td><td class="num neg">&minus;0.7 to &minus;1.7</td></tr>
+        <tr><td>active_matter</td><td class="num">ζ (alignment)</td><td class="num obj-jepa">0.924</td><td class="num obj-mae">0.967</td><td class="num neg">&minus;0.6 to &minus;2.0</td></tr>
+        <tr><td>shear_flow</td><td class="num">Reynolds</td><td class="num obj-jepa">0.706</td><td class="num obj-mae">0.796</td><td class="num neg">&minus;0.12 to &minus;0.17</td></tr>
+        <tr><td>shear_flow</td><td class="num">Schmidt</td><td class="num obj-jepa">0.636</td><td class="num obj-mae">0.804</td><td class="num neg">&minus;0.12 to &minus;0.15</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">Rayleigh</td><td class="num obj-jepa">0.997</td><td class="num obj-mae">0.998</td><td class="num neg">&minus;0.10 to &minus;0.17</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">Prandtl</td><td class="num obj-jepa">0.981</td><td class="num obj-mae">0.988</td><td class="num neg">&minus;0.09 to &minus;0.16</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>MAE is consistently a little ahead of JEPA here too, but the gap is nowhere near the relational-quantity story — both objectives land solidly above 0.6 and mostly above 0.9. This reads as "both encoders trivially pick up the global statistical signature of the regime" rather than a JEPA-vs-MAE effect. Useful context for the headline finding: the reversal is specific to <em>relational, cross-channel, spatially-local</em> physics — not a general JEPA-is-worse-at-everything pattern.</p>
+</section>
+
+<section>
+  <h2>Finding 3 — sliding-window forecast probe</h2>
+  <p class="lede">Also new: mask out the trailing 2 of 8 frames in a clip (a fixed, deterministic split — not the random tube-mask used in training) and ask each model's own trained prediction head to forecast them from real context, no retraining. JEPA forecasts in latent space (ridge-probed against real future physics, alongside a <strong>ceiling</strong> = probe on the real future's own features, and <strong>persistence</strong> = naively assume the future looks like the present). MAE forecasts in pixel space directly (reconstructed vs. real physics compared by correlation/R&sup2;, with a <strong>proxy-sanity</strong> control isolating normalization-approximation error from genuine decoder failure). This is a forecast test with real pixels as input at every step — not autoregressive rollout.</p>
+
+  <h3>JEPA: representative quantities, all 3 datasets</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dataset</th><th>Quantity</th><th class="num">predictor</th><th class="num">ceiling</th><th class="num">persistence</th></tr></thead>
+      <tbody>
+        <tr><td>active_matter</td><td class="num">enstrophy</td><td class="num">0.937</td><td class="num">0.950</td><td class="num">0.946</td></tr>
+        <tr><td>shear_flow</td><td class="num">enstrophy</td><td class="num">0.962</td><td class="num">0.990</td><td class="num">0.952</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">enstrophy</td><td class="num">0.519</td><td class="num">0.690</td><td class="num">0.525</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">convective_flux</td><td class="num">0.657</td><td class="num">0.789</td><td class="num">0.661</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The predictor sits <em>at or just below</em> persistence in most cases (e.g. active_matter's enstrophy: 0.937 vs 0.946) — it's essentially not earning its keep over "assume the future looks like the present" at this two-frame horizon. Ceiling is consistently higher than both, showing there's real predictable signal the model isn't capturing yet.</p>
+
+  <h3>MAE: representative quantities, all 3 datasets</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dataset</th><th>Quantity</th><th class="num">decoded R&sup2;</th><th class="num">decoded corr</th><th class="num">proxy-sanity R&sup2;</th></tr></thead>
+      <tbody>
+        <tr><td>active_matter</td><td class="num">enstrophy</td><td class="num">&minus;2.37</td><td class="num">0.926</td><td class="num">&minus;1.96</td></tr>
+        <tr><td>shear_flow</td><td class="num">okubo_weiss</td><td class="num">0.300</td><td class="num">0.933</td><td class="num">0.913</td></tr>
+        <tr><td>shear_flow</td><td class="num">pressure_grad_mag</td><td class="num">&minus;1.00</td><td class="num">0.834</td><td class="num">0.935</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">pressure_grad_mag</td><td class="num">&minus;3.56</td><td class="num">0.976</td><td class="num">1.000</td></tr>
+        <tr><td>rayleigh_benard</td><td class="num">enstrophy</td><td class="num">&minus;2.0 × 10&sup9;</td><td class="num">&minus;0.24</td><td class="num">&minus;1.0 × 10&sup4;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>Correlation good, R&sup2; terrible — a calibration problem, not (only) a shape problem</strong>
+    A recurring pattern: correlation between decoded and real quantities is often high (0.8&ndash;0.97), but R&sup2; is deeply negative. That combination means the decoder gets the <em>pattern</em> roughly right but the <em>scale</em> badly wrong. The proxy-sanity control (apply the same causal normalization approximation to the real future patches) is often much closer to 1.0 than the decoded result — confirming this is mostly genuine decoder forecast failure, not just an artifact of not knowing the true future normalization statistics in advance. rayleigh_benard's MAE forecast is the most severe failure of the three datasets by a wide margin.
+  </div>
+</section>
+
+<section>
+  <p class="section-label">Method notes</p>
+  <h2>What to know before trusting these numbers</h2>
+  <ul class="steps">
+    <li><strong>Pooled vorticity/divergence are near-meaningless.</strong> Under periodic boundary conditions the domain integral of curl and divergence is ≈0 by Stokes' theorem, so the whole-clip-pooled target has almost no variance — ridge regression on 4/5 cross-validation folds fits noise that doesn't generalize, producing reliably negative (sometimes undefined/NaN on rayleigh_benard, where the near-zero variance underflows exactly) R&sup2; regardless of what the encoder actually knows. The per-token version is the trustworthy one for these two quantities specifically.</li>
+    <li><strong>shear_flow and rayleigh_benard ran at n_offsets=1, not 3.</strong> A memory ceiling on the compute pod (the derived-quantity computation materializes several full-clip-sized intermediate tensors, e.g. Okubo-Weiss needs four) meant the original 3-offsets-per-trajectory sampling used for active_matter and the historical deep-dive OOM'd on these two larger-resolution datasets. Results here use 1 window per trajectory instead — still real signal (consistent with the historical 3-offset pooled numbers where those overlap), but noisier and less averaged than active_matter's numbers. A follow-up pass should fix the streaming/memory handling in <code class="num">build_dataset()</code> rather than reducing sample count.</li>
+    <li><strong>Single seed, no significance testing.</strong> All R&sup2; values are point estimates from one 5-fold split. The reversal is well-evidenced by being consistent across two independent formulas on rayleigh_benard and two other datasets showing the opposite direction, but individual numbers (especially the smaller rayleigh_benard/shear_flow sample sizes above) should be read with real uncertainty bars in mind, not as exact.</li>
+    <li><strong>"Rollout" here is not autoregressive.</strong> Every forecast step conditions on real trajectory pixels, never on the model's own prior prediction fed back in. It tests one-step-ahead forecasting capability, not compounding long-horizon rollout stability.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="section-label">Where this leaves us</p>
+  <h2>Recommended next steps</h2>
+  <ol class="steps">
+    <li><strong>Fund a deeper dive on the relational-quantity reversal.</strong> It's now the best-evidenced finding in the project — confirmed on 2 independent formulas on rayleigh_benard, opposite-direction on 2 other datasets, and sharper at the per-token level than pooled ever showed. Worth a multi-seed replication and, if resources allow, testing whether the effect holds at larger model scale.</li>
+    <li><strong>Fix <code class="num">build_dataset()</code>'s memory handling</strong> so shear_flow and rayleigh_benard can be re-run at matching sample density (n_offsets=3) to remove the one real methodological asymmetry in this sweep — compute the derived quantities in batches rather than materializing them on the full stacked clip tensor.</li>
+    <li><strong>Don't chase pixel-space forecasting for MAE as-is.</strong> The proxy-normalization approach here is a reasonable stopgap for a lean probe, but the underlying result (MAE's forecast is close to non-functional on 2 of 3 datasets) is unlikely to be purely a normalization artifact given how consistently correlation/R&sup2; diverge. If forecasting quality matters to the research question, JEPA's latent-space forecast — while not yet beating persistence — is the more promising direction to push.</li>
+    <li><strong>Regime probing is not a JEPA/MAE differentiator</strong> — deprioritize further work here unless a specific downstream use case (e.g. regime classification as an application) makes it valuable in its own right.</li>
+    <li><strong>The "not every relational quantity reverses" caveat (Okubo-Weiss) is worth understanding</strong>, not dismissing — it may sharpen the mechanistic story (is it specifically the driving-force coupling that JEPA prioritizes, not relational quantities in general?) with a handful of well-chosen additional targets.</li>
+  </ol>
+</section>
+
+<footer>
+  Sweep run locally + on a single restarted RunPod A100 (one mid-run interruption, recovered from the persistent volume with no data loss). Raw result JSONs in <code class="num">sweep_results/</code>; probing code in <code class="num">scripts/analyze_encoders.py</code>, <code class="num">analyze_encoders_local.py</code>, <code class="num">analyze_regime.py</code>, <code class="num">rollout_probe.py</code>.
+</footer>
+
+</main>

@@ -1,0 +1,94 @@
+{
+  "jepa": {
+    "enstrophy": {
+      "predictor": 0.9623834013938903,
+      "ceiling": 0.9895958065986633,
+      "persistence": 0.9517136335372924
+    },
+    "vorticity_signed": {
+      "predictor": 0.17964558601379393,
+      "ceiling": 0.21245768070220947,
+      "persistence": 0.17810550928115845
+    },
+    "divergence": {
+      "predictor": 0.26402983665466306,
+      "ceiling": 0.2733162879943848,
+      "persistence": 0.2606261134147644
+    },
+    "tracer_grad": {
+      "predictor": 0.932789146900177,
+      "ceiling": 0.9357024788856506,
+      "persistence": 0.9288428068161011
+    },
+    "advective_flux": {
+      "predictor": 0.1466499924659729,
+      "ceiling": 0.16102180480957032,
+      "persistence": 0.14026074409484862
+    },
+    "strain_rate_mag": {
+      "predictor": 0.9948299050331115,
+      "ceiling": 0.9989755392074585,
+      "persistence": 0.9925492286682129
+    },
+    "okubo_weiss": {
+      "predictor": 0.9775741338729859,
+      "ceiling": 0.991317892074585,
+      "persistence": 0.9705853343009949
+    },
+    "pressure_grad_mag": {
+      "predictor": 0.9945358633995056,
+      "ceiling": 0.9991492390632629,
+      "persistence": 0.9925359487533569
+    }
+  },
+  "mae": {
+    "enstrophy": {
+      "decoded_r2": -1.3321568965911865,
+      "decoded_corr": 0.7238322496414185,
+      "proxy_sanity_r2": 0.8668122291564941,
+      "proxy_sanity_corr": 0.9899874925613403
+    },
+    "vorticity_signed": {
+      "decoded_r2": -53.66696548461914,
+      "decoded_corr": -5.702388973342909e-13,
+      "proxy_sanity_r2": -5.459218502044678,
+      "proxy_sanity_corr": -3.107384683766201e-13
+    },
+    "divergence": {
+      "decoded_r2": -12.714493751525879,
+      "decoded_corr": -5.764155429008322e-13,
+      "proxy_sanity_r2": -5.99241828918457,
+      "proxy_sanity_corr": -3.5623576571247595e-13
+    },
+    "tracer_grad": {
+      "decoded_r2": -5.540696144104004,
+      "decoded_corr": 0.869401752948761,
+      "proxy_sanity_r2": 0.8892595171928406,
+      "proxy_sanity_corr": 0.9795215725898743
+    },
+    "advective_flux": {
+      "decoded_r2": -531645792.0,
+      "decoded_corr": 0.07055184245109558,
+      "proxy_sanity_r2": -9417820.0,
+      "proxy_sanity_corr": 0.03888190537691116
+    },
+    "strain_rate_mag": {
+      "decoded_r2": -0.3313080072402954,
+      "decoded_corr": 0.9259350299835205,
+      "proxy_sanity_r2": 0.9676538109779358,
+      "proxy_sanity_corr": 0.9876481890678406
+    },
+    "okubo_weiss": {
+      "decoded_r2": 0.30032879114151,
+      "decoded_corr": 0.9330211281776428,
+      "proxy_sanity_r2": 0.9130198955535889,
+      "proxy_sanity_corr": 0.9756080508232117
+    },
+    "pressure_grad_mag": {
+      "decoded_r2": -1.000403881072998,
+      "decoded_corr": 0.8341831564903259,
+      "proxy_sanity_r2": 0.9345812797546387,
+      "proxy_sanity_corr": 0.9801173806190491
+    }
+  }
+}

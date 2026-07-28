@@ -42,6 +42,28 @@ and [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py).
 Both need the corresponding dataset's memmap (see "Reproducing" below) or can
 be pointed at your own tensors of the same shape.
 
+## Probing suite (step 2)
+
+Beyond contemporaneous physics decodability, four more probes ask whether the
+representations differ in *what kind* of physics they capture:
+
+| script | question |
+|---|---|
+| [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity (enstrophy, divergence, okubo-weiss, nematic order, ...)? |
+| [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) — does spatial detail help beyond pooling? |
+| [scripts/analyze_regime.py](scripts/analyze_regime.py) | does the pooled representation know the *regime* (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — one value per trajectory, probed with train/val split by trajectory to avoid leakage |
+| [scripts/rollout_probe.py](scripts/rollout_probe.py) | using each model's own pretrained predictor/decoder under a causal (non-tube) mask, does it forecast a genuinely future window better than a persistence baseline? |
+| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | sidesteps the predictor/decoder entirely — does a *fresh* ridge probe on frozen present-time features forecast future physics, swept over multiple time gaps? |
+
+Supporting scripts: [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py)
+(recovers per-trajectory regime params from Well filenames, needed by
+`analyze_regime.py`) and [scripts/load_predictor.py](scripts/load_predictor.py)
+(loads a JEPA run's full predictor + EMA target encoder from `latest.pt`, needed
+by `rollout_probe.py`). [scripts/run_sweep.sh](scripts/run_sweep.sh) (and its
+`_resume` variants) run the full probing suite across all 3 datasets on a
+remote GPU box; results land in `sweep_results/*.json`, summarized in
+[reports/](reports/) (per-dataset PDF summaries + `probing_sweep_report.html`).
+
 **How they were trained**: 100k steps, AdamW + cosine LR (JEPA 1e-4, MAE 5e-5 —
 picked via a small LR sweep on active_matter, see [Design](#design) below),
 tube masking at 0.9, on a single A100. See git history / [scripts/gen_configs.py](scripts/gen_configs.py)
@@ -142,3 +164,6 @@ sync from a login node with `uv run wandb sync --sync-all`.
 - [scripts/load_encoder.py](scripts/load_encoder.py) — load a checkpoint + sanity-check forward pass
 - [scripts/linear_probe.py](scripts/linear_probe.py) — ridge-probe frozen features against physics targets
 - [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — layer-wise pooled/non-pooled physics probing (the JEPA-vs-MAE comparison)
+- [scripts/analyze_regime.py](scripts/analyze_regime.py), [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py) — does pooled representation encode regime params?
+- [scripts/rollout_probe.py](scripts/rollout_probe.py), [scripts/load_predictor.py](scripts/load_predictor.py), [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) — forecasting probes (see "Probing suite" above)
+- [scripts/run_sweep.sh](scripts/run_sweep.sh) — runs the full probing suite across all 3 datasets; outputs to `sweep_results/`, summarized in [reports/](reports/)

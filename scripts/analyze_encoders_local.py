@@ -38,7 +38,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.models.vit import build_encoder
 from src.data.well import ClipSpec
 from scripts.analyze_encoders import (
-    DATASET_CHANNELS, curl2d, ridge_r2, build_dataset,
+    DATASET_CHANNELS, curl2d, grad2d, divergence2d, okubo_weiss, ridge_r2, build_dataset,
 )
 
 
@@ -49,24 +49,49 @@ def local_target_maps(clip: torch.Tensor, patch_t: int, patch_h: int, patch_w: i
     ch = DATASET_CHANNELS[dataset]
     vx, vy = clip[:, ch["vx"]], clip[:, ch["vy"]]
     vort = curl2d(vx, vy)
-    fields = {"enstrophy": vort**2}
+    fields = {
+        "enstrophy": vort**2,
+        "vorticity_signed": vort,
+        "divergence": divergence2d(vx, vy),
+    }
 
     if dataset == "active_matter":
         dxx, dxy = clip[:, ch["Dxx"]], clip[:, ch["Dxy"]]
+        exx, exy = clip[:, ch["Exx"]], clip[:, ch["Exy"]]
+        eyx, eyy = clip[:, ch["Eyx"]], clip[:, ch["Eyy"]]
+        dyx, dyy = clip[:, ch["Dyx"]], clip[:, ch["Dyy"]]
         fields["nematic_order"] = torch.sqrt(dxx**2 + dxy**2 + 1e-8)
         fields["flow_align"] = vx * dxx + vy * dxy
+        dSdx, dSdy = grad2d(dxx)
+        fields["order_grad_mag"] = torch.sqrt(dSdx**2 + dSdy**2 + 1e-8)
+        fields["strain_order_align"] = exx * dxx + exy * dxy + eyx * dyx + eyy * dyy
     elif dataset == "shear_flow":
         tracer = clip[:, ch["tracer"]]
+        pressure = clip[:, ch["pressure"]]
         dtdx = (torch.roll(tracer, -1, dims=-1) - torch.roll(tracer, 1, dims=-1)) / 2
         dtdy = (torch.roll(tracer, -1, dims=-2) - torch.roll(tracer, 1, dims=-2)) / 2
         fields["tracer_grad"] = dtdx**2 + dtdy**2
         fields["advective_flux"] = vx * dtdx + vy * dtdy
+        dvx_dx, dvx_dy = grad2d(vx)
+        dvy_dx, dvy_dy = grad2d(vy)
+        strain_rate_sq = dvx_dx**2 + dvy_dy**2 + 0.5 * (dvx_dy + dvy_dx) ** 2
+        fields["strain_rate_mag"] = torch.sqrt(strain_rate_sq + 1e-8)
+        fields["okubo_weiss"] = okubo_weiss(vx, vy)
+        dpdx, dpdy = grad2d(pressure)
+        fields["pressure_grad_mag"] = torch.sqrt(dpdx**2 + dpdy**2 + 1e-8)
     elif dataset == "rayleigh_benard":
         buoyancy = clip[:, ch["buoyancy"]]
+        pressure = clip[:, ch["pressure"]]
         dbdx = (torch.roll(buoyancy, -1, dims=-1) - torch.roll(buoyancy, 1, dims=-1)) / 2
         dbdy = (torch.roll(buoyancy, -1, dims=-2) - torch.roll(buoyancy, 1, dims=-2)) / 2
         fields["buoyancy_grad"] = dbdx**2 + dbdy**2
         fields["convective_flux"] = vy * buoyancy
+        fields["okubo_weiss"] = okubo_weiss(vx, vy)
+        speed = torch.sqrt(vx**2 + vy**2 + 1e-8)
+        b_mag = torch.sqrt(buoyancy**2 + 1e-8)
+        fields["velocity_buoyancy_coherence"] = (vy * buoyancy) / (speed * b_mag + 1e-6)
+        dpdx, dpdy = grad2d(pressure)
+        fields["pressure_grad_mag"] = torch.sqrt(dpdx**2 + dpdy**2 + 1e-8)
     else:
         raise ValueError(f"no local target definitions for dataset {dataset!r}")
 
@@ -216,6 +241,8 @@ def main():
     ap.add_argument("--horizon", type=int, default=16)
     ap.add_argument("--token-max-clips", type=int, default=64,
                      help="clips used for per-token probe (each yields ~1024 token-samples)")
+    ap.add_argument("--skip-mlp", action="store_true",
+                     help="skip the nonlinear MLP probe (found noisy/unreliable; lean sweeps use linear probes only)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
@@ -227,8 +254,7 @@ def main():
     for ckpt_path in args.checkpoints:
         print(f"\n=== {ckpt_path} ===")
         tok_res = analyze_token_level(ckpt_path, clips, contemp, args.token_max_clips, dataset=args.dataset)
-        mlp_res = analyze_mlp_level(ckpt_path, clips, contemp)
-        all_results[ckpt_path] = {"token_linear": tok_res, "mlp_pooled": mlp_res}
+        all_results[ckpt_path] = {"token_linear": tok_res}
 
         print("  -- per-token LINEAR probe (no pooling) --")
         for i, layer_r2 in enumerate(tok_res["layers"]):
@@ -236,6 +262,10 @@ def main():
             line = "  ".join(f"{k}={v:.3f}" for k, v in layer_r2.items())
             print(f"    {tag:12s} {line}")
 
+        if args.skip_mlp:
+            continue
+        mlp_res = analyze_mlp_level(ckpt_path, clips, contemp)
+        all_results[ckpt_path]["mlp_pooled"] = mlp_res
         print("  -- pooled NONLINEAR (MLP) probe --")
         for i, layer_r2 in enumerate(mlp_res["layers"]):
             tag = f"block_{i+1}" if i < mlp_res["n_layers"] - 1 else "final_norm"

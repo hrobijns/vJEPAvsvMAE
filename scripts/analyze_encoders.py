@@ -62,6 +62,36 @@ def grad2d_sq(field: torch.Tensor) -> torch.Tensor:
     return dfdx**2 + dfdy**2
 
 
+def grad2d(field: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """field: (..., H, W). Returns (df/dx, df/dy), central differences."""
+    dfdx = (torch.roll(field, -1, dims=-1) - torch.roll(field, 1, dims=-1)) / 2
+    dfdy = (torch.roll(field, -1, dims=-2) - torch.roll(field, 1, dims=-2)) / 2
+    return dfdx, dfdy
+
+
+def divergence2d(vx: torch.Tensor, vy: torch.Tensor) -> torch.Tensor:
+    """vx, vy: (..., H, W). dvx/dx + dvy/dy, central differences, periodic boundary."""
+    dvx_dx = (torch.roll(vx, -1, dims=-1) - torch.roll(vx, 1, dims=-1)) / 2
+    dvy_dy = (torch.roll(vy, -1, dims=-2) - torch.roll(vy, 1, dims=-2)) / 2
+    return dvx_dx + dvy_dy
+
+
+def okubo_weiss(vx: torch.Tensor, vy: torch.Tensor) -> torch.Tensor:
+    """vx, vy: (..., H, W). Normal-strain^2 + shear-strain^2 - vorticity^2.
+
+    Negative OW => vorticity-dominated (coherent rotating structure);
+    positive OW => strain-dominated. Standard 2D turbulence diagnostic.
+    """
+    dvx_dx = (torch.roll(vx, -1, dims=-1) - torch.roll(vx, 1, dims=-1)) / 2
+    dvx_dy = (torch.roll(vx, -1, dims=-2) - torch.roll(vx, 1, dims=-2)) / 2
+    dvy_dx = (torch.roll(vy, -1, dims=-1) - torch.roll(vy, 1, dims=-1)) / 2
+    dvy_dy = (torch.roll(vy, -1, dims=-2) - torch.roll(vy, 1, dims=-2)) / 2
+    normal_strain = dvx_dx - dvy_dy
+    shear_strain = dvy_dx + dvx_dy
+    vorticity = dvy_dx - dvx_dy
+    return normal_strain**2 + shear_strain**2 - vorticity**2
+
+
 def contemporaneous_targets(clip: torch.Tensor, dataset: str = "active_matter") -> dict:
     """clip: (B, C, T, H, W), normalized fields. Returns {name: (B,)}.
 
@@ -79,24 +109,52 @@ def contemporaneous_targets(clip: torch.Tensor, dataset: str = "active_matter") 
     ch = DATASET_CHANNELS[dataset]
     vx, vy = clip[:, ch["vx"]], clip[:, ch["vy"]]
     vorticity = curl2d(vx, vy)
-    out = {"enstrophy": (vorticity**2).mean(dim=(1, 2, 3))}
+    out = {
+        "enstrophy": (vorticity**2).mean(dim=(1, 2, 3)),
+        "vorticity_signed": vorticity.mean(dim=(1, 2, 3)),
+        "divergence": divergence2d(vx, vy).mean(dim=(1, 2, 3)),
+    }
 
     if dataset == "active_matter":
         dxx, dxy = clip[:, ch["Dxx"]], clip[:, ch["Dxy"]]
+        exx, exy = clip[:, ch["Exx"]], clip[:, ch["Exy"]]
+        eyx, eyy = clip[:, ch["Eyx"]], clip[:, ch["Eyy"]]
+        dyx, dyy = clip[:, ch["Dyx"]], clip[:, ch["Dyy"]]
         out["nematic_order"] = torch.sqrt(dxx**2 + dxy**2 + 1e-8).mean(dim=(1, 2, 3))
         out["flow_align"] = (vx * dxx + vy * dxy).mean(dim=(1, 2, 3))
+        dSdx, dSdy = grad2d(dxx)
+        out["order_grad_mag"] = torch.sqrt(dSdx**2 + dSdy**2 + 1e-8).mean(dim=(1, 2, 3))
+        out["strain_order_align"] = (
+            exx * dxx + exy * dxy + eyx * dyx + eyy * dyy
+        ).mean(dim=(1, 2, 3))
     elif dataset == "shear_flow":
         tracer = clip[:, ch["tracer"]]
+        pressure = clip[:, ch["pressure"]]
         dtdx = (torch.roll(tracer, -1, dims=-1) - torch.roll(tracer, 1, dims=-1)) / 2
         dtdy = (torch.roll(tracer, -1, dims=-2) - torch.roll(tracer, 1, dims=-2)) / 2
         out["tracer_grad"] = grad2d_sq(tracer).mean(dim=(1, 2, 3))
         out["advective_flux"] = (vx * dtdx + vy * dtdy).mean(dim=(1, 2, 3))
+        dvx_dx, dvx_dy = grad2d(vx)
+        dvy_dx, dvy_dy = grad2d(vy)
+        strain_rate_sq = dvx_dx**2 + dvy_dy**2 + 0.5 * (dvx_dy + dvy_dx) ** 2
+        out["strain_rate_mag"] = torch.sqrt(strain_rate_sq + 1e-8).mean(dim=(1, 2, 3))
+        out["okubo_weiss"] = okubo_weiss(vx, vy).mean(dim=(1, 2, 3))
+        # incompressible NS: divergence should be ~zero here — negative control.
+        out["pressure_grad_mag"] = torch.sqrt(grad2d_sq(pressure) + 1e-8).mean(dim=(1, 2, 3))
     elif dataset == "rayleigh_benard":
         buoyancy = clip[:, ch["buoyancy"]]
+        pressure = clip[:, ch["pressure"]]
         out["buoyancy_grad"] = grad2d_sq(buoyancy).mean(dim=(1, 2, 3))
         # canonical RB convective/buoyancy flux <v_y * buoyancy>, the standard
         # order parameter for convective heat transport in this system.
         out["convective_flux"] = (vy * buoyancy).mean(dim=(1, 2, 3))
+        out["okubo_weiss"] = okubo_weiss(vx, vy).mean(dim=(1, 2, 3))
+        speed = torch.sqrt(vx**2 + vy**2 + 1e-8)
+        b_mag = torch.sqrt(buoyancy**2 + 1e-8)
+        out["velocity_buoyancy_coherence"] = (
+            (vy * buoyancy) / (speed * b_mag + 1e-6)
+        ).mean(dim=(1, 2, 3))
+        out["pressure_grad_mag"] = torch.sqrt(grad2d_sq(pressure) + 1e-8).mean(dim=(1, 2, 3))
     else:
         raise ValueError(f"no target definitions for dataset {dataset!r}")
     return out
@@ -172,25 +230,38 @@ def build_dataset(base: str, name: str, n_offsets: int, horizon: int, n_frames: 
     return clips, contemp, future
 
 
-def analyze_checkpoint(ckpt_path: str, clips: torch.Tensor, contemp: dict, future: torch.Tensor):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def load_checkpoint_encoder(ckpt_path: str, device: torch.device):
+    """Loads an encoder-only checkpoint (encoder_*pct.pt or full latest.pt's
+    'encoder' key). Returns (encoder, spec)."""
     ckpt = torch.load(ckpt_path, map_location=device)
     spec = ClipSpec(**ckpt["spec"])
     encoder = build_encoder(spec, ckpt["config"].get("encoder", {})).to(device).eval()
     encoder.load_state_dict(ckpt["encoder"])
+    return encoder, spec
 
-    n_layers = encoder.blocks.__len__() + 1
+
+def compute_layerwise_features_batched(encoder, clips: torch.Tensor, batch_size: int = 16) -> list[torch.Tensor]:
+    """Runs layerwise_features over clips in batches. Returns list of (N, D)
+    mean-pooled features, one per block + final norm — shared by any script
+    that needs pooled per-layer features (physics probing, regime probing)."""
+    device = next(encoder.parameters()).device
+    n_layers = len(encoder.blocks) + 1
     per_layer_feats = [[] for _ in range(n_layers)]
-    batch_size = 16
     with torch.no_grad():
         for start in range(0, clips.size(0), batch_size):
             batch = clips[start : start + batch_size].to(device)
             feats = layerwise_features(encoder, batch)
             for i, f in enumerate(feats):
                 per_layer_feats[i].append(f)
-    per_layer_feats = [torch.cat(fs) for fs in per_layer_feats]
+    return [torch.cat(fs) for fs in per_layer_feats]
 
-    results = {"n_layers": n_layers, "n_samples": clips.size(0), "layers": []}
+
+def analyze_checkpoint(ckpt_path: str, clips: torch.Tensor, contemp: dict, future: torch.Tensor):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    encoder, _spec = load_checkpoint_encoder(ckpt_path, device)
+    per_layer_feats = compute_layerwise_features_batched(encoder, clips)
+
+    results = {"n_layers": len(per_layer_feats), "n_samples": clips.size(0), "layers": []}
     targets = {**contemp, "future_enstrophy": future}
     for layer_idx, feats in enumerate(per_layer_feats):
         layer_r2 = {}
