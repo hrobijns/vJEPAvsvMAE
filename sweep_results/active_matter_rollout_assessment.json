@@ -1,0 +1,1673 @@
+{
+  "dataset": "active_matter",
+  "n_steps": 8,
+  "n_seeds": 525,
+  "jepa": {
+    "1": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9841812133789063,
+        "vorticity_signed": -0.48332972526550294,
+        "divergence": -0.5640124320983887,
+        "nematic_order": 0.9927724838256836,
+        "flow_align": 0.48532681465148925,
+        "order_grad_mag": 0.9856199741363525,
+        "strain_order_align": 0.9951692700386048
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9737581133842468,
+          "vorticity_signed": -0.46190290451049804,
+          "divergence": -0.38195855617523194,
+          "nematic_order": 0.9505715489387512,
+          "flow_align": 0.446838915348053,
+          "order_grad_mag": 0.9600356101989747,
+          "strain_order_align": 0.9880670785903931
+        },
+        "pixel_mse": 1.725719287096164,
+        "pixel_rel_l2": 1.730606591399468,
+        "physics_r2": {
+          "enstrophy": 0.8744649887084961,
+          "vorticity_signed": -1.6598398685455322,
+          "divergence": -0.5116318464279175,
+          "nematic_order": -0.1151876449584961,
+          "flow_align": -0.01802992820739746,
+          "order_grad_mag": 0.5602520108222961,
+          "strain_order_align": 0.6984185576438904
+        },
+        "physics_corr": {
+          "enstrophy": 0.9473773837089539,
+          "vorticity_signed": -2.7503442232013064e-12,
+          "divergence": 7.487507142078798e-12,
+          "nematic_order": 0.7859610915184021,
+          "flow_align": 0.3517742455005646,
+          "order_grad_mag": 0.8350101709365845,
+          "strain_order_align": 0.8857539892196655
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9747674822807312,
+          "vorticity_signed": -0.3429681062698364,
+          "divergence": -0.32330348491668703,
+          "nematic_order": 0.9579620718955993,
+          "flow_align": 0.4591550827026367,
+          "order_grad_mag": 0.9549462199211121,
+          "strain_order_align": 0.9895909070968628
+        },
+        "pixel_mse": 1.0470700829576105,
+        "pixel_rel_l2": 1.0500354262556566,
+        "physics_r2": {
+          "enstrophy": -15.90328598022461,
+          "vorticity_signed": -2.97985577583313,
+          "divergence": -0.4741706848144531,
+          "nematic_order": -2.645733118057251,
+          "flow_align": -12.246978759765625,
+          "order_grad_mag": 0.051740169525146484,
+          "strain_order_align": -1.3776676654815674
+        },
+        "physics_corr": {
+          "enstrophy": 0.5026639103889465,
+          "vorticity_signed": -2.5752653048244367e-12,
+          "divergence": -3.782415353148494e-12,
+          "nematic_order": 0.564008355140686,
+          "flow_align": 0.16323000192642212,
+          "order_grad_mag": 0.3946702182292938,
+          "strain_order_align": 0.4150305390357971
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9747674822807312,
+          "vorticity_signed": -0.3429681062698364,
+          "divergence": -0.32330348491668703,
+          "nematic_order": 0.9579620718955993,
+          "flow_align": 0.4591550827026367,
+          "order_grad_mag": 0.9549462199211121,
+          "strain_order_align": 0.9895909070968628
+        },
+        "pixel_mse": 1.0470700829576105,
+        "pixel_rel_l2": 1.0500354262556566,
+        "physics_r2": {
+          "enstrophy": -15.90328598022461,
+          "vorticity_signed": -2.97985577583313,
+          "divergence": -0.4741706848144531,
+          "nematic_order": -2.645733118057251,
+          "flow_align": -12.246978759765625,
+          "order_grad_mag": 0.051740169525146484,
+          "strain_order_align": -1.3776676654815674
+        },
+        "physics_corr": {
+          "enstrophy": 0.5026639103889465,
+          "vorticity_signed": -2.5752653048244367e-12,
+          "divergence": -3.782415353148494e-12,
+          "nematic_order": 0.564008355140686,
+          "flow_align": 0.16323000192642212,
+          "order_grad_mag": 0.3946702182292938,
+          "strain_order_align": 0.4150305390357971
+        }
+      }
+    },
+    "2": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9801015973091125,
+        "vorticity_signed": -0.5093624591827393,
+        "divergence": -0.7192544221878052,
+        "nematic_order": 0.9830296874046326,
+        "flow_align": -0.021585941314697266,
+        "order_grad_mag": 0.9825767755508423,
+        "strain_order_align": 0.9962119102478028
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9488456964492797,
+          "vorticity_signed": -0.4539093255996704,
+          "divergence": -0.3805939435958862,
+          "nematic_order": 0.9430936574935913,
+          "flow_align": -0.06268481016159058,
+          "order_grad_mag": 0.9440715432167053,
+          "strain_order_align": 0.9380396366119385
+        },
+        "pixel_mse": 1.949025176077178,
+        "pixel_rel_l2": 1.9741128583628615,
+        "physics_r2": {
+          "enstrophy": 0.7945289015769958,
+          "vorticity_signed": -2.0501465797424316,
+          "divergence": -0.5340758562088013,
+          "nematic_order": -2.3890912532806396,
+          "flow_align": -0.3345949649810791,
+          "order_grad_mag": 0.3583827614784241,
+          "strain_order_align": 0.5109532475471497
+        },
+        "physics_corr": {
+          "enstrophy": 0.9149293303489685,
+          "vorticity_signed": -1.1364734565748325e-13,
+          "divergence": -3.2650110913523545e-12,
+          "nematic_order": 0.6664976477622986,
+          "flow_align": 0.10531153529882431,
+          "order_grad_mag": 0.7567800879478455,
+          "strain_order_align": 0.8268514275550842
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9024113178253174,
+          "vorticity_signed": -0.2711474895477295,
+          "divergence": -0.2934711933135986,
+          "nematic_order": 0.8345746159553528,
+          "flow_align": 0.04024059772491455,
+          "order_grad_mag": 0.8762858152389527,
+          "strain_order_align": 0.9091277599334717
+        },
+        "pixel_mse": 1.1232732678698254,
+        "pixel_rel_l2": 1.1377319435248205,
+        "physics_r2": {
+          "enstrophy": -8.321006774902344,
+          "vorticity_signed": -3.3282222747802734,
+          "divergence": -0.34192967414855957,
+          "nematic_order": -11.198473930358887,
+          "flow_align": -11.821320533752441,
+          "order_grad_mag": -0.9021905660629272,
+          "strain_order_align": -2.1330275535583496
+        },
+        "physics_corr": {
+          "enstrophy": 0.3878932297229767,
+          "vorticity_signed": 8.536205054442136e-13,
+          "divergence": 4.655044145290832e-12,
+          "nematic_order": 0.5044832825660706,
+          "flow_align": -0.04856884106993675,
+          "order_grad_mag": 0.1487189680337906,
+          "strain_order_align": 0.3968208432197571
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9810784339904786,
+          "vorticity_signed": -0.380617618560791,
+          "divergence": -0.300287652015686,
+          "nematic_order": 0.9826880812644958,
+          "flow_align": 0.12937220335006713,
+          "order_grad_mag": 0.963148546218872,
+          "strain_order_align": 0.9922793626785278
+        },
+        "pixel_mse": 1.0459678303111684,
+        "pixel_rel_l2": 1.0594314371080327,
+        "physics_r2": {
+          "enstrophy": -8.195873260498047,
+          "vorticity_signed": -3.0049972534179688,
+          "divergence": -0.4146575927734375,
+          "nematic_order": -7.1345720291137695,
+          "flow_align": -10.997535705566406,
+          "order_grad_mag": -0.2928504943847656,
+          "strain_order_align": -1.915257215499878
+        },
+        "physics_corr": {
+          "enstrophy": 0.6429227590560913,
+          "vorticity_signed": 2.2291871040053257e-12,
+          "divergence": 2.704156776972555e-12,
+          "nematic_order": 0.5351741313934326,
+          "flow_align": 0.11445901542901993,
+          "order_grad_mag": 0.20706315338611603,
+          "strain_order_align": 0.37746700644493103
+        }
+      }
+    },
+    "3": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9791972041130066,
+        "vorticity_signed": -0.5346871137619018,
+        "divergence": -0.5911167144775391,
+        "nematic_order": 0.954204773902893,
+        "flow_align": -0.008441412448883056,
+        "order_grad_mag": 0.9811603188514709,
+        "strain_order_align": 0.9951339483261108
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9280690670013427,
+          "vorticity_signed": -0.2676533699035645,
+          "divergence": -0.407472038269043,
+          "nematic_order": 0.8913939952850342,
+          "flow_align": -0.17819788455963134,
+          "order_grad_mag": 0.9237796783447265,
+          "strain_order_align": 0.9243971824645996
+        },
+        "pixel_mse": 2.011290025587206,
+        "pixel_rel_l2": 2.035648032959189,
+        "physics_r2": {
+          "enstrophy": 0.7074466943740845,
+          "vorticity_signed": -1.445002555847168,
+          "divergence": -0.5720775127410889,
+          "nematic_order": -9.261357307434082,
+          "flow_align": -0.4127051830291748,
+          "order_grad_mag": 0.245216965675354,
+          "strain_order_align": 0.37508565187454224
+        },
+        "physics_corr": {
+          "enstrophy": 0.8770423531532288,
+          "vorticity_signed": -1.4100750731979583e-12,
+          "divergence": 2.1521652515676948e-11,
+          "nematic_order": 0.5898476243019104,
+          "flow_align": 0.03939847648143768,
+          "order_grad_mag": 0.7159190773963928,
+          "strain_order_align": 0.7847049832344055
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8056861639022828,
+          "vorticity_signed": -0.1614093542098999,
+          "divergence": -0.2625840425491333,
+          "nematic_order": 0.5862297892570496,
+          "flow_align": -0.09881715774536133,
+          "order_grad_mag": 0.8066895604133606,
+          "strain_order_align": 0.8271999955177307
+        },
+        "pixel_mse": 1.1376700172589456,
+        "pixel_rel_l2": 1.1514479281095633,
+        "physics_r2": {
+          "enstrophy": -4.3211870193481445,
+          "vorticity_signed": -2.040649890899658,
+          "divergence": -0.22168421745300293,
+          "nematic_order": -36.089149475097656,
+          "flow_align": -10.833353996276855,
+          "order_grad_mag": -1.7815916538238525,
+          "strain_order_align": -2.5688066482543945
+        },
+        "physics_corr": {
+          "enstrophy": 0.4247080087661743,
+          "vorticity_signed": 2.660393877852024e-13,
+          "divergence": 1.974618211997292e-11,
+          "nematic_order": 0.39425569772720337,
+          "flow_align": -0.06809601187705994,
+          "order_grad_mag": 0.14095771312713623,
+          "strain_order_align": 0.4089112877845764
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.979329788684845,
+          "vorticity_signed": -0.3085263729095459,
+          "divergence": -0.4380944013595581,
+          "nematic_order": 0.9624192714691162,
+          "flow_align": 0.08171875476837158,
+          "order_grad_mag": 0.9635196089744568,
+          "strain_order_align": 0.9909680843353271
+        },
+        "pixel_mse": 1.0655111033782299,
+        "pixel_rel_l2": 1.0784151236740793,
+        "physics_r2": {
+          "enstrophy": -12.962156295776367,
+          "vorticity_signed": -2.415120840072632,
+          "divergence": -0.6085202693939209,
+          "nematic_order": -20.591007232666016,
+          "flow_align": -9.594559669494629,
+          "order_grad_mag": -0.9329335689544678,
+          "strain_order_align": -2.2099449634552
+        },
+        "physics_corr": {
+          "enstrophy": 0.5722212195396423,
+          "vorticity_signed": 6.462348403221631e-16,
+          "divergence": -4.052319244052249e-11,
+          "nematic_order": 0.3457797169685364,
+          "flow_align": 0.09282559901475906,
+          "order_grad_mag": -0.06886935234069824,
+          "strain_order_align": 0.3418319523334503
+        }
+      }
+    },
+    "4": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9797603964805603,
+        "vorticity_signed": -0.7110908031463623,
+        "divergence": -0.6014781475067139,
+        "nematic_order": 0.9330592632293702,
+        "flow_align": 0.02661454677581787,
+        "order_grad_mag": 0.9819875359535217,
+        "strain_order_align": 0.9949521899223328
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9023766279220581,
+          "vorticity_signed": -0.46828887462615965,
+          "divergence": -0.3945708990097046,
+          "nematic_order": 0.7322464108467102,
+          "flow_align": -0.35979280471801756,
+          "order_grad_mag": 0.9124716639518737,
+          "strain_order_align": 0.9160218238830566
+        },
+        "pixel_mse": 2.0201532603342294,
+        "pixel_rel_l2": 2.0516299752166693,
+        "physics_r2": {
+          "enstrophy": 0.6675086617469788,
+          "vorticity_signed": -1.5991926193237305,
+          "divergence": -0.739116907119751,
+          "nematic_order": -29.315933227539062,
+          "flow_align": -0.43722963333129883,
+          "order_grad_mag": 0.1900022029876709,
+          "strain_order_align": 0.3025197982788086
+        },
+        "physics_corr": {
+          "enstrophy": 0.8580843210220337,
+          "vorticity_signed": 3.0576385607467005e-12,
+          "divergence": -1.4947112991769984e-11,
+          "nematic_order": 0.6173315048217773,
+          "flow_align": 0.00749063678085804,
+          "order_grad_mag": 0.6989611983299255,
+          "strain_order_align": 0.7599647045135498
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7825522661209107,
+          "vorticity_signed": -0.2946291208267212,
+          "divergence": -0.19906296730041503,
+          "nematic_order": 0.49251497983932496,
+          "flow_align": -0.10456033945083618,
+          "order_grad_mag": 0.7591346859931946,
+          "strain_order_align": 0.806272292137146
+        },
+        "pixel_mse": 1.123121784424885,
+        "pixel_rel_l2": 1.140621537973658,
+        "physics_r2": {
+          "enstrophy": -2.21891188621521,
+          "vorticity_signed": -2.2329044342041016,
+          "divergence": -0.2832977771759033,
+          "nematic_order": -110.8943862915039,
+          "flow_align": -11.139288902282715,
+          "order_grad_mag": -2.3779189586639404,
+          "strain_order_align": -2.8206520080566406
+        },
+        "physics_corr": {
+          "enstrophy": 0.5136488080024719,
+          "vorticity_signed": 1.225792254158642e-12,
+          "divergence": -1.7637244095758398e-11,
+          "nematic_order": 0.3395577669143677,
+          "flow_align": -0.1024884283542633,
+          "order_grad_mag": 0.2301078885793686,
+          "strain_order_align": 0.4403799772262573
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9765273809432984,
+          "vorticity_signed": -0.30904860496520997,
+          "divergence": -0.1869431972503662,
+          "nematic_order": 0.9115471839904785,
+          "flow_align": 0.08354138135910034,
+          "order_grad_mag": 0.9712284684181214,
+          "strain_order_align": 0.9918978333473205
+        },
+        "pixel_mse": 1.0767671666000829,
+        "pixel_rel_l2": 1.0935446526271757,
+        "physics_r2": {
+          "enstrophy": -17.895601272583008,
+          "vorticity_signed": -2.988621473312378,
+          "divergence": -0.6007590293884277,
+          "nematic_order": -59.51939392089844,
+          "flow_align": -9.717131614685059,
+          "order_grad_mag": -1.4221453666687012,
+          "strain_order_align": -2.3005499839782715
+        },
+        "physics_corr": {
+          "enstrophy": 0.5234436392784119,
+          "vorticity_signed": 1.075368743705396e-12,
+          "divergence": -1.9289818006806847e-11,
+          "nematic_order": 0.10959357023239136,
+          "flow_align": -0.03487616032361984,
+          "order_grad_mag": -0.23008695244789124,
+          "strain_order_align": 0.34924575686454773
+        }
+      }
+    },
+    "5": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9784183144569397,
+        "vorticity_signed": -0.5380693912506104,
+        "divergence": -0.4733542203903198,
+        "nematic_order": 0.8936353921890259,
+        "flow_align": -0.04628114700317383,
+        "order_grad_mag": 0.989258599281311,
+        "strain_order_align": 0.9950698018074036
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9034188866615296,
+          "vorticity_signed": -0.5425695657730103,
+          "divergence": -0.5297510147094726,
+          "nematic_order": 0.7307899236679077,
+          "flow_align": -0.2962367057800293,
+          "order_grad_mag": 0.9062488675117493,
+          "strain_order_align": 0.9158436179161071
+        },
+        "pixel_mse": 2.0323746110660172,
+        "pixel_rel_l2": 2.0739875263905603,
+        "physics_r2": {
+          "enstrophy": 0.6672616004943848,
+          "vorticity_signed": -1.6695210933685303,
+          "divergence": -0.534792423248291,
+          "nematic_order": -79.23258972167969,
+          "flow_align": -0.3747706413269043,
+          "order_grad_mag": 0.17151594161987305,
+          "strain_order_align": 0.28945034742355347
+        },
+        "physics_corr": {
+          "enstrophy": 0.8622531294822693,
+          "vorticity_signed": 2.1408883780354993e-12,
+          "divergence": 2.614704459891204e-11,
+          "nematic_order": 0.7311714887619019,
+          "flow_align": 0.04656561464071274,
+          "order_grad_mag": 0.6950054168701172,
+          "strain_order_align": 0.7555821537971497
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7788203239440918,
+          "vorticity_signed": -0.3900801181793213,
+          "divergence": -0.23817684650421142,
+          "nematic_order": 0.6592542409896851,
+          "flow_align": -0.12310819625854492,
+          "order_grad_mag": 0.723813283443451,
+          "strain_order_align": 0.7887243390083313
+        },
+        "pixel_mse": 1.1106233671114043,
+        "pixel_rel_l2": 1.1333634052330301,
+        "physics_r2": {
+          "enstrophy": -1.1547119617462158,
+          "vorticity_signed": -2.4485268592834473,
+          "divergence": -0.17266690731048584,
+          "nematic_order": -304.21148681640625,
+          "flow_align": -11.706478118896484,
+          "order_grad_mag": -2.8616859912872314,
+          "strain_order_align": -2.9549801349639893
+        },
+        "physics_corr": {
+          "enstrophy": 0.5939410328865051,
+          "vorticity_signed": 3.136877259682369e-12,
+          "divergence": -1.7668805871520754e-12,
+          "nematic_order": 0.3275270462036133,
+          "flow_align": -0.038038406521081924,
+          "order_grad_mag": 0.2973349988460541,
+          "strain_order_align": 0.4782370924949646
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9750774145126343,
+          "vorticity_signed": -0.3266308069229126,
+          "divergence": -0.4696225881576538,
+          "nematic_order": 0.8619118809700013,
+          "flow_align": -0.02011338472366333,
+          "order_grad_mag": 0.9719250917434692,
+          "strain_order_align": 0.9929472088813782
+        },
+        "pixel_mse": 1.0927090242724398,
+        "pixel_rel_l2": 1.1150822658263495,
+        "physics_r2": {
+          "enstrophy": -23.572343826293945,
+          "vorticity_signed": -3.1017513275146484,
+          "divergence": -0.4785691499710083,
+          "nematic_order": -158.13204956054688,
+          "flow_align": -9.376690864562988,
+          "order_grad_mag": -1.720966100692749,
+          "strain_order_align": -2.3209855556488037
+        },
+        "physics_corr": {
+          "enstrophy": 0.4710322618484497,
+          "vorticity_signed": -8.657540287969334e-13,
+          "divergence": -4.3998155813129713e-11,
+          "nematic_order": -0.14199332892894745,
+          "flow_align": -0.036328766494989395,
+          "order_grad_mag": -0.3174254298210144,
+          "strain_order_align": 0.3434258699417114
+        }
+      }
+    },
+    "6": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9800076961517334,
+        "vorticity_signed": -0.7793181657791137,
+        "divergence": -0.43169617652893066,
+        "nematic_order": 0.9116710662841797,
+        "flow_align": -0.07776064872741699,
+        "order_grad_mag": 0.9882010698318482,
+        "strain_order_align": 0.9961625099182129
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.8917802810668946,
+          "vorticity_signed": -0.33375940322875974,
+          "divergence": -0.524721622467041,
+          "nematic_order": 0.894837474822998,
+          "flow_align": -0.11343392133712768,
+          "order_grad_mag": 0.8896889328956604,
+          "strain_order_align": 0.9141930341720581
+        },
+        "pixel_mse": 2.0388626111843884,
+        "pixel_rel_l2": 2.0899272856577698,
+        "physics_r2": {
+          "enstrophy": 0.664901614189148,
+          "vorticity_signed": -1.6684911251068115,
+          "divergence": -0.6946051120758057,
+          "nematic_order": -114.44271850585938,
+          "flow_align": -0.40799736976623535,
+          "order_grad_mag": 0.15326601266860962,
+          "strain_order_align": 0.2764889597892761
+        },
+        "physics_corr": {
+          "enstrophy": 0.8640772700309753,
+          "vorticity_signed": -4.853705328280999e-13,
+          "divergence": -1.5118025104357558e-12,
+          "nematic_order": 0.7533029913902283,
+          "flow_align": 0.022453557699918747,
+          "order_grad_mag": 0.6914437413215637,
+          "strain_order_align": 0.7528244256973267
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7600162982940674,
+          "vorticity_signed": -0.25325326919555663,
+          "divergence": -0.46279885768890383,
+          "nematic_order": 0.7014984488487244,
+          "flow_align": -0.18706738948822021,
+          "order_grad_mag": 0.7314404010772705,
+          "strain_order_align": 0.7656908631324768
+        },
+        "pixel_mse": 1.0995174193279051,
+        "pixel_rel_l2": 1.127055566718413,
+        "physics_r2": {
+          "enstrophy": -0.687442421913147,
+          "vorticity_signed": -2.103226900100708,
+          "divergence": -0.16073012351989746,
+          "nematic_order": -452.4920654296875,
+          "flow_align": -12.693597793579102,
+          "order_grad_mag": -3.250441074371338,
+          "strain_order_align": -3.078307628631592
+        },
+        "physics_corr": {
+          "enstrophy": 0.6359296441078186,
+          "vorticity_signed": -1.0752956684789705e-12,
+          "divergence": -5.439565356306353e-13,
+          "nematic_order": 0.29334717988967896,
+          "flow_align": 0.002185598947107792,
+          "order_grad_mag": 0.35097724199295044,
+          "strain_order_align": 0.5112927556037903
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9798768758773804,
+          "vorticity_signed": -0.3234436511993408,
+          "divergence": -0.4525566339492798,
+          "nematic_order": 0.9003149986267089,
+          "flow_align": -0.08574252128601074,
+          "order_grad_mag": 0.977620804309845,
+          "strain_order_align": 0.993809175491333
+        },
+        "pixel_mse": 1.0965728561599533,
+        "pixel_rel_l2": 1.1240372550012392,
+        "physics_r2": {
+          "enstrophy": -30.68375587463379,
+          "vorticity_signed": -3.311903953552246,
+          "divergence": -0.38131964206695557,
+          "nematic_order": -231.0393524169922,
+          "flow_align": -9.520468711853027,
+          "order_grad_mag": -1.8968303203582764,
+          "strain_order_align": -2.3508951663970947
+        },
+        "physics_corr": {
+          "enstrophy": 0.4484240412712097,
+          "vorticity_signed": 7.990887682454706e-13,
+          "divergence": 5.4462025167456574e-11,
+          "nematic_order": -0.24512925744056702,
+          "flow_align": -0.005735065322369337,
+          "order_grad_mag": -0.34932827949523926,
+          "strain_order_align": 0.344448059797287
+        }
+      }
+    },
+    "7": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9802480697631836,
+        "vorticity_signed": -0.6654661893844604,
+        "divergence": -0.5764808654785156,
+        "nematic_order": 0.9202868461608886,
+        "flow_align": -0.21891577243804933,
+        "order_grad_mag": 0.984499728679657,
+        "strain_order_align": 0.9959783315658569
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9034738779067993,
+          "vorticity_signed": -0.3944809913635254,
+          "divergence": -0.43184196949005127,
+          "nematic_order": 0.9119874119758606,
+          "flow_align": -0.2665483236312866,
+          "order_grad_mag": 0.877568519115448,
+          "strain_order_align": 0.9207348942756652
+        },
+        "pixel_mse": 2.022097244592972,
+        "pixel_rel_l2": 2.0885791165777614,
+        "physics_r2": {
+          "enstrophy": 0.6806625127792358,
+          "vorticity_signed": -1.3540878295898438,
+          "divergence": -0.854738712310791,
+          "nematic_order": -114.90159606933594,
+          "flow_align": -0.4302788972854614,
+          "order_grad_mag": 0.11714392900466919,
+          "strain_order_align": 0.27165424823760986
+        },
+        "physics_corr": {
+          "enstrophy": 0.8719183802604675,
+          "vorticity_signed": 2.19944028267971e-12,
+          "divergence": -3.835846917876751e-11,
+          "nematic_order": 0.7452954649925232,
+          "flow_align": -0.011374631896615028,
+          "order_grad_mag": 0.6959705948829651,
+          "strain_order_align": 0.7526347637176514
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7691248774528503,
+          "vorticity_signed": -0.39948995113372804,
+          "divergence": -0.33488733768463136,
+          "nematic_order": 0.6883574724197388,
+          "flow_align": -0.20859265327453613,
+          "order_grad_mag": 0.7289008021354675,
+          "strain_order_align": 0.762283980846405
+        },
+        "pixel_mse": 1.083617071506781,
+        "pixel_rel_l2": 1.1192438899602857,
+        "physics_r2": {
+          "enstrophy": -0.48011457920074463,
+          "vorticity_signed": -2.0123367309570312,
+          "divergence": -0.1770780086517334,
+          "nematic_order": -469.759033203125,
+          "flow_align": -13.289055824279785,
+          "order_grad_mag": -3.749345302581787,
+          "strain_order_align": -3.1647214889526367
+        },
+        "physics_corr": {
+          "enstrophy": 0.6490086913108826,
+          "vorticity_signed": -1.1701422708391973e-13,
+          "divergence": -1.1969001310896399e-11,
+          "nematic_order": 0.2835747301578522,
+          "flow_align": -0.11273437738418579,
+          "order_grad_mag": 0.40752360224723816,
+          "strain_order_align": 0.5361607670783997
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9758613705635071,
+          "vorticity_signed": -0.28519446849823,
+          "divergence": -0.48084449768066406,
+          "nematic_order": 0.9013402104377747,
+          "flow_align": 0.07028377056121826,
+          "order_grad_mag": 0.9744082450866699,
+          "strain_order_align": 0.9935419678688049
+        },
+        "pixel_mse": 1.0886685867639847,
+        "pixel_rel_l2": 1.1244614873342407,
+        "physics_r2": {
+          "enstrophy": -29.748327255249023,
+          "vorticity_signed": -3.4598827362060547,
+          "divergence": -0.44553637504577637,
+          "nematic_order": -236.42013549804688,
+          "flow_align": -8.759638786315918,
+          "order_grad_mag": -1.938889503479004,
+          "strain_order_align": -2.3663103580474854
+        },
+        "physics_corr": {
+          "enstrophy": 0.4670310318470001,
+          "vorticity_signed": -6.000043344112083e-12,
+          "divergence": 8.271788115576939e-11,
+          "nematic_order": -0.24427515268325806,
+          "flow_align": -0.030003366991877556,
+          "order_grad_mag": -0.35331106185913086,
+          "strain_order_align": 0.3639177978038788
+        }
+      }
+    },
+    "8": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9808735489845276,
+        "vorticity_signed": -0.7382047176361084,
+        "divergence": -0.3193879842758179,
+        "nematic_order": 0.9136383295059204,
+        "flow_align": 0.05687634944915772,
+        "order_grad_mag": 0.9834572672843933,
+        "strain_order_align": 0.9956501722335815
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9120390892028809,
+          "vorticity_signed": -0.3455831527709961,
+          "divergence": -0.35007903575897215,
+          "nematic_order": 0.898011326789856,
+          "flow_align": -0.31928822994232176,
+          "order_grad_mag": 0.8871061086654664,
+          "strain_order_align": 0.9215005517005921
+        },
+        "pixel_mse": 2.02448641161898,
+        "pixel_rel_l2": 2.105314438467164,
+        "physics_r2": {
+          "enstrophy": 0.6733988523483276,
+          "vorticity_signed": -1.4114062786102295,
+          "divergence": -0.6197929382324219,
+          "nematic_order": -106.10873413085938,
+          "flow_align": -0.4381200075149536,
+          "order_grad_mag": 0.07235056161880493,
+          "strain_order_align": 0.28810590505599976
+        },
+        "physics_corr": {
+          "enstrophy": 0.8705840706825256,
+          "vorticity_signed": 5.186227966177959e-13,
+          "divergence": -2.2888293690903616e-11,
+          "nematic_order": 0.7473381757736206,
+          "flow_align": -0.016973355785012245,
+          "order_grad_mag": 0.7051162123680115,
+          "strain_order_align": 0.7588627338409424
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7776617050170899,
+          "vorticity_signed": -0.20577608346939086,
+          "divergence": -0.34467885494232176,
+          "nematic_order": 0.68274005651474,
+          "flow_align": -0.2618664503097534,
+          "order_grad_mag": 0.7444185614585876,
+          "strain_order_align": 0.7725869297981263
+        },
+        "pixel_mse": 1.073432337112757,
+        "pixel_rel_l2": 1.1162893389014101,
+        "physics_r2": {
+          "enstrophy": -0.3300297260284424,
+          "vorticity_signed": -1.652864933013916,
+          "divergence": -0.10817277431488037,
+          "nematic_order": -446.53680419921875,
+          "flow_align": -13.471004486083984,
+          "order_grad_mag": -4.325535297393799,
+          "strain_order_align": -3.1877779960632324
+        },
+        "physics_corr": {
+          "enstrophy": 0.6669398546218872,
+          "vorticity_signed": 3.0568960990989824e-12,
+          "divergence": 5.77677489177475e-12,
+          "nematic_order": 0.2929810881614685,
+          "flow_align": -0.05606507882475853,
+          "order_grad_mag": 0.47651612758636475,
+          "strain_order_align": 0.561825692653656
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9726743698120117,
+          "vorticity_signed": -0.41048922538757326,
+          "divergence": -0.2897740364074707,
+          "nematic_order": 0.9048646092414856,
+          "flow_align": 0.01448991298675537,
+          "order_grad_mag": 0.9737343311309814,
+          "strain_order_align": 0.9916877627372742
+        },
+        "pixel_mse": 1.0980320429285884,
+        "pixel_rel_l2": 1.141871192915781,
+        "physics_r2": {
+          "enstrophy": -33.34441375732422,
+          "vorticity_signed": -2.4872512817382812,
+          "divergence": -0.4306604862213135,
+          "nematic_order": -222.5183868408203,
+          "flow_align": -8.109395027160645,
+          "order_grad_mag": -2.160961627960205,
+          "strain_order_align": -2.3488423824310303
+        },
+        "physics_corr": {
+          "enstrophy": 0.43650802969932556,
+          "vorticity_signed": 3.1342981595544606e-12,
+          "divergence": -6.113271781155172e-12,
+          "nematic_order": -0.28313952684402466,
+          "flow_align": 0.07380727678537369,
+          "order_grad_mag": -0.35838377475738525,
+          "strain_order_align": 0.37893903255462646
+        }
+      }
+    }
+  },
+  "mae": {
+    "1": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9837718486785889,
+        "vorticity_signed": -0.23596560955047607,
+        "divergence": -0.28376455307006837,
+        "nematic_order": 0.9978850841522217,
+        "flow_align": 0.5493353009223938,
+        "order_grad_mag": 0.9943874597549438,
+        "strain_order_align": 0.9963866591453552
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9717693448066711,
+          "vorticity_signed": -0.23891053199768067,
+          "divergence": -0.19275305271148682,
+          "nematic_order": 0.9646012425422669,
+          "flow_align": 0.4027746319770813,
+          "order_grad_mag": 0.9610028743743897,
+          "strain_order_align": 0.9884738206863404
+        },
+        "pixel_mse": 1.725719287096164,
+        "pixel_rel_l2": 1.730606591399468,
+        "physics_r2": {
+          "enstrophy": 0.8744649887084961,
+          "vorticity_signed": -1.6598398685455322,
+          "divergence": -0.5116318464279175,
+          "nematic_order": -0.1151876449584961,
+          "flow_align": -0.01802992820739746,
+          "order_grad_mag": 0.5602520108222961,
+          "strain_order_align": 0.6984185576438904
+        },
+        "physics_corr": {
+          "enstrophy": 0.9473773837089539,
+          "vorticity_signed": -2.7503442232013064e-12,
+          "divergence": 7.487507142078798e-12,
+          "nematic_order": 0.7859610915184021,
+          "flow_align": 0.3517742455005646,
+          "order_grad_mag": 0.8350101709365845,
+          "strain_order_align": 0.8857539892196655
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9770506620407104,
+          "vorticity_signed": -0.20259408950805663,
+          "divergence": -0.204239559173584,
+          "nematic_order": 0.9802358746528625,
+          "flow_align": 0.3975755929946899,
+          "order_grad_mag": 0.9729259729385376,
+          "strain_order_align": 0.9921086549758911
+        },
+        "pixel_mse": 0.7743613589067996,
+        "pixel_rel_l2": 0.7765543804659814,
+        "physics_r2": {
+          "enstrophy": -36.2580451965332,
+          "vorticity_signed": -3.722266674041748,
+          "divergence": -0.9869188070297241,
+          "nematic_order": -0.5467712879180908,
+          "flow_align": -6.208750247955322,
+          "order_grad_mag": -0.2555450201034546,
+          "strain_order_align": -0.03485846519470215
+        },
+        "physics_corr": {
+          "enstrophy": 0.7327090501785278,
+          "vorticity_signed": -3.1255917992689675e-12,
+          "divergence": -2.8195770371275408e-11,
+          "nematic_order": 0.6910024285316467,
+          "flow_align": 0.13293932378292084,
+          "order_grad_mag": 0.7049596309661865,
+          "strain_order_align": 0.6573092937469482
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9770506620407104,
+          "vorticity_signed": -0.20259408950805663,
+          "divergence": -0.204239559173584,
+          "nematic_order": 0.9802358746528625,
+          "flow_align": 0.3975755929946899,
+          "order_grad_mag": 0.9729259729385376,
+          "strain_order_align": 0.9921086549758911
+        },
+        "pixel_mse": 0.7743613589067996,
+        "pixel_rel_l2": 0.7765543804659814,
+        "physics_r2": {
+          "enstrophy": -36.2580451965332,
+          "vorticity_signed": -3.722266674041748,
+          "divergence": -0.9869188070297241,
+          "nematic_order": -0.5467712879180908,
+          "flow_align": -6.208750247955322,
+          "order_grad_mag": -0.2555450201034546,
+          "strain_order_align": -0.03485846519470215
+        },
+        "physics_corr": {
+          "enstrophy": 0.7327090501785278,
+          "vorticity_signed": -3.1255917992689675e-12,
+          "divergence": -2.8195770371275408e-11,
+          "nematic_order": 0.6910024285316467,
+          "flow_align": 0.13293932378292084,
+          "order_grad_mag": 0.7049596309661865,
+          "strain_order_align": 0.6573092937469482
+        }
+      }
+    },
+    "2": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9827816963195801,
+        "vorticity_signed": -0.2416773557662964,
+        "divergence": -0.3103367805480957,
+        "nematic_order": 0.9948996186256409,
+        "flow_align": 0.485689640045166,
+        "order_grad_mag": 0.9952531814575195,
+        "strain_order_align": 0.9957991003990173
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9587854981422425,
+          "vorticity_signed": -0.1790907382965088,
+          "divergence": -0.1567129135131836,
+          "nematic_order": 0.8806004285812378,
+          "flow_align": 0.09501773118972778,
+          "order_grad_mag": 0.9221925377845764,
+          "strain_order_align": 0.9618670463562011
+        },
+        "pixel_mse": 1.949025176077178,
+        "pixel_rel_l2": 1.9741128583628615,
+        "physics_r2": {
+          "enstrophy": 0.7945289015769958,
+          "vorticity_signed": -2.0501465797424316,
+          "divergence": -0.5340758562088013,
+          "nematic_order": -2.3890912532806396,
+          "flow_align": -0.3345949649810791,
+          "order_grad_mag": 0.3583827614784241,
+          "strain_order_align": 0.5109532475471497
+        },
+        "physics_corr": {
+          "enstrophy": 0.9149293303489685,
+          "vorticity_signed": -1.1364734565748325e-13,
+          "divergence": -3.2650110913523545e-12,
+          "nematic_order": 0.6664976477622986,
+          "flow_align": 0.10531153529882431,
+          "order_grad_mag": 0.7567800879478455,
+          "strain_order_align": 0.8268514275550842
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9389083623886109,
+          "vorticity_signed": -0.2683653116226196,
+          "divergence": -0.2559208869934082,
+          "nematic_order": 0.8741668820381164,
+          "flow_align": 0.10919229984283448,
+          "order_grad_mag": 0.873642897605896,
+          "strain_order_align": 0.9529766082763672
+        },
+        "pixel_mse": 1.138927816415762,
+        "pixel_rel_l2": 1.153587996055963,
+        "physics_r2": {
+          "enstrophy": -24.198871612548828,
+          "vorticity_signed": -5.158443450927734,
+          "divergence": -0.48158109188079834,
+          "nematic_order": -6.7068986892700195,
+          "flow_align": -12.458415031433105,
+          "order_grad_mag": -0.24302005767822266,
+          "strain_order_align": -1.3496778011322021
+        },
+        "physics_corr": {
+          "enstrophy": 0.45676547288894653,
+          "vorticity_signed": 2.4713193731012995e-12,
+          "divergence": -1.6795080950982033e-11,
+          "nematic_order": 0.501850426197052,
+          "flow_align": -0.1420881301164627,
+          "order_grad_mag": 0.34567365050315857,
+          "strain_order_align": 0.22155985236167908
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9745007157325745,
+          "vorticity_signed": -0.22776811122894286,
+          "divergence": -0.20338664054870606,
+          "nematic_order": 0.9905686736106872,
+          "flow_align": 0.30194095373153684,
+          "order_grad_mag": 0.9790052533149719,
+          "strain_order_align": 0.9924142241477967
+        },
+        "pixel_mse": 0.7461498341415868,
+        "pixel_rel_l2": 0.7557542098090863,
+        "physics_r2": {
+          "enstrophy": -18.86244010925293,
+          "vorticity_signed": -3.7860350608825684,
+          "divergence": -0.6918747425079346,
+          "nematic_order": -2.1334187984466553,
+          "flow_align": -5.182178497314453,
+          "order_grad_mag": 0.16648191213607788,
+          "strain_order_align": -0.15498137474060059
+        },
+        "physics_corr": {
+          "enstrophy": 0.9016148447990417,
+          "vorticity_signed": 8.643611000558327e-13,
+          "divergence": -2.0947075671240434e-11,
+          "nematic_order": 0.711414098739624,
+          "flow_align": 0.2130695879459381,
+          "order_grad_mag": 0.720466136932373,
+          "strain_order_align": 0.7189542055130005
+        }
+      }
+    },
+    "3": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9852426171302795,
+        "vorticity_signed": -0.23752384185791015,
+        "divergence": -0.35785162448883057,
+        "nematic_order": 0.9896787643432617,
+        "flow_align": 0.5125348091125488,
+        "order_grad_mag": 0.9953730344772339,
+        "strain_order_align": 0.9957991600036621
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9426681876182557,
+          "vorticity_signed": -0.09515221118927002,
+          "divergence": -0.2618297815322876,
+          "nematic_order": 0.6313662767410279,
+          "flow_align": -0.04706408977508545,
+          "order_grad_mag": 0.8975175738334655,
+          "strain_order_align": 0.938358998298645
+        },
+        "pixel_mse": 2.011290025587206,
+        "pixel_rel_l2": 2.035648032959189,
+        "physics_r2": {
+          "enstrophy": 0.7074466943740845,
+          "vorticity_signed": -1.445002555847168,
+          "divergence": -0.5720775127410889,
+          "nematic_order": -9.261357307434082,
+          "flow_align": -0.4127051830291748,
+          "order_grad_mag": 0.245216965675354,
+          "strain_order_align": 0.37508565187454224
+        },
+        "physics_corr": {
+          "enstrophy": 0.8770423531532288,
+          "vorticity_signed": -1.4100750731979583e-12,
+          "divergence": 2.1521652515676948e-11,
+          "nematic_order": 0.5898476243019104,
+          "flow_align": 0.03939847648143768,
+          "order_grad_mag": 0.7159190773963928,
+          "strain_order_align": 0.7847049832344055
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8796642065048218,
+          "vorticity_signed": -0.2510137319564819,
+          "divergence": -0.3553966999053955,
+          "nematic_order": 0.5408391118049621,
+          "flow_align": -0.10555942058563232,
+          "order_grad_mag": 0.790916132926941,
+          "strain_order_align": 0.8819775462150574
+        },
+        "pixel_mse": 1.1924410957897897,
+        "pixel_rel_l2": 1.2068823193987137,
+        "physics_r2": {
+          "enstrophy": -14.297143936157227,
+          "vorticity_signed": -3.8646416664123535,
+          "divergence": -0.3323397636413574,
+          "nematic_order": -29.929824829101562,
+          "flow_align": -11.298601150512695,
+          "order_grad_mag": -0.41841423511505127,
+          "strain_order_align": -2.160015344619751
+        },
+        "physics_corr": {
+          "enstrophy": 0.12352296710014343,
+          "vorticity_signed": 1.7574906373968302e-13,
+          "divergence": -5.916894144780693e-12,
+          "nematic_order": 0.47239795327186584,
+          "flow_align": -0.10282652825117111,
+          "order_grad_mag": -0.005873332265764475,
+          "strain_order_align": 0.06431344151496887
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9777111768722534,
+          "vorticity_signed": -0.20837159156799318,
+          "divergence": -0.2666388988494873,
+          "nematic_order": 0.9829519748687744,
+          "flow_align": 0.2153148889541626,
+          "order_grad_mag": 0.983271062374115,
+          "strain_order_align": 0.993262255191803
+        },
+        "pixel_mse": 0.7525354803176153,
+        "pixel_rel_l2": 0.761649165834901,
+        "physics_r2": {
+          "enstrophy": -18.108171463012695,
+          "vorticity_signed": -3.060422420501709,
+          "divergence": -0.47815823554992676,
+          "nematic_order": -6.8867506980896,
+          "flow_align": -4.395641803741455,
+          "order_grad_mag": 0.1450270414352417,
+          "strain_order_align": -0.25117921829223633
+        },
+        "physics_corr": {
+          "enstrophy": 0.9158870577812195,
+          "vorticity_signed": 3.6280212774991716e-12,
+          "divergence": 5.522797497103937e-11,
+          "nematic_order": 0.5772383213043213,
+          "flow_align": 0.24376311898231506,
+          "order_grad_mag": 0.6449564099311829,
+          "strain_order_align": 0.7117542624473572
+        }
+      }
+    },
+    "4": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9817694783210754,
+        "vorticity_signed": -0.26227972507476804,
+        "divergence": -0.21440765857696534,
+        "nematic_order": 0.9793504476547241,
+        "flow_align": 0.5300150513648987,
+        "order_grad_mag": 0.9963161826133728,
+        "strain_order_align": 0.9965855360031128
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9235670804977417,
+          "vorticity_signed": -0.20343444347381592,
+          "divergence": -0.16867218017578126,
+          "nematic_order": 0.5015207052230835,
+          "flow_align": -0.15707101821899414,
+          "order_grad_mag": 0.8928278088569641,
+          "strain_order_align": 0.9432856440544128
+        },
+        "pixel_mse": 2.0201532603342294,
+        "pixel_rel_l2": 2.0516299752166693,
+        "physics_r2": {
+          "enstrophy": 0.6675086617469788,
+          "vorticity_signed": -1.5991926193237305,
+          "divergence": -0.739116907119751,
+          "nematic_order": -29.315933227539062,
+          "flow_align": -0.43722963333129883,
+          "order_grad_mag": 0.1900022029876709,
+          "strain_order_align": 0.3025197982788086
+        },
+        "physics_corr": {
+          "enstrophy": 0.8580843210220337,
+          "vorticity_signed": 3.0576385607467005e-12,
+          "divergence": -1.4947112991769984e-11,
+          "nematic_order": 0.6173315048217773,
+          "flow_align": 0.00749063678085804,
+          "order_grad_mag": 0.6989611983299255,
+          "strain_order_align": 0.7599647045135498
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8411953568458557,
+          "vorticity_signed": -0.4475189924240112,
+          "divergence": -0.29295690059661866,
+          "nematic_order": 0.22439719438552858,
+          "flow_align": -0.18217339515686035,
+          "order_grad_mag": 0.7486392378807067,
+          "strain_order_align": 0.8791092157363891
+        },
+        "pixel_mse": 1.1704400212011297,
+        "pixel_rel_l2": 1.1886770567556744,
+        "physics_r2": {
+          "enstrophy": -9.361026763916016,
+          "vorticity_signed": -5.50473690032959,
+          "divergence": -0.31784677505493164,
+          "nematic_order": -104.41724395751953,
+          "flow_align": -11.639513969421387,
+          "order_grad_mag": -0.9211225509643555,
+          "strain_order_align": -2.5954506397247314
+        },
+        "physics_corr": {
+          "enstrophy": 0.061413899064064026,
+          "vorticity_signed": -1.1727340019224153e-12,
+          "divergence": 2.4240321121887787e-12,
+          "nematic_order": 0.45826202630996704,
+          "flow_align": -0.0555211678147316,
+          "order_grad_mag": -0.08678624778985977,
+          "strain_order_align": 0.27560970187187195
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9755071878433228,
+          "vorticity_signed": -0.2377157688140869,
+          "divergence": -0.2194832444190979,
+          "nematic_order": 0.9589126348495484,
+          "flow_align": 0.21264668703079223,
+          "order_grad_mag": 0.987548041343689,
+          "strain_order_align": 0.9944971680641175
+        },
+        "pixel_mse": 0.7545761405647575,
+        "pixel_rel_l2": 0.7663334554675482,
+        "physics_r2": {
+          "enstrophy": -18.283565521240234,
+          "vorticity_signed": -3.605645179748535,
+          "divergence": -0.6976479291915894,
+          "nematic_order": -20.137075424194336,
+          "flow_align": -3.798483371734619,
+          "order_grad_mag": 0.14715337753295898,
+          "strain_order_align": -0.258023738861084
+        },
+        "physics_corr": {
+          "enstrophy": 0.9219765663146973,
+          "vorticity_signed": -2.972396417541545e-12,
+          "divergence": 4.9629095971726045e-11,
+          "nematic_order": 0.41504913568496704,
+          "flow_align": 0.2943679690361023,
+          "order_grad_mag": 0.6172609329223633,
+          "strain_order_align": 0.732090175151825
+        }
+      }
+    },
+    "5": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9835744857788086,
+        "vorticity_signed": -0.23262479305267333,
+        "divergence": -0.2537291765213013,
+        "nematic_order": 0.9671206712722779,
+        "flow_align": 0.5398249506950379,
+        "order_grad_mag": 0.9970703601837159,
+        "strain_order_align": 0.9969857215881348
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9234573364257812,
+          "vorticity_signed": -0.31577262878417967,
+          "divergence": -0.1340664267539978,
+          "nematic_order": 0.8015050530433655,
+          "flow_align": -0.19477882385253906,
+          "order_grad_mag": 0.8987009644508361,
+          "strain_order_align": 0.9451664924621582
+        },
+        "pixel_mse": 2.0323746110660172,
+        "pixel_rel_l2": 2.0739875263905603,
+        "physics_r2": {
+          "enstrophy": 0.6672616004943848,
+          "vorticity_signed": -1.6695210933685303,
+          "divergence": -0.534792423248291,
+          "nematic_order": -79.23258972167969,
+          "flow_align": -0.3747706413269043,
+          "order_grad_mag": 0.17151594161987305,
+          "strain_order_align": 0.28945034742355347
+        },
+        "physics_corr": {
+          "enstrophy": 0.8622531294822693,
+          "vorticity_signed": 2.1408883780354993e-12,
+          "divergence": 2.614704459891204e-11,
+          "nematic_order": 0.7311714887619019,
+          "flow_align": 0.04656561464071274,
+          "order_grad_mag": 0.6950054168701172,
+          "strain_order_align": 0.7555821537971497
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8232192993164062,
+          "vorticity_signed": -0.4680683374404907,
+          "divergence": -0.3173365592956543,
+          "nematic_order": 0.6825729131698608,
+          "flow_align": -0.2949357986450195,
+          "order_grad_mag": 0.7400907039642334,
+          "strain_order_align": 0.8674886345863342
+        },
+        "pixel_mse": 1.1427365653958672,
+        "pixel_rel_l2": 1.1661341219659795,
+        "physics_r2": {
+          "enstrophy": -5.6439337730407715,
+          "vorticity_signed": -4.147606372833252,
+          "divergence": -0.2116910219192505,
+          "nematic_order": -294.61334228515625,
+          "flow_align": -12.488106727600098,
+          "order_grad_mag": -1.535442590713501,
+          "strain_order_align": -2.809338092803955
+        },
+        "physics_corr": {
+          "enstrophy": 0.1752047836780548,
+          "vorticity_signed": 1.4636204574702827e-12,
+          "divergence": 4.853715519781421e-12,
+          "nematic_order": 0.36474648118019104,
+          "flow_align": -0.03125080466270447,
+          "order_grad_mag": -0.08333675563335419,
+          "strain_order_align": 0.45891767740249634
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9726261258125305,
+          "vorticity_signed": -0.194939923286438,
+          "divergence": -0.31701078414916994,
+          "nematic_order": 0.9251161575317383,
+          "flow_align": 0.15781826972961427,
+          "order_grad_mag": 0.9868058562278748,
+          "strain_order_align": 0.9931096434593201
+        },
+        "pixel_mse": 0.7566250527782358,
+        "pixel_rel_l2": 0.77211696754742,
+        "physics_r2": {
+          "enstrophy": -18.749305725097656,
+          "vorticity_signed": -4.575525760650635,
+          "divergence": -0.9691047668457031,
+          "nematic_order": -53.21189498901367,
+          "flow_align": -3.610476493835449,
+          "order_grad_mag": 0.14712238311767578,
+          "strain_order_align": -0.2807124853134155
+        },
+        "physics_corr": {
+          "enstrophy": 0.9118406772613525,
+          "vorticity_signed": 1.1970615471090795e-12,
+          "divergence": -5.910798933639327e-11,
+          "nematic_order": 0.23478510975837708,
+          "flow_align": 0.24233263731002808,
+          "order_grad_mag": 0.5871843099594116,
+          "strain_order_align": 0.7193312644958496
+        }
+      }
+    },
+    "6": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9851266980171204,
+        "vorticity_signed": -0.3591783046722412,
+        "divergence": -0.30025577545166016,
+        "nematic_order": 0.9701426506042481,
+        "flow_align": 0.5136532068252564,
+        "order_grad_mag": 0.9974516272544861,
+        "strain_order_align": 0.9971816539764404
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9221526980400085,
+          "vorticity_signed": -0.14213292598724364,
+          "divergence": -0.2842369794845581,
+          "nematic_order": 0.930082356929779,
+          "flow_align": -0.026517343521118165,
+          "order_grad_mag": 0.8809990048408508,
+          "strain_order_align": 0.9470007538795471
+        },
+        "pixel_mse": 2.0388626111843884,
+        "pixel_rel_l2": 2.0899272856577698,
+        "physics_r2": {
+          "enstrophy": 0.664901614189148,
+          "vorticity_signed": -1.6684911251068115,
+          "divergence": -0.6946051120758057,
+          "nematic_order": -114.44271850585938,
+          "flow_align": -0.40799736976623535,
+          "order_grad_mag": 0.15326601266860962,
+          "strain_order_align": 0.2764889597892761
+        },
+        "physics_corr": {
+          "enstrophy": 0.8640772700309753,
+          "vorticity_signed": -4.853705328280999e-13,
+          "divergence": -1.5118025104357558e-12,
+          "nematic_order": 0.7533029913902283,
+          "flow_align": 0.022453557699918747,
+          "order_grad_mag": 0.6914437413215637,
+          "strain_order_align": 0.7528244256973267
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7639395594596863,
+          "vorticity_signed": -0.44173235893249513,
+          "divergence": -0.3341881275177002,
+          "nematic_order": 0.7673502683639526,
+          "flow_align": -0.11772818565368652,
+          "order_grad_mag": 0.7356494069099426,
+          "strain_order_align": 0.7973304271697998
+        },
+        "pixel_mse": 1.1243224503157976,
+        "pixel_rel_l2": 1.1524818562578871,
+        "physics_r2": {
+          "enstrophy": -3.614539623260498,
+          "vorticity_signed": -3.7298812866210938,
+          "divergence": -0.273712158203125,
+          "nematic_order": -437.09259033203125,
+          "flow_align": -13.416010856628418,
+          "order_grad_mag": -2.0467379093170166,
+          "strain_order_align": -2.9622232913970947
+        },
+        "physics_corr": {
+          "enstrophy": 0.31913435459136963,
+          "vorticity_signed": 4.3277016627436826e-13,
+          "divergence": 5.247034143979201e-12,
+          "nematic_order": 0.2969968914985657,
+          "flow_align": -0.024638257920742035,
+          "order_grad_mag": -0.04709693789482117,
+          "strain_order_align": 0.5239073634147644
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9778932452201843,
+          "vorticity_signed": -0.3592087268829346,
+          "divergence": -0.30685465335845946,
+          "nematic_order": 0.9437378406524658,
+          "flow_align": 0.13799386024475097,
+          "order_grad_mag": 0.9874682426452637,
+          "strain_order_align": 0.9942050457000733
+        },
+        "pixel_mse": 0.7518266613452466,
+        "pixel_rel_l2": 0.7706566617147672,
+        "physics_r2": {
+          "enstrophy": -19.525094985961914,
+          "vorticity_signed": -3.7880210876464844,
+          "divergence": -0.9581369161605835,
+          "nematic_order": -76.65975952148438,
+          "flow_align": -3.8871536254882812,
+          "order_grad_mag": 0.16362470388412476,
+          "strain_order_align": -0.29921674728393555
+        },
+        "physics_corr": {
+          "enstrophy": 0.9018135666847229,
+          "vorticity_signed": -4.108961434989844e-12,
+          "divergence": -6.869344676418976e-11,
+          "nematic_order": 0.12015896290540695,
+          "flow_align": 0.26403290033340454,
+          "order_grad_mag": 0.5813875198364258,
+          "strain_order_align": 0.7137914299964905
+        }
+      }
+    },
+    "7": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9860501408576965,
+        "vorticity_signed": -0.3477478504180908,
+        "divergence": -0.3191590070724487,
+        "nematic_order": 0.974028742313385,
+        "flow_align": 0.5711376547813416,
+        "order_grad_mag": 0.9974911928176879,
+        "strain_order_align": 0.9974822044372559
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9233906388282775,
+          "vorticity_signed": -0.12543179988861083,
+          "divergence": -0.30840473175048827,
+          "nematic_order": 0.9319393157958984,
+          "flow_align": -0.08373061418533326,
+          "order_grad_mag": 0.8682896614074707,
+          "strain_order_align": 0.9474692463874816
+        },
+        "pixel_mse": 2.022097244592972,
+        "pixel_rel_l2": 2.0885791165777614,
+        "physics_r2": {
+          "enstrophy": 0.6806625127792358,
+          "vorticity_signed": -1.3540878295898438,
+          "divergence": -0.854738712310791,
+          "nematic_order": -114.90159606933594,
+          "flow_align": -0.4302788972854614,
+          "order_grad_mag": 0.11714392900466919,
+          "strain_order_align": 0.27165424823760986
+        },
+        "physics_corr": {
+          "enstrophy": 0.8719183802604675,
+          "vorticity_signed": 2.19944028267971e-12,
+          "divergence": -3.835846917876751e-11,
+          "nematic_order": 0.7452954649925232,
+          "flow_align": -0.011374631896615028,
+          "order_grad_mag": 0.6959705948829651,
+          "strain_order_align": 0.7526347637176514
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7829492568969727,
+          "vorticity_signed": -0.38079760074615476,
+          "divergence": -0.46174399852752684,
+          "nematic_order": 0.7428859114646912,
+          "flow_align": -0.1767643451690674,
+          "order_grad_mag": 0.7440668940544128,
+          "strain_order_align": 0.7881857395172119
+        },
+        "pixel_mse": 1.104574415859206,
+        "pixel_rel_l2": 1.140890263234591,
+        "physics_r2": {
+          "enstrophy": -2.4411423206329346,
+          "vorticity_signed": -3.412400245666504,
+          "divergence": -0.1167905330657959,
+          "nematic_order": -451.62078857421875,
+          "flow_align": -13.699957847595215,
+          "order_grad_mag": -2.5821926593780518,
+          "strain_order_align": -3.06270170211792
+        },
+        "physics_corr": {
+          "enstrophy": 0.4384607970714569,
+          "vorticity_signed": 2.566996636955976e-13,
+          "divergence": 2.8051075351420707e-11,
+          "nematic_order": 0.28101155161857605,
+          "flow_align": -0.10962626338005066,
+          "order_grad_mag": 0.014957191422581673,
+          "strain_order_align": 0.5569750666618347
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.974914836883545,
+          "vorticity_signed": -0.15083649158477783,
+          "divergence": -0.274789023399353,
+          "nematic_order": 0.9357652187347412,
+          "flow_align": 0.07482064962387085,
+          "order_grad_mag": 0.9891049146652222,
+          "strain_order_align": 0.9950246453285218
+        },
+        "pixel_mse": 0.7432808896679899,
+        "pixel_rel_l2": 0.7677182430582786,
+        "physics_r2": {
+          "enstrophy": -19.20659065246582,
+          "vorticity_signed": -3.281221389770508,
+          "divergence": -0.8355448246002197,
+          "nematic_order": -77.73786163330078,
+          "flow_align": -3.4901747703552246,
+          "order_grad_mag": 0.18964934349060059,
+          "strain_order_align": -0.31976306438446045
+        },
+        "physics_corr": {
+          "enstrophy": 0.8999130725860596,
+          "vorticity_signed": -5.440042513682464e-12,
+          "divergence": -8.037607038269279e-12,
+          "nematic_order": 0.09938021004199982,
+          "flow_align": 0.2928922474384308,
+          "order_grad_mag": 0.5915384888648987,
+          "strain_order_align": 0.6981145739555359
+        }
+      }
+    },
+    "8": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9837042570114136,
+        "vorticity_signed": -0.28033034801483153,
+        "divergence": -0.2071781873703003,
+        "nematic_order": 0.9760351419448853,
+        "flow_align": 0.5738247036933899,
+        "order_grad_mag": 0.9971290707588196,
+        "strain_order_align": 0.9969658732414246
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.926132345199585,
+          "vorticity_signed": -0.11331934928894043,
+          "divergence": -0.16681668758392335,
+          "nematic_order": 0.9302902936935424,
+          "flow_align": -0.12478518486022949,
+          "order_grad_mag": 0.8740362644195556,
+          "strain_order_align": 0.9509535074234009
+        },
+        "pixel_mse": 2.02448641161898,
+        "pixel_rel_l2": 2.105314438467164,
+        "physics_r2": {
+          "enstrophy": 0.6733988523483276,
+          "vorticity_signed": -1.4114062786102295,
+          "divergence": -0.6197929382324219,
+          "nematic_order": -106.10873413085938,
+          "flow_align": -0.4381200075149536,
+          "order_grad_mag": 0.07235056161880493,
+          "strain_order_align": 0.28810590505599976
+        },
+        "physics_corr": {
+          "enstrophy": 0.8705840706825256,
+          "vorticity_signed": 5.186227966177959e-13,
+          "divergence": -2.2888293690903616e-11,
+          "nematic_order": 0.7473381757736206,
+          "flow_align": -0.016973355785012245,
+          "order_grad_mag": 0.7051162123680115,
+          "strain_order_align": 0.7588627338409424
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7889670491218567,
+          "vorticity_signed": -0.3417815208435059,
+          "divergence": -0.27819170951843264,
+          "nematic_order": 0.7044045090675354,
+          "flow_align": -0.23042631149291992,
+          "order_grad_mag": 0.7535763502120971,
+          "strain_order_align": 0.8078312397003173
+        },
+        "pixel_mse": 1.0905807732916497,
+        "pixel_rel_l2": 1.1341224298410941,
+        "physics_r2": {
+          "enstrophy": -1.685520887374878,
+          "vorticity_signed": -2.7994441986083984,
+          "divergence": -0.2002720832824707,
+          "nematic_order": -428.4292297363281,
+          "flow_align": -13.803874969482422,
+          "order_grad_mag": -3.157726764678955,
+          "strain_order_align": -3.1011152267456055
+        },
+        "physics_corr": {
+          "enstrophy": 0.5279331207275391,
+          "vorticity_signed": 2.043794387202036e-12,
+          "divergence": -1.031985087662779e-11,
+          "nematic_order": 0.2853078246116638,
+          "flow_align": -0.06004447862505913,
+          "order_grad_mag": 0.0969511941075325,
+          "strain_order_align": 0.5833835005760193
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9784814476966858,
+          "vorticity_signed": -0.15619266033172607,
+          "divergence": -0.2548760652542114,
+          "nematic_order": 0.9471658349037171,
+          "flow_align": 0.14028812646865846,
+          "order_grad_mag": 0.9877507567405701,
+          "strain_order_align": 0.9946750044822693
+        },
+        "pixel_mse": 0.7456442855240463,
+        "pixel_rel_l2": 0.7754142834769272,
+        "physics_r2": {
+          "enstrophy": -18.880084991455078,
+          "vorticity_signed": -3.11214017868042,
+          "divergence": -0.3648327589035034,
+          "nematic_order": -73.11552429199219,
+          "flow_align": -3.174192428588867,
+          "order_grad_mag": 0.17557573318481445,
+          "strain_order_align": -0.33607351779937744
+        },
+        "physics_corr": {
+          "enstrophy": 0.9001824855804443,
+          "vorticity_signed": 4.957230372720778e-12,
+          "divergence": 6.059064361352284e-11,
+          "nematic_order": 0.07746844738721848,
+          "flow_align": 0.38523414731025696,
+          "order_grad_mag": 0.5828660726547241,
+          "strain_order_align": 0.6912940144538879
+        }
+      }
+    }
+  }
+}

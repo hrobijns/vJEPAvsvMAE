@@ -18,4 +18,5 @@ local_data/
 local_runs/
 local_analysis*.json
 analysis_*.json
+pod_logs/
 .DS_Store

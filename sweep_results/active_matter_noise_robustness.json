@@ -1,0 +1,114 @@
+{
+  "checkpoints/active_matter_jepa.pt": {
+    "0.0": {
+      "enstrophy": 0.9758806824684143,
+      "vorticity_signed": -0.19807775020599366,
+      "divergence": -0.5697906970977783,
+      "nematic_order": 0.9894911289215088,
+      "flow_align": -0.19803028106689452,
+      "order_grad_mag": 0.9771194696426392,
+      "strain_order_align": 0.9937463879585267
+    },
+    "0.1": {
+      "enstrophy": 0.9773527622222901,
+      "vorticity_signed": -0.19008564949035645,
+      "divergence": -0.5039067745208741,
+      "nematic_order": 0.9914008855819703,
+      "flow_align": -0.18246176242828369,
+      "order_grad_mag": 0.9774449229240417,
+      "strain_order_align": 0.9942197322845459
+    },
+    "0.25": {
+      "enstrophy": 0.9814715623855591,
+      "vorticity_signed": -0.21524014472961425,
+      "divergence": -0.5335564613342285,
+      "nematic_order": 0.9950302362442016,
+      "flow_align": -0.14619338512420654,
+      "order_grad_mag": 0.9781067967414856,
+      "strain_order_align": 0.9947671055793762
+    },
+    "0.5": {
+      "enstrophy": 0.9818819999694824,
+      "vorticity_signed": -0.39297945499420167,
+      "divergence": -0.4626302719116211,
+      "nematic_order": 0.9953262686729432,
+      "flow_align": -0.1607767105102539,
+      "order_grad_mag": 0.9674150943756104,
+      "strain_order_align": 0.9928511023521424
+    },
+    "1.0": {
+      "enstrophy": 0.9617553591728211,
+      "vorticity_signed": -0.5954669713973999,
+      "divergence": -0.9805834770202637,
+      "nematic_order": 0.981639850139618,
+      "flow_align": -0.2595545768737793,
+      "order_grad_mag": 0.9223577380180359,
+      "strain_order_align": 0.9807802677154541
+    },
+    "2.0": {
+      "enstrophy": 0.8560230255126953,
+      "vorticity_signed": -1.4168795108795167,
+      "divergence": -1.4502897262573242,
+      "nematic_order": 0.8540247321128845,
+      "flow_align": -1.2597009420394898,
+      "order_grad_mag": 0.7636873364448548,
+      "strain_order_align": 0.8697545766830445
+    }
+  },
+  "checkpoints/active_matter_mae.pt": {
+    "0.0": {
+      "enstrophy": 0.9754879593849182,
+      "vorticity_signed": -0.10430946350097656,
+      "divergence": -0.20603067874908448,
+      "nematic_order": 0.9981678009033204,
+      "flow_align": 0.2835310101509094,
+      "order_grad_mag": 0.9944812417030334,
+      "strain_order_align": 0.9944183826446533
+    },
+    "0.1": {
+      "enstrophy": 0.9754237174987793,
+      "vorticity_signed": -0.10621998310089112,
+      "divergence": -0.19448719024658204,
+      "nematic_order": 0.9983819603919983,
+      "flow_align": 0.29940065145492556,
+      "order_grad_mag": 0.9951659679412842,
+      "strain_order_align": 0.9940475106239319
+    },
+    "0.25": {
+      "enstrophy": 0.9765817046165466,
+      "vorticity_signed": -0.0881503701210022,
+      "divergence": -0.2359928846359253,
+      "nematic_order": 0.9977731347084046,
+      "flow_align": 0.25881820917129517,
+      "order_grad_mag": 0.9925830960273743,
+      "strain_order_align": 0.994875144958496
+    },
+    "0.5": {
+      "enstrophy": 0.9784440279006958,
+      "vorticity_signed": -0.15258851051330566,
+      "divergence": -0.197401762008667,
+      "nematic_order": 0.9895218729972839,
+      "flow_align": 0.14828647375106813,
+      "order_grad_mag": 0.9709585189819336,
+      "strain_order_align": 0.992102324962616
+    },
+    "1.0": {
+      "enstrophy": 0.9065385937690735,
+      "vorticity_signed": -1.5241499662399292,
+      "divergence": -0.957361388206482,
+      "nematic_order": 0.8431105375289917,
+      "flow_align": -1.1959850788116455,
+      "order_grad_mag": 0.832325541973114,
+      "strain_order_align": 0.930388069152832
+    },
+    "2.0": {
+      "enstrophy": -0.3641258001327515,
+      "vorticity_signed": -4.740336275100708,
+      "divergence": -3.818555402755737,
+      "nematic_order": -1.0826165437698365,
+      "flow_align": -3.0789934158325196,
+      "order_grad_mag": -1.7592904567718506,
+      "strain_order_align": -0.30824549198150636
+    }
+  }
+}

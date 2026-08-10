@@ -3,10 +3,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from einops import rearrange
 
 from src.masking import gather_tokens, tube_mask
 from src.models.decoder import MAEDecoder
+from src.models.patchify import patchify as _patchify, unpatchify as _unpatchify
 from src.models.vit import VideoViT
 
 
@@ -29,14 +29,7 @@ class MAEModel(nn.Module):
 
     def patchify(self, x: torch.Tensor) -> torch.Tensor:
         """(B, C, T, H, W) -> (B, N, patch_dim), same token order as encoder."""
-        pt, ph, pw = self.encoder.patch_size
-        return rearrange(
-            x,
-            "b c (t pt) (h ph) (w pw) -> b (t h w) (pt ph pw c)",
-            pt=pt,
-            ph=ph,
-            pw=pw,
-        )
+        return _patchify(x, self.encoder.patch_size)
 
     def forward(self, clip: torch.Tensor) -> tuple[torch.Tensor, dict]:
         b = clip.size(0)
@@ -90,16 +83,9 @@ class MAEModel(nn.Module):
         recon = patches.clone()
         recon.scatter_(1, mask_idx.unsqueeze(-1).expand(-1, -1, pred.size(-1)), pred)
 
-        pt, ph, pw = self.encoder.patch_size
-        unpatch = lambda p: rearrange(
-            p,
-            "b (t h w) (pt ph pw c) -> b c (t pt) (h ph) (w pw)",
-            t=self.encoder.grid_t,
-            h=self.encoder.grid_h,
-            w=self.encoder.grid_w,
-            pt=pt,
-            ph=ph,
-            pw=pw,
+        unpatch = lambda p: _unpatchify(
+            p, self.encoder.grid_t, self.encoder.grid_h, self.encoder.grid_w,
+            self.encoder.patch_size,
         )
         recon_clip = unpatch(recon)
         return (

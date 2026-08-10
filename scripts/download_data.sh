@@ -9,7 +9,7 @@ for dataset in active_matter shear_flow rayleigh_benard; do
     for split in train valid; do
         echo "=== downloading $dataset/$split ==="
         # --no-parallel: the parallel path needs curl >= 7.66, older than some
-        # cluster login nodes (e.g. CSD3) provide
+        # cluster login nodes provide
         uv run the-well-download --base-path "$BASE_PATH" --dataset "$dataset" --split "$split" --no-parallel
     done
 done

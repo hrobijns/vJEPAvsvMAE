@@ -46,3 +46,16 @@ class MAEDecoder(nn.Module):
             x = blk(x)
         x = self.head(self.norm(x))
         return gather_tokens(x, mask_idx)
+
+
+def decode_all(decoder: MAEDecoder, latent: torch.Tensor) -> torch.Tensor:
+    """Decode every position's own feature to its own patch directly: (B, N,
+    encoder_dim) -> (B, N, patch_dim), no keep_idx/mask_idx, no mask-token
+    fill. That machinery in MAEDecoder.forward exists for MAE's
+    partial-visibility reconstruction task (some positions have no real
+    feature yet); it isn't needed when every position already has a real (or
+    predicted) feature, which is always true for rollout-head decoding."""
+    x = decoder.proj(latent) + decoder.pos_embed
+    for blk in decoder.blocks:
+        x = blk(x)
+    return decoder.head(decoder.norm(x))

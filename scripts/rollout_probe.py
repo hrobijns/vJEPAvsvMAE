@@ -40,28 +40,23 @@ from pathlib import Path
 
 import torch
 import torch.nn.functional as F
-from einops import rearrange
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.analyze_encoders import build_dataset, contemporaneous_targets, ridge_r2
 from scripts.load_predictor import load_jepa, load_mae
 from src.masking import causal_temporal_mask, gather_tokens
+from src.models.patchify import patchify as _patchify, unpatchify as _unpatchify
 
 
 def patchify(encoder, x: torch.Tensor) -> torch.Tensor:
     """(B, C, T, H, W) -> (B, N, patch_dim), same token order as encoder.tokenize."""
-    pt, ph, pw = encoder.patch_size
-    return rearrange(x, "b c (t pt) (h ph) (w pw) -> b (t h w) (pt ph pw c)", pt=pt, ph=ph, pw=pw)
+    return _patchify(x, encoder.patch_size)
 
 
 def unpatchify(encoder, patches: torch.Tensor) -> torch.Tensor:
     """(B, N, patch_dim) -> (B, C, T, H, W), inverse of patchify."""
-    pt, ph, pw = encoder.patch_size
-    return rearrange(
-        patches, "b (t h w) (pt ph pw c) -> b c (t pt) (h ph) (w pw)",
-        t=encoder.grid_t, h=encoder.grid_h, w=encoder.grid_w, pt=pt, ph=ph, pw=pw,
-    )
+    return _unpatchify(patches, encoder.grid_t, encoder.grid_h, encoder.grid_w, encoder.patch_size)
 
 
 def r2_across_clips(pred: torch.Tensor, real: torch.Tensor) -> float:

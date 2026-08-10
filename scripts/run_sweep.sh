@@ -30,6 +30,18 @@ for ds in active_matter shear_flow rayleigh_benard; do
     --data-root /workspace/data --dataset $ds --n-offsets 3 --n-context-groups 3 \
     --out sweep_results/${ds}_rollout.json > sweep_results/${ds}_rollout.log 2>&1
 
+  echo "=== $ds: autoregressive latent rollout assessment ===" | tee -a sweep_results/progress.log
+  python scripts/rollout_assessment.py --dataset $ds \
+    --data-root /workspace/data --n-offsets 3 --n-steps 8 \
+    --jepa-encoder-ckpt $jepa_ckpt --mae-encoder-ckpt $mae_ckpt --heads-dir runs \
+    --out sweep_results/${ds}_rollout_assessment.json > sweep_results/${ds}_rollout_assessment.log 2>&1
+
+  echo "=== $ds: representation stability under input noise ===" | tee -a sweep_results/progress.log
+  python scripts/analyze_noise_robustness.py --checkpoints $jepa_ckpt $mae_ckpt \
+    --data-root /workspace/data --dataset $ds --n-offsets 3 \
+    --noise-stds 0 0.1 0.25 0.5 1.0 2.0 \
+    --out sweep_results/${ds}_noise_robustness.json > sweep_results/${ds}_noise_robustness.log 2>&1
+
   echo "=== $ds DONE ===" | tee -a sweep_results/progress.log
 done
 echo "ALL DONE" | tee -a sweep_results/progress.log

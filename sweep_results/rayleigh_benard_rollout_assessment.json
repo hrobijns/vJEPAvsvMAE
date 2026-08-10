@@ -1,0 +1,1833 @@
+{
+  "dataset": "rayleigh_benard",
+  "n_steps": 8,
+  "n_seeds": 4200,
+  "jepa": {
+    "1": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9637362003326416,
+        "vorticity_signed": -0.08533449172973633,
+        "divergence": -0.06641938686370849,
+        "buoyancy_grad": 0.9436534404754638,
+        "convective_flux": 0.9787632703781128,
+        "okubo_weiss": 0.9816024661064148,
+        "velocity_buoyancy_coherence": 0.925879693031311,
+        "pressure_grad_mag": 0.9986824750900268
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9173694372177124,
+          "vorticity_signed": -0.07610809803009033,
+          "divergence": -0.07271401882171631,
+          "buoyancy_grad": 0.9069030404090881,
+          "convective_flux": 0.9477281332015991,
+          "okubo_weiss": 0.9452191233634949,
+          "velocity_buoyancy_coherence": 0.9088584184646606,
+          "pressure_grad_mag": 0.9986567974090577
+        },
+        "pixel_mse": 0.024074811727872916,
+        "pixel_rel_l2": 0.041442551463373126,
+        "physics_r2": {
+          "enstrophy": 0.38444966077804565,
+          "vorticity_signed": -0.2020576000213623,
+          "divergence": -0.23375797271728516,
+          "buoyancy_grad": 0.3355064392089844,
+          "convective_flux": 0.2275354266166687,
+          "okubo_weiss": 0.3956621289253235,
+          "velocity_buoyancy_coherence": 0.5257956981658936,
+          "pressure_grad_mag": 0.9533814191818237
+        },
+        "physics_corr": {
+          "enstrophy": 0.7017682194709778,
+          "vorticity_signed": 1.2111627889846432e-12,
+          "divergence": -3.719301776283768e-12,
+          "buoyancy_grad": 0.7070546746253967,
+          "convective_flux": 0.6576524376869202,
+          "okubo_weiss": 0.7219303846359253,
+          "velocity_buoyancy_coherence": 0.8249355554580688,
+          "pressure_grad_mag": 0.9871892333030701
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9342968225479126,
+          "vorticity_signed": -0.07205963134765625,
+          "divergence": -0.05990023612976074,
+          "buoyancy_grad": 0.9139721035957337,
+          "convective_flux": 0.9598683595657349,
+          "okubo_weiss": 0.9611666083335877,
+          "velocity_buoyancy_coherence": 0.9098374843597412,
+          "pressure_grad_mag": 0.9976934432983399
+        },
+        "pixel_mse": 0.016493774274630207,
+        "pixel_rel_l2": 0.02839249988444314,
+        "physics_r2": {
+          "enstrophy": 0.04312199354171753,
+          "vorticity_signed": -0.4264199733734131,
+          "divergence": -0.16865777969360352,
+          "buoyancy_grad": -1.4736506938934326,
+          "convective_flux": 0.2601478099822998,
+          "okubo_weiss": 0.0705416202545166,
+          "velocity_buoyancy_coherence": -9.017230033874512,
+          "pressure_grad_mag": 0.7035971283912659
+        },
+        "physics_corr": {
+          "enstrophy": 0.650342583656311,
+          "vorticity_signed": 6.533333444559697e-13,
+          "divergence": 2.613910878111053e-13,
+          "buoyancy_grad": 0.07220503687858582,
+          "convective_flux": 0.5554004907608032,
+          "okubo_weiss": 0.7307520508766174,
+          "velocity_buoyancy_coherence": 0.5231510996818542,
+          "pressure_grad_mag": 0.9851963520050049
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9342968225479126,
+          "vorticity_signed": -0.07205963134765625,
+          "divergence": -0.05990023612976074,
+          "buoyancy_grad": 0.9139721035957337,
+          "convective_flux": 0.9598683595657349,
+          "okubo_weiss": 0.9611666083335877,
+          "velocity_buoyancy_coherence": 0.9098374843597412,
+          "pressure_grad_mag": 0.9976934432983399
+        },
+        "pixel_mse": 0.016493774274630207,
+        "pixel_rel_l2": 0.02839249988444314,
+        "physics_r2": {
+          "enstrophy": 0.04312199354171753,
+          "vorticity_signed": -0.4264199733734131,
+          "divergence": -0.16865777969360352,
+          "buoyancy_grad": -1.4736506938934326,
+          "convective_flux": 0.2601478099822998,
+          "okubo_weiss": 0.0705416202545166,
+          "velocity_buoyancy_coherence": -9.017230033874512,
+          "pressure_grad_mag": 0.7035971283912659
+        },
+        "physics_corr": {
+          "enstrophy": 0.650342583656311,
+          "vorticity_signed": 6.533333444559697e-13,
+          "divergence": 2.613910878111053e-13,
+          "buoyancy_grad": 0.07220503687858582,
+          "convective_flux": 0.5554004907608032,
+          "okubo_weiss": 0.7307520508766174,
+          "velocity_buoyancy_coherence": 0.5231510996818542,
+          "pressure_grad_mag": 0.9851963520050049
+        }
+      }
+    },
+    "2": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9834185719490052,
+        "vorticity_signed": -0.0731201171875,
+        "divergence": -0.06605758666992187,
+        "buoyancy_grad": 0.873803722858429,
+        "convective_flux": 0.9886953949928283,
+        "okubo_weiss": 0.9898728132247925,
+        "velocity_buoyancy_coherence": 0.9521658420562744,
+        "pressure_grad_mag": 0.9983358263969422
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9567224264144898,
+          "vorticity_signed": -0.08716139793395997,
+          "divergence": -0.06892650127410889,
+          "buoyancy_grad": 0.8253626108169556,
+          "convective_flux": 0.9306220054626465,
+          "okubo_weiss": 0.9584151148796082,
+          "velocity_buoyancy_coherence": 0.9144586086273193,
+          "pressure_grad_mag": 0.9963927388191223
+        },
+        "pixel_mse": 0.0616590561433917,
+        "pixel_rel_l2": 0.1025096015305458,
+        "physics_r2": {
+          "enstrophy": -0.0235060453414917,
+          "vorticity_signed": -0.10703098773956299,
+          "divergence": -0.05421745777130127,
+          "buoyancy_grad": -0.07548916339874268,
+          "convective_flux": -0.13759970664978027,
+          "okubo_weiss": -0.004549980163574219,
+          "velocity_buoyancy_coherence": -0.047878384590148926,
+          "pressure_grad_mag": 0.9093095660209656
+        },
+        "physics_corr": {
+          "enstrophy": 0.38767731189727783,
+          "vorticity_signed": -5.269961116799449e-12,
+          "divergence": -2.1731479463160674e-12,
+          "buoyancy_grad": 0.2551370859146118,
+          "convective_flux": 0.3393934965133667,
+          "okubo_weiss": 0.46521127223968506,
+          "velocity_buoyancy_coherence": 0.5572163462638855,
+          "pressure_grad_mag": 0.9798552989959717
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9399501323699951,
+          "vorticity_signed": -0.05209879875183106,
+          "divergence": -0.03384177684783936,
+          "buoyancy_grad": 0.829170536994934,
+          "convective_flux": 0.9167364358901977,
+          "okubo_weiss": 0.9382254838943481,
+          "velocity_buoyancy_coherence": 0.8690769076347351,
+          "pressure_grad_mag": 0.9957293629646301
+        },
+        "pixel_mse": 0.05281678987046083,
+        "pixel_rel_l2": 0.08780913011630288,
+        "physics_r2": {
+          "enstrophy": -0.0828249454498291,
+          "vorticity_signed": -0.28374314308166504,
+          "divergence": -0.09860002994537354,
+          "buoyancy_grad": -0.387362003326416,
+          "convective_flux": 0.18466687202453613,
+          "okubo_weiss": -0.04739975929260254,
+          "velocity_buoyancy_coherence": -17.94779396057129,
+          "pressure_grad_mag": 0.7480083703994751
+        },
+        "physics_corr": {
+          "enstrophy": 0.5746055841445923,
+          "vorticity_signed": 9.033991545288889e-13,
+          "divergence": 2.251054811303055e-12,
+          "buoyancy_grad": -0.02935425564646721,
+          "convective_flux": 0.42990946769714355,
+          "okubo_weiss": 0.5881977677345276,
+          "velocity_buoyancy_coherence": 0.2050030678510666,
+          "pressure_grad_mag": 0.986434280872345
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9792094230651855,
+          "vorticity_signed": -0.059302258491516116,
+          "divergence": -0.04799792766571045,
+          "buoyancy_grad": 0.8524829626083374,
+          "convective_flux": 0.9721757888793945,
+          "okubo_weiss": 0.9846801280975341,
+          "velocity_buoyancy_coherence": 0.9337541341781617,
+          "pressure_grad_mag": 0.9970538139343261
+        },
+        "pixel_mse": 0.04365428823356827,
+        "pixel_rel_l2": 0.0725762600309003,
+        "physics_r2": {
+          "enstrophy": 0.013221442699432373,
+          "vorticity_signed": -0.22828328609466553,
+          "divergence": -0.09773659706115723,
+          "buoyancy_grad": -0.0018080472946166992,
+          "convective_flux": 0.5402400493621826,
+          "okubo_weiss": 0.06232172250747681,
+          "velocity_buoyancy_coherence": -5.582629203796387,
+          "pressure_grad_mag": 0.6368492841720581
+        },
+        "physics_corr": {
+          "enstrophy": 0.7108792066574097,
+          "vorticity_signed": 2.9016999306824554e-12,
+          "divergence": -1.0382348626658544e-11,
+          "buoyancy_grad": 0.3757137060165405,
+          "convective_flux": 0.8975986242294312,
+          "okubo_weiss": 0.7983689904212952,
+          "velocity_buoyancy_coherence": 0.6978421211242676,
+          "pressure_grad_mag": 0.9874318838119507
+        }
+      }
+    },
+    "3": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9670090079307556,
+        "vorticity_signed": -0.050998806953430176,
+        "divergence": -0.06819446086883545,
+        "buoyancy_grad": 0.8595794677734375,
+        "convective_flux": 0.982719874382019,
+        "okubo_weiss": 0.9802157282829285,
+        "velocity_buoyancy_coherence": 0.956212043762207,
+        "pressure_grad_mag": 0.9971099972724915
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9348424315452576,
+          "vorticity_signed": -0.07410132884979248,
+          "divergence": -0.055407261848449706,
+          "buoyancy_grad": 0.7903063297271729,
+          "convective_flux": 0.8817828297615051,
+          "okubo_weiss": 0.9388312578201294,
+          "velocity_buoyancy_coherence": 0.8697153210639954,
+          "pressure_grad_mag": 0.9907168745994568
+        },
+        "pixel_mse": 0.15278266316013678,
+        "pixel_rel_l2": 0.2361808509402429,
+        "physics_r2": {
+          "enstrophy": -0.19630944728851318,
+          "vorticity_signed": -0.030739426612854004,
+          "divergence": -0.016409754753112793,
+          "buoyancy_grad": -0.16758227348327637,
+          "convective_flux": -0.37241291999816895,
+          "okubo_weiss": -0.21600520610809326,
+          "velocity_buoyancy_coherence": -0.6572694778442383,
+          "pressure_grad_mag": 0.7788207530975342
+        },
+        "physics_corr": {
+          "enstrophy": 0.34124428033828735,
+          "vorticity_signed": -4.52077524720762e-12,
+          "divergence": 1.9216000318733606e-12,
+          "buoyancy_grad": 0.1731949895620346,
+          "convective_flux": 0.24832843244075775,
+          "okubo_weiss": 0.409148246049881,
+          "velocity_buoyancy_coherence": 0.2777269780635834,
+          "pressure_grad_mag": 0.9499080777168274
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8597377300262451,
+          "vorticity_signed": -0.030627679824829102,
+          "divergence": -0.027991819381713866,
+          "buoyancy_grad": 0.757414448261261,
+          "convective_flux": 0.7489017009735107,
+          "okubo_weiss": 0.8528847694396973,
+          "velocity_buoyancy_coherence": 0.6711163997650147,
+          "pressure_grad_mag": 0.9825617909431458
+        },
+        "pixel_mse": 0.15208997690961473,
+        "pixel_rel_l2": 0.23511005387008435,
+        "physics_r2": {
+          "enstrophy": -0.19598114490509033,
+          "vorticity_signed": -0.27439045906066895,
+          "divergence": -0.08779275417327881,
+          "buoyancy_grad": -0.37627995014190674,
+          "convective_flux": -0.10915803909301758,
+          "okubo_weiss": -0.18166851997375488,
+          "velocity_buoyancy_coherence": -15.239816665649414,
+          "pressure_grad_mag": 0.731896162033081
+        },
+        "physics_corr": {
+          "enstrophy": 0.27718585729599,
+          "vorticity_signed": -1.6925600461112356e-12,
+          "divergence": 1.4845923101969305e-11,
+          "buoyancy_grad": -0.12031154334545135,
+          "convective_flux": 0.1348888874053955,
+          "okubo_weiss": 0.22817404568195343,
+          "velocity_buoyancy_coherence": -0.014807053841650486,
+          "pressure_grad_mag": 0.9496240615844727
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9527344346046448,
+          "vorticity_signed": -0.03997269868850708,
+          "divergence": -0.041591739654541014,
+          "buoyancy_grad": 0.8031782627105712,
+          "convective_flux": 0.9601287245750427,
+          "okubo_weiss": 0.9667020201683044,
+          "velocity_buoyancy_coherence": 0.9366545081138611,
+          "pressure_grad_mag": 0.9940579175949097
+        },
+        "pixel_mse": 0.11966182037034914,
+        "pixel_rel_l2": 0.18498061216870765,
+        "physics_r2": {
+          "enstrophy": 0.05794793367385864,
+          "vorticity_signed": -0.1950681209564209,
+          "divergence": -0.04143190383911133,
+          "buoyancy_grad": 0.03568321466445923,
+          "convective_flux": 0.4478102922439575,
+          "okubo_weiss": 0.18321919441223145,
+          "velocity_buoyancy_coherence": -3.253389835357666,
+          "pressure_grad_mag": 0.48619377613067627
+        },
+        "physics_corr": {
+          "enstrophy": 0.7756650447845459,
+          "vorticity_signed": -6.35692843850566e-12,
+          "divergence": 3.610995530367589e-11,
+          "buoyancy_grad": 0.42976081371307373,
+          "convective_flux": 0.8957109451293945,
+          "okubo_weiss": 0.8237676024436951,
+          "velocity_buoyancy_coherence": 0.7283061146736145,
+          "pressure_grad_mag": 0.9662525653839111
+        }
+      }
+    },
+    "4": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9693134546279907,
+        "vorticity_signed": -0.03968722820281982,
+        "divergence": -0.03314697742462158,
+        "buoyancy_grad": 0.8624908924102783,
+        "convective_flux": 0.9770250797271729,
+        "okubo_weiss": 0.9784767627716064,
+        "velocity_buoyancy_coherence": 0.9464018702507019,
+        "pressure_grad_mag": 0.9960880637168884
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.8983603835105896,
+          "vorticity_signed": -0.05406041145324707,
+          "divergence": -0.0660794734954834,
+          "buoyancy_grad": 0.7515729665756226,
+          "convective_flux": 0.8597469091415405,
+          "okubo_weiss": 0.9113268256187439,
+          "velocity_buoyancy_coherence": 0.8197759985923767,
+          "pressure_grad_mag": 0.9792049288749695
+        },
+        "pixel_mse": 0.28926954115430514,
+        "pixel_rel_l2": 0.4053292216614538,
+        "physics_r2": {
+          "enstrophy": -0.41763174533843994,
+          "vorticity_signed": -0.008759498596191406,
+          "divergence": -0.013379693031311035,
+          "buoyancy_grad": -0.3107253313064575,
+          "convective_flux": -0.6458584070205688,
+          "okubo_weiss": -0.4719744920730591,
+          "velocity_buoyancy_coherence": -1.3239867687225342,
+          "pressure_grad_mag": 0.6015207171440125
+        },
+        "physics_corr": {
+          "enstrophy": 0.3351075053215027,
+          "vorticity_signed": 2.670334873361435e-12,
+          "divergence": -5.301048228850691e-12,
+          "buoyancy_grad": 0.17301607131958008,
+          "convective_flux": 0.09253765642642975,
+          "okubo_weiss": 0.39571133255958557,
+          "velocity_buoyancy_coherence": -0.0037334589287638664,
+          "pressure_grad_mag": 0.9249621033668518
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7187511444091796,
+          "vorticity_signed": 0.0003440380096435547,
+          "divergence": -0.019818127155303955,
+          "buoyancy_grad": 0.5991589188575744,
+          "convective_flux": 0.6227599620819092,
+          "okubo_weiss": 0.7290518403053283,
+          "velocity_buoyancy_coherence": 0.5606698155403137,
+          "pressure_grad_mag": 0.9505856037139893
+        },
+        "pixel_mse": 0.30337139639116467,
+        "pixel_rel_l2": 0.42508897232282655,
+        "physics_r2": {
+          "enstrophy": -0.38742804527282715,
+          "vorticity_signed": -0.33768224716186523,
+          "divergence": -0.1343446969985962,
+          "buoyancy_grad": -0.6418628692626953,
+          "convective_flux": -0.16417944431304932,
+          "okubo_weiss": -0.3724311590194702,
+          "velocity_buoyancy_coherence": -13.711194038391113,
+          "pressure_grad_mag": 0.6776177287101746
+        },
+        "physics_corr": {
+          "enstrophy": 0.0898413434624672,
+          "vorticity_signed": 6.707338677525154e-12,
+          "divergence": 3.0316357063631116e-11,
+          "buoyancy_grad": -0.26296156644821167,
+          "convective_flux": 0.10915961116552353,
+          "okubo_weiss": 0.13531947135925293,
+          "velocity_buoyancy_coherence": -0.00981961004436016,
+          "pressure_grad_mag": 0.8992937207221985
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9501410245895385,
+          "vorticity_signed": -0.025081181526184083,
+          "divergence": -0.04015109539031982,
+          "buoyancy_grad": 0.7989411592483521,
+          "convective_flux": 0.9484816908836364,
+          "okubo_weiss": 0.9610206246376037,
+          "velocity_buoyancy_coherence": 0.9227771162986755,
+          "pressure_grad_mag": 0.9911490082740784
+        },
+        "pixel_mse": 0.2346911280903788,
+        "pixel_rel_l2": 0.32885305483641664,
+        "physics_r2": {
+          "enstrophy": 0.033694565296173096,
+          "vorticity_signed": -0.22348356246948242,
+          "divergence": -0.08835923671722412,
+          "buoyancy_grad": -0.03873276710510254,
+          "convective_flux": 0.37152940034866333,
+          "okubo_weiss": 0.20951366424560547,
+          "velocity_buoyancy_coherence": -3.595714569091797,
+          "pressure_grad_mag": -0.25461888313293457
+        },
+        "physics_corr": {
+          "enstrophy": 0.6500595808029175,
+          "vorticity_signed": 2.731908796405058e-11,
+          "divergence": 2.5134453546238333e-11,
+          "buoyancy_grad": 0.3173629343509674,
+          "convective_flux": 0.798456072807312,
+          "okubo_weiss": 0.6802091598510742,
+          "velocity_buoyancy_coherence": 0.6863753199577332,
+          "pressure_grad_mag": 0.912807285785675
+        }
+      }
+    },
+    "5": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9602573871612549,
+        "vorticity_signed": -0.04334127902984619,
+        "divergence": -0.04008462429046631,
+        "buoyancy_grad": 0.813866937160492,
+        "convective_flux": 0.9636097908020019,
+        "okubo_weiss": 0.9728126406669617,
+        "velocity_buoyancy_coherence": 0.9287169933319092,
+        "pressure_grad_mag": 0.9949089884757996
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.8496657967567444,
+          "vorticity_signed": -0.04426453113555908,
+          "divergence": -0.06470470428466797,
+          "buoyancy_grad": 0.7233233094215393,
+          "convective_flux": 0.7816086888313294,
+          "okubo_weiss": 0.8659120678901673,
+          "velocity_buoyancy_coherence": 0.7470100879669189,
+          "pressure_grad_mag": 0.9673966646194458
+        },
+        "pixel_mse": 0.4359240564845857,
+        "pixel_rel_l2": 0.555785873305282,
+        "physics_r2": {
+          "enstrophy": -0.7160636186599731,
+          "vorticity_signed": -0.004538059234619141,
+          "divergence": -0.009327530860900879,
+          "buoyancy_grad": -0.4309122562408447,
+          "convective_flux": -1.069547176361084,
+          "okubo_weiss": -0.8218508958816528,
+          "velocity_buoyancy_coherence": -2.0456228256225586,
+          "pressure_grad_mag": 0.3894950747489929
+        },
+        "physics_corr": {
+          "enstrophy": 0.3088860809803009,
+          "vorticity_signed": 4.5181297939067555e-12,
+          "divergence": -3.51520353623902e-12,
+          "buoyancy_grad": 0.1453055888414383,
+          "convective_flux": -0.09260628372430801,
+          "okubo_weiss": 0.35526031255722046,
+          "velocity_buoyancy_coherence": -0.2373572587966919,
+          "pressure_grad_mag": 0.9065454602241516
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.5859293699264526,
+          "vorticity_signed": -0.010246145725250243,
+          "divergence": -0.013674557209014893,
+          "buoyancy_grad": 0.5032889723777771,
+          "convective_flux": 0.5783726453781128,
+          "okubo_weiss": 0.6009487628936767,
+          "velocity_buoyancy_coherence": 0.4722435474395752,
+          "pressure_grad_mag": 0.914609682559967
+        },
+        "pixel_mse": 0.44058812808422815,
+        "pixel_rel_l2": 0.5617323795111336,
+        "physics_r2": {
+          "enstrophy": -0.6253275871276855,
+          "vorticity_signed": -0.319607138633728,
+          "divergence": -0.15948987007141113,
+          "buoyancy_grad": -0.6296970844268799,
+          "convective_flux": -0.07885956764221191,
+          "okubo_weiss": -0.6222673654556274,
+          "velocity_buoyancy_coherence": -14.199716567993164,
+          "pressure_grad_mag": 0.6799141764640808
+        },
+        "physics_corr": {
+          "enstrophy": 0.20758813619613647,
+          "vorticity_signed": 1.80735027638379e-11,
+          "divergence": -1.6505508765307653e-11,
+          "buoyancy_grad": -0.2440962940454483,
+          "convective_flux": 0.2981434166431427,
+          "okubo_weiss": 0.22176088392734528,
+          "velocity_buoyancy_coherence": 0.0329974927008152,
+          "pressure_grad_mag": 0.8824137449264526
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.938972806930542,
+          "vorticity_signed": -0.028645586967468262,
+          "divergence": -0.0337714433670044,
+          "buoyancy_grad": 0.76363205909729,
+          "convective_flux": 0.9293888926506042,
+          "okubo_weiss": 0.9524519562721252,
+          "velocity_buoyancy_coherence": 0.8934999942779541,
+          "pressure_grad_mag": 0.9886933088302612
+        },
+        "pixel_mse": 0.36011931573706013,
+        "pixel_rel_l2": 0.4591378370009727,
+        "physics_r2": {
+          "enstrophy": -0.054567575454711914,
+          "vorticity_signed": -0.3502202033996582,
+          "divergence": -0.12419235706329346,
+          "buoyancy_grad": -0.16746079921722412,
+          "convective_flux": 0.21233755350112915,
+          "okubo_weiss": 0.12747466564178467,
+          "velocity_buoyancy_coherence": -4.570272445678711,
+          "pressure_grad_mag": -1.5859198570251465
+        },
+        "physics_corr": {
+          "enstrophy": 0.5370523929595947,
+          "vorticity_signed": 4.2084842555301094e-12,
+          "divergence": 3.963579811583351e-11,
+          "buoyancy_grad": 0.14156855642795563,
+          "convective_flux": 0.6486291289329529,
+          "okubo_weiss": 0.5723174810409546,
+          "velocity_buoyancy_coherence": 0.6627124547958374,
+          "pressure_grad_mag": 0.8721871972084045
+        }
+      }
+    },
+    "6": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9585179209709167,
+        "vorticity_signed": -0.03527364730834961,
+        "divergence": -0.035834670066833496,
+        "buoyancy_grad": 0.8178734660148621,
+        "convective_flux": 0.9625599384307861,
+        "okubo_weiss": 0.9698711633682251,
+        "velocity_buoyancy_coherence": 0.9200633645057679,
+        "pressure_grad_mag": 0.993743634223938
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.7662068009376526,
+          "vorticity_signed": -0.03745503425598144,
+          "divergence": -0.05487222671508789,
+          "buoyancy_grad": 0.6491428852081299,
+          "convective_flux": 0.7344496250152588,
+          "okubo_weiss": 0.7905851244926453,
+          "velocity_buoyancy_coherence": 0.6802895903587342,
+          "pressure_grad_mag": 0.9419458746910095
+        },
+        "pixel_mse": 0.5857896037612642,
+        "pixel_rel_l2": 0.6830940300260998,
+        "physics_r2": {
+          "enstrophy": -1.0412790775299072,
+          "vorticity_signed": -0.012226462364196777,
+          "divergence": -0.005673527717590332,
+          "buoyancy_grad": -0.5503963232040405,
+          "convective_flux": -1.2082569599151611,
+          "okubo_weiss": -1.1865077018737793,
+          "velocity_buoyancy_coherence": -2.154825448989868,
+          "pressure_grad_mag": 0.12421911954879761
+        },
+        "physics_corr": {
+          "enstrophy": 0.2514020502567291,
+          "vorticity_signed": -4.314716119113715e-12,
+          "divergence": 3.074497470847981e-12,
+          "buoyancy_grad": 0.088717982172966,
+          "convective_flux": -0.20179371535778046,
+          "okubo_weiss": 0.29025885462760925,
+          "velocity_buoyancy_coherence": -0.3291119337081909,
+          "pressure_grad_mag": 0.8868640661239624
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.4412818193435669,
+          "vorticity_signed": -0.016985821723937988,
+          "divergence": -0.013379788398742676,
+          "buoyancy_grad": 0.44700639247894286,
+          "convective_flux": 0.43636064529418944,
+          "okubo_weiss": 0.4629060626029968,
+          "velocity_buoyancy_coherence": 0.43871530294418337,
+          "pressure_grad_mag": 0.8725100874900817
+        },
+        "pixel_mse": 0.5660201629286721,
+        "pixel_rel_l2": 0.6600407239875693,
+        "physics_r2": {
+          "enstrophy": -0.922029972076416,
+          "vorticity_signed": -0.30124449729919434,
+          "divergence": -0.1453709602355957,
+          "buoyancy_grad": -0.5787760019302368,
+          "convective_flux": -0.09036827087402344,
+          "okubo_weiss": -0.9238829612731934,
+          "velocity_buoyancy_coherence": -14.1387300491333,
+          "pressure_grad_mag": 0.5585390329360962
+        },
+        "physics_corr": {
+          "enstrophy": 0.23095151782035828,
+          "vorticity_signed": 7.745367715250584e-12,
+          "divergence": -2.4659572994689682e-11,
+          "buoyancy_grad": -0.15523011982440948,
+          "convective_flux": 0.37049445509910583,
+          "okubo_weiss": 0.26649388670921326,
+          "velocity_buoyancy_coherence": 0.08897094428539276,
+          "pressure_grad_mag": 0.8695640563964844
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9324160933494567,
+          "vorticity_signed": -0.023274707794189452,
+          "divergence": -0.021502876281738283,
+          "buoyancy_grad": 0.7667601585388184,
+          "convective_flux": 0.9209619641304017,
+          "okubo_weiss": 0.9432893395423889,
+          "velocity_buoyancy_coherence": 0.8880383729934692,
+          "pressure_grad_mag": 0.9845779299736023
+        },
+        "pixel_mse": 0.48557715564966203,
+        "pixel_rel_l2": 0.5662354777407743,
+        "physics_r2": {
+          "enstrophy": -0.17654919624328613,
+          "vorticity_signed": -0.3979625701904297,
+          "divergence": -0.17356538772583008,
+          "buoyancy_grad": -0.2646373510360718,
+          "convective_flux": 0.014549016952514648,
+          "okubo_weiss": 0.021131157875061035,
+          "velocity_buoyancy_coherence": -4.319375514984131,
+          "pressure_grad_mag": -3.1203250885009766
+        },
+        "physics_corr": {
+          "enstrophy": 0.40255314111709595,
+          "vorticity_signed": 1.2050969597221517e-11,
+          "divergence": -3.444620977344215e-11,
+          "buoyancy_grad": -0.0077680260874331,
+          "convective_flux": 0.5017687082290649,
+          "okubo_weiss": 0.461031049489975,
+          "velocity_buoyancy_coherence": 0.6307885050773621,
+          "pressure_grad_mag": 0.8471648693084717
+        }
+      }
+    },
+    "7": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.954787802696228,
+        "vorticity_signed": -0.04887678623199463,
+        "divergence": -0.05510952472686768,
+        "buoyancy_grad": 0.8094900965690612,
+        "convective_flux": 0.9603756546974183,
+        "okubo_weiss": 0.9671890616416932,
+        "velocity_buoyancy_coherence": 0.9160285472869873,
+        "pressure_grad_mag": 0.9932443976402283
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.7164978623390198,
+          "vorticity_signed": -0.047933340072631836,
+          "divergence": -0.05559587478637695,
+          "buoyancy_grad": 0.6744300365447998,
+          "convective_flux": 0.6155538558959961,
+          "okubo_weiss": 0.7332862615585327,
+          "velocity_buoyancy_coherence": 0.6376862168312073,
+          "pressure_grad_mag": 0.9082478642463684
+        },
+        "pixel_mse": 0.7269049751190912,
+        "pixel_rel_l2": 0.7818305077104826,
+        "physics_r2": {
+          "enstrophy": -1.2831158638000488,
+          "vorticity_signed": -0.007067084312438965,
+          "divergence": -0.003744959831237793,
+          "buoyancy_grad": -0.5999937057495117,
+          "convective_flux": -1.3411431312561035,
+          "okubo_weiss": -1.437441110610962,
+          "velocity_buoyancy_coherence": -1.9252347946166992,
+          "pressure_grad_mag": -0.210548996925354
+        },
+        "physics_corr": {
+          "enstrophy": 0.21234816312789917,
+          "vorticity_signed": 5.831161833773357e-13,
+          "divergence": 7.975091941003765e-12,
+          "buoyancy_grad": 0.01646372303366661,
+          "convective_flux": -0.22000214457511902,
+          "okubo_weiss": 0.24308043718338013,
+          "velocity_buoyancy_coherence": -0.32424095273017883,
+          "pressure_grad_mag": 0.8430589437484741
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.38657379150390625,
+          "vorticity_signed": -0.01291816234588623,
+          "divergence": -0.013627076148986816,
+          "buoyancy_grad": 0.5128857851028442,
+          "convective_flux": 0.5283308863639832,
+          "okubo_weiss": 0.39062591791152956,
+          "velocity_buoyancy_coherence": 0.5375070333480835,
+          "pressure_grad_mag": 0.8110866904258728
+        },
+        "pixel_mse": 0.6804770623218446,
+        "pixel_rel_l2": 0.7318944639679529,
+        "physics_r2": {
+          "enstrophy": -1.1527552604675293,
+          "vorticity_signed": -0.2798713445663452,
+          "divergence": -0.12873327732086182,
+          "buoyancy_grad": -0.666061520576477,
+          "convective_flux": -0.3138713836669922,
+          "okubo_weiss": -1.159492015838623,
+          "velocity_buoyancy_coherence": -18.243574142456055,
+          "pressure_grad_mag": 0.25061678886413574
+        },
+        "physics_corr": {
+          "enstrophy": 0.16468818485736847,
+          "vorticity_signed": -1.1008881306562301e-11,
+          "divergence": -3.198110179458702e-11,
+          "buoyancy_grad": -0.15066656470298767,
+          "convective_flux": 0.23489390313625336,
+          "okubo_weiss": 0.23863263428211212,
+          "velocity_buoyancy_coherence": -0.10108020901679993,
+          "pressure_grad_mag": 0.8323236107826233
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9291916728019715,
+          "vorticity_signed": -0.043837547302246094,
+          "divergence": -0.03634791374206543,
+          "buoyancy_grad": 0.7665683507919312,
+          "convective_flux": 0.9170279860496521,
+          "okubo_weiss": 0.9424293518066407,
+          "velocity_buoyancy_coherence": 0.8861551761627198,
+          "pressure_grad_mag": 0.9850561618804932
+        },
+        "pixel_mse": 0.599708398651509,
+        "pixel_rel_l2": 0.6450228542171323,
+        "physics_r2": {
+          "enstrophy": -0.16217923164367676,
+          "vorticity_signed": -0.49490034580230713,
+          "divergence": -0.18904662132263184,
+          "buoyancy_grad": -0.3567386865615845,
+          "convective_flux": -0.15704238414764404,
+          "okubo_weiss": 0.0715603232383728,
+          "velocity_buoyancy_coherence": -4.142322540283203,
+          "pressure_grad_mag": -4.599005699157715
+        },
+        "physics_corr": {
+          "enstrophy": 0.35414502024650574,
+          "vorticity_signed": -1.9381211913138685e-11,
+          "divergence": -1.1192941538895607e-11,
+          "buoyancy_grad": -0.1419263482093811,
+          "convective_flux": 0.3939749598503113,
+          "okubo_weiss": 0.43234583735466003,
+          "velocity_buoyancy_coherence": 0.6358234882354736,
+          "pressure_grad_mag": 0.8532230257987976
+        }
+      }
+    },
+    "8": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9565981745719909,
+        "vorticity_signed": -0.03967716693878174,
+        "divergence": -0.05264184474945068,
+        "buoyancy_grad": 0.8313408374786377,
+        "convective_flux": 0.9594887375831604,
+        "okubo_weiss": 0.9677730560302734,
+        "velocity_buoyancy_coherence": 0.8918892979621887,
+        "pressure_grad_mag": 0.9931430101394654
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.6383679270744324,
+          "vorticity_signed": -0.05288505554199219,
+          "divergence": -0.0607074499130249,
+          "buoyancy_grad": 0.7436002612113952,
+          "convective_flux": 0.665845251083374,
+          "okubo_weiss": 0.6466627597808838,
+          "velocity_buoyancy_coherence": 0.6834674715995789,
+          "pressure_grad_mag": 0.8644460678100586
+        },
+        "pixel_mse": 0.8284692534378597,
+        "pixel_rel_l2": 0.8398241412018718,
+        "physics_r2": {
+          "enstrophy": -1.426255702972412,
+          "vorticity_signed": -0.0037343502044677734,
+          "divergence": -0.00511622428894043,
+          "buoyancy_grad": -0.8014703989028931,
+          "convective_flux": -1.0409173965454102,
+          "okubo_weiss": -1.5309817790985107,
+          "velocity_buoyancy_coherence": -1.5332534313201904,
+          "pressure_grad_mag": -0.5206174850463867
+        },
+        "physics_corr": {
+          "enstrophy": 0.22141261398792267,
+          "vorticity_signed": 4.55137186619603e-12,
+          "divergence": 2.7903966030168315e-12,
+          "buoyancy_grad": -0.010764185339212418,
+          "convective_flux": -0.17520490288734436,
+          "okubo_weiss": 0.24768933653831482,
+          "velocity_buoyancy_coherence": -0.27129924297332764,
+          "pressure_grad_mag": 0.7901904582977295
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.3370652079582214,
+          "vorticity_signed": -0.0159282922744751,
+          "divergence": -0.01637258529663086,
+          "buoyancy_grad": 0.6169676065444947,
+          "convective_flux": 0.581178855895996,
+          "okubo_weiss": 0.33105260133743286,
+          "velocity_buoyancy_coherence": 0.5854818105697632,
+          "pressure_grad_mag": 0.7622112035751343
+        },
+        "pixel_mse": 0.7657097935676574,
+        "pixel_rel_l2": 0.7762045086457201,
+        "physics_r2": {
+          "enstrophy": -1.301835536956787,
+          "vorticity_signed": -0.301066517829895,
+          "divergence": -0.15094411373138428,
+          "buoyancy_grad": -1.3349082469940186,
+          "convective_flux": -0.519161581993103,
+          "okubo_weiss": -1.2709815502166748,
+          "velocity_buoyancy_coherence": -24.28643035888672,
+          "pressure_grad_mag": -0.16971909999847412
+        },
+        "physics_corr": {
+          "enstrophy": 0.05525478348135948,
+          "vorticity_signed": -1.7087227466294763e-11,
+          "divergence": -8.104780041540138e-11,
+          "buoyancy_grad": -0.2528890073299408,
+          "convective_flux": 0.01169694121927023,
+          "okubo_weiss": 0.13229022920131683,
+          "velocity_buoyancy_coherence": -0.18955391645431519,
+          "pressure_grad_mag": 0.7715058326721191
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9345028400421143,
+          "vorticity_signed": -0.03384716510772705,
+          "divergence": -0.0421809196472168,
+          "buoyancy_grad": 0.8054738998413086,
+          "convective_flux": 0.9136896133422852,
+          "okubo_weiss": 0.9437772393226623,
+          "velocity_buoyancy_coherence": 0.8586727619171143,
+          "pressure_grad_mag": 0.9847088932991028
+        },
+        "pixel_mse": 0.6775895680700029,
+        "pixel_rel_l2": 0.6868765192315254,
+        "physics_r2": {
+          "enstrophy": -0.04373633861541748,
+          "vorticity_signed": -0.5462425947189331,
+          "divergence": -0.2105928659439087,
+          "buoyancy_grad": -0.7609035968780518,
+          "convective_flux": -0.22313547134399414,
+          "okubo_weiss": 0.16872632503509521,
+          "velocity_buoyancy_coherence": -4.742204666137695,
+          "pressure_grad_mag": -6.252264976501465
+        },
+        "physics_corr": {
+          "enstrophy": 0.37408992648124695,
+          "vorticity_signed": 1.4410533313510832e-12,
+          "divergence": 1.524548369491452e-11,
+          "buoyancy_grad": -0.26357951760292053,
+          "convective_flux": 0.3525005578994751,
+          "okubo_weiss": 0.45781925320625305,
+          "velocity_buoyancy_coherence": 0.5447824597358704,
+          "pressure_grad_mag": 0.8779969215393066
+        }
+      }
+    }
+  },
+  "mae": {
+    "1": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9877734780311584,
+        "vorticity_signed": -0.03736757040023804,
+        "divergence": -0.05967059135437012,
+        "buoyancy_grad": 0.9685525059700012,
+        "convective_flux": 0.9917778730392456,
+        "okubo_weiss": 0.9931617498397827,
+        "velocity_buoyancy_coherence": 0.9300142407417298,
+        "pressure_grad_mag": 0.9997727274894714
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9809995889663696,
+          "vorticity_signed": -0.039053487777709964,
+          "divergence": -0.05546238422393799,
+          "buoyancy_grad": 0.9405222177505493,
+          "convective_flux": 0.9800358176231384,
+          "okubo_weiss": 0.9847450375556945,
+          "velocity_buoyancy_coherence": 0.9125010132789612,
+          "pressure_grad_mag": 0.9997915983200073
+        },
+        "pixel_mse": 0.024074811727872916,
+        "pixel_rel_l2": 0.041442551463373126,
+        "physics_r2": {
+          "enstrophy": 0.38444966077804565,
+          "vorticity_signed": -0.2020576000213623,
+          "divergence": -0.23375797271728516,
+          "buoyancy_grad": 0.3355064392089844,
+          "convective_flux": 0.2275354266166687,
+          "okubo_weiss": 0.3956621289253235,
+          "velocity_buoyancy_coherence": 0.5257956981658936,
+          "pressure_grad_mag": 0.9533814191818237
+        },
+        "physics_corr": {
+          "enstrophy": 0.7017682194709778,
+          "vorticity_signed": 1.2111627889846432e-12,
+          "divergence": -3.719301776283768e-12,
+          "buoyancy_grad": 0.7070546746253967,
+          "convective_flux": 0.6576524376869202,
+          "okubo_weiss": 0.7219303846359253,
+          "velocity_buoyancy_coherence": 0.8249355554580688,
+          "pressure_grad_mag": 0.9871892333030701
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9774924635887146,
+          "vorticity_signed": -0.03907790184020996,
+          "divergence": -0.042586231231689455,
+          "buoyancy_grad": 0.9415722608566284,
+          "convective_flux": 0.9803249478340149,
+          "okubo_weiss": 0.9848663926124572,
+          "velocity_buoyancy_coherence": 0.9125447392463684,
+          "pressure_grad_mag": 0.999600613117218
+        },
+        "pixel_mse": 0.014676334818026849,
+        "pixel_rel_l2": 0.025263946728422085,
+        "physics_r2": {
+          "enstrophy": 0.06308907270431519,
+          "vorticity_signed": -0.40342187881469727,
+          "divergence": -0.1741124391555786,
+          "buoyancy_grad": -0.924534797668457,
+          "convective_flux": -0.12018775939941406,
+          "okubo_weiss": 0.15485501289367676,
+          "velocity_buoyancy_coherence": -8.83276653289795,
+          "pressure_grad_mag": 0.8464429974555969
+        },
+        "physics_corr": {
+          "enstrophy": 0.621757447719574,
+          "vorticity_signed": 1.2577932402210723e-12,
+          "divergence": 4.5920242434938086e-12,
+          "buoyancy_grad": 0.06691491603851318,
+          "convective_flux": 0.3714449107646942,
+          "okubo_weiss": 0.664827287197113,
+          "velocity_buoyancy_coherence": 0.36710160970687866,
+          "pressure_grad_mag": 0.9904267191886902
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9774924635887146,
+          "vorticity_signed": -0.03907790184020996,
+          "divergence": -0.042586231231689455,
+          "buoyancy_grad": 0.9415722608566284,
+          "convective_flux": 0.9803249478340149,
+          "okubo_weiss": 0.9848663926124572,
+          "velocity_buoyancy_coherence": 0.9125447392463684,
+          "pressure_grad_mag": 0.999600613117218
+        },
+        "pixel_mse": 0.014676334818026849,
+        "pixel_rel_l2": 0.025263946728422085,
+        "physics_r2": {
+          "enstrophy": 0.06308907270431519,
+          "vorticity_signed": -0.40342187881469727,
+          "divergence": -0.1741124391555786,
+          "buoyancy_grad": -0.924534797668457,
+          "convective_flux": -0.12018775939941406,
+          "okubo_weiss": 0.15485501289367676,
+          "velocity_buoyancy_coherence": -8.83276653289795,
+          "pressure_grad_mag": 0.8464429974555969
+        },
+        "physics_corr": {
+          "enstrophy": 0.621757447719574,
+          "vorticity_signed": 1.2577932402210723e-12,
+          "divergence": 4.5920242434938086e-12,
+          "buoyancy_grad": 0.06691491603851318,
+          "convective_flux": 0.3714449107646942,
+          "okubo_weiss": 0.664827287197113,
+          "velocity_buoyancy_coherence": 0.36710160970687866,
+          "pressure_grad_mag": 0.9904267191886902
+        }
+      }
+    },
+    "2": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9853516221046448,
+        "vorticity_signed": -0.05576021671295166,
+        "divergence": -0.03391797542572021,
+        "buoyancy_grad": 0.8933678865432739,
+        "convective_flux": 0.992168128490448,
+        "okubo_weiss": 0.9904907464981079,
+        "velocity_buoyancy_coherence": 0.9540257453918457,
+        "pressure_grad_mag": 0.9991864323616028
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.9756024479866028,
+          "vorticity_signed": -0.03744328022003174,
+          "divergence": -0.03783824443817139,
+          "buoyancy_grad": 0.8604539394378662,
+          "convective_flux": 0.9776675820350647,
+          "okubo_weiss": 0.9697858214378356,
+          "velocity_buoyancy_coherence": 0.9010248064994812,
+          "pressure_grad_mag": 0.998541784286499
+        },
+        "pixel_mse": 0.0616590561433917,
+        "pixel_rel_l2": 0.1025096015305458,
+        "physics_r2": {
+          "enstrophy": -0.0235060453414917,
+          "vorticity_signed": -0.10703098773956299,
+          "divergence": -0.05421745777130127,
+          "buoyancy_grad": -0.07548916339874268,
+          "convective_flux": -0.13759970664978027,
+          "okubo_weiss": -0.004549980163574219,
+          "velocity_buoyancy_coherence": -0.047878384590148926,
+          "pressure_grad_mag": 0.9093095660209656
+        },
+        "physics_corr": {
+          "enstrophy": 0.38767731189727783,
+          "vorticity_signed": -5.269961116799449e-12,
+          "divergence": -2.1731479463160674e-12,
+          "buoyancy_grad": 0.2551370859146118,
+          "convective_flux": 0.3393934965133667,
+          "okubo_weiss": 0.46521127223968506,
+          "velocity_buoyancy_coherence": 0.5572163462638855,
+          "pressure_grad_mag": 0.9798552989959717
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.9634429931640625,
+          "vorticity_signed": -0.029254913330078125,
+          "divergence": -0.018271052837371828,
+          "buoyancy_grad": 0.8489278435707093,
+          "convective_flux": 0.9624958276748657,
+          "okubo_weiss": 0.9617976069450378,
+          "velocity_buoyancy_coherence": 0.9030932307243347,
+          "pressure_grad_mag": 0.9978413581848145
+        },
+        "pixel_mse": 0.050264896752224085,
+        "pixel_rel_l2": 0.08356654900882307,
+        "physics_r2": {
+          "enstrophy": -0.0874779224395752,
+          "vorticity_signed": -0.21521544456481934,
+          "divergence": -0.08280956745147705,
+          "buoyancy_grad": -0.4353058338165283,
+          "convective_flux": 0.2545965313911438,
+          "okubo_weiss": -0.019086837768554688,
+          "velocity_buoyancy_coherence": -9.00413990020752,
+          "pressure_grad_mag": 0.8504073619842529
+        },
+        "physics_corr": {
+          "enstrophy": 0.6120597124099731,
+          "vorticity_signed": 1.056599035695327e-12,
+          "divergence": 9.090475767969952e-13,
+          "buoyancy_grad": 0.029459228739142418,
+          "convective_flux": 0.5696009397506714,
+          "okubo_weiss": 0.754008412361145,
+          "velocity_buoyancy_coherence": 0.4889531135559082,
+          "pressure_grad_mag": 0.9839988946914673
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9849753975868225,
+          "vorticity_signed": -0.04262523651123047,
+          "divergence": -0.021077775955200197,
+          "buoyancy_grad": 0.8658310651779175,
+          "convective_flux": 0.9868038773536683,
+          "okubo_weiss": 0.9862339496612549,
+          "velocity_buoyancy_coherence": 0.9439871907234192,
+          "pressure_grad_mag": 0.9989531874656677
+        },
+        "pixel_mse": 0.03867645827299428,
+        "pixel_rel_l2": 0.06430050302679408,
+        "physics_r2": {
+          "enstrophy": 0.11259323358535767,
+          "vorticity_signed": -0.37321150302886963,
+          "divergence": -0.17892980575561523,
+          "buoyancy_grad": 0.02936387062072754,
+          "convective_flux": 0.520180344581604,
+          "okubo_weiss": 0.2536318898200989,
+          "velocity_buoyancy_coherence": -3.4715375900268555,
+          "pressure_grad_mag": 0.7915506362915039
+        },
+        "physics_corr": {
+          "enstrophy": 0.7147301435470581,
+          "vorticity_signed": 2.8180951495981876e-12,
+          "divergence": -2.3199352595232314e-12,
+          "buoyancy_grad": 0.371843159198761,
+          "convective_flux": 0.8602476716041565,
+          "okubo_weiss": 0.7397235631942749,
+          "velocity_buoyancy_coherence": 0.684802234172821,
+          "pressure_grad_mag": 0.9913530945777893
+        }
+      }
+    },
+    "3": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9734747886657715,
+        "vorticity_signed": -0.041657018661499026,
+        "divergence": -0.04265458583831787,
+        "buoyancy_grad": 0.878084683418274,
+        "convective_flux": 0.9905242323875427,
+        "okubo_weiss": 0.9834845304489136,
+        "velocity_buoyancy_coherence": 0.9588721752166748,
+        "pressure_grad_mag": 0.9978436231613159
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.914838457107544,
+          "vorticity_signed": -0.023665452003479005,
+          "divergence": -0.026107001304626464,
+          "buoyancy_grad": 0.7858136415481567,
+          "convective_flux": 0.9238024950027466,
+          "okubo_weiss": 0.9000629544258117,
+          "velocity_buoyancy_coherence": 0.8220762610435486,
+          "pressure_grad_mag": 0.9923330187797547
+        },
+        "pixel_mse": 0.15278266316013678,
+        "pixel_rel_l2": 0.2361808509402429,
+        "physics_r2": {
+          "enstrophy": -0.19630944728851318,
+          "vorticity_signed": -0.030739426612854004,
+          "divergence": -0.016409754753112793,
+          "buoyancy_grad": -0.16758227348327637,
+          "convective_flux": -0.37241291999816895,
+          "okubo_weiss": -0.21600520610809326,
+          "velocity_buoyancy_coherence": -0.6572694778442383,
+          "pressure_grad_mag": 0.7788207530975342
+        },
+        "physics_corr": {
+          "enstrophy": 0.34124428033828735,
+          "vorticity_signed": -4.52077524720762e-12,
+          "divergence": 1.9216000318733606e-12,
+          "buoyancy_grad": 0.1731949895620346,
+          "convective_flux": 0.24832843244075775,
+          "okubo_weiss": 0.409148246049881,
+          "velocity_buoyancy_coherence": 0.2777269780635834,
+          "pressure_grad_mag": 0.9499080777168274
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.8867158055305481,
+          "vorticity_signed": -0.011199522018432616,
+          "divergence": -0.015364837646484376,
+          "buoyancy_grad": 0.7667991995811463,
+          "convective_flux": 0.900450611114502,
+          "okubo_weiss": 0.884531307220459,
+          "velocity_buoyancy_coherence": 0.7871633887290954,
+          "pressure_grad_mag": 0.9891503810882568
+        },
+        "pixel_mse": 0.13855853661894799,
+        "pixel_rel_l2": 0.21419232003697877,
+        "physics_r2": {
+          "enstrophy": -0.14797401428222656,
+          "vorticity_signed": -0.15383172035217285,
+          "divergence": -0.05946207046508789,
+          "buoyancy_grad": -0.32611382007598877,
+          "convective_flux": 0.20511239767074585,
+          "okubo_weiss": -0.11504149436950684,
+          "velocity_buoyancy_coherence": -12.261807441711426,
+          "pressure_grad_mag": 0.8370397090911865
+        },
+        "physics_corr": {
+          "enstrophy": 0.7279054522514343,
+          "vorticity_signed": 9.07826591678429e-12,
+          "divergence": 5.464775333641203e-12,
+          "buoyancy_grad": 0.07019022107124329,
+          "convective_flux": 0.5711468458175659,
+          "okubo_weiss": 0.7801621556282043,
+          "velocity_buoyancy_coherence": 0.34155091643333435,
+          "pressure_grad_mag": 0.9485846161842346
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9699028134346008,
+          "vorticity_signed": -0.01891038417816162,
+          "divergence": -0.020863926410675047,
+          "buoyancy_grad": 0.8302134156227112,
+          "convective_flux": 0.981880247592926,
+          "okubo_weiss": 0.9773929715156555,
+          "velocity_buoyancy_coherence": 0.9483339190483093,
+          "pressure_grad_mag": 0.9969602823257446
+        },
+        "pixel_mse": 0.09664830175538858,
+        "pixel_rel_l2": 0.14940489763941234,
+        "physics_r2": {
+          "enstrophy": 0.3168817162513733,
+          "vorticity_signed": -0.4294790029525757,
+          "divergence": -0.2084273099899292,
+          "buoyancy_grad": 0.10418492555618286,
+          "convective_flux": 0.5473748445510864,
+          "okubo_weiss": 0.5050321817398071,
+          "velocity_buoyancy_coherence": -2.5460383892059326,
+          "pressure_grad_mag": 0.6950902938842773
+        },
+        "physics_corr": {
+          "enstrophy": 0.8065963983535767,
+          "vorticity_signed": 2.5645695636566934e-11,
+          "divergence": 6.566142074504455e-11,
+          "buoyancy_grad": 0.4887971878051758,
+          "convective_flux": 0.8600624799728394,
+          "okubo_weiss": 0.809659481048584,
+          "velocity_buoyancy_coherence": 0.7169253826141357,
+          "pressure_grad_mag": 0.9730542898178101
+        }
+      }
+    },
+    "4": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9714905977249145,
+        "vorticity_signed": -0.020482802391052247,
+        "divergence": -0.02945370674133301,
+        "buoyancy_grad": 0.8747105956077575,
+        "convective_flux": 0.987440025806427,
+        "okubo_weiss": 0.9799281477928161,
+        "velocity_buoyancy_coherence": 0.9538010716438293,
+        "pressure_grad_mag": 0.9965360403060913
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.7764752507209778,
+          "vorticity_signed": -0.01926579475402832,
+          "divergence": -0.030200695991516112,
+          "buoyancy_grad": 0.6052318453788758,
+          "convective_flux": 0.7089273810386658,
+          "okubo_weiss": 0.779096269607544,
+          "velocity_buoyancy_coherence": 0.6562367081642151,
+          "pressure_grad_mag": 0.9715986371040344
+        },
+        "pixel_mse": 0.28926954115430514,
+        "pixel_rel_l2": 0.4053292216614538,
+        "physics_r2": {
+          "enstrophy": -0.41763174533843994,
+          "vorticity_signed": -0.008759498596191406,
+          "divergence": -0.013379693031311035,
+          "buoyancy_grad": -0.3107253313064575,
+          "convective_flux": -0.6458584070205688,
+          "okubo_weiss": -0.4719744920730591,
+          "velocity_buoyancy_coherence": -1.3239867687225342,
+          "pressure_grad_mag": 0.6015207171440125
+        },
+        "physics_corr": {
+          "enstrophy": 0.3351075053215027,
+          "vorticity_signed": 2.670334873361435e-12,
+          "divergence": -5.301048228850691e-12,
+          "buoyancy_grad": 0.17301607131958008,
+          "convective_flux": 0.09253765642642975,
+          "okubo_weiss": 0.39571133255958557,
+          "velocity_buoyancy_coherence": -0.0037334589287638664,
+          "pressure_grad_mag": 0.9249621033668518
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.7464800596237182,
+          "vorticity_signed": -0.010668396949768066,
+          "divergence": -0.015934967994689943,
+          "buoyancy_grad": 0.5937918782234192,
+          "convective_flux": 0.7182930111885071,
+          "okubo_weiss": 0.7566514134407043,
+          "velocity_buoyancy_coherence": 0.6382405161857605,
+          "pressure_grad_mag": 0.9672320365905762
+        },
+        "pixel_mse": 0.27141292156917707,
+        "pixel_rel_l2": 0.38030823366160155,
+        "physics_r2": {
+          "enstrophy": -0.30482208728790283,
+          "vorticity_signed": -0.203019380569458,
+          "divergence": -0.07044458389282227,
+          "buoyancy_grad": -0.4822310209274292,
+          "convective_flux": 0.10398399829864502,
+          "okubo_weiss": -0.29897189140319824,
+          "velocity_buoyancy_coherence": -13.878329277038574,
+          "pressure_grad_mag": 0.8017165660858154
+        },
+        "physics_corr": {
+          "enstrophy": 0.5807507038116455,
+          "vorticity_signed": 2.4282595031954735e-11,
+          "divergence": -2.451207639642128e-13,
+          "buoyancy_grad": 0.009011008776724339,
+          "convective_flux": 0.4340079724788666,
+          "okubo_weiss": 0.5201843976974487,
+          "velocity_buoyancy_coherence": 0.16298453509807587,
+          "pressure_grad_mag": 0.9058783650398254
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9611180186271667,
+          "vorticity_signed": -0.021988391876220703,
+          "divergence": -0.021637272834777833,
+          "buoyancy_grad": 0.8246898770332336,
+          "convective_flux": 0.9723462104797364,
+          "okubo_weiss": 0.9685752391815186,
+          "velocity_buoyancy_coherence": 0.9408649563789367,
+          "pressure_grad_mag": 0.994611394405365
+        },
+        "pixel_mse": 0.17320603061201317,
+        "pixel_rel_l2": 0.24269912862200557,
+        "physics_r2": {
+          "enstrophy": 0.2996100187301636,
+          "vorticity_signed": -0.5923018455505371,
+          "divergence": -0.5224639177322388,
+          "buoyancy_grad": -0.0023899078369140625,
+          "convective_flux": 0.45370012521743774,
+          "okubo_weiss": 0.4567376375198364,
+          "velocity_buoyancy_coherence": -2.169820785522461,
+          "pressure_grad_mag": 0.30092716217041016
+        },
+        "physics_corr": {
+          "enstrophy": 0.689900815486908,
+          "vorticity_signed": 3.302222731371707e-11,
+          "divergence": -9.85061060498893e-11,
+          "buoyancy_grad": 0.35236307978630066,
+          "convective_flux": 0.774221658706665,
+          "okubo_weiss": 0.7161341905593872,
+          "velocity_buoyancy_coherence": 0.6981744766235352,
+          "pressure_grad_mag": 0.933012843132019
+        }
+      }
+    },
+    "5": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.965241014957428,
+        "vorticity_signed": -0.03194608688354492,
+        "divergence": -0.03411083221435547,
+        "buoyancy_grad": 0.8391097664833069,
+        "convective_flux": 0.9822039484977723,
+        "okubo_weiss": 0.9757028937339782,
+        "velocity_buoyancy_coherence": 0.9349237084388733,
+        "pressure_grad_mag": 0.9953396916389465
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.651085102558136,
+          "vorticity_signed": -0.014758145809173584,
+          "divergence": -0.013578951358795166,
+          "buoyancy_grad": 0.509597373008728,
+          "convective_flux": 0.6338061332702637,
+          "okubo_weiss": 0.6595990419387817,
+          "velocity_buoyancy_coherence": 0.5447877287864685,
+          "pressure_grad_mag": 0.9372958421707154
+        },
+        "pixel_mse": 0.4359240564845857,
+        "pixel_rel_l2": 0.555785873305282,
+        "physics_r2": {
+          "enstrophy": -0.7160636186599731,
+          "vorticity_signed": -0.004538059234619141,
+          "divergence": -0.009327530860900879,
+          "buoyancy_grad": -0.4309122562408447,
+          "convective_flux": -1.069547176361084,
+          "okubo_weiss": -0.8218508958816528,
+          "velocity_buoyancy_coherence": -2.0456228256225586,
+          "pressure_grad_mag": 0.3894950747489929
+        },
+        "physics_corr": {
+          "enstrophy": 0.3088860809803009,
+          "vorticity_signed": 4.5181297939067555e-12,
+          "divergence": -3.51520353623902e-12,
+          "buoyancy_grad": 0.1453055888414383,
+          "convective_flux": -0.09260628372430801,
+          "okubo_weiss": 0.35526031255722046,
+          "velocity_buoyancy_coherence": -0.2373572587966919,
+          "pressure_grad_mag": 0.9065454602241516
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.608138382434845,
+          "vorticity_signed": -0.008672869205474854,
+          "divergence": -0.009716641902923585,
+          "buoyancy_grad": 0.4976886510848999,
+          "convective_flux": 0.6367220759391785,
+          "okubo_weiss": 0.6234030246734619,
+          "velocity_buoyancy_coherence": 0.5448013305664062,
+          "pressure_grad_mag": 0.9274989604949951
+        },
+        "pixel_mse": 0.4115098310936065,
+        "pixel_rel_l2": 0.5246587047580302,
+        "physics_r2": {
+          "enstrophy": -0.5453095436096191,
+          "vorticity_signed": -0.2741647958755493,
+          "divergence": -0.0779958963394165,
+          "buoyancy_grad": -0.5956233739852905,
+          "convective_flux": 0.051725924015045166,
+          "okubo_weiss": -0.5720170736312866,
+          "velocity_buoyancy_coherence": -14.70533275604248,
+          "pressure_grad_mag": 0.7363952994346619
+        },
+        "physics_corr": {
+          "enstrophy": 0.35885146260261536,
+          "vorticity_signed": 8.926810679543706e-12,
+          "divergence": 8.655383701428043e-12,
+          "buoyancy_grad": -0.05302789434790611,
+          "convective_flux": 0.387253075838089,
+          "okubo_weiss": 0.31796908378601074,
+          "velocity_buoyancy_coherence": 0.12755632400512695,
+          "pressure_grad_mag": 0.8760712742805481
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9522244691848755,
+          "vorticity_signed": -0.020257604122161866,
+          "divergence": -0.021193599700927733,
+          "buoyancy_grad": 0.7841241002082825,
+          "convective_flux": 0.9548135161399841,
+          "okubo_weiss": 0.9610448718070984,
+          "velocity_buoyancy_coherence": 0.913500964641571,
+          "pressure_grad_mag": 0.9919228076934814
+        },
+        "pixel_mse": 0.2484953367284366,
+        "pixel_rel_l2": 0.31682169332352006,
+        "physics_r2": {
+          "enstrophy": 0.24802881479263306,
+          "vorticity_signed": -0.7418811321258545,
+          "divergence": -0.4965091943740845,
+          "buoyancy_grad": -0.0883108377456665,
+          "convective_flux": 0.38211047649383545,
+          "okubo_weiss": 0.3253863453865051,
+          "velocity_buoyancy_coherence": -1.9203062057495117,
+          "pressure_grad_mag": -0.2911897897720337
+        },
+        "physics_corr": {
+          "enstrophy": 0.627004861831665,
+          "vorticity_signed": -3.508484475167606e-11,
+          "divergence": 2.8620588538030844e-11,
+          "buoyancy_grad": 0.22901609539985657,
+          "convective_flux": 0.700975239276886,
+          "okubo_weiss": 0.642645001411438,
+          "velocity_buoyancy_coherence": 0.6632463932037354,
+          "pressure_grad_mag": 0.9075995683670044
+        }
+      }
+    },
+    "6": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9643012046813965,
+        "vorticity_signed": -0.035772156715393064,
+        "divergence": -0.02176957130432129,
+        "buoyancy_grad": 0.846029531955719,
+        "convective_flux": 0.9825394988059998,
+        "okubo_weiss": 0.9743740081787109,
+        "velocity_buoyancy_coherence": 0.9350206732749939,
+        "pressure_grad_mag": 0.9945214629173279
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.5323957681655884,
+          "vorticity_signed": -0.013902652263641357,
+          "divergence": -0.014514732360839843,
+          "buoyancy_grad": 0.4762608289718628,
+          "convective_flux": 0.5347601771354675,
+          "okubo_weiss": 0.5518204212188721,
+          "velocity_buoyancy_coherence": 0.5325299859046936,
+          "pressure_grad_mag": 0.8997735261917115
+        },
+        "pixel_mse": 0.5857896037612642,
+        "pixel_rel_l2": 0.6830940300260998,
+        "physics_r2": {
+          "enstrophy": -1.0412790775299072,
+          "vorticity_signed": -0.012226462364196777,
+          "divergence": -0.005673527717590332,
+          "buoyancy_grad": -0.5503963232040405,
+          "convective_flux": -1.2082569599151611,
+          "okubo_weiss": -1.1865077018737793,
+          "velocity_buoyancy_coherence": -2.154825448989868,
+          "pressure_grad_mag": 0.12421911954879761
+        },
+        "physics_corr": {
+          "enstrophy": 0.2514020502567291,
+          "vorticity_signed": -4.314716119113715e-12,
+          "divergence": 3.074497470847981e-12,
+          "buoyancy_grad": 0.088717982172966,
+          "convective_flux": -0.20179371535778046,
+          "okubo_weiss": 0.29025885462760925,
+          "velocity_buoyancy_coherence": -0.3291119337081909,
+          "pressure_grad_mag": 0.8868640661239624
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.46182688474655154,
+          "vorticity_signed": -0.011420297622680663,
+          "divergence": -0.011945366859436035,
+          "buoyancy_grad": 0.46391390562057494,
+          "convective_flux": 0.5171107292175293,
+          "okubo_weiss": 0.48188190460205077,
+          "velocity_buoyancy_coherence": 0.5120739579200745,
+          "pressure_grad_mag": 0.8776054143905639
+        },
+        "pixel_mse": 0.5494970121270134,
+        "pixel_rel_l2": 0.6407729432052496,
+        "physics_r2": {
+          "enstrophy": -0.8433883190155029,
+          "vorticity_signed": -0.2708280086517334,
+          "divergence": -0.09296321868896484,
+          "buoyancy_grad": -0.7819528579711914,
+          "convective_flux": 0.015106439590454102,
+          "okubo_weiss": -0.9309842586517334,
+          "velocity_buoyancy_coherence": -13.053495407104492,
+          "pressure_grad_mag": 0.6215227842330933
+        },
+        "physics_corr": {
+          "enstrophy": 0.22849160432815552,
+          "vorticity_signed": 3.23287707368336e-12,
+          "divergence": -2.059717847668896e-11,
+          "buoyancy_grad": -0.13514310121536255,
+          "convective_flux": 0.418830931186676,
+          "okubo_weiss": 0.15603262186050415,
+          "velocity_buoyancy_coherence": 0.083893783390522,
+          "pressure_grad_mag": 0.8587917685508728
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9436094045639039,
+          "vorticity_signed": -0.025196051597595213,
+          "divergence": -0.003253638744354248,
+          "buoyancy_grad": 0.7787211060523986,
+          "convective_flux": 0.9488525748252868,
+          "okubo_weiss": 0.9517274141311646,
+          "velocity_buoyancy_coherence": 0.9074339151382447,
+          "pressure_grad_mag": 0.9896547555923462
+        },
+        "pixel_mse": 0.3153103172920999,
+        "pixel_rel_l2": 0.3676859301785228,
+        "physics_r2": {
+          "enstrophy": 0.1416459083557129,
+          "vorticity_signed": -0.7791415452957153,
+          "divergence": -0.5034655332565308,
+          "buoyancy_grad": -0.19047904014587402,
+          "convective_flux": 0.3330801725387573,
+          "okubo_weiss": 0.143646240234375,
+          "velocity_buoyancy_coherence": -0.8950952291488647,
+          "pressure_grad_mag": -0.891352653503418
+        },
+        "physics_corr": {
+          "enstrophy": 0.5168116092681885,
+          "vorticity_signed": 2.704616912374558e-12,
+          "divergence": 1.582349945516981e-10,
+          "buoyancy_grad": 0.06356818974018097,
+          "convective_flux": 0.6671348214149475,
+          "okubo_weiss": 0.5437808632850647,
+          "velocity_buoyancy_coherence": 0.7190106511116028,
+          "pressure_grad_mag": 0.8984909057617188
+        }
+      }
+    },
+    "7": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9610799551010132,
+        "vorticity_signed": -0.02647566795349121,
+        "divergence": -0.03760650157928467,
+        "buoyancy_grad": 0.827289617061615,
+        "convective_flux": 0.9809487938880921,
+        "okubo_weiss": 0.9733781456947327,
+        "velocity_buoyancy_coherence": 0.929828143119812,
+        "pressure_grad_mag": 0.9937324166297913
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.5022353053092956,
+          "vorticity_signed": -0.017752981185913085,
+          "divergence": -0.01664469242095947,
+          "buoyancy_grad": 0.5401187419891358,
+          "convective_flux": 0.5674924850463867,
+          "okubo_weiss": 0.5099297285079956,
+          "velocity_buoyancy_coherence": 0.5631924271583557,
+          "pressure_grad_mag": 0.8570479154586792
+        },
+        "pixel_mse": 0.7269049751190912,
+        "pixel_rel_l2": 0.7818305077104826,
+        "physics_r2": {
+          "enstrophy": -1.2831158638000488,
+          "vorticity_signed": -0.007067084312438965,
+          "divergence": -0.003744959831237793,
+          "buoyancy_grad": -0.5999937057495117,
+          "convective_flux": -1.3411431312561035,
+          "okubo_weiss": -1.437441110610962,
+          "velocity_buoyancy_coherence": -1.9252347946166992,
+          "pressure_grad_mag": -0.210548996925354
+        },
+        "physics_corr": {
+          "enstrophy": 0.21234816312789917,
+          "vorticity_signed": 5.831161833773357e-13,
+          "divergence": 7.975091941003765e-12,
+          "buoyancy_grad": 0.01646372303366661,
+          "convective_flux": -0.22000214457511902,
+          "okubo_weiss": 0.24308043718338013,
+          "velocity_buoyancy_coherence": -0.32424095273017883,
+          "pressure_grad_mag": 0.8430589437484741
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.40340826511383054,
+          "vorticity_signed": -0.014891600608825684,
+          "divergence": -0.012581229209899902,
+          "buoyancy_grad": 0.533369517326355,
+          "convective_flux": 0.5435872435569763,
+          "okubo_weiss": 0.4033316373825073,
+          "velocity_buoyancy_coherence": 0.5537903547286988,
+          "pressure_grad_mag": 0.8153339385986328
+        },
+        "pixel_mse": 0.6779875462111973,
+        "pixel_rel_l2": 0.7292168379901943,
+        "physics_r2": {
+          "enstrophy": -1.0851061344146729,
+          "vorticity_signed": -0.2381201982498169,
+          "divergence": -0.08053505420684814,
+          "buoyancy_grad": -0.9512956142425537,
+          "convective_flux": -0.07567203044891357,
+          "okubo_weiss": -1.1830143928527832,
+          "velocity_buoyancy_coherence": -15.321304321289062,
+          "pressure_grad_mag": 0.4032185673713684
+        },
+        "physics_corr": {
+          "enstrophy": 0.1347845196723938,
+          "vorticity_signed": -7.75759317894753e-12,
+          "divergence": -1.6119074824905155e-11,
+          "buoyancy_grad": -0.20325563848018646,
+          "convective_flux": 0.29426178336143494,
+          "okubo_weiss": 0.0962245985865593,
+          "velocity_buoyancy_coherence": -0.04159625992178917,
+          "pressure_grad_mag": 0.8293095827102661
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9338035345077514,
+          "vorticity_signed": -0.026059412956237794,
+          "divergence": -0.028555631637573242,
+          "buoyancy_grad": 0.7693756461143494,
+          "convective_flux": 0.9429686784744262,
+          "okubo_weiss": 0.9449710369110107,
+          "velocity_buoyancy_coherence": 0.8984121084213257,
+          "pressure_grad_mag": 0.9871359825134277
+        },
+        "pixel_mse": 0.36448416453741844,
+        "pixel_rel_l2": 0.392024885186725,
+        "physics_r2": {
+          "enstrophy": 0.2026820182800293,
+          "vorticity_signed": -0.8142399787902832,
+          "divergence": -0.6426651477813721,
+          "buoyancy_grad": -0.2209768295288086,
+          "convective_flux": 0.3486323952674866,
+          "okubo_weiss": 0.12691563367843628,
+          "velocity_buoyancy_coherence": -0.288496732711792,
+          "pressure_grad_mag": -1.4278457164764404
+        },
+        "physics_corr": {
+          "enstrophy": 0.5258835554122925,
+          "vorticity_signed": -1.7625715123537056e-11,
+          "divergence": -1.6150539239312423e-10,
+          "buoyancy_grad": -0.02532971277832985,
+          "convective_flux": 0.640748143196106,
+          "okubo_weiss": 0.5442538857460022,
+          "velocity_buoyancy_coherence": 0.7933675646781921,
+          "pressure_grad_mag": 0.9104084372520447
+        }
+      }
+    },
+    "8": {
+      "ceiling_latent_r2": {
+        "enstrophy": 0.9631247043609619,
+        "vorticity_signed": -0.039393258094787595,
+        "divergence": -0.044745993614196775,
+        "buoyancy_grad": 0.833078932762146,
+        "convective_flux": 0.9815642595291137,
+        "okubo_weiss": 0.9748420000076294,
+        "velocity_buoyancy_coherence": 0.9134206533432007,
+        "pressure_grad_mag": 0.9931921362876892
+      },
+      "persistence": {
+        "latent_r2": {
+          "enstrophy": 0.4623815417289734,
+          "vorticity_signed": -0.019665074348449708,
+          "divergence": -0.019436979293823244,
+          "buoyancy_grad": 0.6593748688697815,
+          "convective_flux": 0.6235819339752198,
+          "okubo_weiss": 0.4621340990066528,
+          "velocity_buoyancy_coherence": 0.6113500952720642,
+          "pressure_grad_mag": 0.8156013011932373
+        },
+        "pixel_mse": 0.8284692534378597,
+        "pixel_rel_l2": 0.8398241412018718,
+        "physics_r2": {
+          "enstrophy": -1.426255702972412,
+          "vorticity_signed": -0.0037343502044677734,
+          "divergence": -0.00511622428894043,
+          "buoyancy_grad": -0.8014703989028931,
+          "convective_flux": -1.0409173965454102,
+          "okubo_weiss": -1.5309817790985107,
+          "velocity_buoyancy_coherence": -1.5332534313201904,
+          "pressure_grad_mag": -0.5206174850463867
+        },
+        "physics_corr": {
+          "enstrophy": 0.22141261398792267,
+          "vorticity_signed": 4.55137186619603e-12,
+          "divergence": 2.7903966030168315e-12,
+          "buoyancy_grad": -0.010764185339212418,
+          "convective_flux": -0.17520490288734436,
+          "okubo_weiss": 0.24768933653831482,
+          "velocity_buoyancy_coherence": -0.27129924297332764,
+          "pressure_grad_mag": 0.7901904582977295
+        }
+      },
+      "fed_back": {
+        "latent_r2": {
+          "enstrophy": 0.339476203918457,
+          "vorticity_signed": -0.009358608722686767,
+          "divergence": -0.013096284866333009,
+          "buoyancy_grad": 0.6423896908760071,
+          "convective_flux": 0.6261147737503052,
+          "okubo_weiss": 0.3298603415489197,
+          "velocity_buoyancy_coherence": 0.6081753969192505,
+          "pressure_grad_mag": 0.7596905350685119
+        },
+        "pixel_mse": 0.7731447193168458,
+        "pixel_rel_l2": 0.783741336483689,
+        "physics_r2": {
+          "enstrophy": -1.239342451095581,
+          "vorticity_signed": -0.2338252067565918,
+          "divergence": -0.07106995582580566,
+          "buoyancy_grad": -1.6741175651550293,
+          "convective_flux": -0.08137273788452148,
+          "okubo_weiss": -1.2986476421356201,
+          "velocity_buoyancy_coherence": -21.9853515625,
+          "pressure_grad_mag": 0.11801111698150635
+        },
+        "physics_corr": {
+          "enstrophy": 0.040403712540864944,
+          "vorticity_signed": -1.3815384600213143e-11,
+          "divergence": 2.7579235770125443e-11,
+          "buoyancy_grad": -0.3135458827018738,
+          "convective_flux": 0.10350704193115234,
+          "okubo_weiss": 0.033371664583683014,
+          "velocity_buoyancy_coherence": -0.09778335690498352,
+          "pressure_grad_mag": 0.7855867743492126
+        }
+      },
+      "oracle": {
+        "latent_r2": {
+          "enstrophy": 0.9310808062553406,
+          "vorticity_signed": -0.020040726661682128,
+          "divergence": -0.027329611778259277,
+          "buoyancy_grad": 0.7939100503921509,
+          "convective_flux": 0.9394946217536926,
+          "okubo_weiss": 0.9420017600059509,
+          "velocity_buoyancy_coherence": 0.8748962044715881,
+          "pressure_grad_mag": 0.9861617684364319
+        },
+        "pixel_mse": 0.37799410067853473,
+        "pixel_rel_l2": 0.38317483680223857,
+        "physics_r2": {
+          "enstrophy": 0.2588716745376587,
+          "vorticity_signed": -0.8198648691177368,
+          "divergence": -0.5578951835632324,
+          "buoyancy_grad": -0.5187673568725586,
+          "convective_flux": 0.5242288112640381,
+          "okubo_weiss": 0.02107715606689453,
+          "velocity_buoyancy_coherence": -0.03973972797393799,
+          "pressure_grad_mag": -1.9671099185943604
+        },
+        "physics_corr": {
+          "enstrophy": 0.5318336486816406,
+          "vorticity_signed": 1.1994264088877049e-11,
+          "divergence": 1.9077978086201597e-10,
+          "buoyancy_grad": -0.20863735675811768,
+          "convective_flux": 0.7370559573173523,
+          "okubo_weiss": 0.5640215873718262,
+          "velocity_buoyancy_coherence": 0.8054903149604797,
+          "pressure_grad_mag": 0.9275728464126587
+        }
+      }
+    }
+  }
+}
