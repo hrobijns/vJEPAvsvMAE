@@ -13,6 +13,41 @@ See [docs/OVERVIEW.md](docs/OVERVIEW.md) for a research-summary writeup
 for a deep dive on each probing pipeline. This README covers setup and
 reproduction.
 
+## Results (summary)
+
+Full sweep complete on all 3 datasets: pooled + per-token linear/MLP probing,
+13-layer depth sweep, 6-level noise sweep (pooled + token), regime probing,
+forecast/skill-score, and a held-out (`valid`-split) generalization check.
+Full tables and discussion in [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md);
+raw numbers in `sweep_results/*.json`, figures in `reports/figures/`.
+
+- **`rayleigh_benard` is where the two objectives genuinely diverge.** JEPA
+  beats MAE on every axis there: clean pooled accuracy on coupled quantities
+  (`convective_flux` 0.835 vs 0.576), depth (needs L6–L11 to peak vs. MAE's
+  L0–L2 plateau, but reaches a higher peak), noise robustness, real
+  nonlinear-only token-level information MAE lacks entirely, and forecast
+  skill at longer horizons. Purely local quantities (gradients, pressure) are
+  at ceiling for both, on every dataset.
+- **`active_matter`/`shear_flow` show no clean-data gap** — sometimes MAE is
+  fractionally ahead — but `active_matter` still shows a large noise-
+  robustness split (MAE's R² goes negative under input noise; JEPA degrades
+  gracefully), while `shear_flow` shows no split on any axis at all. Likely
+  mechanism: `rayleigh_benard`'s buoyancy and `active_matter`'s active stress
+  both feed back into the momentum equation (two-way coupling); `shear_flow`'s
+  tracer is passively advected (one-way) — see LINEAR_PROBE.md's Discussion.
+- **Regime parameters (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta) are
+  decoded equally well by both objectives** — not where JEPA/MAE differ.
+- **Multi-step autoregressive rollout tracks closely between objectives on
+  every dataset** ([docs/ROLLOUT_PROBE.md](docs/ROLLOUT_PROBE.md)) —
+  representational quality (everything above) and forecasting competence
+  through a shallow post-hoc-trained predictor are empirically not the same
+  axis.
+- **A held-out generalization check** (small `valid`-split slice, encoders
+  never pretrained on it) reproduces and sharpens the noise-robustness
+  finding — MAE's `active_matter` `nematic_order` R² is −15.4 at *zero* added
+  noise on unseen trajectories. Sample size is small (4–5 trajectories per
+  dataset), so treat as directional, not precise.
+
 ## Pretrained encoders
 
 [`checkpoints/`](checkpoints/) has the final (100k-step) trained encoder for
@@ -53,15 +88,15 @@ be pointed at your own tensors of the same shape.
 Beyond contemporaneous physics decodability, six more probes ask whether the
 representations differ in *what kind* of physics they capture:
 
-| script | question |
-|---|---|
-| [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity (enstrophy, divergence, okubo-weiss, nematic order, ...)? |
-| [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) — does spatial detail help beyond pooling? |
-| [scripts/analyze_regime.py](scripts/analyze_regime.py) | does the pooled representation know the *regime* (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — one value per trajectory, probed with train/val split by trajectory to avoid leakage |
-| [scripts/rollout_probe.py](scripts/rollout_probe.py) | using each model's own pretrained predictor/decoder under a causal (non-tube) mask, does it forecast a genuinely future window better than a persistence baseline? Single-shot only, not fed back — see the next row for that. |
-| [scripts/rollout_assessment.py](scripts/rollout_assessment.py) | **genuine autoregressive rollout**: encoder → latent dynamics predictor → small decoder → decoded future window → re-encode → predict again, chained for many steps. Does the representation encode enough about the dynamics to forecast forward, and does that forecast stay usable as errors compound? Compares a fed-back chain against an oracle (always re-seeded with real context) and a persistence floor. Needs a one-time prerequisite: `scripts/train_rollout_heads.py` (see below). |
-| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | sidesteps the predictor/decoder entirely — does a *fresh* ridge probe on frozen present-time features forecast future physics, swept over multiple time gaps? |
-| [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) | injects Gaussian noise (several std levels) directly into the input physical variables before encoding, then ridge-probes against the *clean* clip's physics — does decodability degrade gracefully or collapse abruptly? Found: MAE is often the sharper decoder at zero noise but degrades far more sharply (occasionally collapsing outright) than JEPA once the input is corrupted, on 2 of 3 datasets. |
+| script | question | found |
+|---|---|---|
+| [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity (enstrophy, divergence, okubo-weiss, nematic order, ...)? Also supports `--split valid` for a held-out generalization check. | JEPA and MAE tie on `active_matter`/`shear_flow`; JEPA clearly ahead on `rayleigh_benard`'s coupled quantities. |
+| [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) plus a small MLP nonlinear readout — does spatial detail or nonlinearity recover signal pooling/linearity hides? | On `rayleigh_benard`, JEPA has real nonlinear-only local information (e.g. `convective_flux` MLP 0.90) that MAE lacks even nonlinearly (0.07). Elsewhere, MLP gains are symmetric between objectives. |
+| [scripts/analyze_regime.py](scripts/analyze_regime.py) | does the pooled representation know the *regime* (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — one value per trajectory, probed with train/val split by trajectory to avoid leakage | Both objectives decode regime near-perfectly (R² 0.77–0.999) — not where JEPA/MAE differ. |
+| [scripts/rollout_probe.py](scripts/rollout_probe.py) | using each model's own pretrained predictor/decoder under a causal (non-tube) mask, does it forecast a genuinely future window better than a persistence baseline? Single-shot only, not fed back — see the next row for that. | Pretrained predictor doesn't beat persistence by much for either objective. |
+| [scripts/rollout_assessment.py](scripts/rollout_assessment.py) | **genuine autoregressive rollout**: encoder → latent dynamics predictor → small decoder → decoded future window → re-encode → predict again, chained for many steps. Does the representation encode enough about the dynamics to forecast forward, and does that forecast stay usable as errors compound? Compares a fed-back chain against an oracle (always re-seeded with real context) and a persistence floor. Needs a one-time prerequisite: `scripts/train_rollout_heads.py` (see below). | JEPA and MAE track closely at every step, every dataset — contemporaneous-probe advantages don't transfer to multi-step forecasting through this head. |
+| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | sidesteps the predictor/decoder entirely — does a *fresh* linear/MLP probe on frozen present-time features forecast future physics, swept over multiple time gaps and noise levels, scored with a persistence-relative skill score? | On `rayleigh_benard`, JEPA's forecast-skill advantage *grows* with horizon; token-level flips `active_matter`'s ranking to JEPA despite MAE leading pooled. |
+| [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) | injects Gaussian noise (several std levels) directly into the input physical variables before encoding, then ridge-probes (pooled and per-token, every layer) against the *clean* clip's physics — does decodability degrade gracefully or collapse abruptly? | MAE is the sharper decoder at zero noise but collapses far more sharply than JEPA once corrupted, on `active_matter`/`rayleigh_benard` (confirmed on held-out `valid`-split data too); `shear_flow` shows no split. |
 
 Supporting scripts: [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py)
 (recovers per-trajectory regime params from Well filenames, needed by
@@ -117,7 +152,7 @@ Both objectives share everything except the head:
 | **JEPA** | EMA target encoder (0.996→1.0) + 6-layer predictor (384d) → smooth-L1 on layer-normed target features at masked positions |
 
 Datasets (per-dataset model pairs, 6 runs): `active_matter` (11ch, 256×256),
-`shear_flow` (4ch, 256×128, incompressible NS), `rayleigh_benard` (4ch, 512×128).
+`shear_flow` (4ch, 256×512, incompressible NS), `rayleigh_benard` (4ch, 512×128).
 `turbulent_radiative_layer_2D` is used only as a local smoke-test dataset.
 
 ## Quickstart

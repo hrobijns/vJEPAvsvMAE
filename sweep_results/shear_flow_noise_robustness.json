@@ -1,126 +1,3206 @@
 {
   "checkpoints/shear_flow_jepa.pt": {
-    "0.0": {
-      "enstrophy": 0.9835331201553345,
-      "vorticity_signed": 0.11442919969558715,
-      "divergence": 0.24087269306182862,
-      "tracer_grad": 0.725403118133545,
-      "advective_flux": 0.46977893114089964,
-      "strain_rate_mag": 0.9961154699325562,
-      "okubo_weiss": 0.9720637202262878,
-      "pressure_grad_mag": 0.9966078281402588
+    "n_layers": 13,
+    "noise_stds": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "by_noise": {
+      "0.0": [
+        {
+          "enstrophy": 0.9874558210372925,
+          "tracer_grad": 0.7372883319854736,
+          "advective_flux": 0.3127442717552185,
+          "strain_rate_mag": 0.9969101428985596,
+          "okubo_weiss": 0.9744178175926208,
+          "pressure_grad_mag": 0.9985955715179443,
+          "tracer_laplacian": 0.6717062830924988
+        },
+        {
+          "enstrophy": 0.9937423586845398,
+          "tracer_grad": 0.8350617051124573,
+          "advective_flux": 0.37738293409347534,
+          "strain_rate_mag": 0.9982650637626648,
+          "okubo_weiss": 0.988127076625824,
+          "pressure_grad_mag": 0.9994478583335876,
+          "tracer_laplacian": 0.806306779384613
+        },
+        {
+          "enstrophy": 0.9958225607872009,
+          "tracer_grad": 0.8734530210494995,
+          "advective_flux": 0.3929274320602417,
+          "strain_rate_mag": 0.9986458897590638,
+          "okubo_weiss": 0.9929692268371582,
+          "pressure_grad_mag": 0.9995017528533936,
+          "tracer_laplacian": 0.839542806148529
+        },
+        {
+          "enstrophy": 0.9947862744331359,
+          "tracer_grad": 0.8782606840133667,
+          "advective_flux": 0.44183605909347534,
+          "strain_rate_mag": 0.998499059677124,
+          "okubo_weiss": 0.9905457854270935,
+          "pressure_grad_mag": 0.9991993069648742,
+          "tracer_laplacian": 0.8511645793914795
+        },
+        {
+          "enstrophy": 0.9921546101570129,
+          "tracer_grad": 0.8629763960838318,
+          "advective_flux": 0.4458753228187561,
+          "strain_rate_mag": 0.9976730108261108,
+          "okubo_weiss": 0.9845840215682984,
+          "pressure_grad_mag": 0.9984225988388061,
+          "tracer_laplacian": 0.836788535118103
+        },
+        {
+          "enstrophy": 0.9910978555679322,
+          "tracer_grad": 0.8454469799995422,
+          "advective_flux": 0.527604055404663,
+          "strain_rate_mag": 0.9977376461029053,
+          "okubo_weiss": 0.9842558979988099,
+          "pressure_grad_mag": 0.9980366349220275,
+          "tracer_laplacian": 0.8198784828186035
+        },
+        {
+          "enstrophy": 0.9922801852226257,
+          "tracer_grad": 0.8238300442695617,
+          "advective_flux": 0.5177492260932922,
+          "strain_rate_mag": 0.9976440310478211,
+          "okubo_weiss": 0.986568284034729,
+          "pressure_grad_mag": 0.9980540037155151,
+          "tracer_laplacian": 0.7926884651184082
+        },
+        {
+          "enstrophy": 0.9926193952560425,
+          "tracer_grad": 0.7971863865852356,
+          "advective_flux": 0.5074852347373963,
+          "strain_rate_mag": 0.9979456901550293,
+          "okubo_weiss": 0.9878880500793457,
+          "pressure_grad_mag": 0.998270845413208,
+          "tracer_laplacian": 0.7668802380561829
+        },
+        {
+          "enstrophy": 0.9913534045219421,
+          "tracer_grad": 0.7841462969779969,
+          "advective_flux": 0.5005137920379639,
+          "strain_rate_mag": 0.9975504636764526,
+          "okubo_weiss": 0.9848978877067566,
+          "pressure_grad_mag": 0.9976335167884827,
+          "tracer_laplacian": 0.7444854497909545
+        },
+        {
+          "enstrophy": 0.9900819182395935,
+          "tracer_grad": 0.7625500679016113,
+          "advective_flux": 0.4971168637275696,
+          "strain_rate_mag": 0.9970267653465271,
+          "okubo_weiss": 0.9837740898132324,
+          "pressure_grad_mag": 0.997410237789154,
+          "tracer_laplacian": 0.7283590078353882
+        },
+        {
+          "enstrophy": 0.9877887964248657,
+          "tracer_grad": 0.7441884756088257,
+          "advective_flux": 0.4909498572349548,
+          "strain_rate_mag": 0.99706552028656,
+          "okubo_weiss": 0.9792973637580872,
+          "pressure_grad_mag": 0.9972932457923889,
+          "tracer_laplacian": 0.707363486289978
+        },
+        {
+          "enstrophy": 0.9836487412452698,
+          "tracer_grad": 0.7215161442756652,
+          "advective_flux": 0.47660499811172485,
+          "strain_rate_mag": 0.9960114479064941,
+          "okubo_weiss": 0.9718404650688172,
+          "pressure_grad_mag": 0.9966576099395752,
+          "tracer_laplacian": 0.6759474992752075
+        },
+        {
+          "enstrophy": 0.9835327506065369,
+          "tracer_grad": 0.7253998041152954,
+          "advective_flux": 0.4697819948196411,
+          "strain_rate_mag": 0.9961154818534851,
+          "okubo_weiss": 0.972063422203064,
+          "pressure_grad_mag": 0.9966079473495484,
+          "tracer_laplacian": 0.6794281005859375
+        }
+      ],
+      "0.1": [
+        {
+          "enstrophy": 0.9871752858161926,
+          "tracer_grad": 0.7360857367515564,
+          "advective_flux": 0.30649696588516234,
+          "strain_rate_mag": 0.9967683672904968,
+          "okubo_weiss": 0.9736933708190918,
+          "pressure_grad_mag": 0.998506224155426,
+          "tracer_laplacian": 0.6705228328704834
+        },
+        {
+          "enstrophy": 0.9937346696853637,
+          "tracer_grad": 0.8344900965690613,
+          "advective_flux": 0.37230623960494996,
+          "strain_rate_mag": 0.9982475876808167,
+          "okubo_weiss": 0.9881254673004151,
+          "pressure_grad_mag": 0.9994368553161621,
+          "tracer_laplacian": 0.8049217820167541
+        },
+        {
+          "enstrophy": 0.9960426211357116,
+          "tracer_grad": 0.8751862168312072,
+          "advective_flux": 0.3880254030227661,
+          "strain_rate_mag": 0.9986302495002747,
+          "okubo_weiss": 0.9932072401046753,
+          "pressure_grad_mag": 0.9995260119438172,
+          "tracer_laplacian": 0.8410393238067627
+        },
+        {
+          "enstrophy": 0.995156729221344,
+          "tracer_grad": 0.8796658635139465,
+          "advective_flux": 0.42540684938430784,
+          "strain_rate_mag": 0.9985436797142029,
+          "okubo_weiss": 0.9910241961479187,
+          "pressure_grad_mag": 0.9992733716964721,
+          "tracer_laplacian": 0.8533520698547363
+        },
+        {
+          "enstrophy": 0.9931923270225524,
+          "tracer_grad": 0.8697996616363526,
+          "advective_flux": 0.438356077671051,
+          "strain_rate_mag": 0.9979321956634521,
+          "okubo_weiss": 0.986721670627594,
+          "pressure_grad_mag": 0.998570728302002,
+          "tracer_laplacian": 0.8452787518501281
+        },
+        {
+          "enstrophy": 0.9923400402069091,
+          "tracer_grad": 0.856381869316101,
+          "advective_flux": 0.495513916015625,
+          "strain_rate_mag": 0.9981220960617065,
+          "okubo_weiss": 0.9864714503288269,
+          "pressure_grad_mag": 0.9984676957130432,
+          "tracer_laplacian": 0.8337165594100953
+        },
+        {
+          "enstrophy": 0.9926822304725647,
+          "tracer_grad": 0.8315965414047242,
+          "advective_flux": 0.4949551343917847,
+          "strain_rate_mag": 0.9977738738059998,
+          "okubo_weiss": 0.9880438923835755,
+          "pressure_grad_mag": 0.9984327554702759,
+          "tracer_laplacian": 0.8081810474395752
+        },
+        {
+          "enstrophy": 0.9926339983940125,
+          "tracer_grad": 0.8117854833602905,
+          "advective_flux": 0.48138998746871947,
+          "strain_rate_mag": 0.9979708075523377,
+          "okubo_weiss": 0.9888068795204162,
+          "pressure_grad_mag": 0.9985092997550964,
+          "tracer_laplacian": 0.7856719613075256
+        },
+        {
+          "enstrophy": 0.9918479204177857,
+          "tracer_grad": 0.7928663969039917,
+          "advective_flux": 0.4958974838256836,
+          "strain_rate_mag": 0.9975878715515136,
+          "okubo_weiss": 0.9868320226669312,
+          "pressure_grad_mag": 0.9978795766830444,
+          "tracer_laplacian": 0.7558806657791137
+        },
+        {
+          "enstrophy": 0.9904648661613464,
+          "tracer_grad": 0.7728533625602723,
+          "advective_flux": 0.49217809438705445,
+          "strain_rate_mag": 0.9970533609390259,
+          "okubo_weiss": 0.9847027897834778,
+          "pressure_grad_mag": 0.9977890610694885,
+          "tracer_laplacian": 0.7417520642280578
+        },
+        {
+          "enstrophy": 0.9894411444664002,
+          "tracer_grad": 0.750329053401947,
+          "advective_flux": 0.4794513940811157,
+          "strain_rate_mag": 0.9970426082611084,
+          "okubo_weiss": 0.9819172501564026,
+          "pressure_grad_mag": 0.9977844953536987,
+          "tracer_laplacian": 0.7122020602226258
+        },
+        {
+          "enstrophy": 0.9854550242424012,
+          "tracer_grad": 0.7262794017791748,
+          "advective_flux": 0.4503409743309021,
+          "strain_rate_mag": 0.9961548924446106,
+          "okubo_weiss": 0.9754304528236389,
+          "pressure_grad_mag": 0.9971043586730957,
+          "tracer_laplacian": 0.6812683582305908
+        },
+        {
+          "enstrophy": 0.9851595878601074,
+          "tracer_grad": 0.7279489994049072,
+          "advective_flux": 0.4474851846694946,
+          "strain_rate_mag": 0.996170699596405,
+          "okubo_weiss": 0.9755000233650207,
+          "pressure_grad_mag": 0.9970635771751404,
+          "tracer_laplacian": 0.6824381351470947
+        }
+      ],
+      "0.25": [
+        {
+          "enstrophy": 0.9857958912849426,
+          "tracer_grad": 0.7152970314025879,
+          "advective_flux": 0.28193308115005494,
+          "strain_rate_mag": 0.9962397933006286,
+          "okubo_weiss": 0.9708003759384155,
+          "pressure_grad_mag": 0.9980791211128235,
+          "tracer_laplacian": 0.6475026607513428
+        },
+        {
+          "enstrophy": 0.9934772849082947,
+          "tracer_grad": 0.8299454689025879,
+          "advective_flux": 0.353393018245697,
+          "strain_rate_mag": 0.9981370329856872,
+          "okubo_weiss": 0.987821888923645,
+          "pressure_grad_mag": 0.9993812084197998,
+          "tracer_laplacian": 0.797687292098999
+        },
+        {
+          "enstrophy": 0.9961125493049622,
+          "tracer_grad": 0.8725687623023987,
+          "advective_flux": 0.3686211943626404,
+          "strain_rate_mag": 0.9984888672828675,
+          "okubo_weiss": 0.992978298664093,
+          "pressure_grad_mag": 0.9995143055915833,
+          "tracer_laplacian": 0.8376212000846863
+        },
+        {
+          "enstrophy": 0.9956037521362304,
+          "tracer_grad": 0.8862087488174438,
+          "advective_flux": 0.38806345462799074,
+          "strain_rate_mag": 0.9984501719474792,
+          "okubo_weiss": 0.9916188359260559,
+          "pressure_grad_mag": 0.9994100093841553,
+          "tracer_laplacian": 0.8590740442276001
+        },
+        {
+          "enstrophy": 0.9936270117759705,
+          "tracer_grad": 0.8752395987510682,
+          "advective_flux": 0.40766369104385375,
+          "strain_rate_mag": 0.998024046421051,
+          "okubo_weiss": 0.9883911371231079,
+          "pressure_grad_mag": 0.9989177823066712,
+          "tracer_laplacian": 0.8510499835014343
+        },
+        {
+          "enstrophy": 0.9936280012130737,
+          "tracer_grad": 0.8681703448295593,
+          "advective_flux": 0.452980101108551,
+          "strain_rate_mag": 0.9982244968414307,
+          "okubo_weiss": 0.9884048461914062,
+          "pressure_grad_mag": 0.9989359736442566,
+          "tracer_laplacian": 0.8474593162536621
+        },
+        {
+          "enstrophy": 0.993285882472992,
+          "tracer_grad": 0.848353362083435,
+          "advective_flux": 0.48975573778152465,
+          "strain_rate_mag": 0.9978304386138916,
+          "okubo_weiss": 0.988881242275238,
+          "pressure_grad_mag": 0.9988489985466004,
+          "tracer_laplacian": 0.8254851460456848
+        },
+        {
+          "enstrophy": 0.9926112294197083,
+          "tracer_grad": 0.8272754907608032,
+          "advective_flux": 0.4824007272720337,
+          "strain_rate_mag": 0.9978510141372681,
+          "okubo_weiss": 0.9888875007629394,
+          "pressure_grad_mag": 0.99880930185318,
+          "tracer_laplacian": 0.7992838382720947
+        },
+        {
+          "enstrophy": 0.9920085549354554,
+          "tracer_grad": 0.8128425240516662,
+          "advective_flux": 0.5069629907608032,
+          "strain_rate_mag": 0.9974418640136719,
+          "okubo_weiss": 0.9879341721534729,
+          "pressure_grad_mag": 0.9983456134796143,
+          "tracer_laplacian": 0.7751472353935241
+        },
+        {
+          "enstrophy": 0.99143967628479,
+          "tracer_grad": 0.7839561939239502,
+          "advective_flux": 0.49961875677108764,
+          "strain_rate_mag": 0.9971698522567749,
+          "okubo_weiss": 0.9868865847587586,
+          "pressure_grad_mag": 0.9983190536499024,
+          "tracer_laplacian": 0.7495733141899109
+        },
+        {
+          "enstrophy": 0.9905096173286438,
+          "tracer_grad": 0.7737062692642211,
+          "advective_flux": 0.4851986885070801,
+          "strain_rate_mag": 0.9970759391784668,
+          "okubo_weiss": 0.9851934671401977,
+          "pressure_grad_mag": 0.9982178211212158,
+          "tracer_laplacian": 0.7349960327148437
+        },
+        {
+          "enstrophy": 0.9878540635108948,
+          "tracer_grad": 0.7478447914123535,
+          "advective_flux": 0.47131435871124266,
+          "strain_rate_mag": 0.9964893698692322,
+          "okubo_weiss": 0.9807549238204956,
+          "pressure_grad_mag": 0.9978287935256958,
+          "tracer_laplacian": 0.7057143449783325
+        },
+        {
+          "enstrophy": 0.9875864148139953,
+          "tracer_grad": 0.7478376626968384,
+          "advective_flux": 0.4712794780731201,
+          "strain_rate_mag": 0.9964709520339966,
+          "okubo_weiss": 0.9806246995925904,
+          "pressure_grad_mag": 0.9978177666664123,
+          "tracer_laplacian": 0.7042612195014953
+        }
+      ],
+      "0.5": [
+        {
+          "enstrophy": 0.9836397647857666,
+          "tracer_grad": 0.6825294733047486,
+          "advective_flux": 0.2317948341369629,
+          "strain_rate_mag": 0.9946771621704101,
+          "okubo_weiss": 0.9646911859512329,
+          "pressure_grad_mag": 0.997085702419281,
+          "tracer_laplacian": 0.6053404688835144
+        },
+        {
+          "enstrophy": 0.9924038767814636,
+          "tracer_grad": 0.8041016697883606,
+          "advective_flux": 0.30088880062103274,
+          "strain_rate_mag": 0.9975379109382629,
+          "okubo_weiss": 0.985583233833313,
+          "pressure_grad_mag": 0.9991035342216492,
+          "tracer_laplacian": 0.7679683566093445
+        },
+        {
+          "enstrophy": 0.9955088019371032,
+          "tracer_grad": 0.8527238249778748,
+          "advective_flux": 0.3019291877746582,
+          "strain_rate_mag": 0.997968065738678,
+          "okubo_weiss": 0.99179927110672,
+          "pressure_grad_mag": 0.9993443012237548,
+          "tracer_laplacian": 0.8161653041839599
+        },
+        {
+          "enstrophy": 0.9950215101242066,
+          "tracer_grad": 0.8764991879463195,
+          "advective_flux": 0.3155298113822937,
+          "strain_rate_mag": 0.9978376507759095,
+          "okubo_weiss": 0.9903797507286072,
+          "pressure_grad_mag": 0.9993533253669739,
+          "tracer_laplacian": 0.8451297521591187
+        },
+        {
+          "enstrophy": 0.9936874508857727,
+          "tracer_grad": 0.8706324815750122,
+          "advective_flux": 0.3366280674934387,
+          "strain_rate_mag": 0.9975206613540649,
+          "okubo_weiss": 0.9880909323692322,
+          "pressure_grad_mag": 0.9990697979927063,
+          "tracer_laplacian": 0.8437915563583374
+        },
+        {
+          "enstrophy": 0.9938624382019043,
+          "tracer_grad": 0.8563097476959228,
+          "advective_flux": 0.3862375855445862,
+          "strain_rate_mag": 0.9976624131202698,
+          "okubo_weiss": 0.9873273134231567,
+          "pressure_grad_mag": 0.9990750432014466,
+          "tracer_laplacian": 0.8337671756744385
+        },
+        {
+          "enstrophy": 0.992944061756134,
+          "tracer_grad": 0.8462635636329651,
+          "advective_flux": 0.4491990089416504,
+          "strain_rate_mag": 0.9973476886749267,
+          "okubo_weiss": 0.9873561978340148,
+          "pressure_grad_mag": 0.9989769458770752,
+          "tracer_laplacian": 0.8211837768554687
+        },
+        {
+          "enstrophy": 0.9920833826065063,
+          "tracer_grad": 0.8189131379127502,
+          "advective_flux": 0.4451985001564026,
+          "strain_rate_mag": 0.9972987651824952,
+          "okubo_weiss": 0.9869735598564148,
+          "pressure_grad_mag": 0.9988634705543518,
+          "tracer_laplacian": 0.790570592880249
+        },
+        {
+          "enstrophy": 0.991482961177826,
+          "tracer_grad": 0.8008851051330567,
+          "advective_flux": 0.4470581769943237,
+          "strain_rate_mag": 0.997155773639679,
+          "okubo_weiss": 0.9867573380470276,
+          "pressure_grad_mag": 0.9984117388725281,
+          "tracer_laplacian": 0.767401111125946
+        },
+        {
+          "enstrophy": 0.9914014577865601,
+          "tracer_grad": 0.7828071236610412,
+          "advective_flux": 0.4416878461837769,
+          "strain_rate_mag": 0.9969274878501893,
+          "okubo_weiss": 0.9864482760429383,
+          "pressure_grad_mag": 0.99842369556427,
+          "tracer_laplacian": 0.7492079019546509
+        },
+        {
+          "enstrophy": 0.9901995658874512,
+          "tracer_grad": 0.7631821036338806,
+          "advective_flux": 0.44447877407073977,
+          "strain_rate_mag": 0.9966090440750122,
+          "okubo_weiss": 0.9843265175819397,
+          "pressure_grad_mag": 0.9982447504997254,
+          "tracer_laplacian": 0.7270111441612244
+        },
+        {
+          "enstrophy": 0.9889065146446228,
+          "tracer_grad": 0.7470065712928772,
+          "advective_flux": 0.43307271003723147,
+          "strain_rate_mag": 0.9963753938674926,
+          "okubo_weiss": 0.9817723274230957,
+          "pressure_grad_mag": 0.9980334877967835,
+          "tracer_laplacian": 0.7079272985458374
+        },
+        {
+          "enstrophy": 0.9884973645210267,
+          "tracer_grad": 0.746944785118103,
+          "advective_flux": 0.4341162800788879,
+          "strain_rate_mag": 0.9963561058044433,
+          "okubo_weiss": 0.9814045667648316,
+          "pressure_grad_mag": 0.9979899168014527,
+          "tracer_laplacian": 0.7070255875587463
+        }
+      ],
+      "1.0": [
+        {
+          "enstrophy": 0.9755865335464478,
+          "tracer_grad": 0.6234251141548157,
+          "advective_flux": 0.07041993141174316,
+          "strain_rate_mag": 0.9887360453605651,
+          "okubo_weiss": 0.9368134379386902,
+          "pressure_grad_mag": 0.9932215571403503,
+          "tracer_laplacian": 0.5243244409561157
+        },
+        {
+          "enstrophy": 0.9886530637741089,
+          "tracer_grad": 0.732261347770691,
+          "advective_flux": 0.13245283365249633,
+          "strain_rate_mag": 0.9934988975524902,
+          "okubo_weiss": 0.9748957991600037,
+          "pressure_grad_mag": 0.9980544805526733,
+          "tracer_laplacian": 0.675574517250061
+        },
+        {
+          "enstrophy": 0.991440224647522,
+          "tracer_grad": 0.768360710144043,
+          "advective_flux": 0.16617212295532227,
+          "strain_rate_mag": 0.9946031928062439,
+          "okubo_weiss": 0.9830847382545471,
+          "pressure_grad_mag": 0.9985858798027039,
+          "tracer_laplacian": 0.7089050889015198
+        },
+        {
+          "enstrophy": 0.9915814757347107,
+          "tracer_grad": 0.7938140511512757,
+          "advective_flux": 0.19290525913238527,
+          "strain_rate_mag": 0.9947358965873718,
+          "okubo_weiss": 0.9834952473640441,
+          "pressure_grad_mag": 0.9986809253692627,
+          "tracer_laplacian": 0.7339751839637756
+        },
+        {
+          "enstrophy": 0.9896361947059631,
+          "tracer_grad": 0.8078741073608399,
+          "advective_flux": 0.1803736686706543,
+          "strain_rate_mag": 0.9941314697265625,
+          "okubo_weiss": 0.9789653420448303,
+          "pressure_grad_mag": 0.9984722375869751,
+          "tracer_laplacian": 0.7566453576087951
+        },
+        {
+          "enstrophy": 0.9881626605987549,
+          "tracer_grad": 0.8042224526405335,
+          "advective_flux": 0.1657169818878174,
+          "strain_rate_mag": 0.993635642528534,
+          "okubo_weiss": 0.9736840009689331,
+          "pressure_grad_mag": 0.9980942249298096,
+          "tracer_laplacian": 0.7515628099441528
+        },
+        {
+          "enstrophy": 0.9880810737609863,
+          "tracer_grad": 0.7891084790229798,
+          "advective_flux": 0.20320940017700195,
+          "strain_rate_mag": 0.993340277671814,
+          "okubo_weiss": 0.974894666671753,
+          "pressure_grad_mag": 0.997924292087555,
+          "tracer_laplacian": 0.7435949563980102
+        },
+        {
+          "enstrophy": 0.9862965703010559,
+          "tracer_grad": 0.7645165681838989,
+          "advective_flux": 0.2182245969772339,
+          "strain_rate_mag": 0.9927137494087219,
+          "okubo_weiss": 0.9709716081619263,
+          "pressure_grad_mag": 0.9976036429405213,
+          "tracer_laplacian": 0.7174629688262939
+        },
+        {
+          "enstrophy": 0.9857747077941894,
+          "tracer_grad": 0.7492311358451843,
+          "advective_flux": 0.23374271392822266,
+          "strain_rate_mag": 0.9925822496414185,
+          "okubo_weiss": 0.9708499789237977,
+          "pressure_grad_mag": 0.9973045706748962,
+          "tracer_laplacian": 0.70093994140625
+        },
+        {
+          "enstrophy": 0.984099292755127,
+          "tracer_grad": 0.7287391185760498,
+          "advective_flux": 0.1997487425804138,
+          "strain_rate_mag": 0.9922669768333435,
+          "okubo_weiss": 0.9691200017929077,
+          "pressure_grad_mag": 0.996884560585022,
+          "tracer_laplacian": 0.6801117420196533
+        },
+        {
+          "enstrophy": 0.9821220517158509,
+          "tracer_grad": 0.714557683467865,
+          "advective_flux": 0.2095097064971924,
+          "strain_rate_mag": 0.9914813160896301,
+          "okubo_weiss": 0.9640552997589111,
+          "pressure_grad_mag": 0.9963770151138306,
+          "tracer_laplacian": 0.660873532295227
+        },
+        {
+          "enstrophy": 0.9792245864868164,
+          "tracer_grad": 0.7030359148979187,
+          "advective_flux": 0.18573942184448242,
+          "strain_rate_mag": 0.9908625364303589,
+          "okubo_weiss": 0.9598098754882812,
+          "pressure_grad_mag": 0.9956794261932373,
+          "tracer_laplacian": 0.6481764316558838
+        },
+        {
+          "enstrophy": 0.979146671295166,
+          "tracer_grad": 0.7031209349632264,
+          "advective_flux": 0.1813359260559082,
+          "strain_rate_mag": 0.9907631516456604,
+          "okubo_weiss": 0.9596131443977356,
+          "pressure_grad_mag": 0.9956415891647339,
+          "tracer_laplacian": 0.6478823542594909
+        }
+      ],
+      "2.0": [
+        {
+          "enstrophy": 0.9522539615631104,
+          "tracer_grad": 0.5170965671539307,
+          "advective_flux": -0.11618626117706299,
+          "strain_rate_mag": 0.9675044178962707,
+          "okubo_weiss": 0.8738564014434814,
+          "pressure_grad_mag": 0.9749178051948547,
+          "tracer_laplacian": 0.41819651126861573
+        },
+        {
+          "enstrophy": 0.9715990424156189,
+          "tracer_grad": 0.628566038608551,
+          "advective_flux": -0.07682138681411743,
+          "strain_rate_mag": 0.980933666229248,
+          "okubo_weiss": 0.9178605079650879,
+          "pressure_grad_mag": 0.9898513793945313,
+          "tracer_laplacian": 0.5194653272628784
+        },
+        {
+          "enstrophy": 0.9774351716041565,
+          "tracer_grad": 0.6521585702896118,
+          "advective_flux": -0.0413926362991333,
+          "strain_rate_mag": 0.9848976492881775,
+          "okubo_weiss": 0.931244695186615,
+          "pressure_grad_mag": 0.9936584949493408,
+          "tracer_laplacian": 0.5480205297470093
+        },
+        {
+          "enstrophy": 0.9782057166099548,
+          "tracer_grad": 0.6647636532783509,
+          "advective_flux": -0.03563446998596191,
+          "strain_rate_mag": 0.9856224775314331,
+          "okubo_weiss": 0.935510003566742,
+          "pressure_grad_mag": 0.9945356965065002,
+          "tracer_laplacian": 0.5575305700302124
+        },
+        {
+          "enstrophy": 0.9775739192962647,
+          "tracer_grad": 0.6607920408248902,
+          "advective_flux": -0.043284261226654054,
+          "strain_rate_mag": 0.9852763175964355,
+          "okubo_weiss": 0.9334485292434692,
+          "pressure_grad_mag": 0.994329285621643,
+          "tracer_laplacian": 0.5537784457206726
+        },
+        {
+          "enstrophy": 0.9749532461166381,
+          "tracer_grad": 0.6588407635688782,
+          "advective_flux": -0.050264036655426024,
+          "strain_rate_mag": 0.9845059752464295,
+          "okubo_weiss": 0.9225307703018188,
+          "pressure_grad_mag": 0.9937655091285705,
+          "tracer_laplacian": 0.5535290002822876
+        },
+        {
+          "enstrophy": 0.9733676195144654,
+          "tracer_grad": 0.6660091161727906,
+          "advective_flux": -0.040159308910369874,
+          "strain_rate_mag": 0.9838634610176087,
+          "okubo_weiss": 0.9230716228485107,
+          "pressure_grad_mag": 0.9933399558067322,
+          "tracer_laplacian": 0.5573347687721253
+        },
+        {
+          "enstrophy": 0.9720866322517395,
+          "tracer_grad": 0.6623994827270507,
+          "advective_flux": -0.03578522205352783,
+          "strain_rate_mag": 0.982839834690094,
+          "okubo_weiss": 0.9244076251983643,
+          "pressure_grad_mag": 0.9923088312149048,
+          "tracer_laplacian": 0.5587835311889648
+        },
+        {
+          "enstrophy": 0.9682924628257752,
+          "tracer_grad": 0.6389623999595642,
+          "advective_flux": -0.027782487869262695,
+          "strain_rate_mag": 0.9810711503028869,
+          "okubo_weiss": 0.9208855152130127,
+          "pressure_grad_mag": 0.9907425045967102,
+          "tracer_laplacian": 0.5391566634178162
+        },
+        {
+          "enstrophy": 0.9656636834144592,
+          "tracer_grad": 0.6251701831817627,
+          "advective_flux": -0.024601185321807863,
+          "strain_rate_mag": 0.9793339610099793,
+          "okubo_weiss": 0.9168724894523621,
+          "pressure_grad_mag": 0.9896138191223145,
+          "tracer_laplacian": 0.5147705674171448
+        },
+        {
+          "enstrophy": 0.9597365021705627,
+          "tracer_grad": 0.5990530133247376,
+          "advective_flux": -0.051271700859069826,
+          "strain_rate_mag": 0.9764203906059266,
+          "okubo_weiss": 0.9100271344184876,
+          "pressure_grad_mag": 0.9874498724937439,
+          "tracer_laplacian": 0.4979089617729187
+        },
+        {
+          "enstrophy": 0.9482898116111755,
+          "tracer_grad": 0.5736214995384217,
+          "advective_flux": -0.08180751800537109,
+          "strain_rate_mag": 0.9716511249542237,
+          "okubo_weiss": 0.8841849803924561,
+          "pressure_grad_mag": 0.9830407977104187,
+          "tracer_laplacian": 0.4754480481147766
+        },
+        {
+          "enstrophy": 0.9454379796981811,
+          "tracer_grad": 0.5810465335845947,
+          "advective_flux": -0.08459165096282958,
+          "strain_rate_mag": 0.9712371110916138,
+          "okubo_weiss": 0.8813325643539429,
+          "pressure_grad_mag": 0.9823961019515991,
+          "tracer_laplacian": 0.48474485874176027
+        }
+      ]
     },
-    "0.1": {
-      "enstrophy": 0.9850099921226502,
-      "vorticity_signed": 0.11511285305023193,
-      "divergence": 0.24717811346054078,
-      "tracer_grad": 0.7286972045898438,
-      "advective_flux": 0.4482449531555176,
-      "strain_rate_mag": 0.9961427211761474,
-      "okubo_weiss": 0.9753223180770874,
-      "pressure_grad_mag": 0.9970471262931824
-    },
-    "0.25": {
-      "enstrophy": 0.9875524520874024,
-      "vorticity_signed": 0.11646492481231689,
-      "divergence": 0.2486390709877014,
-      "tracer_grad": 0.7456117272377014,
-      "advective_flux": 0.46709294319152833,
-      "strain_rate_mag": 0.9965179324150085,
-      "okubo_weiss": 0.9806936860084534,
-      "pressure_grad_mag": 0.9978655815124512
-    },
-    "0.5": {
-      "enstrophy": 0.9882588505744934,
-      "vorticity_signed": 0.11615304946899414,
-      "divergence": 0.23159348964691162,
-      "tracer_grad": 0.7499648332595825,
-      "advective_flux": 0.43441846370697024,
-      "strain_rate_mag": 0.9963205099105835,
-      "okubo_weiss": 0.9811329483985901,
-      "pressure_grad_mag": 0.9979632735252381
-    },
-    "1.0": {
-      "enstrophy": 0.9791553616523743,
-      "vorticity_signed": 0.03253904581069946,
-      "divergence": 0.049045455455780027,
-      "tracer_grad": 0.7026201248168945,
-      "advective_flux": 0.17446749210357665,
-      "strain_rate_mag": 0.9903864026069641,
-      "okubo_weiss": 0.9596465110778809,
-      "pressure_grad_mag": 0.9957921028137207
-    },
-    "2.0": {
-      "enstrophy": 0.9449737906455994,
-      "vorticity_signed": -0.14671478271484376,
-      "divergence": -0.1180919885635376,
-      "tracer_grad": 0.5871774792671204,
-      "advective_flux": -0.10035437345504761,
-      "strain_rate_mag": 0.9704704999923706,
-      "okubo_weiss": 0.8861015915870667,
-      "pressure_grad_mag": 0.9818745493888855
+    "token": {
+      "n_token_samples": 16,
+      "by_noise": {
+        "0.0": [
+          {
+            "enstrophy": 0.7856221914291381,
+            "vorticity_signed": 0.9982174873352051,
+            "divergence": 0.9964758276939392,
+            "tracer_grad": 0.7716270923614502,
+            "advective_flux": 0.5518338561058045,
+            "strain_rate_mag": 0.9513709306716919,
+            "okubo_weiss": 0.9123271942138672,
+            "pressure_grad_mag": 0.9580177545547486,
+            "tracer_laplacian": 0.7238119959831237
+          },
+          {
+            "enstrophy": 0.879208242893219,
+            "vorticity_signed": 0.9875276565551758,
+            "divergence": 0.9784505367279053,
+            "tracer_grad": 0.8748560786247254,
+            "advective_flux": 0.6304664373397827,
+            "strain_rate_mag": 0.9747794985771179,
+            "okubo_weiss": 0.9334627509117126,
+            "pressure_grad_mag": 0.9756795287132263,
+            "tracer_laplacian": 0.8320358514785766
+          },
+          {
+            "enstrophy": 0.840618634223938,
+            "vorticity_signed": 0.9350904583930969,
+            "divergence": 0.8745910048484802,
+            "tracer_grad": 0.8670600533485413,
+            "advective_flux": 0.5557292461395263,
+            "strain_rate_mag": 0.9639634609222412,
+            "okubo_weiss": 0.8973158955574035,
+            "pressure_grad_mag": 0.9719464421272278,
+            "tracer_laplacian": 0.8239619374275208
+          },
+          {
+            "enstrophy": 0.7639366745948791,
+            "vorticity_signed": 0.8458349585533143,
+            "divergence": 0.6836943626403809,
+            "tracer_grad": 0.8270917654037475,
+            "advective_flux": 0.3784186005592346,
+            "strain_rate_mag": 0.9400336503982544,
+            "okubo_weiss": 0.8349043488502502,
+            "pressure_grad_mag": 0.9541376948356628,
+            "tracer_laplacian": 0.7950040817260742
+          },
+          {
+            "enstrophy": 0.6687403559684754,
+            "vorticity_signed": 0.6290986776351929,
+            "divergence": 0.32238041162490844,
+            "tracer_grad": 0.7064345002174377,
+            "advective_flux": 0.20385174751281737,
+            "strain_rate_mag": 0.8571577429771423,
+            "okubo_weiss": 0.6827266216278076,
+            "pressure_grad_mag": 0.9221655488014221,
+            "tracer_laplacian": 0.6796592235565185
+          },
+          {
+            "enstrophy": 0.5782440423965454,
+            "vorticity_signed": 0.5393321275711059,
+            "divergence": 0.1496948480606079,
+            "tracer_grad": 0.6219668865203858,
+            "advective_flux": 0.10285534858703613,
+            "strain_rate_mag": 0.755582869052887,
+            "okubo_weiss": 0.5321711778640748,
+            "pressure_grad_mag": 0.8661704778671264,
+            "tracer_laplacian": 0.6092703104019165
+          },
+          {
+            "enstrophy": 0.5654384732246399,
+            "vorticity_signed": 0.5346713304519654,
+            "divergence": 0.11546953916549682,
+            "tracer_grad": 0.5649036765098572,
+            "advective_flux": 0.07637836933135986,
+            "strain_rate_mag": 0.7250029802322387,
+            "okubo_weiss": 0.516147792339325,
+            "pressure_grad_mag": 0.8509783744812012,
+            "tracer_laplacian": 0.5562992095947266
+          },
+          {
+            "enstrophy": 0.5594865202903747,
+            "vorticity_signed": 0.5428903818130493,
+            "divergence": 0.0992214560508728,
+            "tracer_grad": 0.5319106340408325,
+            "advective_flux": 0.062054216861724854,
+            "strain_rate_mag": 0.7136148929595947,
+            "okubo_weiss": 0.5095714330673218,
+            "pressure_grad_mag": 0.8426460504531861,
+            "tracer_laplacian": 0.5167470812797547
+          },
+          {
+            "enstrophy": 0.5190950632095337,
+            "vorticity_signed": 0.4783733367919922,
+            "divergence": 0.08892612457275391,
+            "tracer_grad": 0.502521562576294,
+            "advective_flux": 0.05333636999130249,
+            "strain_rate_mag": 0.6962777733802795,
+            "okubo_weiss": 0.48271002769470217,
+            "pressure_grad_mag": 0.8146237373352051,
+            "tracer_laplacian": 0.482504665851593
+          },
+          {
+            "enstrophy": 0.4929313063621521,
+            "vorticity_signed": 0.4352479577064514,
+            "divergence": 0.08067790269851685,
+            "tracer_grad": 0.4608027458190918,
+            "advective_flux": 0.04673470258712768,
+            "strain_rate_mag": 0.678148341178894,
+            "okubo_weiss": 0.4486208438873291,
+            "pressure_grad_mag": 0.7856605529785157,
+            "tracer_laplacian": 0.44161186218261717
+          },
+          {
+            "enstrophy": 0.4830114483833313,
+            "vorticity_signed": 0.39048655033111573,
+            "divergence": 0.07441204786300659,
+            "tracer_grad": 0.4544968128204346,
+            "advective_flux": 0.03897978067398071,
+            "strain_rate_mag": 0.6637127161026001,
+            "okubo_weiss": 0.4237605094909668,
+            "pressure_grad_mag": 0.776386022567749,
+            "tracer_laplacian": 0.4294565558433533
+          },
+          {
+            "enstrophy": 0.45976459980010986,
+            "vorticity_signed": 0.3169500708580017,
+            "divergence": 0.06761109828948975,
+            "tracer_grad": 0.4332773327827454,
+            "advective_flux": 0.03464146852493286,
+            "strain_rate_mag": 0.6459688186645508,
+            "okubo_weiss": 0.3952497959136963,
+            "pressure_grad_mag": 0.7526830196380615,
+            "tracer_laplacian": 0.41065033674240115
+          },
+          {
+            "enstrophy": 0.46218893527984617,
+            "vorticity_signed": 0.3134158492088318,
+            "divergence": 0.0034902334213256837,
+            "tracer_grad": 0.4435110926628113,
+            "advective_flux": -0.001884162425994873,
+            "strain_rate_mag": 0.6403028488159179,
+            "okubo_weiss": 0.3840919494628906,
+            "pressure_grad_mag": 0.7505686163902283,
+            "tracer_laplacian": 0.42133686542510984
+          }
+        ],
+        "0.1": [
+          {
+            "enstrophy": 0.7159306406974792,
+            "vorticity_signed": 0.9924489736557007,
+            "divergence": 0.9884748339653016,
+            "tracer_grad": 0.6477403759956359,
+            "advective_flux": 0.43537808656692506,
+            "strain_rate_mag": 0.9216530084609985,
+            "okubo_weiss": 0.8408859372138977,
+            "pressure_grad_mag": 0.9423822045326233,
+            "tracer_laplacian": 0.5779917120933533
+          },
+          {
+            "enstrophy": 0.8211288213729858,
+            "vorticity_signed": 0.9546332120895386,
+            "divergence": 0.9476391911506653,
+            "tracer_grad": 0.8046955823898315,
+            "advective_flux": 0.4924336910247803,
+            "strain_rate_mag": 0.9565512537956238,
+            "okubo_weiss": 0.8808581352233886,
+            "pressure_grad_mag": 0.9619216322898865,
+            "tracer_laplacian": 0.7435496568679809
+          },
+          {
+            "enstrophy": 0.7828469276428223,
+            "vorticity_signed": 0.8634158134460449,
+            "divergence": 0.7727548003196716,
+            "tracer_grad": 0.8141514420509338,
+            "advective_flux": 0.4425589919090271,
+            "strain_rate_mag": 0.947741687297821,
+            "okubo_weiss": 0.8518143773078919,
+            "pressure_grad_mag": 0.9585960149765015,
+            "tracer_laplacian": 0.7613991856575012
+          },
+          {
+            "enstrophy": 0.7153620004653931,
+            "vorticity_signed": 0.7666497945785522,
+            "divergence": 0.5537060260772705,
+            "tracer_grad": 0.7759711503982544,
+            "advective_flux": 0.29347249269485476,
+            "strain_rate_mag": 0.9167325139045716,
+            "okubo_weiss": 0.786608898639679,
+            "pressure_grad_mag": 0.9422232151031494,
+            "tracer_laplacian": 0.7352669358253479
+          },
+          {
+            "enstrophy": 0.6478698492050171,
+            "vorticity_signed": 0.5970673799514771,
+            "divergence": 0.2751234173774719,
+            "tracer_grad": 0.6854424595832824,
+            "advective_flux": 0.17390929460525512,
+            "strain_rate_mag": 0.8413131594657898,
+            "okubo_weiss": 0.6596713185310363,
+            "pressure_grad_mag": 0.9121782302856445,
+            "tracer_laplacian": 0.6547820448875428
+          },
+          {
+            "enstrophy": 0.5729047656059265,
+            "vorticity_signed": 0.5371207118034362,
+            "divergence": 0.14374243021011351,
+            "tracer_grad": 0.6192714452743531,
+            "advective_flux": 0.09804590940475463,
+            "strain_rate_mag": 0.7456394791603088,
+            "okubo_weiss": 0.5201395988464356,
+            "pressure_grad_mag": 0.8613730549812317,
+            "tracer_laplacian": 0.6062240719795227
+          },
+          {
+            "enstrophy": 0.560817301273346,
+            "vorticity_signed": 0.5472244024276733,
+            "divergence": 0.11242977380752564,
+            "tracer_grad": 0.5691713929176331,
+            "advective_flux": 0.07280879020690918,
+            "strain_rate_mag": 0.7215489149093628,
+            "okubo_weiss": 0.5085160493850708,
+            "pressure_grad_mag": 0.8497800707817078,
+            "tracer_laplacian": 0.5600189089775085
+          },
+          {
+            "enstrophy": 0.5565449833869934,
+            "vorticity_signed": 0.5450231909751893,
+            "divergence": 0.09715096950531006,
+            "tracer_grad": 0.5409517884254456,
+            "advective_flux": 0.06001260280609131,
+            "strain_rate_mag": 0.7135197877883911,
+            "okubo_weiss": 0.5110215902328491,
+            "pressure_grad_mag": 0.8407047867774964,
+            "tracer_laplacian": 0.525158703327179
+          },
+          {
+            "enstrophy": 0.5201117992401123,
+            "vorticity_signed": 0.4777547359466553,
+            "divergence": 0.08672962188720704,
+            "tracer_grad": 0.507171905040741,
+            "advective_flux": 0.052425050735473634,
+            "strain_rate_mag": 0.6955363154411316,
+            "okubo_weiss": 0.48314563035964964,
+            "pressure_grad_mag": 0.813098406791687,
+            "tracer_laplacian": 0.48970210552215576
+          },
+          {
+            "enstrophy": 0.4929760336875916,
+            "vorticity_signed": 0.43752760887145997,
+            "divergence": 0.07757371664047241,
+            "tracer_grad": 0.4656448245048523,
+            "advective_flux": 0.04467170238494873,
+            "strain_rate_mag": 0.6736385941505432,
+            "okubo_weiss": 0.4369507908821106,
+            "pressure_grad_mag": 0.7867360711097717,
+            "tracer_laplacian": 0.44690431356430055
+          },
+          {
+            "enstrophy": 0.48500540256500246,
+            "vorticity_signed": 0.38615349531173704,
+            "divergence": 0.07060315608978271,
+            "tracer_grad": 0.451545512676239,
+            "advective_flux": 0.038874471187591554,
+            "strain_rate_mag": 0.659726357460022,
+            "okubo_weiss": 0.41054201126098633,
+            "pressure_grad_mag": 0.7786501049995422,
+            "tracer_laplacian": 0.4271155118942261
+          },
+          {
+            "enstrophy": 0.46105471849441526,
+            "vorticity_signed": 0.3068886995315552,
+            "divergence": 0.06322585344314575,
+            "tracer_grad": 0.4289583683013916,
+            "advective_flux": 0.03409087657928467,
+            "strain_rate_mag": 0.6407512903213501,
+            "okubo_weiss": 0.38593885898590086,
+            "pressure_grad_mag": 0.7545214056968689,
+            "tracer_laplacian": 0.40241208076477053
+          },
+          {
+            "enstrophy": 0.4617772698402405,
+            "vorticity_signed": 0.30236235857009885,
+            "divergence": 0.0022955060005187987,
+            "tracer_grad": 0.43885365724563596,
+            "advective_flux": -0.0012945890426635741,
+            "strain_rate_mag": 0.634647262096405,
+            "okubo_weiss": 0.373389208316803,
+            "pressure_grad_mag": 0.7517980933189392,
+            "tracer_laplacian": 0.4123772859573364
+          }
+        ],
+        "0.25": [
+          {
+            "enstrophy": 0.6350456118583679,
+            "vorticity_signed": 0.969460415840149,
+            "divergence": 0.9687139511108398,
+            "tracer_grad": 0.49313762187957766,
+            "advective_flux": 0.32000731229782103,
+            "strain_rate_mag": 0.8738051176071167,
+            "okubo_weiss": 0.7529039144515991,
+            "pressure_grad_mag": 0.9167637586593628,
+            "tracer_laplacian": 0.4153414607048035
+          },
+          {
+            "enstrophy": 0.7344543814659119,
+            "vorticity_signed": 0.8755288243293762,
+            "divergence": 0.9008726119995117,
+            "tracer_grad": 0.704157555103302,
+            "advective_flux": 0.3523191809654236,
+            "strain_rate_mag": 0.9244025349617004,
+            "okubo_weiss": 0.7963639855384826,
+            "pressure_grad_mag": 0.9405149102210999,
+            "tracer_laplacian": 0.6235701203346252
+          },
+          {
+            "enstrophy": 0.6954055905342102,
+            "vorticity_signed": 0.6961682558059692,
+            "divergence": 0.5822426438331604,
+            "tracer_grad": 0.7188006401062011,
+            "advective_flux": 0.29437981843948363,
+            "strain_rate_mag": 0.9148355722427368,
+            "okubo_weiss": 0.7690676331520081,
+            "pressure_grad_mag": 0.9328303337097168,
+            "tracer_laplacian": 0.6478299736976624
+          },
+          {
+            "enstrophy": 0.6395440697669983,
+            "vorticity_signed": 0.593976891040802,
+            "divergence": 0.38833439350128174,
+            "tracer_grad": 0.6890775680541992,
+            "advective_flux": 0.20041487216949463,
+            "strain_rate_mag": 0.8742702841758728,
+            "okubo_weiss": 0.7012921094894409,
+            "pressure_grad_mag": 0.910208773612976,
+            "tracer_laplacian": 0.6296241283416748
+          },
+          {
+            "enstrophy": 0.5958258271217346,
+            "vorticity_signed": 0.5371348261833191,
+            "divergence": 0.21238443851470948,
+            "tracer_grad": 0.6323830962181092,
+            "advective_flux": 0.12813894748687743,
+            "strain_rate_mag": 0.8048248529434204,
+            "okubo_weiss": 0.5955149888992309,
+            "pressure_grad_mag": 0.8875200271606445,
+            "tracer_laplacian": 0.5961548566818238
+          },
+          {
+            "enstrophy": 0.5581854224205017,
+            "vorticity_signed": 0.5273033976554871,
+            "divergence": 0.1218075156211853,
+            "tracer_grad": 0.5994987607002258,
+            "advective_flux": 0.08379582166671753,
+            "strain_rate_mag": 0.7360512971878052,
+            "okubo_weiss": 0.5030190110206604,
+            "pressure_grad_mag": 0.8532047510147095,
+            "tracer_laplacian": 0.5794219970703125
+          },
+          {
+            "enstrophy": 0.5541019916534424,
+            "vorticity_signed": 0.5382758378982544,
+            "divergence": 0.09946562051773071,
+            "tracer_grad": 0.5699761152267456,
+            "advective_flux": 0.0643850326538086,
+            "strain_rate_mag": 0.7191864013671875,
+            "okubo_weiss": 0.4947928190231323,
+            "pressure_grad_mag": 0.8448680996894836,
+            "tracer_laplacian": 0.5553288102149964
+          },
+          {
+            "enstrophy": 0.5443803071975708,
+            "vorticity_signed": 0.5311757445335388,
+            "divergence": 0.08539164066314697,
+            "tracer_grad": 0.5428965449333191,
+            "advective_flux": 0.05364755392074585,
+            "strain_rate_mag": 0.7124537229537964,
+            "okubo_weiss": 0.5034726977348327,
+            "pressure_grad_mag": 0.8352077722549438,
+            "tracer_laplacian": 0.521722674369812
+          },
+          {
+            "enstrophy": 0.5173006534576416,
+            "vorticity_signed": 0.45689613819122316,
+            "divergence": 0.07678037881851196,
+            "tracer_grad": 0.5049236655235291,
+            "advective_flux": 0.04541797637939453,
+            "strain_rate_mag": 0.6948786735534668,
+            "okubo_weiss": 0.47907133102416993,
+            "pressure_grad_mag": 0.8127636671066284,
+            "tracer_laplacian": 0.48364356756210325
+          },
+          {
+            "enstrophy": 0.49202613830566405,
+            "vorticity_signed": 0.42372257709503175,
+            "divergence": 0.0675727128982544,
+            "tracer_grad": 0.4594070792198181,
+            "advective_flux": 0.03917849063873291,
+            "strain_rate_mag": 0.671613335609436,
+            "okubo_weiss": 0.43110309839248656,
+            "pressure_grad_mag": 0.7877384901046753,
+            "tracer_laplacian": 0.43460712432861326
+          },
+          {
+            "enstrophy": 0.4811859965324402,
+            "vorticity_signed": 0.3790149807929993,
+            "divergence": 0.06296352148056031,
+            "tracer_grad": 0.44167795181274416,
+            "advective_flux": 0.035679852962493895,
+            "strain_rate_mag": 0.6603462338447571,
+            "okubo_weiss": 0.4043764114379883,
+            "pressure_grad_mag": 0.7771498918533325,
+            "tracer_laplacian": 0.4148610353469849
+          },
+          {
+            "enstrophy": 0.4558238983154297,
+            "vorticity_signed": 0.28678375482559204,
+            "divergence": 0.05645155906677246,
+            "tracer_grad": 0.42123563289642335,
+            "advective_flux": 0.030293428897857667,
+            "strain_rate_mag": 0.6402018666267395,
+            "okubo_weiss": 0.3760047197341919,
+            "pressure_grad_mag": 0.7506726622581482,
+            "tracer_laplacian": 0.3912323474884033
+          },
+          {
+            "enstrophy": 0.45569361448287965,
+            "vorticity_signed": 0.2804139733314514,
+            "divergence": -0.000672149658203125,
+            "tracer_grad": 0.43301981687545776,
+            "advective_flux": -0.0030884504318237304,
+            "strain_rate_mag": 0.6342013597488403,
+            "okubo_weiss": 0.3648115634918213,
+            "pressure_grad_mag": 0.7469540357589721,
+            "tracer_laplacian": 0.40276241302490234
+          }
+        ],
+        "0.5": [
+          {
+            "enstrophy": 0.5504421949386596,
+            "vorticity_signed": 0.9037002205848694,
+            "divergence": 0.9202285528182983,
+            "tracer_grad": 0.33195836544036866,
+            "advective_flux": 0.21937596797943115,
+            "strain_rate_mag": 0.8098719596862793,
+            "okubo_weiss": 0.6590133666992187,
+            "pressure_grad_mag": 0.8859338879585266,
+            "tracer_laplacian": 0.2729884505271912
+          },
+          {
+            "enstrophy": 0.6354228496551514,
+            "vorticity_signed": 0.752817440032959,
+            "divergence": 0.849850869178772,
+            "tracer_grad": 0.5667233228683471,
+            "advective_flux": 0.23266125917434693,
+            "strain_rate_mag": 0.8734832286834717,
+            "okubo_weiss": 0.6897031426429748,
+            "pressure_grad_mag": 0.9094831705093384,
+            "tracer_laplacian": 0.4807736039161682
+          },
+          {
+            "enstrophy": 0.6014394402503968,
+            "vorticity_signed": 0.49122252464294436,
+            "divergence": 0.39962841272354127,
+            "tracer_grad": 0.6042293071746826,
+            "advective_flux": 0.18781121969223022,
+            "strain_rate_mag": 0.8613210916519165,
+            "okubo_weiss": 0.6596696138381958,
+            "pressure_grad_mag": 0.8895423293113709,
+            "tracer_laplacian": 0.5169453859329224
+          },
+          {
+            "enstrophy": 0.5575686573982239,
+            "vorticity_signed": 0.3965535044670105,
+            "divergence": 0.24720339775085448,
+            "tracer_grad": 0.5845290899276734,
+            "advective_flux": 0.1432345986366272,
+            "strain_rate_mag": 0.817048704624176,
+            "okubo_weiss": 0.5932303667068481,
+            "pressure_grad_mag": 0.8561854481697082,
+            "tracer_laplacian": 0.5062415599822998
+          },
+          {
+            "enstrophy": 0.5410111427307129,
+            "vorticity_signed": 0.4391180038452148,
+            "divergence": 0.1534030556678772,
+            "tracer_grad": 0.571347439289093,
+            "advective_flux": 0.09203095436096191,
+            "strain_rate_mag": 0.7694242715835571,
+            "okubo_weiss": 0.5213186383247376,
+            "pressure_grad_mag": 0.8482574582099914,
+            "tracer_laplacian": 0.5172822117805481
+          },
+          {
+            "enstrophy": 0.5390401601791381,
+            "vorticity_signed": 0.4771433711051941,
+            "divergence": 0.10136528015136718,
+            "tracer_grad": 0.5817530512809753,
+            "advective_flux": 0.06944785118103028,
+            "strain_rate_mag": 0.7249658584594727,
+            "okubo_weiss": 0.4755200982093811,
+            "pressure_grad_mag": 0.8357683062553406,
+            "tracer_laplacian": 0.5453228116035461
+          },
+          {
+            "enstrophy": 0.5402860641479492,
+            "vorticity_signed": 0.4992199778556824,
+            "divergence": 0.07658768892288208,
+            "tracer_grad": 0.581299650669098,
+            "advective_flux": 0.054376959800720215,
+            "strain_rate_mag": 0.7220966219902039,
+            "okubo_weiss": 0.4820649981498718,
+            "pressure_grad_mag": 0.8325879096984863,
+            "tracer_laplacian": 0.5493090629577637
+          },
+          {
+            "enstrophy": 0.5289773344993591,
+            "vorticity_signed": 0.49486666917800903,
+            "divergence": 0.06262334585189819,
+            "tracer_grad": 0.545528769493103,
+            "advective_flux": 0.043735396862030027,
+            "strain_rate_mag": 0.7100958585739136,
+            "okubo_weiss": 0.4736123442649841,
+            "pressure_grad_mag": 0.8243198752403259,
+            "tracer_laplacian": 0.5110474348068237
+          },
+          {
+            "enstrophy": 0.5080530285835266,
+            "vorticity_signed": 0.4262977123260498,
+            "divergence": 0.055699598789215085,
+            "tracer_grad": 0.5077316522598266,
+            "advective_flux": 0.0350793719291687,
+            "strain_rate_mag": 0.6948188066482544,
+            "okubo_weiss": 0.4564900755882263,
+            "pressure_grad_mag": 0.8041217088699341,
+            "tracer_laplacian": 0.47472500801086426
+          },
+          {
+            "enstrophy": 0.4833251118659973,
+            "vorticity_signed": 0.39833070039749147,
+            "divergence": 0.050280439853668216,
+            "tracer_grad": 0.46482951641082765,
+            "advective_flux": 0.029519271850585938,
+            "strain_rate_mag": 0.6694528579711914,
+            "okubo_weiss": 0.40952205657958984,
+            "pressure_grad_mag": 0.7753891348838806,
+            "tracer_laplacian": 0.4279629707336426
+          },
+          {
+            "enstrophy": 0.46665955781936647,
+            "vorticity_signed": 0.35518417358398435,
+            "divergence": 0.045900583267211914,
+            "tracer_grad": 0.4407554030418396,
+            "advective_flux": 0.02781648635864258,
+            "strain_rate_mag": 0.6609778642654419,
+            "okubo_weiss": 0.38792561292648314,
+            "pressure_grad_mag": 0.7621530413627624,
+            "tracer_laplacian": 0.4043056607246399
+          },
+          {
+            "enstrophy": 0.4350587844848633,
+            "vorticity_signed": 0.24968041181564332,
+            "divergence": 0.04299253225326538,
+            "tracer_grad": 0.40676518678665163,
+            "advective_flux": 0.023291182518005372,
+            "strain_rate_mag": 0.6355927348136902,
+            "okubo_weiss": 0.35130460262298585,
+            "pressure_grad_mag": 0.7317868351936341,
+            "tracer_laplacian": 0.36523576974868777
+          },
+          {
+            "enstrophy": 0.4336950659751892,
+            "vorticity_signed": 0.24220881462097169,
+            "divergence": -0.004353713989257812,
+            "tracer_grad": 0.4228772759437561,
+            "advective_flux": -0.0031129956245422364,
+            "strain_rate_mag": 0.6320690631866455,
+            "okubo_weiss": 0.34427834749221803,
+            "pressure_grad_mag": 0.7282213568687439,
+            "tracer_laplacian": 0.3794582009315491
+          }
+        ],
+        "1.0": [
+          {
+            "enstrophy": 0.4514294505119324,
+            "vorticity_signed": 0.7220173001289367,
+            "divergence": 0.7784301042556763,
+            "tracer_grad": 0.15286989212036134,
+            "advective_flux": 0.13786835670471193,
+            "strain_rate_mag": 0.7166297197341919,
+            "okubo_weiss": 0.5398962020874023,
+            "pressure_grad_mag": 0.8373469352722168,
+            "tracer_laplacian": 0.13126617670059204
+          },
+          {
+            "enstrophy": 0.5037089705467224,
+            "vorticity_signed": 0.5715498685836792,
+            "divergence": 0.740247654914856,
+            "tracer_grad": 0.3271667718887329,
+            "advective_flux": 0.1422932505607605,
+            "strain_rate_mag": 0.7671312808990478,
+            "okubo_weiss": 0.5263148546218872,
+            "pressure_grad_mag": 0.8489986419677734,
+            "tracer_laplacian": 0.26659723520278933
+          },
+          {
+            "enstrophy": 0.4967716097831726,
+            "vorticity_signed": 0.39615108966827395,
+            "divergence": 0.5317914605140686,
+            "tracer_grad": 0.3802465915679932,
+            "advective_flux": 0.13378188610076905,
+            "strain_rate_mag": 0.7652804970741272,
+            "okubo_weiss": 0.5088174104690552,
+            "pressure_grad_mag": 0.8187438607215881,
+            "tracer_laplacian": 0.3070670962333679
+          },
+          {
+            "enstrophy": 0.46947176456451417,
+            "vorticity_signed": 0.31147764921188353,
+            "divergence": 0.3570549488067627,
+            "tracer_grad": 0.38167219161987304,
+            "advective_flux": 0.1129761815071106,
+            "strain_rate_mag": 0.7300620675086975,
+            "okubo_weiss": 0.4681627035140991,
+            "pressure_grad_mag": 0.7794196009635925,
+            "tracer_laplacian": 0.30936717987060547
+          },
+          {
+            "enstrophy": 0.4607672095298767,
+            "vorticity_signed": 0.309838604927063,
+            "divergence": 0.22068158388137818,
+            "tracer_grad": 0.4046987295150757,
+            "advective_flux": 0.08840457201004029,
+            "strain_rate_mag": 0.7057922005653381,
+            "okubo_weiss": 0.42584149837493895,
+            "pressure_grad_mag": 0.7662558794021607,
+            "tracer_laplacian": 0.3342512845993042
+          },
+          {
+            "enstrophy": 0.4503041386604309,
+            "vorticity_signed": 0.29765685796737673,
+            "divergence": 0.10388048887252807,
+            "tracer_grad": 0.4138823986053467,
+            "advective_flux": 0.057647955417633054,
+            "strain_rate_mag": 0.660354220867157,
+            "okubo_weiss": 0.3646519184112549,
+            "pressure_grad_mag": 0.7445931673049927,
+            "tracer_laplacian": 0.35852364301681516
+          },
+          {
+            "enstrophy": 0.44878861904144285,
+            "vorticity_signed": 0.3116467952728271,
+            "divergence": 0.05827411413192749,
+            "tracer_grad": 0.4141881465911865,
+            "advective_flux": 0.04189951419830322,
+            "strain_rate_mag": 0.6534143924713135,
+            "okubo_weiss": 0.3818108081817627,
+            "pressure_grad_mag": 0.7493210554122924,
+            "tracer_laplacian": 0.3596199154853821
+          },
+          {
+            "enstrophy": 0.4462628126144409,
+            "vorticity_signed": 0.3690252661705017,
+            "divergence": 0.039154016971588136,
+            "tracer_grad": 0.37168011665344236,
+            "advective_flux": 0.03155131340026855,
+            "strain_rate_mag": 0.6463720798492432,
+            "okubo_weiss": 0.38310301303863525,
+            "pressure_grad_mag": 0.7383352041244506,
+            "tracer_laplacian": 0.32401286363601683
+          },
+          {
+            "enstrophy": 0.43057814836502073,
+            "vorticity_signed": 0.33963325023651125,
+            "divergence": 0.029268014430999755,
+            "tracer_grad": 0.3506409049034119,
+            "advective_flux": 0.02430133819580078,
+            "strain_rate_mag": 0.6403787136077881,
+            "okubo_weiss": 0.3774286389350891,
+            "pressure_grad_mag": 0.7255129456520081,
+            "tracer_laplacian": 0.3109389305114746
+          },
+          {
+            "enstrophy": 0.4052951455116272,
+            "vorticity_signed": 0.3125461459159851,
+            "divergence": 0.024652087688446046,
+            "tracer_grad": 0.3394712686538696,
+            "advective_flux": 0.023540246486663818,
+            "strain_rate_mag": 0.6241252779960632,
+            "okubo_weiss": 0.35573134422302244,
+            "pressure_grad_mag": 0.6905395865440369,
+            "tracer_laplacian": 0.3029398560523987
+          },
+          {
+            "enstrophy": 0.3857345938682556,
+            "vorticity_signed": 0.24972938299179076,
+            "divergence": 0.021843588352203368,
+            "tracer_grad": 0.3130661606788635,
+            "advective_flux": 0.019871461391448974,
+            "strain_rate_mag": 0.6129086256027222,
+            "okubo_weiss": 0.32462722063064575,
+            "pressure_grad_mag": 0.6767807006835938,
+            "tracer_laplacian": 0.27989767789840697
+          },
+          {
+            "enstrophy": 0.3368713974952698,
+            "vorticity_signed": 0.1638814091682434,
+            "divergence": 0.022809791564941406,
+            "tracer_grad": 0.2603797197341919,
+            "advective_flux": 0.016813278198242188,
+            "strain_rate_mag": 0.5736950993537903,
+            "okubo_weiss": 0.2797572612762451,
+            "pressure_grad_mag": 0.6081777095794678,
+            "tracer_laplacian": 0.22749631404876708
+          },
+          {
+            "enstrophy": 0.339358913898468,
+            "vorticity_signed": 0.1613645911216736,
+            "divergence": -0.004174351692199707,
+            "tracer_grad": 0.2694611787796021,
+            "advective_flux": 0.0023780941963195803,
+            "strain_rate_mag": 0.5784821391105652,
+            "okubo_weiss": 0.2837825775146484,
+            "pressure_grad_mag": 0.6151960372924805,
+            "tracer_laplacian": 0.23447591066360474
+          }
+        ],
+        "2.0": [
+          {
+            "enstrophy": 0.29538588523864745,
+            "vorticity_signed": 0.4109346270561218,
+            "divergence": 0.5018279075622558,
+            "tracer_grad": 0.035267186164855954,
+            "advective_flux": 0.07121621370315552,
+            "strain_rate_mag": 0.563534414768219,
+            "okubo_weiss": 0.41108031272888185,
+            "pressure_grad_mag": 0.6639022111892701,
+            "tracer_laplacian": 0.03529781103134155
+          },
+          {
+            "enstrophy": 0.3238616347312927,
+            "vorticity_signed": 0.33057838678359985,
+            "divergence": 0.49017269611358644,
+            "tracer_grad": 0.07548854351043702,
+            "advective_flux": 0.07368574142456055,
+            "strain_rate_mag": 0.6008710384368896,
+            "okubo_weiss": 0.3788674473762512,
+            "pressure_grad_mag": 0.6771113753318787,
+            "tracer_laplacian": 0.060627102851867676
+          },
+          {
+            "enstrophy": 0.32830913066864015,
+            "vorticity_signed": 0.2852882623672485,
+            "divergence": 0.4613447546958923,
+            "tracer_grad": 0.10003046989440918,
+            "advective_flux": 0.0729109764099121,
+            "strain_rate_mag": 0.5973415851593018,
+            "okubo_weiss": 0.3655982494354248,
+            "pressure_grad_mag": 0.6556640028953552,
+            "tracer_laplacian": 0.07660584449768067
+          },
+          {
+            "enstrophy": 0.3231637001037598,
+            "vorticity_signed": 0.2701031565666199,
+            "divergence": 0.4324742078781128,
+            "tracer_grad": 0.11238987445831299,
+            "advective_flux": 0.06929670572280884,
+            "strain_rate_mag": 0.5817889928817749,
+            "okubo_weiss": 0.35628812313079833,
+            "pressure_grad_mag": 0.6340575098991394,
+            "tracer_laplacian": 0.08237062692642212
+          },
+          {
+            "enstrophy": 0.32218371629714965,
+            "vorticity_signed": 0.26947453022003176,
+            "divergence": 0.4083580732345581,
+            "tracer_grad": 0.11607646942138672,
+            "advective_flux": 0.06520192623138428,
+            "strain_rate_mag": 0.5700228929519653,
+            "okubo_weiss": 0.3431950330734253,
+            "pressure_grad_mag": 0.6269639372825623,
+            "tracer_laplacian": 0.08380573987960815
+          },
+          {
+            "enstrophy": 0.31489593982696534,
+            "vorticity_signed": 0.2687749147415161,
+            "divergence": 0.36473339796066284,
+            "tracer_grad": 0.12216503620147705,
+            "advective_flux": 0.0596430778503418,
+            "strain_rate_mag": 0.5598257780075073,
+            "okubo_weiss": 0.3226675629615784,
+            "pressure_grad_mag": 0.6085146069526672,
+            "tracer_laplacian": 0.09115840196609497
+          },
+          {
+            "enstrophy": 0.29804933071136475,
+            "vorticity_signed": 0.24236491918563843,
+            "divergence": 0.2850276708602905,
+            "tracer_grad": 0.11829189062118531,
+            "advective_flux": 0.051017355918884275,
+            "strain_rate_mag": 0.5389143109321595,
+            "okubo_weiss": 0.29938197135925293,
+            "pressure_grad_mag": 0.5767250299453736,
+            "tracer_laplacian": 0.08971399068832397
+          },
+          {
+            "enstrophy": 0.26481057405471803,
+            "vorticity_signed": 0.2020619511604309,
+            "divergence": 0.19981433153152467,
+            "tracer_grad": 0.11004759073257446,
+            "advective_flux": 0.03964623212814331,
+            "strain_rate_mag": 0.5106759667396545,
+            "okubo_weiss": 0.27778849601745603,
+            "pressure_grad_mag": 0.5140807032585144,
+            "tracer_laplacian": 0.0869288682937622
+          },
+          {
+            "enstrophy": 0.22180458307266235,
+            "vorticity_signed": 0.15946011543273925,
+            "divergence": 0.12822307348251344,
+            "tracer_grad": 0.09768109321594239,
+            "advective_flux": 0.02673470973968506,
+            "strain_rate_mag": 0.4723980188369751,
+            "okubo_weiss": 0.25260376930236816,
+            "pressure_grad_mag": 0.4382025241851807,
+            "tracer_laplacian": 0.08019543886184692
+          },
+          {
+            "enstrophy": 0.2040623903274536,
+            "vorticity_signed": 0.12860289812088013,
+            "divergence": 0.07027970552444458,
+            "tracer_grad": 0.09318660497665406,
+            "advective_flux": 0.020727717876434328,
+            "strain_rate_mag": 0.4547043442726135,
+            "okubo_weiss": 0.2342736005783081,
+            "pressure_grad_mag": 0.4190688252449036,
+            "tracer_laplacian": 0.07554244995117188
+          },
+          {
+            "enstrophy": 0.17000765800476075,
+            "vorticity_signed": 0.09559439420700074,
+            "divergence": 0.04302210807800293,
+            "tracer_grad": 0.08839955329895019,
+            "advective_flux": 0.016814756393432616,
+            "strain_rate_mag": 0.4237164258956909,
+            "okubo_weiss": 0.20937819480895997,
+            "pressure_grad_mag": 0.34671869277954104,
+            "tracer_laplacian": 0.07420828342437744
+          },
+          {
+            "enstrophy": 0.13722857236862182,
+            "vorticity_signed": 0.06259571313858033,
+            "divergence": 0.03527035713195801,
+            "tracer_grad": 0.07700620889663697,
+            "advective_flux": 0.013596045970916747,
+            "strain_rate_mag": 0.3937524318695068,
+            "okubo_weiss": 0.18358317613601685,
+            "pressure_grad_mag": 0.2918417930603027,
+            "tracer_laplacian": 0.06549948453903198
+          },
+          {
+            "enstrophy": 0.14187604188919067,
+            "vorticity_signed": 0.061776602268218996,
+            "divergence": 0.027565181255340576,
+            "tracer_grad": 0.07890120744705201,
+            "advective_flux": 0.008795690536499024,
+            "strain_rate_mag": 0.40107948780059816,
+            "okubo_weiss": 0.19145166873931885,
+            "pressure_grad_mag": 0.3056777477264404,
+            "tracer_laplacian": 0.06693966388702392
+          }
+        ]
+      }
     }
   },
   "checkpoints/shear_flow_mae.pt": {
-    "0.0": {
-      "enstrophy": 0.9935942411422729,
-      "vorticity_signed": 0.1163713812828064,
-      "divergence": 0.33408685922622683,
-      "tracer_grad": 0.8811742782592773,
-      "advective_flux": 0.5826319813728332,
-      "strain_rate_mag": 0.9981541156768798,
-      "okubo_weiss": 0.9896088242530823,
-      "pressure_grad_mag": 0.9989642381668091
+    "n_layers": 13,
+    "noise_stds": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "by_noise": {
+      "0.0": [
+        {
+          "enstrophy": 0.9808380722999572,
+          "tracer_grad": 0.8119146347045898,
+          "advective_flux": 0.39220064878463745,
+          "strain_rate_mag": 0.9969717383384704,
+          "okubo_weiss": 0.9633407950401306,
+          "pressure_grad_mag": 0.9970545291900634,
+          "tracer_laplacian": 0.7607049465179443
+        },
+        {
+          "enstrophy": 0.9875369071960449,
+          "tracer_grad": 0.8567890048027038,
+          "advective_flux": 0.41623719930648806,
+          "strain_rate_mag": 0.9981719970703125,
+          "okubo_weiss": 0.977707302570343,
+          "pressure_grad_mag": 0.9987525820732117,
+          "tracer_laplacian": 0.8196443080902099
+        },
+        {
+          "enstrophy": 0.9903398990631104,
+          "tracer_grad": 0.8939109444618225,
+          "advective_flux": 0.4273696780204773,
+          "strain_rate_mag": 0.9985605955123902,
+          "okubo_weiss": 0.9839268207550049,
+          "pressure_grad_mag": 0.9992788672447205,
+          "tracer_laplacian": 0.867505156993866
+        },
+        {
+          "enstrophy": 0.9933779954910278,
+          "tracer_grad": 0.902300226688385,
+          "advective_flux": 0.4509864330291748,
+          "strain_rate_mag": 0.9988592147827149,
+          "okubo_weiss": 0.9891249775886536,
+          "pressure_grad_mag": 0.9994100332260132,
+          "tracer_laplacian": 0.881698215007782
+        },
+        {
+          "enstrophy": 0.9941948175430297,
+          "tracer_grad": 0.9044954895973205,
+          "advective_flux": 0.47853090763092043,
+          "strain_rate_mag": 0.9988346815109252,
+          "okubo_weiss": 0.9901999950408935,
+          "pressure_grad_mag": 0.9993920803070069,
+          "tracer_laplacian": 0.8823071837425231
+        },
+        {
+          "enstrophy": 0.9947478413581848,
+          "tracer_grad": 0.8966476082801819,
+          "advective_flux": 0.4716988801956177,
+          "strain_rate_mag": 0.9986765146255493,
+          "okubo_weiss": 0.9907406449317933,
+          "pressure_grad_mag": 0.9993115663528442,
+          "tracer_laplacian": 0.8777343988418579
+        },
+        {
+          "enstrophy": 0.9951947212219239,
+          "tracer_grad": 0.8997712016105652,
+          "advective_flux": 0.5267949104309082,
+          "strain_rate_mag": 0.998702609539032,
+          "okubo_weiss": 0.9910925626754761,
+          "pressure_grad_mag": 0.9993812322616578,
+          "tracer_laplacian": 0.8787746787071228
+        },
+        {
+          "enstrophy": 0.9954915761947631,
+          "tracer_grad": 0.8982668161392212,
+          "advective_flux": 0.5392093300819397,
+          "strain_rate_mag": 0.9987329125404358,
+          "okubo_weiss": 0.9920271277427674,
+          "pressure_grad_mag": 0.9993969798088074,
+          "tracer_laplacian": 0.8807596564292908
+        },
+        {
+          "enstrophy": 0.9952025651931763,
+          "tracer_grad": 0.8895682454109192,
+          "advective_flux": 0.5599694371223449,
+          "strain_rate_mag": 0.9986689567565918,
+          "okubo_weiss": 0.9913849592208862,
+          "pressure_grad_mag": 0.9993565559387207,
+          "tracer_laplacian": 0.8713767051696777
+        },
+        {
+          "enstrophy": 0.9949355244636535,
+          "tracer_grad": 0.8854924440383911,
+          "advective_flux": 0.5801040649414062,
+          "strain_rate_mag": 0.9985929250717163,
+          "okubo_weiss": 0.9910573720932007,
+          "pressure_grad_mag": 0.999336051940918,
+          "tracer_laplacian": 0.8696365356445312
+        },
+        {
+          "enstrophy": 0.9947344422340393,
+          "tracer_grad": 0.8822628140449524,
+          "advective_flux": 0.5816961169242859,
+          "strain_rate_mag": 0.99848473072052,
+          "okubo_weiss": 0.9907962203025817,
+          "pressure_grad_mag": 0.9992951393127442,
+          "tracer_laplacian": 0.8682679533958435
+        },
+        {
+          "enstrophy": 0.9947774648666382,
+          "tracer_grad": 0.8749844789505005,
+          "advective_flux": 0.579063332080841,
+          "strain_rate_mag": 0.9983997106552124,
+          "okubo_weiss": 0.9911769390106201,
+          "pressure_grad_mag": 0.9993052005767822,
+          "tracer_laplacian": 0.8629290580749511
+        },
+        {
+          "enstrophy": 0.9935941100120544,
+          "tracer_grad": 0.8811765909194946,
+          "advective_flux": 0.5826292753219604,
+          "strain_rate_mag": 0.9981540441513062,
+          "okubo_weiss": 0.9896092295646668,
+          "pressure_grad_mag": 0.9989642381668091,
+          "tracer_laplacian": 0.8702742218971252
+        }
+      ],
+      "0.1": [
+        {
+          "enstrophy": 0.9802365064620971,
+          "tracer_grad": 0.8070025444030762,
+          "advective_flux": 0.38619489669799806,
+          "strain_rate_mag": 0.996802282333374,
+          "okubo_weiss": 0.9621477603912354,
+          "pressure_grad_mag": 0.9968664646148682,
+          "tracer_laplacian": 0.7558527827262879
+        },
+        {
+          "enstrophy": 0.9873256921768189,
+          "tracer_grad": 0.8540164589881897,
+          "advective_flux": 0.41280694007873536,
+          "strain_rate_mag": 0.9981201887130737,
+          "okubo_weiss": 0.977365231513977,
+          "pressure_grad_mag": 0.998700487613678,
+          "tracer_laplacian": 0.8158389449119567
+        },
+        {
+          "enstrophy": 0.990306305885315,
+          "tracer_grad": 0.8926159024238587,
+          "advective_flux": 0.42468641996383666,
+          "strain_rate_mag": 0.99854975938797,
+          "okubo_weiss": 0.9838568925857544,
+          "pressure_grad_mag": 0.9992690443992615,
+          "tracer_laplacian": 0.8658541917800904
+        },
+        {
+          "enstrophy": 0.993410074710846,
+          "tracer_grad": 0.9024827361106873,
+          "advective_flux": 0.4503120303153992,
+          "strain_rate_mag": 0.9988635897636413,
+          "okubo_weiss": 0.9891328692436219,
+          "pressure_grad_mag": 0.9994133949279785,
+          "tracer_laplacian": 0.8814172506332397
+        },
+        {
+          "enstrophy": 0.9943038582801819,
+          "tracer_grad": 0.9059741735458374,
+          "advective_flux": 0.4765190124511719,
+          "strain_rate_mag": 0.9988479256629944,
+          "okubo_weiss": 0.990338122844696,
+          "pressure_grad_mag": 0.9994150519371032,
+          "tracer_laplacian": 0.8839033007621765
+        },
+        {
+          "enstrophy": 0.9948071479797364,
+          "tracer_grad": 0.8979112863540649,
+          "advective_flux": 0.4739095211029053,
+          "strain_rate_mag": 0.9986990928649903,
+          "okubo_weiss": 0.9908979415893555,
+          "pressure_grad_mag": 0.9993537187576294,
+          "tracer_laplacian": 0.8794311642646789
+        },
+        {
+          "enstrophy": 0.9952476263046265,
+          "tracer_grad": 0.9003766775131226,
+          "advective_flux": 0.5258898496627807,
+          "strain_rate_mag": 0.9987458229064942,
+          "okubo_weiss": 0.9913437724113464,
+          "pressure_grad_mag": 0.9994255185127259,
+          "tracer_laplacian": 0.8800264835357666
+        },
+        {
+          "enstrophy": 0.9956219911575317,
+          "tracer_grad": 0.8995979428291321,
+          "advective_flux": 0.5440191388130188,
+          "strain_rate_mag": 0.9987785816192627,
+          "okubo_weiss": 0.9923343658447266,
+          "pressure_grad_mag": 0.9994472980499267,
+          "tracer_laplacian": 0.8827893733978271
+        },
+        {
+          "enstrophy": 0.9952123641967774,
+          "tracer_grad": 0.8923578500747681,
+          "advective_flux": 0.5615077137947082,
+          "strain_rate_mag": 0.998729693889618,
+          "okubo_weiss": 0.9914924383163453,
+          "pressure_grad_mag": 0.9993980050086975,
+          "tracer_laplacian": 0.8739742040634155
+        },
+        {
+          "enstrophy": 0.9949604868888855,
+          "tracer_grad": 0.8867002844810485,
+          "advective_flux": 0.5765843987464905,
+          "strain_rate_mag": 0.9986446022987365,
+          "okubo_weiss": 0.9911835312843322,
+          "pressure_grad_mag": 0.9993736505508423,
+          "tracer_laplacian": 0.8705825090408326
+        },
+        {
+          "enstrophy": 0.9945626139640809,
+          "tracer_grad": 0.8832906126976013,
+          "advective_flux": 0.5784909129142761,
+          "strain_rate_mag": 0.9984999895095825,
+          "okubo_weiss": 0.990652573108673,
+          "pressure_grad_mag": 0.9992917656898499,
+          "tracer_laplacian": 0.8689555287361145
+        },
+        {
+          "enstrophy": 0.9947649717330933,
+          "tracer_grad": 0.8759946584701538,
+          "advective_flux": 0.5755638003349304,
+          "strain_rate_mag": 0.9984405875205994,
+          "okubo_weiss": 0.9913038969039917,
+          "pressure_grad_mag": 0.9993475914001465,
+          "tracer_laplacian": 0.8629163026809692
+        },
+        {
+          "enstrophy": 0.9933740735054016,
+          "tracer_grad": 0.8799803853034973,
+          "advective_flux": 0.578205919265747,
+          "strain_rate_mag": 0.9981724858283997,
+          "okubo_weiss": 0.9893852829933166,
+          "pressure_grad_mag": 0.9989853620529174,
+          "tracer_laplacian": 0.8678230762481689
+        }
+      ],
+      "0.25": [
+        {
+          "enstrophy": 0.9778526663780213,
+          "tracer_grad": 0.7895997881889343,
+          "advective_flux": 0.34828585386276245,
+          "strain_rate_mag": 0.9960290312767028,
+          "okubo_weiss": 0.9571121335029602,
+          "pressure_grad_mag": 0.996255362033844,
+          "tracer_laplacian": 0.7340984106063843
+        },
+        {
+          "enstrophy": 0.9860432028770447,
+          "tracer_grad": 0.8439137101173401,
+          "advective_flux": 0.3874689698219299,
+          "strain_rate_mag": 0.9979411363601685,
+          "okubo_weiss": 0.9752963662147522,
+          "pressure_grad_mag": 0.9984792113304138,
+          "tracer_laplacian": 0.8020631551742554
+        },
+        {
+          "enstrophy": 0.9897184014320374,
+          "tracer_grad": 0.8902259826660156,
+          "advective_flux": 0.4083102345466614,
+          "strain_rate_mag": 0.9984660029411316,
+          "okubo_weiss": 0.9831155657768249,
+          "pressure_grad_mag": 0.999184513092041,
+          "tracer_laplacian": 0.8625621914863586
+        },
+        {
+          "enstrophy": 0.9930888175964355,
+          "tracer_grad": 0.9043078064918518,
+          "advective_flux": 0.4331319570541382,
+          "strain_rate_mag": 0.9987940073013306,
+          "okubo_weiss": 0.9887763977050781,
+          "pressure_grad_mag": 0.9993841052055359,
+          "tracer_laplacian": 0.8820717096328735
+        },
+        {
+          "enstrophy": 0.9942740201950073,
+          "tracer_grad": 0.9089195728302002,
+          "advective_flux": 0.45516601800918577,
+          "strain_rate_mag": 0.998841404914856,
+          "okubo_weiss": 0.9904659986495972,
+          "pressure_grad_mag": 0.9994299292564393,
+          "tracer_laplacian": 0.8869006991386413
+        },
+        {
+          "enstrophy": 0.9950068473815918,
+          "tracer_grad": 0.9031996488571167,
+          "advective_flux": 0.46228369474411013,
+          "strain_rate_mag": 0.9987858653068542,
+          "okubo_weiss": 0.9913053393363953,
+          "pressure_grad_mag": 0.9994594693183899,
+          "tracer_laplacian": 0.8841375827789306
+        },
+        {
+          "enstrophy": 0.9954893112182617,
+          "tracer_grad": 0.9045937180519104,
+          "advective_flux": 0.49978697299957275,
+          "strain_rate_mag": 0.9988474369049072,
+          "okubo_weiss": 0.9920712351799011,
+          "pressure_grad_mag": 0.9995558142662049,
+          "tracer_laplacian": 0.8844867467880249
+        },
+        {
+          "enstrophy": 0.9958975434303283,
+          "tracer_grad": 0.902467691898346,
+          "advective_flux": 0.523353660106659,
+          "strain_rate_mag": 0.9988533616065979,
+          "okubo_weiss": 0.992923641204834,
+          "pressure_grad_mag": 0.9995620965957641,
+          "tracer_laplacian": 0.8861332774162293
+        },
+        {
+          "enstrophy": 0.9957329154014587,
+          "tracer_grad": 0.8956177592277527,
+          "advective_flux": 0.550330638885498,
+          "strain_rate_mag": 0.9988703489303589,
+          "okubo_weiss": 0.9924795746803283,
+          "pressure_grad_mag": 0.9995617151260376,
+          "tracer_laplacian": 0.8787628054618836
+        },
+        {
+          "enstrophy": 0.9955013155937195,
+          "tracer_grad": 0.8910054326057434,
+          "advective_flux": 0.5638492226600647,
+          "strain_rate_mag": 0.9988180756568908,
+          "okubo_weiss": 0.9921651124954224,
+          "pressure_grad_mag": 0.9995396137237549,
+          "tracer_laplacian": 0.876064908504486
+        },
+        {
+          "enstrophy": 0.995189881324768,
+          "tracer_grad": 0.8875772714614868,
+          "advective_flux": 0.5646796703338623,
+          "strain_rate_mag": 0.9987063407897949,
+          "okubo_weiss": 0.9916489720344543,
+          "pressure_grad_mag": 0.9994916439056396,
+          "tracer_laplacian": 0.8753875494003296
+        },
+        {
+          "enstrophy": 0.9953522682189941,
+          "tracer_grad": 0.8823357939720153,
+          "advective_flux": 0.5620660305023193,
+          "strain_rate_mag": 0.9986075401306153,
+          "okubo_weiss": 0.9920433044433594,
+          "pressure_grad_mag": 0.9995170593261719,
+          "tracer_laplacian": 0.8711029052734375
+        },
+        {
+          "enstrophy": 0.9935665488243103,
+          "tracer_grad": 0.8784673333168029,
+          "advective_flux": 0.5618337750434875,
+          "strain_rate_mag": 0.9982304334640503,
+          "okubo_weiss": 0.9894942045211792,
+          "pressure_grad_mag": 0.9991039037704468,
+          "tracer_laplacian": 0.8672511339187622
+        }
+      ],
+      "0.5": [
+        {
+          "enstrophy": 0.9721416234970093,
+          "tracer_grad": 0.7477732181549073,
+          "advective_flux": 0.23652129173278807,
+          "strain_rate_mag": 0.994108772277832,
+          "okubo_weiss": 0.9428349494934082,
+          "pressure_grad_mag": 0.9947714686393738,
+          "tracer_laplacian": 0.6813236474990845
+        },
+        {
+          "enstrophy": 0.9832863450050354,
+          "tracer_grad": 0.8136408925056458,
+          "advective_flux": 0.29276491403579713,
+          "strain_rate_mag": 0.9972611427307129,
+          "okubo_weiss": 0.9691605925559997,
+          "pressure_grad_mag": 0.9979123115539551,
+          "tracer_laplacian": 0.7626608490943909
+        },
+        {
+          "enstrophy": 0.9886225461959839,
+          "tracer_grad": 0.865357780456543,
+          "advective_flux": 0.3206950783729553,
+          "strain_rate_mag": 0.9980704069137574,
+          "okubo_weiss": 0.9810902833938598,
+          "pressure_grad_mag": 0.9988628029823303,
+          "tracer_laplacian": 0.8341386556625366
+        },
+        {
+          "enstrophy": 0.9921242713928222,
+          "tracer_grad": 0.8866397738456726,
+          "advective_flux": 0.3503953814506531,
+          "strain_rate_mag": 0.998526132106781,
+          "okubo_weiss": 0.9868160963058472,
+          "pressure_grad_mag": 0.9992606043815613,
+          "tracer_laplacian": 0.8594803094863892
+        },
+        {
+          "enstrophy": 0.9938577055931092,
+          "tracer_grad": 0.8977506041526795,
+          "advective_flux": 0.3671303391456604,
+          "strain_rate_mag": 0.9986833572387696,
+          "okubo_weiss": 0.9892387866973877,
+          "pressure_grad_mag": 0.9993650317192078,
+          "tracer_laplacian": 0.8701292634010315
+        },
+        {
+          "enstrophy": 0.9947836637496948,
+          "tracer_grad": 0.901907205581665,
+          "advective_flux": 0.39259413480758665,
+          "strain_rate_mag": 0.9986950516700744,
+          "okubo_weiss": 0.9901701211929321,
+          "pressure_grad_mag": 0.9994565129280091,
+          "tracer_laplacian": 0.8780788064002991
+        },
+        {
+          "enstrophy": 0.995447838306427,
+          "tracer_grad": 0.8999304294586181,
+          "advective_flux": 0.4298253536224365,
+          "strain_rate_mag": 0.9987679600715638,
+          "okubo_weiss": 0.991793692111969,
+          "pressure_grad_mag": 0.999542772769928,
+          "tracer_laplacian": 0.8762638926506042
+        },
+        {
+          "enstrophy": 0.9961520552635192,
+          "tracer_grad": 0.8983371496200562,
+          "advective_flux": 0.44643023014068606,
+          "strain_rate_mag": 0.9988340854644775,
+          "okubo_weiss": 0.9928678750991822,
+          "pressure_grad_mag": 0.9995777487754822,
+          "tracer_laplacian": 0.8780760288238525
+        },
+        {
+          "enstrophy": 0.9960340857505798,
+          "tracer_grad": 0.8971333980560303,
+          "advective_flux": 0.4749017238616943,
+          "strain_rate_mag": 0.998836362361908,
+          "okubo_weiss": 0.9928099989891053,
+          "pressure_grad_mag": 0.999612283706665,
+          "tracer_laplacian": 0.8759111166000366
+        },
+        {
+          "enstrophy": 0.9957751631736755,
+          "tracer_grad": 0.8943516731262207,
+          "advective_flux": 0.4815917730331421,
+          "strain_rate_mag": 0.9987767577171326,
+          "okubo_weiss": 0.9925368666648865,
+          "pressure_grad_mag": 0.9995869755744934,
+          "tracer_laplacian": 0.8747183680534363
+        },
+        {
+          "enstrophy": 0.9952625393867492,
+          "tracer_grad": 0.8906471610069275,
+          "advective_flux": 0.48064465522766114,
+          "strain_rate_mag": 0.9986804366111756,
+          "okubo_weiss": 0.9920510888099671,
+          "pressure_grad_mag": 0.9995286345481873,
+          "tracer_laplacian": 0.8710941672325134
+        },
+        {
+          "enstrophy": 0.9954828143119812,
+          "tracer_grad": 0.8845751404762268,
+          "advective_flux": 0.46677460670471194,
+          "strain_rate_mag": 0.9986343383789062,
+          "okubo_weiss": 0.9922771453857422,
+          "pressure_grad_mag": 0.9995549917221069,
+          "tracer_laplacian": 0.8660211682319641
+        },
+        {
+          "enstrophy": 0.9934829473495483,
+          "tracer_grad": 0.8774087429046631,
+          "advective_flux": 0.4706295132637024,
+          "strain_rate_mag": 0.998245120048523,
+          "okubo_weiss": 0.9896645426750184,
+          "pressure_grad_mag": 0.9991674304008484,
+          "tracer_laplacian": 0.858911669254303
+        }
+      ],
+      "1.0": [
+        {
+          "enstrophy": 0.9613519668579101,
+          "tracer_grad": 0.6310958743095398,
+          "advective_flux": 0.0822858452796936,
+          "strain_rate_mag": 0.9869718194007874,
+          "okubo_weiss": 0.912709641456604,
+          "pressure_grad_mag": 0.9917152285575866,
+          "tracer_laplacian": 0.5388574123382568
+        },
+        {
+          "enstrophy": 0.9747111916542053,
+          "tracer_grad": 0.7050012350082397,
+          "advective_flux": 0.10667989253997803,
+          "strain_rate_mag": 0.9935722827911377,
+          "okubo_weiss": 0.9439088463783264,
+          "pressure_grad_mag": 0.995566725730896,
+          "tracer_laplacian": 0.6171400427818299
+        },
+        {
+          "enstrophy": 0.9826406598091125,
+          "tracer_grad": 0.7855829477310181,
+          "advective_flux": 0.13326170444488525,
+          "strain_rate_mag": 0.9958807229995728,
+          "okubo_weiss": 0.9624029755592346,
+          "pressure_grad_mag": 0.9969835042953491,
+          "tracer_laplacian": 0.7306671261787414
+        },
+        {
+          "enstrophy": 0.9877088904380799,
+          "tracer_grad": 0.8234490156173706,
+          "advective_flux": 0.17320553064346314,
+          "strain_rate_mag": 0.99643394947052,
+          "okubo_weiss": 0.9725534439086914,
+          "pressure_grad_mag": 0.9980131149291992,
+          "tracer_laplacian": 0.7848482012748719
+        },
+        {
+          "enstrophy": 0.9899523615837097,
+          "tracer_grad": 0.838386344909668,
+          "advective_flux": 0.19885077476501464,
+          "strain_rate_mag": 0.9969413161277771,
+          "okubo_weiss": 0.9759438991546631,
+          "pressure_grad_mag": 0.9985628604888916,
+          "tracer_laplacian": 0.8031252145767211
+        },
+        {
+          "enstrophy": 0.9917631387710572,
+          "tracer_grad": 0.8466636538505554,
+          "advective_flux": 0.20693540573120117,
+          "strain_rate_mag": 0.9970484018325806,
+          "okubo_weiss": 0.9797043681144715,
+          "pressure_grad_mag": 0.9988400340080261,
+          "tracer_laplacian": 0.8146575570106507
+        },
+        {
+          "enstrophy": 0.9927863836288452,
+          "tracer_grad": 0.8501609802246094,
+          "advective_flux": 0.21630311012268066,
+          "strain_rate_mag": 0.9972988843917847,
+          "okubo_weiss": 0.9832721590995789,
+          "pressure_grad_mag": 0.99901123046875,
+          "tracer_laplacian": 0.820366632938385
+        },
+        {
+          "enstrophy": 0.9933971643447876,
+          "tracer_grad": 0.8508256793022155,
+          "advective_flux": 0.22734204530715943,
+          "strain_rate_mag": 0.9973804116249084,
+          "okubo_weiss": 0.984874153137207,
+          "pressure_grad_mag": 0.9991216421127319,
+          "tracer_laplacian": 0.8196739077568054
+        },
+        {
+          "enstrophy": 0.9934925556182861,
+          "tracer_grad": 0.8527028799057007,
+          "advective_flux": 0.2446514368057251,
+          "strain_rate_mag": 0.9974239110946655,
+          "okubo_weiss": 0.9858919262886048,
+          "pressure_grad_mag": 0.9991762518882752,
+          "tracer_laplacian": 0.8196559429168702
+        },
+        {
+          "enstrophy": 0.9936137557029724,
+          "tracer_grad": 0.8538702726364136,
+          "advective_flux": 0.26791738271713256,
+          "strain_rate_mag": 0.9972678542137146,
+          "okubo_weiss": 0.9865514039993286,
+          "pressure_grad_mag": 0.9991878032684326,
+          "tracer_laplacian": 0.8211760520935059
+        },
+        {
+          "enstrophy": 0.9932040333747864,
+          "tracer_grad": 0.8507691025733948,
+          "advective_flux": 0.2713151812553406,
+          "strain_rate_mag": 0.9972169756889343,
+          "okubo_weiss": 0.9863690614700318,
+          "pressure_grad_mag": 0.9991080403327942,
+          "tracer_laplacian": 0.8185131669044494
+        },
+        {
+          "enstrophy": 0.9930878400802612,
+          "tracer_grad": 0.8437017321586608,
+          "advective_flux": 0.2616469979286194,
+          "strain_rate_mag": 0.996889865398407,
+          "okubo_weiss": 0.9848240137100219,
+          "pressure_grad_mag": 0.9990463495254517,
+          "tracer_laplacian": 0.8112768292427063
+        },
+        {
+          "enstrophy": 0.9890374183654785,
+          "tracer_grad": 0.8327458739280701,
+          "advective_flux": 0.2634176850318909,
+          "strain_rate_mag": 0.9965104579925537,
+          "okubo_weiss": 0.9786969423294067,
+          "pressure_grad_mag": 0.9983256578445434,
+          "tracer_laplacian": 0.7997509002685547
+        }
+      ],
+      "2.0": [
+        {
+          "enstrophy": 0.9160879373550415,
+          "tracer_grad": 0.42530977725982666,
+          "advective_flux": -0.08983824253082276,
+          "strain_rate_mag": 0.9524324774742127,
+          "okubo_weiss": 0.8321626663208008,
+          "pressure_grad_mag": 0.9667859435081482,
+          "tracer_laplacian": 0.32839820384979246
+        },
+        {
+          "enstrophy": 0.9478915929794312,
+          "tracer_grad": 0.5395805358886718,
+          "advective_flux": -0.07990686893463135,
+          "strain_rate_mag": 0.9753525137901307,
+          "okubo_weiss": 0.8800832152366638,
+          "pressure_grad_mag": 0.9830628514289856,
+          "tracer_laplacian": 0.4117845296859741
+        },
+        {
+          "enstrophy": 0.9612742781639099,
+          "tracer_grad": 0.5800243139266967,
+          "advective_flux": -0.06963877677917481,
+          "strain_rate_mag": 0.983601701259613,
+          "okubo_weiss": 0.9014994263648987,
+          "pressure_grad_mag": 0.9890667080879212,
+          "tracer_laplacian": 0.45443459749221804
+        },
+        {
+          "enstrophy": 0.9662176132202148,
+          "tracer_grad": 0.6217055082321167,
+          "advective_flux": -0.06619716882705688,
+          "strain_rate_mag": 0.9848837375640869,
+          "okubo_weiss": 0.9096009612083436,
+          "pressure_grad_mag": 0.9905402183532714,
+          "tracer_laplacian": 0.5012614369392395
+        },
+        {
+          "enstrophy": 0.9701298117637634,
+          "tracer_grad": 0.6345157027244568,
+          "advective_flux": -0.06586731672286987,
+          "strain_rate_mag": 0.9858237743377686,
+          "okubo_weiss": 0.9138519167900085,
+          "pressure_grad_mag": 0.9915450811386108,
+          "tracer_laplacian": 0.5158727645874024
+        },
+        {
+          "enstrophy": 0.9729822516441345,
+          "tracer_grad": 0.6425867676734924,
+          "advective_flux": -0.05785025358200073,
+          "strain_rate_mag": 0.9866000294685364,
+          "okubo_weiss": 0.919222378730774,
+          "pressure_grad_mag": 0.9925433754920959,
+          "tracer_laplacian": 0.5267636775970459
+        },
+        {
+          "enstrophy": 0.9751449704170227,
+          "tracer_grad": 0.6448383927345276,
+          "advective_flux": -0.05111405849456787,
+          "strain_rate_mag": 0.9871300220489502,
+          "okubo_weiss": 0.9241688847541809,
+          "pressure_grad_mag": 0.9931508898735046,
+          "tracer_laplacian": 0.5305912375450135
+        },
+        {
+          "enstrophy": 0.9759890675544739,
+          "tracer_grad": 0.6468220233917237,
+          "advective_flux": -0.05062239170074463,
+          "strain_rate_mag": 0.9874406814575195,
+          "okubo_weiss": 0.925974702835083,
+          "pressure_grad_mag": 0.9933021068572998,
+          "tracer_laplacian": 0.5326721787452697
+        },
+        {
+          "enstrophy": 0.9774658679962158,
+          "tracer_grad": 0.6469013929367066,
+          "advective_flux": -0.03883507251739502,
+          "strain_rate_mag": 0.987679660320282,
+          "okubo_weiss": 0.9277227640151977,
+          "pressure_grad_mag": 0.9938681244850158,
+          "tracer_laplacian": 0.5327622294425964
+        },
+        {
+          "enstrophy": 0.9784146189689636,
+          "tracer_grad": 0.6509426236152649,
+          "advective_flux": -0.03318566083908081,
+          "strain_rate_mag": 0.9874720811843872,
+          "okubo_weiss": 0.9290472626686096,
+          "pressure_grad_mag": 0.993938148021698,
+          "tracer_laplacian": 0.5387613892555236
+        },
+        {
+          "enstrophy": 0.9779424548149109,
+          "tracer_grad": 0.6542363047599793,
+          "advective_flux": -0.03157438039779663,
+          "strain_rate_mag": 0.987635588645935,
+          "okubo_weiss": 0.9277440309524536,
+          "pressure_grad_mag": 0.9942743897438049,
+          "tracer_laplacian": 0.5432709932327271
+        },
+        {
+          "enstrophy": 0.9786460876464844,
+          "tracer_grad": 0.6571782946586608,
+          "advective_flux": -0.029895639419555663,
+          "strain_rate_mag": 0.9876216173171997,
+          "okubo_weiss": 0.9278212070465088,
+          "pressure_grad_mag": 0.9943626880645752,
+          "tracer_laplacian": 0.5464387536048889
+        },
+        {
+          "enstrophy": 0.9732495188713074,
+          "tracer_grad": 0.6415917634963989,
+          "advective_flux": -0.02020660638809204,
+          "strain_rate_mag": 0.9876505494117737,
+          "okubo_weiss": 0.91775484085083,
+          "pressure_grad_mag": 0.993486487865448,
+          "tracer_laplacian": 0.5358726620674134
+        }
+      ]
     },
-    "0.1": {
-      "enstrophy": 0.9933940410614014,
-      "vorticity_signed": 0.11374379396438598,
-      "divergence": 0.33117088079452517,
-      "tracer_grad": 0.8797816753387451,
-      "advective_flux": 0.5787984490394592,
-      "strain_rate_mag": 0.9981930494308472,
-      "okubo_weiss": 0.9894480228424072,
-      "pressure_grad_mag": 0.9989849090576172
-    },
-    "0.25": {
-      "enstrophy": 0.9934992790222168,
-      "vorticity_signed": 0.11208870410919189,
-      "divergence": 0.34048354625701904,
-      "tracer_grad": 0.8789381384849548,
-      "advective_flux": 0.560183048248291,
-      "strain_rate_mag": 0.9982018113136292,
-      "okubo_weiss": 0.9895228028297425,
-      "pressure_grad_mag": 0.9990927338600158
-    },
-    "0.5": {
-      "enstrophy": 0.993382477760315,
-      "vorticity_signed": 0.0974579095840454,
-      "divergence": 0.3130976319313049,
-      "tracer_grad": 0.8772504568099976,
-      "advective_flux": 0.473548948764801,
-      "strain_rate_mag": 0.9982012987136841,
-      "okubo_weiss": 0.9895803213119507,
-      "pressure_grad_mag": 0.9991378426551819
-    },
-    "1.0": {
-      "enstrophy": 0.9898051500320435,
-      "vorticity_signed": 0.03611056804656983,
-      "divergence": 0.12247220277786255,
-      "tracer_grad": 0.8317719578742981,
-      "advective_flux": 0.26356064081192015,
-      "strain_rate_mag": 0.9965751767158508,
-      "okubo_weiss": 0.9794366002082825,
-      "pressure_grad_mag": 0.9983022212982178
-    },
-    "2.0": {
-      "enstrophy": 0.9746929407119751,
-      "vorticity_signed": -0.12846477031707765,
-      "divergence": -0.11058895587921143,
-      "tracer_grad": 0.6362393021583557,
-      "advective_flux": 0.03376932144165039,
-      "strain_rate_mag": 0.9879075765609742,
-      "okubo_weiss": 0.9239999294281006,
-      "pressure_grad_mag": 0.9932472944259644
+    "token": {
+      "n_token_samples": 16,
+      "by_noise": {
+        "0.0": [
+          {
+            "enstrophy": 0.75447758436203,
+            "vorticity_signed": 0.9989804983139038,
+            "divergence": 0.9985114812850953,
+            "tracer_grad": 0.8230907559394837,
+            "advective_flux": 0.6888216257095336,
+            "strain_rate_mag": 0.9521731734275818,
+            "okubo_weiss": 0.9022720694541931,
+            "pressure_grad_mag": 0.9419291734695434,
+            "tracer_laplacian": 0.7684008002281189
+          },
+          {
+            "enstrophy": 0.8293659448623657,
+            "vorticity_signed": 0.99870924949646,
+            "divergence": 0.9969170808792114,
+            "tracer_grad": 0.9040334820747375,
+            "advective_flux": 0.7140087723731995,
+            "strain_rate_mag": 0.9761854767799377,
+            "okubo_weiss": 0.918846583366394,
+            "pressure_grad_mag": 0.9629972577095032,
+            "tracer_laplacian": 0.8751380562782287
+          },
+          {
+            "enstrophy": 0.8572190880775452,
+            "vorticity_signed": 0.9975571393966675,
+            "divergence": 0.9779158473014832,
+            "tracer_grad": 0.9214900493621826,
+            "advective_flux": 0.6874019503593445,
+            "strain_rate_mag": 0.9840939044952393,
+            "okubo_weiss": 0.9335291981697083,
+            "pressure_grad_mag": 0.9708152294158936,
+            "tracer_laplacian": 0.8913864850997925
+          },
+          {
+            "enstrophy": 0.8701982736587525,
+            "vorticity_signed": 0.994260048866272,
+            "divergence": 0.9328490734100342,
+            "tracer_grad": 0.9250985980033875,
+            "advective_flux": 0.6397230982780456,
+            "strain_rate_mag": 0.9857220411300659,
+            "okubo_weiss": 0.9451189160346984,
+            "pressure_grad_mag": 0.9781174421310425,
+            "tracer_laplacian": 0.8965302467346191
+          },
+          {
+            "enstrophy": 0.8773202538490296,
+            "vorticity_signed": 0.9893365740776062,
+            "divergence": 0.8830051302909852,
+            "tracer_grad": 0.9182342767715455,
+            "advective_flux": 0.5864942073822021,
+            "strain_rate_mag": 0.9848777055740356,
+            "okubo_weiss": 0.9464120626449585,
+            "pressure_grad_mag": 0.9810488939285278,
+            "tracer_laplacian": 0.8878767609596252
+          },
+          {
+            "enstrophy": 0.8784798979759216,
+            "vorticity_signed": 0.9802635192871094,
+            "divergence": 0.8203872203826904,
+            "tracer_grad": 0.9146554231643677,
+            "advective_flux": 0.5488696694374084,
+            "strain_rate_mag": 0.9839711904525756,
+            "okubo_weiss": 0.9463142275810241,
+            "pressure_grad_mag": 0.9810734272003174,
+            "tracer_laplacian": 0.8862533688545227
+          },
+          {
+            "enstrophy": 0.8723671555519104,
+            "vorticity_signed": 0.969019091129303,
+            "divergence": 0.7845515727996826,
+            "tracer_grad": 0.9054231405258178,
+            "advective_flux": 0.5067953944206238,
+            "strain_rate_mag": 0.9811612129211426,
+            "okubo_weiss": 0.9462377309799195,
+            "pressure_grad_mag": 0.979725968837738,
+            "tracer_laplacian": 0.8772287726402282
+          },
+          {
+            "enstrophy": 0.8621674418449402,
+            "vorticity_signed": 0.9550155162811279,
+            "divergence": 0.7539076209068298,
+            "tracer_grad": 0.8907621741294861,
+            "advective_flux": 0.4760133743286133,
+            "strain_rate_mag": 0.9788568615913391,
+            "okubo_weiss": 0.942933464050293,
+            "pressure_grad_mag": 0.9789138913154602,
+            "tracer_laplacian": 0.8601003170013428
+          },
+          {
+            "enstrophy": 0.8564815759658814,
+            "vorticity_signed": 0.9494795799255371,
+            "divergence": 0.7343528389930725,
+            "tracer_grad": 0.8838626146316528,
+            "advective_flux": 0.45453767776489257,
+            "strain_rate_mag": 0.9765996098518371,
+            "okubo_weiss": 0.9400406002998352,
+            "pressure_grad_mag": 0.9780712485313415,
+            "tracer_laplacian": 0.8507971167564392
+          },
+          {
+            "enstrophy": 0.8515066742897034,
+            "vorticity_signed": 0.9451141238212586,
+            "divergence": 0.7128223299980163,
+            "tracer_grad": 0.8863836288452148,
+            "advective_flux": 0.4287061095237732,
+            "strain_rate_mag": 0.9756566762924195,
+            "okubo_weiss": 0.9397369980812073,
+            "pressure_grad_mag": 0.9776028990745544,
+            "tracer_laplacian": 0.8538822770118714
+          },
+          {
+            "enstrophy": 0.8514023661613465,
+            "vorticity_signed": 0.9413585066795349,
+            "divergence": 0.6857613801956177,
+            "tracer_grad": 0.8837875485420227,
+            "advective_flux": 0.4052074313163757,
+            "strain_rate_mag": 0.9752358198165894,
+            "okubo_weiss": 0.9377488851547241,
+            "pressure_grad_mag": 0.9783600211143494,
+            "tracer_laplacian": 0.8525685787200927
+          },
+          {
+            "enstrophy": 0.8466689109802246,
+            "vorticity_signed": 0.9388349175453186,
+            "divergence": 0.6710162281990051,
+            "tracer_grad": 0.8792634248733521,
+            "advective_flux": 0.3940504789352417,
+            "strain_rate_mag": 0.9737835764884949,
+            "okubo_weiss": 0.9368797779083252,
+            "pressure_grad_mag": 0.9782311320304871,
+            "tracer_laplacian": 0.8484774112701416
+          },
+          {
+            "enstrophy": 0.8268782734870911,
+            "vorticity_signed": 0.9307206511497498,
+            "divergence": 0.6417969107627869,
+            "tracer_grad": 0.8914166808128356,
+            "advective_flux": 0.3996554732322693,
+            "strain_rate_mag": 0.9631301403045655,
+            "okubo_weiss": 0.8929031491279602,
+            "pressure_grad_mag": 0.9719961881637573,
+            "tracer_laplacian": 0.8641532182693481
+          }
+        ],
+        "0.1": [
+          {
+            "enstrophy": 0.659295117855072,
+            "vorticity_signed": 0.995664095878601,
+            "divergence": 0.9942568659782409,
+            "tracer_grad": 0.6929125547409057,
+            "advective_flux": 0.5515848159790039,
+            "strain_rate_mag": 0.9151648283004761,
+            "okubo_weiss": 0.8142840266227722,
+            "pressure_grad_mag": 0.9199037551879883,
+            "tracer_laplacian": 0.6154922366142273
+          },
+          {
+            "enstrophy": 0.7794035077095032,
+            "vorticity_signed": 0.9950657963752747,
+            "divergence": 0.9914944529533386,
+            "tracer_grad": 0.8292595148086548,
+            "advective_flux": 0.5784159898757935,
+            "strain_rate_mag": 0.9602603793144227,
+            "okubo_weiss": 0.8645236849784851,
+            "pressure_grad_mag": 0.9492211222648621,
+            "tracer_laplacian": 0.7721257925033569
+          },
+          {
+            "enstrophy": 0.8204085111618042,
+            "vorticity_signed": 0.992405891418457,
+            "divergence": 0.950327205657959,
+            "tracer_grad": 0.8618994951248169,
+            "advective_flux": 0.562065315246582,
+            "strain_rate_mag": 0.9750566840171814,
+            "okubo_weiss": 0.8977482199668885,
+            "pressure_grad_mag": 0.959536862373352,
+            "tracer_laplacian": 0.8098939776420593
+          },
+          {
+            "enstrophy": 0.83492112159729,
+            "vorticity_signed": 0.9865206003189086,
+            "divergence": 0.8730369567871094,
+            "tracer_grad": 0.8776559948921203,
+            "advective_flux": 0.5251959443092347,
+            "strain_rate_mag": 0.9785997867584229,
+            "okubo_weiss": 0.9209808230400085,
+            "pressure_grad_mag": 0.9697953462600708,
+            "tracer_laplacian": 0.8330086946487427
+          },
+          {
+            "enstrophy": 0.8428040146827698,
+            "vorticity_signed": 0.979894506931305,
+            "divergence": 0.8113780379295349,
+            "tracer_grad": 0.8753427505493164,
+            "advective_flux": 0.48739137649536135,
+            "strain_rate_mag": 0.9776250958442688,
+            "okubo_weiss": 0.927273428440094,
+            "pressure_grad_mag": 0.9746814608573914,
+            "tracer_laplacian": 0.8332454919815063
+          },
+          {
+            "enstrophy": 0.8461614727973938,
+            "vorticity_signed": 0.968028461933136,
+            "divergence": 0.7529024958610535,
+            "tracer_grad": 0.8808472633361817,
+            "advective_flux": 0.4549026250839233,
+            "strain_rate_mag": 0.9764120697975158,
+            "okubo_weiss": 0.9285639882087707,
+            "pressure_grad_mag": 0.9746276140213013,
+            "tracer_laplacian": 0.8416394233703614
+          },
+          {
+            "enstrophy": 0.8405478954315185,
+            "vorticity_signed": 0.9546925187110901,
+            "divergence": 0.7168964624404908,
+            "tracer_grad": 0.8727065324783325,
+            "advective_flux": 0.4219572186470032,
+            "strain_rate_mag": 0.9735486626625061,
+            "okubo_weiss": 0.9297534227371216,
+            "pressure_grad_mag": 0.9736913084983826,
+            "tracer_laplacian": 0.8338917374610901
+          },
+          {
+            "enstrophy": 0.8335888504981994,
+            "vorticity_signed": 0.937737238407135,
+            "divergence": 0.6910608291625977,
+            "tracer_grad": 0.8601543426513671,
+            "advective_flux": 0.3967067122459412,
+            "strain_rate_mag": 0.9713929176330567,
+            "okubo_weiss": 0.9292444944381714,
+            "pressure_grad_mag": 0.9730661988258362,
+            "tracer_laplacian": 0.8187825918197632
+          },
+          {
+            "enstrophy": 0.8289162993431092,
+            "vorticity_signed": 0.9304907441139221,
+            "divergence": 0.6724051713943482,
+            "tracer_grad": 0.8538008570671082,
+            "advective_flux": 0.37625118494033816,
+            "strain_rate_mag": 0.9685108184814453,
+            "okubo_weiss": 0.9262681484222413,
+            "pressure_grad_mag": 0.9725209474563599,
+            "tracer_laplacian": 0.8106689453125
+          },
+          {
+            "enstrophy": 0.8230619549751281,
+            "vorticity_signed": 0.9254706263542175,
+            "divergence": 0.6519044399261474,
+            "tracer_grad": 0.8530468106269836,
+            "advective_flux": 0.3598219633102417,
+            "strain_rate_mag": 0.9669538855552673,
+            "okubo_weiss": 0.924835455417633,
+            "pressure_grad_mag": 0.971713387966156,
+            "tracer_laplacian": 0.8106332778930664
+          },
+          {
+            "enstrophy": 0.8238924741744995,
+            "vorticity_signed": 0.919543468952179,
+            "divergence": 0.6274438738822937,
+            "tracer_grad": 0.8504623293876648,
+            "advective_flux": 0.3443652391433716,
+            "strain_rate_mag": 0.9666073441505432,
+            "okubo_weiss": 0.9239878535270691,
+            "pressure_grad_mag": 0.9726158499717712,
+            "tracer_laplacian": 0.8098172664642334
+          },
+          {
+            "enstrophy": 0.8190241694450379,
+            "vorticity_signed": 0.9159051537513733,
+            "divergence": 0.6138301134109497,
+            "tracer_grad": 0.8447069764137268,
+            "advective_flux": 0.3380114555358887,
+            "strain_rate_mag": 0.9653307557106018,
+            "okubo_weiss": 0.9228232979774476,
+            "pressure_grad_mag": 0.9725813627243042,
+            "tracer_laplacian": 0.8042179703712463
+          },
+          {
+            "enstrophy": 0.7948630213737488,
+            "vorticity_signed": 0.9030332803726197,
+            "divergence": 0.5729301810264588,
+            "tracer_grad": 0.8559876322746277,
+            "advective_flux": 0.33686419725418093,
+            "strain_rate_mag": 0.9510206460952759,
+            "okubo_weiss": 0.8687943935394287,
+            "pressure_grad_mag": 0.9654129028320313,
+            "tracer_laplacian": 0.8191635847091675
+          }
+        ],
+        "0.25": [
+          {
+            "enstrophy": 0.5532653093338012,
+            "vorticity_signed": 0.9811930418014526,
+            "divergence": 0.9812190771102905,
+            "tracer_grad": 0.5073799133300781,
+            "advective_flux": 0.34499669075012207,
+            "strain_rate_mag": 0.8491517424583435,
+            "okubo_weiss": 0.7079582452774048,
+            "pressure_grad_mag": 0.8932359218597412,
+            "tracer_laplacian": 0.43649067878723147
+          },
+          {
+            "enstrophy": 0.687566614151001,
+            "vorticity_signed": 0.9810617804527283,
+            "divergence": 0.9768924236297607,
+            "tracer_grad": 0.725122594833374,
+            "advective_flux": 0.37182739973068235,
+            "strain_rate_mag": 0.9295606732368469,
+            "okubo_weiss": 0.7929957747459412,
+            "pressure_grad_mag": 0.926628589630127,
+            "tracer_laplacian": 0.6340865373611451
+          },
+          {
+            "enstrophy": 0.7466556072235108,
+            "vorticity_signed": 0.9756288647651672,
+            "divergence": 0.906756055355072,
+            "tracer_grad": 0.7647469401359558,
+            "advective_flux": 0.36784436702728274,
+            "strain_rate_mag": 0.9555312037467957,
+            "okubo_weiss": 0.843274962902069,
+            "pressure_grad_mag": 0.9399564266204834,
+            "tracer_laplacian": 0.6817407846450806
+          },
+          {
+            "enstrophy": 0.7644580602645874,
+            "vorticity_signed": 0.9647075057029724,
+            "divergence": 0.7736395001411438,
+            "tracer_grad": 0.7862667083740235,
+            "advective_flux": 0.3455605387687683,
+            "strain_rate_mag": 0.9588972687721252,
+            "okubo_weiss": 0.8711209535598755,
+            "pressure_grad_mag": 0.9520501494407654,
+            "tracer_laplacian": 0.7133213758468628
+          },
+          {
+            "enstrophy": 0.7750779867172242,
+            "vorticity_signed": 0.9533577203750611,
+            "divergence": 0.6945440292358398,
+            "tracer_grad": 0.7858461976051331,
+            "advective_flux": 0.3220564365386963,
+            "strain_rate_mag": 0.9573471426963807,
+            "okubo_weiss": 0.8841078996658325,
+            "pressure_grad_mag": 0.9584573030471801,
+            "tracer_laplacian": 0.7183206081390381
+          },
+          {
+            "enstrophy": 0.7728761315345765,
+            "vorticity_signed": 0.9361503839492797,
+            "divergence": 0.6295072674751282,
+            "tracer_grad": 0.798951256275177,
+            "advective_flux": 0.2943630337715149,
+            "strain_rate_mag": 0.954702365398407,
+            "okubo_weiss": 0.8873042821884155,
+            "pressure_grad_mag": 0.9583830237388611,
+            "tracer_laplacian": 0.7348230242729187
+          },
+          {
+            "enstrophy": 0.7700102925300598,
+            "vorticity_signed": 0.9173854470252991,
+            "divergence": 0.5910212278366089,
+            "tracer_grad": 0.7880983829498291,
+            "advective_flux": 0.2787654876708984,
+            "strain_rate_mag": 0.9512662172317505,
+            "okubo_weiss": 0.8902457475662231,
+            "pressure_grad_mag": 0.9592965841293335,
+            "tracer_laplacian": 0.7235050559043884
+          },
+          {
+            "enstrophy": 0.7676712036132812,
+            "vorticity_signed": 0.8938177585601806,
+            "divergence": 0.5597391128540039,
+            "tracer_grad": 0.7776122927665711,
+            "advective_flux": 0.26247878074645997,
+            "strain_rate_mag": 0.9481541514396667,
+            "okubo_weiss": 0.8914197444915771,
+            "pressure_grad_mag": 0.9589378476142884,
+            "tracer_laplacian": 0.713368022441864
+          },
+          {
+            "enstrophy": 0.7625399589538574,
+            "vorticity_signed": 0.8804372310638428,
+            "divergence": 0.5422404408454895,
+            "tracer_grad": 0.7675959706306458,
+            "advective_flux": 0.25066548585891724,
+            "strain_rate_mag": 0.9432884097099304,
+            "okubo_weiss": 0.8873164296150208,
+            "pressure_grad_mag": 0.958362090587616,
+            "tracer_laplacian": 0.7031158447265625
+          },
+          {
+            "enstrophy": 0.7545616149902343,
+            "vorticity_signed": 0.8724691152572632,
+            "divergence": 0.5175485372543335,
+            "tracer_grad": 0.7622562050819397,
+            "advective_flux": 0.24238889217376708,
+            "strain_rate_mag": 0.9403785228729248,
+            "okubo_weiss": 0.8844437599182129,
+            "pressure_grad_mag": 0.9567604303359986,
+            "tracer_laplacian": 0.6987484097480774
+          },
+          {
+            "enstrophy": 0.7569963097572326,
+            "vorticity_signed": 0.8594125390052796,
+            "divergence": 0.4933950185775757,
+            "tracer_grad": 0.7605859518051148,
+            "advective_flux": 0.23336441516876222,
+            "strain_rate_mag": 0.9398297786712646,
+            "okubo_weiss": 0.8856446862220764,
+            "pressure_grad_mag": 0.9572470784187317,
+            "tracer_laplacian": 0.6985162615776062
+          },
+          {
+            "enstrophy": 0.7527806401252747,
+            "vorticity_signed": 0.8509100079536438,
+            "divergence": 0.48415220975875856,
+            "tracer_grad": 0.7553898096084595,
+            "advective_flux": 0.22877492904663085,
+            "strain_rate_mag": 0.939264178276062,
+            "okubo_weiss": 0.8866793513298035,
+            "pressure_grad_mag": 0.9570398211479187,
+            "tracer_laplacian": 0.6937593460083008
+          },
+          {
+            "enstrophy": 0.7189007639884949,
+            "vorticity_signed": 0.8219187498092652,
+            "divergence": 0.4196252942085266,
+            "tracer_grad": 0.7650171399116517,
+            "advective_flux": 0.22283555269241334,
+            "strain_rate_mag": 0.9171557784080505,
+            "okubo_weiss": 0.8130072593688965,
+            "pressure_grad_mag": 0.9470863342285156,
+            "tracer_laplacian": 0.7080077052116394
+          }
+        ],
+        "0.5": [
+          {
+            "enstrophy": 0.48233665227890016,
+            "vorticity_signed": 0.934499454498291,
+            "divergence": 0.9467767596244812,
+            "tracer_grad": 0.2967936635017395,
+            "advective_flux": 0.2085198163986206,
+            "strain_rate_mag": 0.7615394830703736,
+            "okubo_weiss": 0.6175641417503357,
+            "pressure_grad_mag": 0.8708789825439454,
+            "tracer_laplacian": 0.25878832340240476
+          },
+          {
+            "enstrophy": 0.5783449292182923,
+            "vorticity_signed": 0.9394570589065552,
+            "divergence": 0.9440840125083924,
+            "tracer_grad": 0.5770547389984131,
+            "advective_flux": 0.22109622955322267,
+            "strain_rate_mag": 0.8741234064102172,
+            "okubo_weiss": 0.7177306413650513,
+            "pressure_grad_mag": 0.9011258006095886,
+            "tracer_laplacian": 0.47971056699752807
+          },
+          {
+            "enstrophy": 0.6480049967765809,
+            "vorticity_signed": 0.9361842274665833,
+            "divergence": 0.8934322953224182,
+            "tracer_grad": 0.6339636445045471,
+            "advective_flux": 0.21914527416229249,
+            "strain_rate_mag": 0.9161549806594849,
+            "okubo_weiss": 0.7812215447425842,
+            "pressure_grad_mag": 0.9140113472938538,
+            "tracer_laplacian": 0.5316650748252869
+          },
+          {
+            "enstrophy": 0.6672230720520019,
+            "vorticity_signed": 0.9212661504745483,
+            "divergence": 0.7530695796012878,
+            "tracer_grad": 0.6491097927093505,
+            "advective_flux": 0.2121508836746216,
+            "strain_rate_mag": 0.9187402963638306,
+            "okubo_weiss": 0.8064416408538818,
+            "pressure_grad_mag": 0.9245636343955994,
+            "tracer_laplacian": 0.5506146430969239
+          },
+          {
+            "enstrophy": 0.6746587157249451,
+            "vorticity_signed": 0.9056257486343384,
+            "divergence": 0.6508818626403808,
+            "tracer_grad": 0.6470317721366883,
+            "advective_flux": 0.19889354705810547,
+            "strain_rate_mag": 0.9168036580085754,
+            "okubo_weiss": 0.8220091462135315,
+            "pressure_grad_mag": 0.9311515331268311,
+            "tracer_laplacian": 0.5527375936508179
+          },
+          {
+            "enstrophy": 0.6681432127952576,
+            "vorticity_signed": 0.8864241719245911,
+            "divergence": 0.5671947956085205,
+            "tracer_grad": 0.6555617570877075,
+            "advective_flux": 0.18643747568130492,
+            "strain_rate_mag": 0.9105998039245605,
+            "okubo_weiss": 0.8269006729125976,
+            "pressure_grad_mag": 0.9313897728919983,
+            "tracer_laplacian": 0.5631685614585876
+          },
+          {
+            "enstrophy": 0.663737690448761,
+            "vorticity_signed": 0.8589311361312866,
+            "divergence": 0.5171570301055908,
+            "tracer_grad": 0.6467345237731934,
+            "advective_flux": 0.17650001049041747,
+            "strain_rate_mag": 0.9091275572776795,
+            "okubo_weiss": 0.8369230985641479,
+            "pressure_grad_mag": 0.9340298295021057,
+            "tracer_laplacian": 0.5570355892181397
+          },
+          {
+            "enstrophy": 0.6600347638130188,
+            "vorticity_signed": 0.8306355237960815,
+            "divergence": 0.48300508260726926,
+            "tracer_grad": 0.6428798317909241,
+            "advective_flux": 0.16595007181167604,
+            "strain_rate_mag": 0.9063581466674805,
+            "okubo_weiss": 0.841506028175354,
+            "pressure_grad_mag": 0.9359495043754578,
+            "tracer_laplacian": 0.5561191439628601
+          },
+          {
+            "enstrophy": 0.6592339277267456,
+            "vorticity_signed": 0.8136761546134949,
+            "divergence": 0.4632080435752869,
+            "tracer_grad": 0.6396342635154724,
+            "advective_flux": 0.15767228603363037,
+            "strain_rate_mag": 0.9022520422935486,
+            "okubo_weiss": 0.8390116572380066,
+            "pressure_grad_mag": 0.9351264476776123,
+            "tracer_laplacian": 0.5553268074989319
+          },
+          {
+            "enstrophy": 0.6517823219299317,
+            "vorticity_signed": 0.7994310855865479,
+            "divergence": 0.43858722448348997,
+            "tracer_grad": 0.6331947326660157,
+            "advective_flux": 0.15299566984176635,
+            "strain_rate_mag": 0.8985401868820191,
+            "okubo_weiss": 0.8360502243041992,
+            "pressure_grad_mag": 0.9340544700622558,
+            "tracer_laplacian": 0.5514496326446533
+          },
+          {
+            "enstrophy": 0.6521670103073121,
+            "vorticity_signed": 0.7835211396217346,
+            "divergence": 0.41727041006088256,
+            "tracer_grad": 0.6308201670646667,
+            "advective_flux": 0.14793320894241332,
+            "strain_rate_mag": 0.8980577111244201,
+            "okubo_weiss": 0.8394283652305603,
+            "pressure_grad_mag": 0.9333762526512146,
+            "tracer_laplacian": 0.5514189004898071
+          },
+          {
+            "enstrophy": 0.6542885065078735,
+            "vorticity_signed": 0.7698732137680053,
+            "divergence": 0.4064526200294495,
+            "tracer_grad": 0.6272639513015748,
+            "advective_flux": 0.14606308937072754,
+            "strain_rate_mag": 0.8976335644721984,
+            "okubo_weiss": 0.8397589921951294,
+            "pressure_grad_mag": 0.9347882747650147,
+            "tracer_laplacian": 0.5499071598052978
+          },
+          {
+            "enstrophy": 0.6173872113227844,
+            "vorticity_signed": 0.7262653112411499,
+            "divergence": 0.3495000720024109,
+            "tracer_grad": 0.6304607629776001,
+            "advective_flux": 0.14118690490722657,
+            "strain_rate_mag": 0.8676622390747071,
+            "okubo_weiss": 0.7453748106956481,
+            "pressure_grad_mag": 0.9220959544181824,
+            "tracer_laplacian": 0.5562145829200744
+          }
+        ],
+        "1.0": [
+          {
+            "enstrophy": 0.3980584144592285,
+            "vorticity_signed": 0.7849793791770935,
+            "divergence": 0.8372472763061524,
+            "tracer_grad": 0.10672115087509156,
+            "advective_flux": 0.11551848649978638,
+            "strain_rate_mag": 0.6148920297622681,
+            "okubo_weiss": 0.4984187841415405,
+            "pressure_grad_mag": 0.8122102856636048,
+            "tracer_laplacian": 0.09865254163742065
+          },
+          {
+            "enstrophy": 0.45102795362472536,
+            "vorticity_signed": 0.7927743196487427,
+            "divergence": 0.8379068493843078,
+            "tracer_grad": 0.26088681221008303,
+            "advective_flux": 0.11647183895111084,
+            "strain_rate_mag": 0.7136615633964538,
+            "okubo_weiss": 0.5816498637199402,
+            "pressure_grad_mag": 0.8506645202636719,
+            "tracer_laplacian": 0.21365365982055665
+          },
+          {
+            "enstrophy": 0.4919751286506653,
+            "vorticity_signed": 0.8045183300971985,
+            "divergence": 0.8367624640464782,
+            "tracer_grad": 0.3621553421020508,
+            "advective_flux": 0.11607532501220703,
+            "strain_rate_mag": 0.7866334438323974,
+            "okubo_weiss": 0.6555314183235168,
+            "pressure_grad_mag": 0.8638342499732972,
+            "tracer_laplacian": 0.2883407473564148
+          },
+          {
+            "enstrophy": 0.5133075833320617,
+            "vorticity_signed": 0.8010368704795837,
+            "divergence": 0.7997452616691589,
+            "tracer_grad": 0.3746701717376709,
+            "advective_flux": 0.11670644283294677,
+            "strain_rate_mag": 0.7925072312355042,
+            "okubo_weiss": 0.6799463152885437,
+            "pressure_grad_mag": 0.8688286900520324,
+            "tracer_laplacian": 0.29915107488632203
+          },
+          {
+            "enstrophy": 0.5256421089172363,
+            "vorticity_signed": 0.7956806063652039,
+            "divergence": 0.7532487988471985,
+            "tracer_grad": 0.38518012762069703,
+            "advective_flux": 0.11099083423614502,
+            "strain_rate_mag": 0.7990256309509277,
+            "okubo_weiss": 0.6959459781646729,
+            "pressure_grad_mag": 0.8713836789131164,
+            "tracer_laplacian": 0.31184462308883665
+          },
+          {
+            "enstrophy": 0.5226428151130676,
+            "vorticity_signed": 0.7874029994010925,
+            "divergence": 0.7031262874603271,
+            "tracer_grad": 0.38662331104278563,
+            "advective_flux": 0.10655920505523682,
+            "strain_rate_mag": 0.7998640418052674,
+            "okubo_weiss": 0.7057188868522644,
+            "pressure_grad_mag": 0.8708158612251282,
+            "tracer_laplacian": 0.3125050663948059
+          },
+          {
+            "enstrophy": 0.5192817091941834,
+            "vorticity_signed": 0.7725971102714538,
+            "divergence": 0.6604907393455506,
+            "tracer_grad": 0.3815592646598816,
+            "advective_flux": 0.1036954402923584,
+            "strain_rate_mag": 0.8020125985145569,
+            "okubo_weiss": 0.7249340653419495,
+            "pressure_grad_mag": 0.8747153043746948,
+            "tracer_laplacian": 0.305707049369812
+          },
+          {
+            "enstrophy": 0.5159198403358459,
+            "vorticity_signed": 0.7557521104812622,
+            "divergence": 0.6288276553153992,
+            "tracer_grad": 0.37897499799728396,
+            "advective_flux": 0.09906905889511108,
+            "strain_rate_mag": 0.7976340532302857,
+            "okubo_weiss": 0.7319578766822815,
+            "pressure_grad_mag": 0.8810735225677491,
+            "tracer_laplacian": 0.3039069652557373
+          },
+          {
+            "enstrophy": 0.5152670264244079,
+            "vorticity_signed": 0.7389505505561829,
+            "divergence": 0.6014740943908692,
+            "tracer_grad": 0.3687974810600281,
+            "advective_flux": 0.09507600069046021,
+            "strain_rate_mag": 0.7931405425071716,
+            "okubo_weiss": 0.7294974446296691,
+            "pressure_grad_mag": 0.8794384717941284,
+            "tracer_laplacian": 0.2965394616127014
+          },
+          {
+            "enstrophy": 0.513479471206665,
+            "vorticity_signed": 0.7200583696365357,
+            "divergence": 0.5701439142227173,
+            "tracer_grad": 0.36037919521331785,
+            "advective_flux": 0.09307750463485717,
+            "strain_rate_mag": 0.792124617099762,
+            "okubo_weiss": 0.7292344212532044,
+            "pressure_grad_mag": 0.8798439145088196,
+            "tracer_laplacian": 0.2884318470954895
+          },
+          {
+            "enstrophy": 0.5166423320770264,
+            "vorticity_signed": 0.7062263369560242,
+            "divergence": 0.553883147239685,
+            "tracer_grad": 0.35456583499908445,
+            "advective_flux": 0.09100580215454102,
+            "strain_rate_mag": 0.7975815415382386,
+            "okubo_weiss": 0.7359479427337646,
+            "pressure_grad_mag": 0.8820578217506408,
+            "tracer_laplacian": 0.2869642019271851
+          },
+          {
+            "enstrophy": 0.5184846758842468,
+            "vorticity_signed": 0.6953219771385193,
+            "divergence": 0.5346456050872803,
+            "tracer_grad": 0.3519643783569336,
+            "advective_flux": 0.08871870040893555,
+            "strain_rate_mag": 0.7972459077835083,
+            "okubo_weiss": 0.738682496547699,
+            "pressure_grad_mag": 0.8824620723724366,
+            "tracer_laplacian": 0.288814103603363
+          },
+          {
+            "enstrophy": 0.507882583141327,
+            "vorticity_signed": 0.666903841495514,
+            "divergence": 0.5187335968017578,
+            "tracer_grad": 0.35867996215820314,
+            "advective_flux": 0.08649717569351197,
+            "strain_rate_mag": 0.7664649724960327,
+            "okubo_weiss": 0.6367470979690552,
+            "pressure_grad_mag": 0.8789434432983398,
+            "tracer_laplacian": 0.297079598903656
+          }
+        ],
+        "2.0": [
+          {
+            "enstrophy": 0.23032718896865845,
+            "vorticity_signed": 0.48150060176849363,
+            "divergence": 0.5866281151771545,
+            "tracer_grad": 0.017537474632263184,
+            "advective_flux": 0.0676074504852295,
+            "strain_rate_mag": 0.3813244581222534,
+            "okubo_weiss": 0.38506307601928713,
+            "pressure_grad_mag": 0.5685365200042725,
+            "tracer_laplacian": 0.01756037473678589
+          },
+          {
+            "enstrophy": 0.2742475032806396,
+            "vorticity_signed": 0.480554986000061,
+            "divergence": 0.5870616793632507,
+            "tracer_grad": 0.03486872911453247,
+            "advective_flux": 0.06709914207458496,
+            "strain_rate_mag": 0.44288742542266846,
+            "okubo_weiss": 0.4127289652824402,
+            "pressure_grad_mag": 0.6392614603042602,
+            "tracer_laplacian": 0.028485536575317383
+          },
+          {
+            "enstrophy": 0.29517379999160764,
+            "vorticity_signed": 0.48369048833847045,
+            "divergence": 0.5922337055206299,
+            "tracer_grad": 0.05913530588150025,
+            "advective_flux": 0.06649448871612548,
+            "strain_rate_mag": 0.4854418396949768,
+            "okubo_weiss": 0.4440837621688843,
+            "pressure_grad_mag": 0.6686318397521973,
+            "tracer_laplacian": 0.043372046947479245
+          },
+          {
+            "enstrophy": 0.3043229341506958,
+            "vorticity_signed": 0.4841578245162964,
+            "divergence": 0.592902410030365,
+            "tracer_grad": 0.06576684713363648,
+            "advective_flux": 0.06688793897628784,
+            "strain_rate_mag": 0.4979422569274902,
+            "okubo_weiss": 0.4549447774887085,
+            "pressure_grad_mag": 0.6790141344070435,
+            "tracer_laplacian": 0.04823670387268066
+          },
+          {
+            "enstrophy": 0.3089862585067749,
+            "vorticity_signed": 0.4838967561721802,
+            "divergence": 0.5903353452682495,
+            "tracer_grad": 0.07080788612365722,
+            "advective_flux": 0.0662793755531311,
+            "strain_rate_mag": 0.5089882612228394,
+            "okubo_weiss": 0.46807323694229125,
+            "pressure_grad_mag": 0.6853273391723633,
+            "tracer_laplacian": 0.05161871910095215
+          },
+          {
+            "enstrophy": 0.310878586769104,
+            "vorticity_signed": 0.48420277833938596,
+            "divergence": 0.5867605566978454,
+            "tracer_grad": 0.07340984344482422,
+            "advective_flux": 0.06553020477294921,
+            "strain_rate_mag": 0.5126208305358887,
+            "okubo_weiss": 0.47395060062408445,
+            "pressure_grad_mag": 0.6870980858802795,
+            "tracer_laplacian": 0.053002572059631346
+          },
+          {
+            "enstrophy": 0.3124409198760986,
+            "vorticity_signed": 0.4821073055267334,
+            "divergence": 0.5830397248268128,
+            "tracer_grad": 0.07458242177963256,
+            "advective_flux": 0.06439416408538819,
+            "strain_rate_mag": 0.517406451702118,
+            "okubo_weiss": 0.48454936742782595,
+            "pressure_grad_mag": 0.6899162769317627,
+            "tracer_laplacian": 0.053363454341888425
+          },
+          {
+            "enstrophy": 0.31274346113204954,
+            "vorticity_signed": 0.48035197257995604,
+            "divergence": 0.5789176821708679,
+            "tracer_grad": 0.07495647668838501,
+            "advective_flux": 0.06440010070800781,
+            "strain_rate_mag": 0.5183405041694641,
+            "okubo_weiss": 0.48990010023117064,
+            "pressure_grad_mag": 0.6927168130874634,
+            "tracer_laplacian": 0.053787052631378174
+          },
+          {
+            "enstrophy": 0.3120620012283325,
+            "vorticity_signed": 0.478203022480011,
+            "divergence": 0.5754736304283142,
+            "tracer_grad": 0.07385499477386474,
+            "advective_flux": 0.0635796308517456,
+            "strain_rate_mag": 0.5196210741996765,
+            "okubo_weiss": 0.4941853880882263,
+            "pressure_grad_mag": 0.6919665694236755,
+            "tracer_laplacian": 0.05322699546813965
+          },
+          {
+            "enstrophy": 0.31417293548583985,
+            "vorticity_signed": 0.4746015667915344,
+            "divergence": 0.5711497902870178,
+            "tracer_grad": 0.07193855047225953,
+            "advective_flux": 0.0628854513168335,
+            "strain_rate_mag": 0.5207670092582702,
+            "okubo_weiss": 0.4986536383628845,
+            "pressure_grad_mag": 0.6940752506256104,
+            "tracer_laplacian": 0.0515541672706604
+          },
+          {
+            "enstrophy": 0.3193816184997559,
+            "vorticity_signed": 0.47176371812820433,
+            "divergence": 0.5691069602966309,
+            "tracer_grad": 0.07162907123565673,
+            "advective_flux": 0.062074136734008786,
+            "strain_rate_mag": 0.527390968799591,
+            "okubo_weiss": 0.5045077204704285,
+            "pressure_grad_mag": 0.699703860282898,
+            "tracer_laplacian": 0.052276110649108885
+          },
+          {
+            "enstrophy": 0.3194762110710144,
+            "vorticity_signed": 0.47120323181152346,
+            "divergence": 0.5657403349876404,
+            "tracer_grad": 0.07172881364822388,
+            "advective_flux": 0.061411154270172116,
+            "strain_rate_mag": 0.5324804306030273,
+            "okubo_weiss": 0.5103083848953247,
+            "pressure_grad_mag": 0.6998562812805176,
+            "tracer_laplacian": 0.05349289178848267
+          },
+          {
+            "enstrophy": 0.32275364398956297,
+            "vorticity_signed": 0.44950648546218874,
+            "divergence": 0.5493876695632934,
+            "tracer_grad": 0.072510027885437,
+            "advective_flux": 0.06083841323852539,
+            "strain_rate_mag": 0.4873708963394165,
+            "okubo_weiss": 0.4084015846252441,
+            "pressure_grad_mag": 0.6881428718566894,
+            "tracer_laplacian": 0.0544552206993103
+          }
+        ]
+      }
     }
   }
 }

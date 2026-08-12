@@ -48,7 +48,8 @@ import torch.nn.functional as F
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.analyze_encoders import contemporaneous_targets, ridge_r2
+from scripts.analyze_encoders import contemporaneous_targets, ridge_r2, skill_score
+from scripts.analyze_encoders_local import local_target_maps
 from scripts.load_encoder import load_encoder
 from scripts.load_rollout_heads import load_rollout_heads
 from scripts.rollout_probe import pearson_r, r2_across_clips
@@ -131,22 +132,45 @@ def _accumulate_targets(store: dict, targets: dict):
         store.setdefault(k, []).append(v.cpu())
 
 
+def _skill_dict(probe_r2s: dict, baseline_r2s: dict) -> dict:
+    """Per-quantity persistence-relative skill score (see skill_score() in
+    analyze_encoders.py) — the fair, cross-quantity-comparable companion to
+    the raw R^2 dicts this script already reports. Needed here specifically
+    because a raw mean-R^2-across-quantities summary (as OVERVIEW.md's
+    headline tables currently use) lets one exploding/degenerate quantity
+    dominate the average — see LINEAR_PROBE.md's vorticity_signed/divergence
+    write-up for why some of these targets are near-degenerate to begin
+    with."""
+    return {k: skill_score(probe_r2s[k], baseline_r2s[k]) for k in probe_r2s}
+
+
 @torch.no_grad()
 def rollout_assessment(encoder_ckpt: str, heads_ckpt: str, mm: np.ndarray, seeds: list, total_len: int,
-                        dataset: str, n_steps: int, batch_size: int, device: torch.device) -> dict:
+                        dataset: str, n_steps: int, batch_size: int, device: torch.device,
+                        token_max_seeds: int = 16) -> dict:
     """Single pass over the data per batch: every metric is either a small
     per-clip scalar (accumulated across batches) or a running sum (MSE/rel-L2)
     — full-size decoded/real pixel tensors are never retained past the batch
     that produced them. An earlier version stored every batch's decoded and
     real pixel tensors for all steps/modes before reducing at the end, which
     for a few hundred seeds over 8 steps ballooned into hundreds of GB of
-    resident memory; this version's peak memory is independent of n_seeds."""
+    resident memory; this version's peak memory is independent of n_seeds.
+
+    Also accumulates a per-token variant for the first `token_max_seeds`
+    samples only (per-token feature tensors are ~n_tokens x larger than the
+    pooled ones per step/mode, so this stays capped independent of n_seeds).
+    Every window here (context, decoded, ground-truth) is a full n_frames
+    clip sharing the encoder's native (grid_t, grid_h, grid_w) token grid, so
+    — unlike rollout_probe.py's disjoint context/future sub-windows —
+    predicted and target tokens correspond 1:1 by index with no gathering
+    needed: pred_latent's token i predicts windows[:, step]'s token i."""
     encoder, _cfg, _spec = load_encoder(encoder_ckpt)
     encoder = encoder.to(device)
     predictor, decoder, hcfg = load_rollout_heads(heads_ckpt, encoder)
     predictor, decoder = predictor.to(device), decoder.to(device)
     norm_pix = hcfg["heads"].get("norm_pix", True)
     n = encoder.n_tokens
+    pt, ph, pw = encoder.patch_size
 
     acc = {m: {s: {"pred_pooled": [], "targets": {}, "pixel": _new_pixel_acc()} for s in range(1, n_steps + 1)}
            for m in ("fed_back", "oracle")}
@@ -156,15 +180,28 @@ def rollout_assessment(encoder_ckpt: str, heads_ckpt: str, mm: np.ndarray, seeds
     persistence_targets_step0: dict = {}
     persistence_feats = []
 
+    tok_acc = {m: {s: {"pred_local": [], "targets": {}} for s in range(1, n_steps + 1)}
+               for m in ("fed_back", "oracle")}
+    tok_ceiling_feats = {s: [] for s in range(1, n_steps + 1)}
+    tok_real_targets = {s: {} for s in range(1, n_steps + 1)}
+    tok_persistence_targets_step0: dict = {}
+    tok_persistence_feats = []
+    n_tok_seen = 0
+
     for start in range(0, len(seeds), batch_size):
         windows = load_seed_batch(mm, seeds[start : start + batch_size], total_len).to(device)
         b = windows.size(0)
+        use_token = n_tok_seen < token_max_seeds
         ctx_idx = torch.arange(n, device=device).unsqueeze(0).expand(b, -1)
         future_idx = torch.arange(n, 2 * n, device=device).unsqueeze(0).expand(b, -1)
 
         step0_feats = encoder(windows[:, 0])
         persistence_feats.append(step0_feats.mean(dim=1).cpu())
         _accumulate_targets(persistence_targets_step0, contemporaneous_targets(windows[:, 0], dataset=dataset))
+        if use_token:
+            tok_persistence_feats.append(step0_feats.float().cpu())
+            _accumulate_targets(tok_persistence_targets_step0,
+                                 local_target_maps(windows[:, 0], pt, ph, pw, dataset=dataset))
 
         for mode in ("fed_back", "oracle"):
             current = windows[:, 0]
@@ -174,6 +211,10 @@ def rollout_assessment(encoder_ckpt: str, heads_ckpt: str, mm: np.ndarray, seeds
                 acc[mode][step]["pred_pooled"].append(pred_latent.mean(dim=1).cpu())
                 _accumulate_targets(acc[mode][step]["targets"], contemporaneous_targets(decoded_window, dataset=dataset))
                 _accumulate_pixel(acc[mode][step]["pixel"], decoded_window, windows[:, step])
+                if use_token:
+                    tok_acc[mode][step]["pred_local"].append(pred_latent.float().cpu())
+                    _accumulate_targets(tok_acc[mode][step]["targets"],
+                                         local_target_maps(decoded_window, pt, ph, pw, dataset=dataset))
                 if mode == "fed_back":
                     current = decoded_window
 
@@ -182,9 +223,19 @@ def rollout_assessment(encoder_ckpt: str, heads_ckpt: str, mm: np.ndarray, seeds
             ceiling_feats[step].append(tgt_feats.mean(dim=1).cpu())
             _accumulate_targets(real_targets[step], contemporaneous_targets(windows[:, step], dataset=dataset))
             _accumulate_pixel(persistence_pixel[step], windows[:, 0], windows[:, step])
+            if use_token:
+                tok_ceiling_feats[step].append(tgt_feats.float().cpu())
+                _accumulate_targets(tok_real_targets[step],
+                                     local_target_maps(windows[:, step], pt, ph, pw, dataset=dataset))
+
+        if use_token:
+            n_tok_seen += b
 
     persistence_feats_all = torch.cat(persistence_feats)
     persistence_targets_step0 = {k: torch.cat(v) for k, v in persistence_targets_step0.items()}
+    d = persistence_feats_all.size(-1)
+    tok_persistence_feats_all = torch.cat(tok_persistence_feats).reshape(-1, d)
+    tok_persistence_targets_step0 = {k: torch.cat(v).reshape(-1) for k, v in tok_persistence_targets_step0.items()}
 
     results = {}
     for step in range(1, n_steps + 1):
@@ -206,13 +257,44 @@ def rollout_assessment(encoder_ckpt: str, heads_ckpt: str, mm: np.ndarray, seeds
             pred_pooled_all = torch.cat(acc[mode][step]["pred_pooled"])
             decoded_targets = {k: torch.cat(v) for k, v in acc[mode][step]["targets"].items()}
             px = acc[mode][step]["pixel"]
+            latent_r2 = {k: ridge_r2(pred_pooled_all, v) for k, v in targets.items()}
+            physics_r2 = {k: r2_across_clips(decoded_targets[k], v) for k, v in targets.items()}
             step_res[mode] = {
-                "latent_r2": {k: ridge_r2(pred_pooled_all, v) for k, v in targets.items()},
+                "latent_r2": latent_r2,
                 "pixel_mse": px["sq_diff"] / px["n"],
                 "pixel_rel_l2": px["sq_diff"] / px["sq_real"],
-                "physics_r2": {k: r2_across_clips(decoded_targets[k], v) for k, v in targets.items()},
+                "physics_r2": physics_r2,
                 "physics_corr": {k: pearson_r(decoded_targets[k], v) for k, v in targets.items()},
+                "skill_latent": _skill_dict(latent_r2, step_res["persistence"]["latent_r2"]),
+                "skill_physics": _skill_dict(physics_r2, step_res["persistence"]["physics_r2"]),
             }
+
+        # per-token variant: same structure, flattened (n_tok_samples*N,) tensors
+        tok_targets = {k: torch.cat(v).reshape(-1) for k, v in tok_real_targets[step].items()}
+        tok_ceiling_feats_all = torch.cat(tok_ceiling_feats[step]).reshape(-1, d)
+        token_res = {
+            "n_token_samples": tok_ceiling_feats_all.size(0),
+            "ceiling_latent_r2": {k: ridge_r2(tok_ceiling_feats_all, v) for k, v in tok_targets.items()},
+            "persistence": {
+                "latent_r2": {k: ridge_r2(tok_persistence_feats_all, v) for k, v in tok_targets.items()},
+                "physics_r2": {k: r2_across_clips(tok_persistence_targets_step0[k], v) for k, v in tok_targets.items()},
+                "physics_corr": {k: pearson_r(tok_persistence_targets_step0[k], v) for k, v in tok_targets.items()},
+            },
+        }
+        for mode in ("fed_back", "oracle"):
+            tok_pred_all = torch.cat(tok_acc[mode][step]["pred_local"]).reshape(-1, d)
+            tok_decoded_targets = {k: torch.cat(v).reshape(-1) for k, v in tok_acc[mode][step]["targets"].items()}
+            tok_latent_r2 = {k: ridge_r2(tok_pred_all, v) for k, v in tok_targets.items()}
+            tok_physics_r2 = {k: r2_across_clips(tok_decoded_targets[k], v) for k, v in tok_targets.items()}
+            token_res[mode] = {
+                "latent_r2": tok_latent_r2,
+                "physics_r2": tok_physics_r2,
+                "physics_corr": {k: pearson_r(tok_decoded_targets[k], v) for k, v in tok_targets.items()},
+                "skill_latent": _skill_dict(tok_latent_r2, token_res["persistence"]["latent_r2"]),
+                "skill_physics": _skill_dict(tok_physics_r2, token_res["persistence"]["physics_r2"]),
+            }
+        step_res["token"] = token_res
+
         results[str(step)] = step_res
 
     return results
@@ -225,6 +307,8 @@ def main():
     ap.add_argument("--n-offsets", type=int, default=3, help="starting windows per trajectory")
     ap.add_argument("--n-steps", type=int, default=8, help="rollout steps (8 frames/step)")
     ap.add_argument("--batch-size", type=int, default=16)
+    ap.add_argument("--token-max-seeds", type=int, default=16,
+                     help="seeds used for the per-token variant (token tensors are ~n_tokens x larger)")
     ap.add_argument("--jepa-encoder-ckpt", default=None)
     ap.add_argument("--mae-encoder-ckpt", default=None)
     ap.add_argument("--jepa-heads-ckpt", default=None)
@@ -250,7 +334,7 @@ def main():
     ):
         print(f"\n=== {objective}: {heads_ckpt} ===")
         res = rollout_assessment(encoder_ckpt, heads_ckpt, mm, seeds, total_len, args.dataset,
-                                  args.n_steps, args.batch_size, device)
+                                  args.n_steps, args.batch_size, device, args.token_max_seeds)
         out[objective] = res
         for step in range(1, args.n_steps + 1):
             r = res[str(step)]

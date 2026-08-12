@@ -38,7 +38,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.models.vit import build_encoder
 from src.data.well import ClipSpec
 from scripts.analyze_encoders import (
-    DATASET_CHANNELS, curl2d, grad2d, divergence2d, okubo_weiss, ridge_r2, build_dataset,
+    DATASET_CHANNELS, curl2d, grad2d, divergence2d, laplacian2d, tensor_div2d,
+    okubo_weiss, ridge_r2, build_dataset,
 )
 
 
@@ -65,6 +66,8 @@ def local_target_maps(clip: torch.Tensor, patch_t: int, patch_h: int, patch_w: i
         dSdx, dSdy = grad2d(dxx)
         fields["order_grad_mag"] = torch.sqrt(dSdx**2 + dSdy**2 + 1e-8)
         fields["strain_order_align"] = exx * dxx + exy * dxy + eyx * dyx + eyy * dyy
+        div_dx, div_dy = tensor_div2d(dxx, dxy, dyx, dyy)
+        fields["active_stress_div_mag"] = torch.sqrt(div_dx**2 + div_dy**2 + 1e-8)
     elif dataset == "shear_flow":
         tracer = clip[:, ch["tracer"]]
         pressure = clip[:, ch["pressure"]]
@@ -79,6 +82,7 @@ def local_target_maps(clip: torch.Tensor, patch_t: int, patch_h: int, patch_w: i
         fields["okubo_weiss"] = okubo_weiss(vx, vy)
         dpdx, dpdy = grad2d(pressure)
         fields["pressure_grad_mag"] = torch.sqrt(dpdx**2 + dpdy**2 + 1e-8)
+        fields["tracer_laplacian"] = laplacian2d(tracer).abs()
     elif dataset == "rayleigh_benard":
         buoyancy = clip[:, ch["buoyancy"]]
         pressure = clip[:, ch["pressure"]]
@@ -92,6 +96,7 @@ def local_target_maps(clip: torch.Tensor, patch_t: int, patch_h: int, patch_w: i
         fields["velocity_buoyancy_coherence"] = (vy * buoyancy) / (speed * b_mag + 1e-6)
         dpdx, dpdy = grad2d(pressure)
         fields["pressure_grad_mag"] = torch.sqrt(dpdx**2 + dpdy**2 + 1e-8)
+        fields["buoyancy_laplacian"] = laplacian2d(buoyancy).abs()
     else:
         raise ValueError(f"no local target definitions for dataset {dataset!r}")
 
@@ -133,7 +138,17 @@ def mlp_r2(x: torch.Tensor, y: torch.Tensor, hidden: int = 128, steps: int = 200
     Hyperparameters were calibrated on a synthetic near-linear signal to reach
     R^2 ~= 0.97 (matching ceiling) rather than stalling partway — an
     undertrained MLP would falsely look like "no benefit from nonlinearity".
+
+    Runs on GPU when available: unlike ridge_r2's single closed-form solve,
+    this is `steps` sequential Adam iterations — the one part of the probing
+    suite that's actually compute-bound rather than I/O-bound, so leaving it
+    on CPU (as the rest of the suite does, since `layerwise_*features()`
+    already moves everything to `.cpu()` right after the encoder forward
+    pass) stalls badly at the scale of a full sweep (8 targets x 13 layers x
+    2 checkpoints x 3 datasets).
     """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x, y = x.to(device), y.to(device)
     g = torch.Generator().manual_seed(seed)
     n = x.size(0)
     perm = torch.randperm(n, generator=g)
@@ -146,7 +161,7 @@ def mlp_r2(x: torch.Tensor, y: torch.Tensor, hidden: int = 128, steps: int = 200
     ytr, yval = (y[tr_idx] - ym) / ys, (y[val_idx] - ym) / ys
 
     torch.manual_seed(seed)
-    model = TinyMLP(x.size(1), hidden)
+    model = TinyMLP(x.size(1), hidden).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=steps)
     for _ in range(steps):
@@ -232,6 +247,49 @@ def analyze_mlp_level(ckpt_path: str, clips: torch.Tensor, contemp: dict):
     return results
 
 
+def analyze_token_mlp_level(ckpt_path: str, clips: torch.Tensor, contemp: dict, max_clips: int,
+                             dataset: str = "active_matter"):
+    """Per-token nonlinear (small MLP) probe: identical features/targets to
+    analyze_token_level's per-token LINEAR probe, swapping ridge_r2 for
+    mlp_r2 as the readout. analyze_mlp_level's pooled MLP was flagged
+    noisy/unreliable — per arXiv:2602.07050 (attentive/per-token probes
+    recover structure that pooled-then-nonlinear probes miss because
+    mean-pooling destroys the local structure a small MLP needs), this tests
+    whether that was a pooling artifact rather than a real absence of
+    nonlinear-only signal at the token level."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    ckpt = torch.load(ckpt_path, map_location=device)
+    spec = ClipSpec(**ckpt["spec"])
+    encoder = build_encoder(spec, ckpt["config"].get("encoder", {})).to(device).eval()
+    encoder.load_state_dict(ckpt["encoder"])
+    pt, ph, pw = encoder.patch_size
+
+    sub = clips[:max_clips]
+    targets = local_target_maps(sub, pt, ph, pw, dataset=dataset)  # each (B, N)
+
+    n_layers = len(encoder.blocks) + 1
+    per_layer = [[] for _ in range(n_layers)]
+    batch_size = 8
+    with torch.no_grad():
+        for start in range(0, sub.size(0), batch_size):
+            batch = sub[start : start + batch_size].to(device)
+            feats = layerwise_token_features(encoder, batch)  # list of (b, N, D)
+            for i, f in enumerate(feats):
+                per_layer[i].append(f)
+    per_layer = [torch.cat(fs) for fs in per_layer]  # (n_clips, N, D)
+
+    results = {"n_layers": n_layers, "n_clips": sub.size(0), "layers": []}
+    for layer_idx, feats in enumerate(per_layer):
+        n_clips, n_tok, d = feats.shape
+        x_flat = feats.reshape(-1, d)
+        layer_r2 = {}
+        for tname, y in targets.items():
+            y_flat = y.reshape(-1)
+            layer_r2[tname] = mlp_r2(x_flat, y_flat, seed=layer_idx)
+        results["layers"].append(layer_r2)
+    return results
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoints", nargs="+", required=True)
@@ -239,15 +297,25 @@ def main():
     ap.add_argument("--dataset", default="active_matter")
     ap.add_argument("--n-offsets", type=int, default=3)
     ap.add_argument("--horizon", type=int, default=16)
+    ap.add_argument("--max-traj", type=int, default=None,
+                     help="cap trajectories used (evenly subsampled) — see analyze_encoders.py's "
+                          "build_dataset() docstring; default uses every trajectory")
     ap.add_argument("--token-max-clips", type=int, default=64,
-                     help="clips used for per-token probe (each yields ~1024 token-samples)")
+                     help="clips used for per-token linear probe (each yields ~1024 token-samples)")
+    ap.add_argument("--token-mlp-max-clips", type=int, default=8,
+                     help="clips used for per-token MLP probe (more expensive than linear: "
+                          "2000 Adam steps x n_targets x n_layers, so a smaller default)")
     ap.add_argument("--skip-mlp", action="store_true",
-                     help="skip the nonlinear MLP probe (found noisy/unreliable; lean sweeps use linear probes only)")
+                     help="skip both nonlinear MLP probes (pooled + token)")
+    ap.add_argument("--split", default="train", choices=["train", "valid", "test"],
+                     help="which preprocessed memmap split to probe (default train; use valid for a "
+                          "held-out generalization check against the pretraining data)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    print("building probe dataset...")
-    clips, contemp, _future = build_dataset(args.data_root, args.dataset, args.n_offsets, args.horizon)
+    print(f"building probe dataset ({args.split})...")
+    clips, contemp, _future = build_dataset(args.data_root, args.dataset, args.n_offsets, args.horizon,
+                                             max_trajectories=args.max_traj, split=args.split)
     print(f"{clips.size(0)} clips total; token probe uses first {args.token_max_clips}")
 
     all_results = {}
@@ -269,6 +337,16 @@ def main():
         print("  -- pooled NONLINEAR (MLP) probe --")
         for i, layer_r2 in enumerate(mlp_res["layers"]):
             tag = f"block_{i+1}" if i < mlp_res["n_layers"] - 1 else "final_norm"
+            line = "  ".join(f"{k}={v:.3f}" for k, v in layer_r2.items())
+            print(f"    {tag:12s} {line}")
+
+        tok_mlp_res = analyze_token_mlp_level(
+            ckpt_path, clips, contemp, args.token_mlp_max_clips, dataset=args.dataset
+        )
+        all_results[ckpt_path]["mlp_token"] = tok_mlp_res
+        print("  -- per-token NONLINEAR (MLP) probe --")
+        for i, layer_r2 in enumerate(tok_mlp_res["layers"]):
+            tag = f"block_{i+1}" if i < tok_mlp_res["n_layers"] - 1 else "final_norm"
             line = "  ".join(f"{k}={v:.3f}" for k, v in layer_r2.items())
             print(f"    {tag:12s} {line}")
 

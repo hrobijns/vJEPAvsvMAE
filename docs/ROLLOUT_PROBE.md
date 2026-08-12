@@ -56,9 +56,41 @@ At each step of the chain, `rollout_assessment.py` reports:
 
 Metrics: `latent_r2` (JEPA — ridge R² of predicted latent vs. real future
 physics), `physics_r2`/`physics_corr` (both objectives, decoded-to-pixels vs.
-real future physics), `pixel_mse`/`pixel_rel_l2`.
+real future physics), `pixel_mse`/`pixel_rel_l2`, and `skill_latent`/
+`skill_physics` — the persistence-relative skill score for `fed_back`/
+`oracle` against the `persistence` baseline above (see
+[LINEAR_PROBE.md](LINEAR_PROBE.md#a-fair-metric-for-comparing-forecast-quality-across-quantities)
+for the metric and why raw R² isn't fair to average across quantities here —
+directly relevant to this doc's own step-by-step tables below, which
+currently report unweighted mean raw R²).
+
+## Token-level extension
+
+Both scripts now also report a per-token variant alongside the pooled one
+described above (see [LINEAR_PROBE.md](LINEAR_PROBE.md) for why token-level
+matters generally). Every window in both scripts is a full clip sharing the
+encoder's native `(grid_t, grid_h, grid_w)` token grid — `rollout_probe.py`'s
+disjoint context/future sub-windows are the one exception (JEPA's masked
+future tokens correspond 1:1 by index to `local_target_maps()` computed on
+just the real future sub-window, since `causal_temporal_mask` selects a
+contiguous trailing block in the same time-major/h/w order as `tokenize()`;
+MAE's reconstructed windows are already full pixel fields, so no special
+handling is needed there either). `rollout_assessment.py`'s windows are all
+full `n_frames` clips at every step, so predicted and target tokens
+correspond 1:1 by index directly — simpler than `rollout_probe.py`'s case.
+Both cap the token-level sample count (`--token-max-clips` /
+`--token-max-seeds`) independent of the pooled sample count, since per-token
+tensors are ~`n_tokens`× larger.
 
 ## Results
+
+> **Pre-expansion snapshot**, pooled-only — predates the token-level
+> extension above and the target-set changes in
+> [LINEAR_PROBE.md](LINEAR_PROBE.md) (both scripts consume
+> `contemporaneous_targets()`, which no longer includes pooled
+> `vorticity_signed`/`divergence` and now includes
+> `active_stress_div_mag`/`tracer_laplacian`/`buoyancy_laplacian`). Needs a
+> fresh GPU sweep before these numbers are current.
 
 ### Single-shot (`rollout_probe.py`) — JEPA latent R², own predictor
 

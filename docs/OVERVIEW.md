@@ -28,6 +28,20 @@ NS + tracer), `rayleigh_benard` (4ch, 512×128, buoyancy-driven convection).
 
 Full architecture/training detail in [README.md § Design](../README.md#design).
 
+### Training curves
+
+![Training loss curves: V-JEPA vs. VideoMAE encoders on The Well](figures/training_curves.png)
+
+All six runs converge cleanly over the full 100k steps (log-scale y-axis;
+note JEPA's smooth-L1-on-latents loss and MAE's pixel-MSE loss are on
+different scales and not directly comparable). JEPA's loss on `shear_flow`
+and `rayleigh_benard` shows a transient rise-then-recover in the first
+~30k steps — worth a caveat/footnote if this figure goes in the paper, since
+we haven't dug into whether it's EMA-target warmup or something else.
+Reproduce via `scripts/extract_training_history.py` (needs the local
+`pod_logs/wandb/` offline-run logs) → `sweep_results/training_history.csv`
+→ `scripts/plot_training_curves.py`.
+
 ## Two probing pipelines
 
 - **[Linear probe suite](LINEAR_PROBE.md)** — does the *frozen representation*
@@ -46,20 +60,21 @@ probe docs; raw numbers in `sweep_results/*.json`.
 
 **1. Contemporaneous physics — JEPA and MAE are close on `active_matter` and
 `shear_flow`, but JEPA clearly ahead on `rayleigh_benard`.** Both objectives
-decode "obvious" derived quantities well (enstrophy, order parameters,
-pressure/buoyancy gradients: R² > 0.95 on `active_matter`/`shear_flow`); raw
-signed vorticity and divergence are hard for both everywhere (near 0 or
-negative R², likely a genuinely hard/high-frequency target rather than a
-representational gap). On `rayleigh_benard`, JEPA is well ahead of MAE on
-every dynamically-interesting quantity:
+decode purely local, near-differential quantities at ceiling on every dataset
+(gradients, pressure: R² ≈ 1.0) — a pixel-reconstruction objective directly
+rewards keeping exactly this kind of information. Pooled `vorticity_signed`/
+`divergence` are dropped as targets (mathematically ≈0 on every clip by
+Stokes'/the divergence theorem — not a representational gap, a degenerate
+target; still probed at token level). On `rayleigh_benard`, JEPA is well
+ahead of MAE specifically on the *coupled* quantities:
 
 | quantity | JEPA best-R² | MAE best-R² |
 |---|---|---|
-| `velocity_buoyancy_coherence` | 0.705 | 0.033 |
-| `convective_flux` | 0.870 | 0.588 |
-| `okubo_weiss` | 0.799 | 0.466 |
-| `enstrophy` | 0.774 | 0.467 |
-| `future_enstrophy` | 0.628 | 0.431 |
+| `velocity_buoyancy_coherence` | 0.583 | −0.049 |
+| `convective_flux` | 0.835 | 0.576 |
+| `okubo_weiss` | 0.722 | 0.460 |
+| `enstrophy` | 0.686 | 0.455 |
+| `future_enstrophy` | 0.474 | 0.347 |
 
 **2. Regime parameters (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta) —
 roughly matched, MAE slightly ahead in several cases.** Both objectives
@@ -77,19 +92,59 @@ latents as input for the next step) drops well below the `oracle` baseline
 this is not a dimension where JEPA's advantage on `rayleigh_benard` shows up.
 
 **4. Noise robustness — MAE is sharper on clean input, JEPA is more robust to
-corruption.** At zero injected noise, MAE's final-layer R² is higher than
-JEPA's on all three datasets (e.g. `active_matter` 0.562 vs 0.424). But under
-heavy Gaussian corruption of the input (z-scored std 2.0), MAE collapses on
-`active_matter` (R² → −2.17) and degrades sharply on `rayleigh_benard`
-(0.708 → 0.486, vs JEPA's 0.695 → 0.628); the two are comparable on
-`shear_flow`. So MAE's representation is sharper but more brittle; JEPA's is
-blunter but degrades more gracefully.
+corruption, and this replicates on held-out data.** At zero injected noise,
+MAE's final-layer R² is higher than JEPA's on all three datasets (e.g.
+`active_matter` 0.874 vs 0.786, mean across quantities). Under heavy Gaussian
+corruption (z-scored std 2.0), MAE collapses on `active_matter` (R² → −1.02)
+and degrades sharply on `rayleigh_benard` (0.943 → 0.646, vs JEPA's 0.933 →
+0.842); the two are close on `shear_flow` (MAE stays fractionally ahead
+throughout — the one dataset with no robustness gap at all). A held-out
+`valid`-split check (encoders never pretrained on these trajectories)
+reproduces and sharpens this: `active_matter`'s MAE `nematic_order` R² is
+−15.4 at *zero* added noise on unseen data. Full detail, including the
+token-level noise sweep and the forecast/skill-score results, in
+[LINEAR_PROBE.md](LINEAR_PROBE.md).
+
+**5. `rayleigh_benard` is the one dataset where JEPA leads on essentially
+every axis** — clean pooled accuracy, depth (needs more layers to reach peak
+but reaches a higher one), noise robustness, token-level nonlinear
+information MAE simply lacks, and forecast skill at longer horizons. On
+`active_matter` and `shear_flow`, clean-data accuracy is a wash or
+MAE-favoring. The likely mechanism: `rayleigh_benard`'s buoyancy and
+`active_matter`'s active stress both feed back directly into the momentum
+equation (two-way coupling), while `shear_flow`'s tracer is passively
+advected (one-way) — see [LINEAR_PROBE.md](LINEAR_PROBE.md)'s Discussion
+section for the full argument and literature connections.
 
 ## Status / caveats
 
-- `reports/*.pdf` and `reports/probing_sweep_report.html` were generated
-  before the rollout-assessment and noise-robustness probes existed
-  (~11 days stale relative to those results) — treat this doc and
-  `sweep_results/*.json` as the current source of truth, not the PDFs.
+- `reports/*.pdf` and `reports/probing_sweep_report.html` predate the current
+  target set and sweep — treat this doc, [LINEAR_PROBE.md](LINEAR_PROBE.md),
+  and `sweep_results/*.json` as the current source of truth, not the PDFs.
 - LR values (JEPA 1e-4, MAE 5e-5) are the result of a completed LR sweep on
   `active_matter` (see `scripts/gen_configs.py` comment), not placeholders.
+- **Probing-suite expansion: complete.** Physics targets re-derived from each
+  dataset's governing PDE, token-level probing extended to every probe
+  (contemporaneous, regime, rollout, forecast), per-token MLP added, noise
+  robustness sweeps all 13 layers (pooled and token) instead of just the
+  final one, persistence-relative skill scoring added to the forecast and
+  rollout probes, and a held-out `valid`-split generalization check run
+  against all three datasets. Full detail and current numbers in
+  [LINEAR_PROBE.md](LINEAR_PROBE.md) (contemporaneous/depth/noise/forecast/
+  generalization) and [ROLLOUT_PROBE.md](ROLLOUT_PROBE.md) (multi-step
+  rollout — still a pre-expansion snapshot, see that doc's own caveat).
+- **No held-out validation loss during pretraining, partially mitigated.**
+  `src/train.py` only ever trains on `split="train"` — the training-curve
+  figure above is training loss only, for all 6 runs, so the 100k-step budget
+  can't be directly justified against a held-out objective-loss curve.
+  Intermediate 25/50/75% checkpoints were also deleted in the repo cleanup,
+  so probe performance can't be reconstructed at earlier steps. What *is* now
+  covered: a held-out `valid`-split check (small slice, 4–5 trajectories per
+  dataset — not a full re-validation) reruns the pooled/token/noise-
+  robustness probes against data the encoders never pretrained on at all; see
+  [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-generalization-check-valid-split).
+  The noise-robustness finding replicates (and sharpens) there, which is
+  reassuring but doesn't by itself rule out the pretraining schedule running
+  past a generalization optimum — that would need an actual val-loss eval
+  loop and retained milestone checkpoints, still not implemented. Revisit if
+  a reviewer pushes on this.
