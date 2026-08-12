@@ -133,6 +133,18 @@ section for the full argument and literature connections.
   [LINEAR_PROBE.md](LINEAR_PROBE.md) (contemporaneous/depth/noise/forecast/
   generalization) and [ROLLOUT_PROBE.md](ROLLOUT_PROBE.md) (multi-step
   rollout — still a pre-expansion snapshot, see that doc's own caveat).
+- **Held-out test-split evaluation: complete for the three headline
+  analyses.** The `valid`-split check above still picks its best layer via
+  CV within that same split; `scripts/test_split_eval.py` fixes the
+  remaining gap by freezing the layer choice from train-CV *before* touching
+  any test data, then fitting once on train and evaluating once on `test`
+  trajectories (10/28/50 for active_matter/shear_flow/rayleigh_benard).
+  Every headline claim reproduces: `rayleigh_benard`'s JEPA-ahead-on-coupled-
+  quantities gap *widens* on test rather than shrinking, `active_matter`'s
+  MAE noise-collapse reproduces almost exactly (−0.78 at σ=2 vs. −1.02 on
+  train), and `shear_flow` confirms no robustness gap on held-out data
+  either. Full numbers and the one regime-coverage pitfall hit and fixed
+  along the way: [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-test-split-evaluation-freezing-layer-selection).
 - **No held-out validation loss during pretraining, partially mitigated.**
   `src/train.py` only ever trains on `split="train"` — the training-curve
   figure above is training loss only, for all 6 runs, so the 100k-step budget

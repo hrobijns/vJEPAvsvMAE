@@ -244,6 +244,26 @@ def ridge_r2(x: torch.Tensor, y: torch.Tensor, lam: float = 1e-2) -> float:
     return sum(r2s) / len(r2s)
 
 
+def ridge_fit_eval(x_train: torch.Tensor, y_train: torch.Tensor,
+                    x_test: torch.Tensor, y_test: torch.Tensor, lam: float = 1e-2) -> float:
+    """Fit ridge on (x_train, y_train) only, evaluate R^2 on (x_test, y_test)
+    only — no CV, no fold search. Mirrors one 'fold' of ridge_r2() but against
+    a genuinely separate split (e.g. train vs. test trajectories) rather than
+    a random row-split of the same in-distribution data. Used for the
+    held-out test-split evaluation: the layer/hyperparameters must be chosen
+    beforehand from train-CV (ridge_r2) results, never from this function's
+    own output, or the test R^2 stops being an honest estimate."""
+    xm, xs = x_train.mean(0), x_train.std(0) + 1e-8
+    xtr, xte = (x_train - xm) / xs, (x_test - xm) / xs
+    ym = y_train.mean()
+    a = xtr.T @ xtr + lam * xtr.size(0) * torch.eye(x_train.size(1))
+    w = torch.linalg.solve(a, xtr.T @ (y_train - ym))
+    pred = xte @ w + ym
+    ss_res = ((pred - y_test) ** 2).sum()
+    ss_tot = ((y_test - y_test.mean()) ** 2).sum()
+    return (1 - ss_res / ss_tot).item()
+
+
 def ridge_r2_grouped(x: torch.Tensor, y: torch.Tensor, groups: torch.Tensor, lam: float = 1e-2) -> float:
     """Same as ridge_r2, but 5-fold CV splits by GROUP id (e.g. trajectory
     index) so that no two rows sharing a group ever land in different folds.

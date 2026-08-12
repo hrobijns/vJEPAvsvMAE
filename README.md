@@ -47,6 +47,13 @@ raw numbers in `sweep_results/*.json`, figures in `reports/figures/`.
   finding — MAE's `active_matter` `nematic_order` R² is −15.4 at *zero* added
   noise on unseen trajectories. Sample size is small (4–5 trajectories per
   dataset), so treat as directional, not precise.
+- **A proper held-out `test`-split evaluation** (layer choice frozen from
+  train-CV *before* touching test data, probe fit once on train, evaluated
+  once on 10/28/50 held-out trajectories) confirms every headline claim
+  above — `rayleigh_benard`'s JEPA-ahead gap *widens* on test rather than
+  shrinking, and `active_matter`'s MAE noise-collapse reproduces almost
+  exactly (−0.78 at σ=2 vs. −1.02 on train). See LINEAR_PROBE.md's "Held-out
+  test-split evaluation" section.
 
 ## Pretrained encoders
 

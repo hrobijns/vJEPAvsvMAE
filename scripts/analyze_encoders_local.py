@@ -180,6 +180,44 @@ def mlp_r2(x: torch.Tensor, y: torch.Tensor, hidden: int = 128, steps: int = 200
     return (1 - ss_res / ss_tot).item()
 
 
+def mlp_fit_eval(x_train: torch.Tensor, y_train: torch.Tensor,
+                  x_test: torch.Tensor, y_test: torch.Tensor, hidden: int = 128,
+                  steps: int = 2000, lr: float = 1e-2, seed: int = 0) -> float:
+    """Fit-train/eval-test counterpart to mlp_r2() — trains on the full
+    (x_train, y_train) with no internal val split (fixed step count, no
+    early stopping, matching mlp_r2()'s schedule), evaluates once on
+    (x_test, y_test). Same fixed hyperparameters as mlp_r2() (calibrated
+    against a synthetic ceiling target); layer/architecture choices must
+    already be frozen from train-CV before calling this."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x_train, y_train = x_train.to(device), y_train.to(device)
+    x_test, y_test = x_test.to(device), y_test.to(device)
+
+    xm, xs = x_train.mean(0), x_train.std(0) + 1e-8
+    ym, ys = y_train.mean(), y_train.std() + 1e-8
+    xtr, xte = (x_train - xm) / xs, (x_test - xm) / xs
+    ytr, yte = (y_train - ym) / ys, (y_test - ym) / ys
+
+    torch.manual_seed(seed)
+    model = TinyMLP(x_train.size(1), hidden).to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
+    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=steps)
+    for _ in range(steps):
+        opt.zero_grad()
+        pred = model(xtr)
+        loss = F.mse_loss(pred, ytr)
+        loss.backward()
+        opt.step()
+        sched.step()
+
+    model.eval()
+    with torch.no_grad():
+        pred_te = model(xte)
+    ss_res = ((pred_te - yte) ** 2).sum()
+    ss_tot = ((yte - yte.mean()) ** 2).sum()
+    return (1 - ss_res / ss_tot).item()
+
+
 def analyze_token_level(ckpt_path: str, clips: torch.Tensor, contemp: dict, max_clips: int,
                          dataset: str = "active_matter"):
     """Per-token linear probe: no pooling of features or targets."""
