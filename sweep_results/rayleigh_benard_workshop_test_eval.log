@@ -1,0 +1,125 @@
+device=cuda
+rayleigh_benard: train_total=1400 -> fit=1225 valid=175  test=50
+== family 1: contemporaneous (t+0) ==
+  [t+0] n_samples: train=900 valid=525 test=150
+    pooled t+0 rayleigh_benard_jepa.pt  buoyancy_grad              L 8 [mlp]  test_r2=+0.928(+/-0.016)  ridge=+0.910
+    pooled t+0 rayleigh_benard_jepa.pt  buoyancy_laplacian         L 8 [mlp]  test_r2=+0.932(+/-0.013)  ridge=+0.913
+    pooled t+0 rayleigh_benard_jepa.pt  convective_flux            L 9 [mlp]  test_r2=+0.987(+/-0.003)  ridge=+0.982
+    pooled t+0 rayleigh_benard_jepa.pt  enstrophy                  L 8 [mlp]  test_r2=+0.994(+/-0.001)  ridge=+0.983
+    pooled t+0 rayleigh_benard_jepa.pt  okubo_weiss                L 9 [mlp]  test_r2=+0.992(+/-0.002)  ridge=+0.983
+    pooled t+0 rayleigh_benard_jepa.pt  pressure_grad_mag          L10 [mlp]  test_r2=+0.997(+/-0.000)  ridge=+0.996
+    pooled t+0 rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 9 [mlp]  test_r2=+0.939(+/-0.003)  ridge=+0.928
+    token  t+0 rayleigh_benard_jepa.pt  buoyancy_grad              L 6 [mlp]  test_r2=+0.903(+/-0.003)  ridge=+0.853
+    token  t+0 rayleigh_benard_jepa.pt  buoyancy_laplacian         L 6 [mlp]  test_r2=+0.678(+/-0.004)  ridge=+0.597
+    token  t+0 rayleigh_benard_jepa.pt  convective_flux            L 6 [mlp]  test_r2=+0.617(+/-0.011)  ridge=-0.496
+    token  t+0 rayleigh_benard_jepa.pt  divergence                 L 2 [mlp]  test_r2=+0.994(+/-0.000)  ridge=+0.992
+    token  t+0 rayleigh_benard_jepa.pt  enstrophy                  L 4 [mlp]  test_r2=+0.823(+/-0.005)  ridge=+0.639
+    token  t+0 rayleigh_benard_jepa.pt  okubo_weiss                L 6 [mlp]  test_r2=+0.863(+/-0.007)  ridge=+0.731
+    token  t+0 rayleigh_benard_jepa.pt  pressure_grad_mag          L 3 [mlp]  test_r2=+0.850(+/-0.004)  ridge=+0.613
+    token  t+0 rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 2 [mlp]  test_r2=+0.263(+/-0.021)  ridge=-0.389
+    token  t+0 rayleigh_benard_jepa.pt  vorticity_signed           L 0 [mlp]  test_r2=+0.998(+/-0.000)  ridge=+0.997
+    pooled t+0 rayleigh_benard_mae.pt   buoyancy_grad              L 4 [mlp]  test_r2=+0.956(+/-0.013)  ridge=+0.910
+    pooled t+0 rayleigh_benard_mae.pt   buoyancy_laplacian         L 2 [mlp]  test_r2=+0.945(+/-0.018)  ridge=+0.902
+    pooled t+0 rayleigh_benard_mae.pt   convective_flux            L 8 [mlp]  test_r2=+0.995(+/-0.001)  ridge=+0.989
+    pooled t+0 rayleigh_benard_mae.pt   enstrophy                  L 4 [mlp]  test_r2=+0.996(+/-0.001)  ridge=+0.987
+    pooled t+0 rayleigh_benard_mae.pt   okubo_weiss                L 4 [mlp]  test_r2=+0.995(+/-0.001)  ridge=+0.989
+    pooled t+0 rayleigh_benard_mae.pt   pressure_grad_mag          L 3 [mlp]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    pooled t+0 rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 2 [mlp]  test_r2=+0.958(+/-0.005)  ridge=+0.937
+    token  t+0 rayleigh_benard_mae.pt   buoyancy_grad              L 0 [mlp]  test_r2=+0.905(+/-0.001)  ridge=+0.860
+    token  t+0 rayleigh_benard_mae.pt   buoyancy_laplacian         L 4 [mlp]  test_r2=+0.631(+/-0.007)  ridge=+0.593
+    token  t+0 rayleigh_benard_mae.pt   convective_flux            L 1 [mlp]  test_r2=+0.682(+/-0.012)  ridge=-0.273
+    token  t+0 rayleigh_benard_mae.pt   divergence                 L 0 [mlp]  test_r2=+0.993(+/-0.000)  ridge=+0.989
+    token  t+0 rayleigh_benard_mae.pt   enstrophy                  L 1 [mlp]  test_r2=+0.830(+/-0.003)  ridge=+0.700
+    token  t+0 rayleigh_benard_mae.pt   okubo_weiss                L 0 [mlp]  test_r2=+0.851(+/-0.007)  ridge=+0.680
+    token  t+0 rayleigh_benard_mae.pt   pressure_grad_mag          L 0 [mlp]  test_r2=+0.922(+/-0.002)  ridge=+0.793
+    token  t+0 rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 1 [mlp]  test_r2=+0.051(+/-0.019)  ridge=-0.195
+    token  t+0 rayleigh_benard_mae.pt   vorticity_signed           L 0 [mlp]  test_r2=+0.996(+/-0.000)  ridge=+0.992
+family 1 done in 3810s
+== family 2: forecast-content ==
+  [forecast] n_samples: train=900 valid=525 test=150  n_token_clips: train=16 valid=16 test=16
+    pooled t+8  rayleigh_benard_jepa.pt  buoyancy_grad              L 7 [mlp]  test_r2=+0.915(+/-0.005)  ridge=+0.881
+    pooled t+8  rayleigh_benard_jepa.pt  buoyancy_laplacian         L 7 [mlp]  test_r2=+0.933(+/-0.008)  ridge=+0.907
+    pooled t+8  rayleigh_benard_jepa.pt  convective_flux            L 5 [mlp]  test_r2=+0.947(+/-0.004)  ridge=+0.922
+    pooled t+8  rayleigh_benard_jepa.pt  enstrophy                  L 9 [mlp]  test_r2=+0.980(+/-0.003)  ridge=+0.952
+    pooled t+8  rayleigh_benard_jepa.pt  okubo_weiss                L 7 [mlp]  test_r2=+0.974(+/-0.001)  ridge=+0.936
+    pooled t+8  rayleigh_benard_jepa.pt  pressure_grad_mag          L 9 [ridge]  test_r2=+0.990(+/-0.000)  ridge=+0.990
+    pooled t+8  rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 6 [mlp]  test_r2=+0.914(+/-0.007)  ridge=+0.896
+    token  t+8  rayleigh_benard_jepa.pt  buoyancy_grad              L 3 [mlp]  test_r2=+0.910(+/-0.006)  ridge=+0.872
+    token  t+8  rayleigh_benard_jepa.pt  buoyancy_laplacian         L 2 [mlp]  test_r2=+0.708(+/-0.014)  ridge=+0.677
+    token  t+8  rayleigh_benard_jepa.pt  convective_flux            L 0 [mlp]  test_r2=-0.019(+/-0.018)  ridge=-0.079
+    token  t+8  rayleigh_benard_jepa.pt  divergence                 L11 [mlp]  test_r2=+0.002(+/-0.003)  ridge=-0.050
+    token  t+8  rayleigh_benard_jepa.pt  enstrophy                  L 3 [mlp]  test_r2=+0.600(+/-0.005)  ridge=+0.598
+    token  t+8  rayleigh_benard_jepa.pt  okubo_weiss                L 2 [mlp]  test_r2=+0.441(+/-0.004)  ridge=+0.441
+    token  t+8  rayleigh_benard_jepa.pt  pressure_grad_mag          L 0 [mlp]  test_r2=+0.791(+/-0.012)  ridge=+0.644
+    token  t+8  rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 3 [mlp]  test_r2=+0.005(+/-0.005)  ridge=-0.047
+    token  t+8  rayleigh_benard_jepa.pt  vorticity_signed           L10 [mlp]  test_r2=-0.004(+/-0.002)  ridge=-0.084
+    pooled t+8  rayleigh_benard_mae.pt   buoyancy_grad              L 9 [mlp]  test_r2=+0.927(+/-0.005)  ridge=+0.902
+    pooled t+8  rayleigh_benard_mae.pt   buoyancy_laplacian         L 2 [mlp]  test_r2=+0.942(+/-0.007)  ridge=+0.913
+    pooled t+8  rayleigh_benard_mae.pt   convective_flux            L 5 [mlp]  test_r2=+0.949(+/-0.005)  ridge=+0.918
+    pooled t+8  rayleigh_benard_mae.pt   enstrophy                  L 4 [mlp]  test_r2=+0.982(+/-0.003)  ridge=+0.945
+    pooled t+8  rayleigh_benard_mae.pt   okubo_weiss                L 6 [mlp]  test_r2=+0.978(+/-0.001)  ridge=+0.957
+    pooled t+8  rayleigh_benard_mae.pt   pressure_grad_mag          L 7 [mlp]  test_r2=+0.992(+/-0.002)  ridge=+0.990
+    pooled t+8  rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 5 [mlp]  test_r2=+0.915(+/-0.005)  ridge=+0.896
+    token  t+8  rayleigh_benard_mae.pt   buoyancy_grad              L 3 [mlp]  test_r2=+0.918(+/-0.002)  ridge=+0.878
+    token  t+8  rayleigh_benard_mae.pt   buoyancy_laplacian         L 7 [mlp]  test_r2=+0.741(+/-0.004)  ridge=+0.704
+    token  t+8  rayleigh_benard_mae.pt   convective_flux            L 6 [mlp]  test_r2=-0.008(+/-0.006)  ridge=-0.212
+    token  t+8  rayleigh_benard_mae.pt   divergence                 L 8 [mlp]  test_r2=+0.007(+/-0.003)  ridge=-0.018
+    token  t+8  rayleigh_benard_mae.pt   enstrophy                  L 3 [mlp]  test_r2=+0.589(+/-0.006)  ridge=+0.549
+    token  t+8  rayleigh_benard_mae.pt   okubo_weiss                L 3 [mlp]  test_r2=+0.413(+/-0.005)  ridge=+0.394
+    token  t+8  rayleigh_benard_mae.pt   pressure_grad_mag          L 0 [mlp]  test_r2=+0.816(+/-0.003)  ridge=+0.738
+    token  t+8  rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 6 [mlp]  test_r2=-0.007(+/-0.002)  ridge=-0.137
+    token  t+8  rayleigh_benard_mae.pt   vorticity_signed           L 4 [mlp]  test_r2=-0.014(+/-0.006)  ridge=-0.063
+  [forecast] gap=8 done in 3484s
+    pooled t+32 rayleigh_benard_jepa.pt  buoyancy_grad              L 7 [mlp]  test_r2=+0.815(+/-0.009)  ridge=+0.782
+    pooled t+32 rayleigh_benard_jepa.pt  buoyancy_laplacian         L 8 [mlp]  test_r2=+0.879(+/-0.011)  ridge=+0.843
+    pooled t+32 rayleigh_benard_jepa.pt  convective_flux            L 6 [mlp]  test_r2=+0.800(+/-0.021)  ridge=+0.725
+    pooled t+32 rayleigh_benard_jepa.pt  enstrophy                  L 6 [mlp]  test_r2=+0.897(+/-0.007)  ridge=+0.822
+    pooled t+32 rayleigh_benard_jepa.pt  okubo_weiss                L 6 [mlp]  test_r2=+0.910(+/-0.011)  ridge=+0.834
+    pooled t+32 rayleigh_benard_jepa.pt  pressure_grad_mag          L 8 [mlp]  test_r2=+0.971(+/-0.002)  ridge=+0.955
+    pooled t+32 rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 5 [mlp]  test_r2=+0.840(+/-0.005)  ridge=+0.773
+    token  t+32 rayleigh_benard_jepa.pt  buoyancy_grad              L 2 [mlp]  test_r2=+0.912(+/-0.003)  ridge=+0.872
+    token  t+32 rayleigh_benard_jepa.pt  buoyancy_laplacian         L 1 [mlp]  test_r2=+0.646(+/-0.011)  ridge=+0.591
+    token  t+32 rayleigh_benard_jepa.pt  convective_flux            L 0 [ridge]  test_r2=-0.085(+/-0.000)  ridge=-0.085
+    token  t+32 rayleigh_benard_jepa.pt  divergence                 L 0 [mlp]  test_r2=-0.010(+/-0.001)  ridge=-0.028
+    token  t+32 rayleigh_benard_jepa.pt  enstrophy                  L 5 [ridge]  test_r2=+0.334(+/-0.000)  ridge=+0.334
+    token  t+32 rayleigh_benard_jepa.pt  okubo_weiss                L 5 [ridge]  test_r2=+0.173(+/-0.000)  ridge=+0.173
+    token  t+32 rayleigh_benard_jepa.pt  pressure_grad_mag          L 1 [mlp]  test_r2=+0.662(+/-0.014)  ridge=+0.555
+    token  t+32 rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 0 [mlp]  test_r2=-0.054(+/-0.015)  ridge=-0.093
+    token  t+32 rayleigh_benard_jepa.pt  vorticity_signed           L 0 [mlp]  test_r2=-0.007(+/-0.001)  ridge=-0.009
+    pooled t+32 rayleigh_benard_mae.pt   buoyancy_grad              L 9 [mlp]  test_r2=+0.681(+/-0.014)  ridge=+0.672
+    pooled t+32 rayleigh_benard_mae.pt   buoyancy_laplacian         L 4 [mlp]  test_r2=+0.764(+/-0.008)  ridge=+0.753
+    pooled t+32 rayleigh_benard_mae.pt   convective_flux            L10 [mlp]  test_r2=+0.625(+/-0.049)  ridge=+0.534
+    pooled t+32 rayleigh_benard_mae.pt   enstrophy                  L10 [mlp]  test_r2=+0.772(+/-0.006)  ridge=+0.731
+    pooled t+32 rayleigh_benard_mae.pt   okubo_weiss                L 8 [mlp]  test_r2=+0.772(+/-0.006)  ridge=+0.720
+    pooled t+32 rayleigh_benard_mae.pt   pressure_grad_mag          L12 [mlp]  test_r2=+0.963(+/-0.001)  ridge=+0.943
+    pooled t+32 rayleigh_benard_mae.pt   velocity_buoyancy_coherence L11 [mlp]  test_r2=+0.645(+/-0.040)  ridge=+0.603
+    token  t+32 rayleigh_benard_mae.pt   buoyancy_grad              L 3 [mlp]  test_r2=+0.923(+/-0.001)  ridge=+0.863
+    token  t+32 rayleigh_benard_mae.pt   buoyancy_laplacian         L10 [mlp]  test_r2=+0.625(+/-0.005)  ridge=+0.554
+    token  t+32 rayleigh_benard_mae.pt   convective_flux            L 0 [ridge]  test_r2=-0.146(+/-0.000)  ridge=-0.146
+    token  t+32 rayleigh_benard_mae.pt   divergence                 L 9 [mlp]  test_r2=-0.037(+/-0.004)  ridge=-0.093
+    token  t+32 rayleigh_benard_mae.pt   enstrophy                  L10 [mlp]  test_r2=+0.382(+/-0.008)  ridge=+0.319
+    token  t+32 rayleigh_benard_mae.pt   okubo_weiss                L 7 [mlp]  test_r2=+0.188(+/-0.003)  ridge=+0.170
+    token  t+32 rayleigh_benard_mae.pt   pressure_grad_mag          L 1 [mlp]  test_r2=+0.680(+/-0.007)  ridge=+0.644
+    token  t+32 rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 0 [ridge]  test_r2=-0.194(+/-0.000)  ridge=-0.194
+    token  t+32 rayleigh_benard_mae.pt   vorticity_signed           L 0 [ridge]  test_r2=-0.065(+/-0.000)  ridge=-0.065
+  [forecast] gap=32 done in 3299s
+family 2 done in 6963s
+== family 3: noise robustness ==
+  [noise] n_samples: train=900 test=150
+    noise  rayleigh_benard_jepa.pt  buoyancy_grad              L 8  std=0:+0.931(ridge=+0.910)  std=0.5:+0.924(ridge=+0.890)  std=1.0:+0.849(ridge=+0.809)  std=2.0:+0.738(ridge=+0.688)
+    noise  rayleigh_benard_jepa.pt  buoyancy_laplacian         L 8  std=0:+0.934(ridge=+0.913)  std=0.5:+0.928(ridge=+0.882)  std=1.0:+0.878(ridge=+0.787)  std=2.0:+0.748(ridge=+0.651)
+    noise  rayleigh_benard_jepa.pt  convective_flux            L 9  std=0:+0.987(ridge=+0.982)  std=0.5:+0.985(ridge=+0.982)  std=1.0:+0.977(ridge=+0.964)  std=2.0:+0.963(ridge=+0.900)
+    noise  rayleigh_benard_jepa.pt  enstrophy                  L 8  std=0:+0.994(ridge=+0.983)  std=0.5:+0.993(ridge=+0.973)  std=1.0:+0.977(ridge=+0.949)  std=2.0:+0.940(ridge=+0.872)
+    noise  rayleigh_benard_jepa.pt  okubo_weiss                L 9  std=0:+0.992(ridge=+0.983)  std=0.5:+0.992(ridge=+0.976)  std=1.0:+0.984(ridge=+0.961)  std=2.0:+0.961(ridge=+0.909)
+    noise  rayleigh_benard_jepa.pt  pressure_grad_mag          L10  std=0:+0.997(ridge=+0.996)  std=0.5:+0.998(ridge=+0.997)  std=1.0:+0.997(ridge=+0.994)  std=2.0:+0.993(ridge=+0.987)
+    noise  rayleigh_benard_jepa.pt  velocity_buoyancy_coherence L 9  std=0:+0.942(ridge=+0.928)  std=0.5:+0.944(ridge=+0.912)  std=1.0:+0.906(ridge=+0.848)  std=2.0:+0.845(ridge=+0.751)
+    noise  rayleigh_benard_mae.pt   buoyancy_grad              L 4  std=0:+0.956(ridge=+0.910)  std=0.5:+0.913(ridge=+0.872)  std=1.0:+0.780(ridge=+0.640)  std=2.0:+0.545(ridge=+0.296)
+    noise  rayleigh_benard_mae.pt   buoyancy_laplacian         L 2  std=0:+0.945(ridge=+0.902)  std=0.5:+0.883(ridge=+0.798)  std=1.0:+0.783(ridge=+0.577)  std=2.0:+0.357(ridge=+0.201)
+    noise  rayleigh_benard_mae.pt   convective_flux            L 8  std=0:+0.995(ridge=+0.989)  std=0.5:+0.994(ridge=+0.990)  std=1.0:+0.970(ridge=+0.933)  std=2.0:+0.810(ridge=+0.580)
+    noise  rayleigh_benard_mae.pt   enstrophy                  L 4  std=0:+0.996(ridge=+0.987)  std=0.5:+0.987(ridge=+0.973)  std=1.0:+0.964(ridge=+0.917)  std=2.0:+0.655(ridge=+0.599)
+    noise  rayleigh_benard_mae.pt   okubo_weiss                L 4  std=0:+0.995(ridge=+0.989)  std=0.5:+0.986(ridge=+0.980)  std=1.0:+0.967(ridge=+0.942)  std=2.0:+0.724(ridge=+0.685)
+    noise  rayleigh_benard_mae.pt   pressure_grad_mag          L 3  std=0:+0.999(ridge=+0.999)  std=0.5:+0.998(ridge=+0.997)  std=1.0:+0.995(ridge=+0.986)  std=2.0:+0.970(ridge=+0.957)
+    noise  rayleigh_benard_mae.pt   velocity_buoyancy_coherence L 2  std=0:+0.958(ridge=+0.937)  std=0.5:+0.922(ridge=+0.854)  std=1.0:+0.784(ridge=+0.638)  std=2.0:+0.541(ridge=+0.343)
+family 3 done in 281s
+
+wrote sweep_results/rayleigh_benard_workshop_test_eval.json

@@ -9,9 +9,8 @@ training infrastructure).
 
 See [docs/OVERVIEW.md](docs/OVERVIEW.md) for a research-summary writeup
 (motivation, architecture, headline results), and
-[docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) / [docs/ROLLOUT_PROBE.md](docs/ROLLOUT_PROBE.md)
-for a deep dive on each probing pipeline. This README covers setup and
-reproduction.
+[docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) for a deep dive on the probing
+pipeline. This README covers setup and reproduction.
 
 ## Results (summary)
 
@@ -37,11 +36,6 @@ raw numbers in `sweep_results/*.json`, figures in `reports/figures/`.
   tracer is passively advected (one-way) — see LINEAR_PROBE.md's Discussion.
 - **Regime parameters (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta) are
   decoded equally well by both objectives** — not where JEPA/MAE differ.
-- **Multi-step autoregressive rollout tracks closely between objectives on
-  every dataset** ([docs/ROLLOUT_PROBE.md](docs/ROLLOUT_PROBE.md)) —
-  representational quality (everything above) and forecasting competence
-  through a shallow post-hoc-trained predictor are empirically not the same
-  axis.
 - **A held-out generalization check** (small `valid`-split slice, encoders
   never pretrained on it) reproduces and sharpens the noise-robustness
   finding — MAE's `active_matter` `nematic_order` R² is −15.4 at *zero* added
@@ -100,34 +94,15 @@ representations differ in *what kind* of physics they capture:
 | [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity (enstrophy, divergence, okubo-weiss, nematic order, ...)? Also supports `--split valid` for a held-out generalization check. | JEPA and MAE tie on `active_matter`/`shear_flow`; JEPA clearly ahead on `rayleigh_benard`'s coupled quantities. |
 | [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) plus a small MLP nonlinear readout — does spatial detail or nonlinearity recover signal pooling/linearity hides? | On `rayleigh_benard`, JEPA has real nonlinear-only local information (e.g. `convective_flux` MLP 0.90) that MAE lacks even nonlinearly (0.07). Elsewhere, MLP gains are symmetric between objectives. |
 | [scripts/analyze_regime.py](scripts/analyze_regime.py) | does the pooled representation know the *regime* (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — one value per trajectory, probed with train/val split by trajectory to avoid leakage | Both objectives decode regime near-perfectly (R² 0.77–0.999) — not where JEPA/MAE differ. |
-| [scripts/rollout_probe.py](scripts/rollout_probe.py) | using each model's own pretrained predictor/decoder under a causal (non-tube) mask, does it forecast a genuinely future window better than a persistence baseline? Single-shot only, not fed back — see the next row for that. | Pretrained predictor doesn't beat persistence by much for either objective. |
-| [scripts/rollout_assessment.py](scripts/rollout_assessment.py) | **genuine autoregressive rollout**: encoder → latent dynamics predictor → small decoder → decoded future window → re-encode → predict again, chained for many steps. Does the representation encode enough about the dynamics to forecast forward, and does that forecast stay usable as errors compound? Compares a fed-back chain against an oracle (always re-seeded with real context) and a persistence floor. Needs a one-time prerequisite: `scripts/train_rollout_heads.py` (see below). | JEPA and MAE track closely at every step, every dataset — contemporaneous-probe advantages don't transfer to multi-step forecasting through this head. |
-| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | sidesteps the predictor/decoder entirely — does a *fresh* linear/MLP probe on frozen present-time features forecast future physics, swept over multiple time gaps and noise levels, scored with a persistence-relative skill score? | On `rayleigh_benard`, JEPA's forecast-skill advantage *grows* with horizon; token-level flips `active_matter`'s ranking to JEPA despite MAE leading pooled. |
+| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | does a *fresh* linear/MLP probe on frozen present-time features forecast future physics, swept over multiple time gaps and noise levels, scored with a persistence-relative skill score? | On `rayleigh_benard`, JEPA's forecast-skill advantage *grows* with horizon; token-level flips `active_matter`'s ranking to JEPA despite MAE leading pooled. |
 | [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) | injects Gaussian noise (several std levels) directly into the input physical variables before encoding, then ridge-probes (pooled and per-token, every layer) against the *clean* clip's physics — does decodability degrade gracefully or collapse abruptly? | MAE is the sharper decoder at zero noise but collapses far more sharply than JEPA once corrupted, on `active_matter`/`rayleigh_benard` (confirmed on held-out `valid`-split data too); `shear_flow` shows no split. |
 
 Supporting scripts: [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py)
 (recovers per-trajectory regime params from Well filenames, needed by
-`analyze_regime.py`) and [scripts/load_predictor.py](scripts/load_predictor.py)
-(loads a JEPA run's full predictor + EMA target encoder from `latest.pt`, needed
-by `rollout_probe.py`). [scripts/run_sweep.sh](scripts/run_sweep.sh) runs the
+`analyze_regime.py`). [scripts/run_sweep.sh](scripts/run_sweep.sh) runs the
 full probing suite across all 3 datasets on a remote GPU box; results land in
 `sweep_results/*.json`, summarized in
 [reports/](reports/) (per-dataset PDF summaries + `probing_sweep_report.html`).
-
-**`rollout_assessment.py`'s prerequisite**: unlike the other probes, it needs a
-latent dynamics predictor and small pixel decoder trained *post-hoc* on top of
-each frozen encoder — neither JEPA's original predictor (trained jointly with
-its own encoder to fill in masked patches within one clip) nor MAE's decoder
-(which fuses "predict" and "decode" into one call) fit the genuine
-next-window-forecasting task this probe needs. Both objectives get the same
-architecture and training recipe (see
-[src/objectives/rollout_heads.py](src/objectives/rollout_heads.py)), so the
-only difference between the two pipelines is which frozen encoder sits
-underneath. Run once with
-[scripts/run_rollout_heads_training.sh](scripts/run_rollout_heads_training.sh)
-(6 dataset × objective combos, configs generated by
-[scripts/gen_rollout_heads_configs.py](scripts/gen_rollout_heads_configs.py))
-before `rollout_assessment.py` or `run_sweep.sh` will work.
 
 **How they were trained**: 100k steps, AdamW + cosine LR (JEPA 1e-4, MAE 5e-5 —
 picked via a small LR sweep on active_matter, see [Design](#design) below),
@@ -156,7 +131,7 @@ Both objectives share everything except the head:
 | shared | ViT-S encoder (384d × 12), 2×16×16 tubelet patches, tube masking @ 0.9, T=8 clips at native resolution, per-channel z-score norm (Well stats), AdamW + cosine, same batch/steps |
 |---|---|
 | **MAE** | 4-layer decoder (192d) → MSE on masked patches (`norm_pix`) |
-| **JEPA** | EMA target encoder (0.996→1.0) + 6-layer predictor (384d) → smooth-L1 on layer-normed target features at masked positions |
+| **JEPA** | EMA target encoder (0.996→1.0) + 6-layer predictor (192d, narrower than the 384d encoder) → smooth-L1 on layer-normed target features at masked positions |
 
 Datasets (per-dataset model pairs, 6 runs): `active_matter` (11ch, 256×256),
 `shear_flow` (4ch, 256×512, incompressible NS), `rayleigh_benard` (4ch, 512×128).
@@ -214,10 +189,7 @@ for the step-2 probing study).
 - [scripts/linear_probe.py](scripts/linear_probe.py) — ridge-probe frozen features against physics targets
 - [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — layer-wise pooled/non-pooled physics probing (the JEPA-vs-MAE comparison)
 - [scripts/analyze_regime.py](scripts/analyze_regime.py), [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py) — does pooled representation encode regime params?
-- [scripts/rollout_probe.py](scripts/rollout_probe.py), [scripts/load_predictor.py](scripts/load_predictor.py), [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) — forecasting probes (see "Probing suite" above)
-- [src/objectives/rollout_heads.py](src/objectives/rollout_heads.py) — post-hoc latent dynamics predictor + small decoder trained on a frozen encoder, for genuine autoregressive rollout
-- [scripts/train_rollout_heads.py](scripts/train_rollout_heads.py), [scripts/gen_rollout_heads_configs.py](scripts/gen_rollout_heads_configs.py), [scripts/run_rollout_heads_training.sh](scripts/run_rollout_heads_training.sh) — trains those heads (one-time prerequisite for `rollout_assessment.py`)
-- [scripts/load_rollout_heads.py](scripts/load_rollout_heads.py), [scripts/rollout_assessment.py](scripts/rollout_assessment.py) — loads the trained heads and runs the autoregressive rollout assessment (see "Probing suite" above)
+- [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) — forecasting probe (see "Probing suite" above)
 - [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) — Gaussian input-noise representation-stability probe (see "Probing suite" above)
 - [scripts/run_sweep.sh](scripts/run_sweep.sh) — runs the full probing suite across all 3 datasets; outputs to `sweep_results/`, summarized in [reports/](reports/)
 - [docs/](docs/) — research-summary writeup and per-probe deep dives (architecture, variables, results)

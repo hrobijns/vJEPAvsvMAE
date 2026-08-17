@@ -12,6 +12,8 @@ data:
   n_frames: 8
   num_workers: 0
   memmap: false
+  valid_stride: 8
+val_every: 10
 encoder:
   patch_t: 2
   patch_h: 16
@@ -21,7 +23,7 @@ encoder:
   num_heads: 6
 objective:
   mask_ratio: 0.9
-  predictor_dim: 384
+  predictor_dim: 192
   predictor_depth: 6
   predictor_heads: 6
   ema_start: 0.996

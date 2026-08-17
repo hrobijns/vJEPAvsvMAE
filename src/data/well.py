@@ -70,6 +70,28 @@ class WellClipDataset(torch.utils.data.Dataset):
         return ClipSpec(n_channels=c, n_frames=t, height=h, width=w)
 
 
+def train_valid_trajectory_split(n_traj: int, valid_stride: int = 8) -> tuple[list, list]:
+    """Carve a trajectory-disjoint pseudo-valid set out of train (the Well's
+    shipped `valid` split is too small/regime-degenerate to use directly for
+    checkpoint selection — see docs/OVERVIEW.md). Every valid_stride-th
+    trajectory index goes to `valid`, the rest to `fit` — interleaved, not a
+    contiguous prefix/suffix, so both halves draw proportionally from every
+    regime file's contiguous index block (preprocess_memmap.py lays
+    trajectories out in contiguous per-source-file blocks).
+
+    Note this split is trajectory-disjoint, not regime-disjoint: `valid`
+    trajectories can come from the same regime/source file as `fit`
+    trajectories, just a different simulation run. It's a weaker
+    generalization test than the official, regime-balanced `test` split —
+    good enough for checkpoint/hyperparameter selection, not for claims about
+    generalization to unseen physical regimes.
+    """
+    valid_idx = list(range(0, n_traj, valid_stride))
+    valid_set = set(valid_idx)
+    fit_idx = [i for i in range(n_traj) if i not in valid_set]
+    return fit_idx, valid_idx
+
+
 class MemmapClipDataset(torch.utils.data.Dataset):
     """Fast clip dataset over a memmap produced by scripts/preprocess_memmap.py.
 
@@ -80,7 +102,14 @@ class MemmapClipDataset(torch.utils.data.Dataset):
     WellDataset's. A .meta.json sidecar guards against stale old-layout files.
     """
 
-    def __init__(self, base_path: str, dataset_name: str, split: str, n_frames: int = 8):
+    def __init__(
+        self,
+        base_path: str,
+        dataset_name: str,
+        split: str,
+        n_frames: int = 8,
+        trajectories: list | None = None,
+    ):
         d = Path(base_path) / "memmap" / dataset_name
         self.path = d / f"{split}.npy"
         meta = d / f"{split}.meta.json"
@@ -93,14 +122,16 @@ class MemmapClipDataset(torch.utils.data.Dataset):
         self.mm = np.load(self.path, mmap_mode="r")
         self.n_frames = n_frames
         n_traj, _, t, _, _ = self.mm.shape
+        self.traj_ids = trajectories if trajectories is not None else list(range(n_traj))
         self.windows_per_traj = t - n_frames + 1
-        self.length = n_traj * self.windows_per_traj
+        self.length = len(self.traj_ids) * self.windows_per_traj
 
     def __len__(self) -> int:
         return self.length
 
     def __getitem__(self, idx: int) -> dict:
-        traj, off = divmod(idx, self.windows_per_traj)
+        local_traj, off = divmod(idx, self.windows_per_traj)
+        traj = self.traj_ids[local_traj]
         window = np.array(self.mm[traj, :, off : off + self.n_frames])  # (C,T,H,W)
         return {"clip": torch.from_numpy(window)}
 

@@ -313,7 +313,8 @@ def skill_score(r2_probe: float, r2_baseline: float, eps: float = 1e-3) -> float
 
     0 -> exactly as good as the baseline. 1 -> closes the entire remaining
     gap. Negative -> worse than the baseline (this happens in practice, e.g.
-    fed_back rollout dropping below persistence mid-chain). Algebraically
+    a probe's forecast decaying below persistence at long horizons).
+    Algebraically
     equivalent to 1 - MSE_probe/MSE_baseline (the target-variance term in R^2's
     denominator cancels), so it needs no extra encoder/probe computation
     beyond R^2 values the suite already produces.

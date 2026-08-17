@@ -1,0 +1,92 @@
+building probe dataset...
+525 clips total; token probe uses first 64
+
+=== checkpoints/active_matter_jepa.pt ===
+  -- per-token LINEAR probe (no pooling) --
+    block_1      enstrophy=0.692  vorticity_signed=0.997  divergence=0.998  nematic_order=0.953  flow_align=0.845  order_grad_mag=0.824  strain_order_align=0.910  active_stress_div_mag=0.832
+    block_2      enstrophy=0.702  vorticity_signed=0.992  divergence=0.993  nematic_order=0.976  flow_align=0.838  order_grad_mag=0.818  strain_order_align=0.918  active_stress_div_mag=0.835
+    block_3      enstrophy=0.655  vorticity_signed=0.980  divergence=0.983  nematic_order=0.976  flow_align=0.760  order_grad_mag=0.738  strain_order_align=0.895  active_stress_div_mag=0.757
+    block_4      enstrophy=0.566  vorticity_signed=0.962  divergence=0.971  nematic_order=0.970  flow_align=0.651  order_grad_mag=0.652  strain_order_align=0.855  active_stress_div_mag=0.663
+    block_5      enstrophy=0.508  vorticity_signed=0.941  divergence=0.954  nematic_order=0.964  flow_align=0.496  order_grad_mag=0.599  strain_order_align=0.819  active_stress_div_mag=0.608
+    block_6      enstrophy=0.468  vorticity_signed=0.917  divergence=0.937  nematic_order=0.952  flow_align=0.355  order_grad_mag=0.562  strain_order_align=0.801  active_stress_div_mag=0.567
+    block_7      enstrophy=0.453  vorticity_signed=0.903  divergence=0.921  nematic_order=0.945  flow_align=0.256  order_grad_mag=0.535  strain_order_align=0.785  active_stress_div_mag=0.541
+    block_8      enstrophy=0.438  vorticity_signed=0.887  divergence=0.908  nematic_order=0.928  flow_align=0.195  order_grad_mag=0.505  strain_order_align=0.771  active_stress_div_mag=0.512
+    block_9      enstrophy=0.432  vorticity_signed=0.878  divergence=0.902  nematic_order=0.914  flow_align=0.172  order_grad_mag=0.492  strain_order_align=0.764  active_stress_div_mag=0.497
+    block_10     enstrophy=0.426  vorticity_signed=0.876  divergence=0.897  nematic_order=0.896  flow_align=0.146  order_grad_mag=0.467  strain_order_align=0.760  active_stress_div_mag=0.474
+    block_11     enstrophy=0.417  vorticity_signed=0.866  divergence=0.888  nematic_order=0.885  flow_align=0.120  order_grad_mag=0.445  strain_order_align=0.752  active_stress_div_mag=0.454
+    block_12     enstrophy=0.413  vorticity_signed=0.860  divergence=0.882  nematic_order=0.867  flow_align=0.119  order_grad_mag=0.428  strain_order_align=0.746  active_stress_div_mag=0.437
+    final_norm   enstrophy=0.405  vorticity_signed=0.756  divergence=0.820  nematic_order=0.873  flow_align=0.107  order_grad_mag=0.428  strain_order_align=0.743  active_stress_div_mag=0.438
+  -- pooled NONLINEAR (MLP) probe --
+    block_1      enstrophy=0.994  nematic_order=0.998  flow_align=0.300  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+    block_2      enstrophy=0.988  nematic_order=0.999  flow_align=0.364  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.996
+    block_3      enstrophy=0.984  nematic_order=0.999  flow_align=0.095  order_grad_mag=0.994  strain_order_align=0.998  active_stress_div_mag=0.995
+    block_4      enstrophy=0.987  nematic_order=0.995  flow_align=-0.465  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.996
+    block_5      enstrophy=0.985  nematic_order=0.998  flow_align=-0.340  order_grad_mag=0.991  strain_order_align=0.997  active_stress_div_mag=0.995
+    block_6      enstrophy=0.981  nematic_order=0.992  flow_align=-0.591  order_grad_mag=0.986  strain_order_align=0.994  active_stress_div_mag=0.990
+    block_7      enstrophy=0.975  nematic_order=0.974  flow_align=-0.388  order_grad_mag=0.981  strain_order_align=0.995  active_stress_div_mag=0.983
+    block_8      enstrophy=0.979  nematic_order=0.990  flow_align=-0.206  order_grad_mag=0.987  strain_order_align=0.994  active_stress_div_mag=0.988
+    block_9      enstrophy=0.984  nematic_order=0.991  flow_align=0.219  order_grad_mag=0.984  strain_order_align=0.997  active_stress_div_mag=0.987
+    block_10     enstrophy=0.974  nematic_order=0.991  flow_align=-0.715  order_grad_mag=0.986  strain_order_align=0.994  active_stress_div_mag=0.986
+    block_11     enstrophy=0.984  nematic_order=0.992  flow_align=-0.276  order_grad_mag=0.988  strain_order_align=0.996  active_stress_div_mag=0.988
+    block_12     enstrophy=0.977  nematic_order=0.993  flow_align=0.054  order_grad_mag=0.987  strain_order_align=0.993  active_stress_div_mag=0.990
+    final_norm   enstrophy=0.983  nematic_order=0.997  flow_align=-0.709  order_grad_mag=0.982  strain_order_align=0.996  active_stress_div_mag=0.986
+  -- per-token NONLINEAR (MLP) probe --
+    block_1      enstrophy=0.991  vorticity_signed=0.999  divergence=0.999  nematic_order=0.999  flow_align=0.997  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.996
+    block_2      enstrophy=0.985  vorticity_signed=0.998  divergence=0.999  nematic_order=0.999  flow_align=0.997  order_grad_mag=0.992  strain_order_align=0.998  active_stress_div_mag=0.994
+    block_3      enstrophy=0.979  vorticity_signed=0.997  divergence=0.999  nematic_order=0.999  flow_align=0.994  order_grad_mag=0.985  strain_order_align=0.996  active_stress_div_mag=0.984
+    block_4      enstrophy=0.979  vorticity_signed=0.995  divergence=0.998  nematic_order=0.998  flow_align=0.989  order_grad_mag=0.968  strain_order_align=0.992  active_stress_div_mag=0.976
+    block_5      enstrophy=0.933  vorticity_signed=0.988  divergence=0.997  nematic_order=0.996  flow_align=0.980  order_grad_mag=0.948  strain_order_align=0.986  active_stress_div_mag=0.957
+    block_6      enstrophy=0.927  vorticity_signed=0.986  divergence=0.996  nematic_order=0.994  flow_align=0.961  order_grad_mag=0.905  strain_order_align=0.977  active_stress_div_mag=0.921
+    block_7      enstrophy=0.905  vorticity_signed=0.980  divergence=0.995  nematic_order=0.990  flow_align=0.956  order_grad_mag=0.862  strain_order_align=0.969  active_stress_div_mag=0.882
+    block_8      enstrophy=0.878  vorticity_signed=0.975  divergence=0.994  nematic_order=0.984  flow_align=0.955  order_grad_mag=0.793  strain_order_align=0.960  active_stress_div_mag=0.851
+    block_9      enstrophy=0.869  vorticity_signed=0.977  divergence=0.994  nematic_order=0.984  flow_align=0.951  order_grad_mag=0.786  strain_order_align=0.956  active_stress_div_mag=0.832
+    block_10     enstrophy=0.865  vorticity_signed=0.976  divergence=0.994  nematic_order=0.982  flow_align=0.951  order_grad_mag=0.773  strain_order_align=0.954  active_stress_div_mag=0.815
+    block_11     enstrophy=0.873  vorticity_signed=0.977  divergence=0.994  nematic_order=0.982  flow_align=0.947  order_grad_mag=0.762  strain_order_align=0.954  active_stress_div_mag=0.824
+    block_12     enstrophy=0.869  vorticity_signed=0.976  divergence=0.993  nematic_order=0.983  flow_align=0.953  order_grad_mag=0.787  strain_order_align=0.958  active_stress_div_mag=0.861
+    final_norm   enstrophy=0.877  vorticity_signed=0.972  divergence=0.990  nematic_order=0.981  flow_align=0.934  order_grad_mag=0.813  strain_order_align=0.944  active_stress_div_mag=0.872
+
+=== checkpoints/active_matter_mae.pt ===
+  -- per-token LINEAR probe (no pooling) --
+    block_1      enstrophy=0.686  vorticity_signed=0.998  divergence=0.999  nematic_order=0.968  flow_align=0.825  order_grad_mag=0.857  strain_order_align=0.911  active_stress_div_mag=0.871
+    block_2      enstrophy=0.648  vorticity_signed=0.992  divergence=0.995  nematic_order=0.975  flow_align=0.848  order_grad_mag=0.855  strain_order_align=0.902  active_stress_div_mag=0.872
+    block_3      enstrophy=0.586  vorticity_signed=0.979  divergence=0.986  nematic_order=0.974  flow_align=0.820  order_grad_mag=0.817  strain_order_align=0.881  active_stress_div_mag=0.838
+    block_4      enstrophy=0.528  vorticity_signed=0.951  divergence=0.965  nematic_order=0.971  flow_align=0.729  order_grad_mag=0.770  strain_order_align=0.848  active_stress_div_mag=0.795
+    block_5      enstrophy=0.491  vorticity_signed=0.923  divergence=0.942  nematic_order=0.968  flow_align=0.656  order_grad_mag=0.727  strain_order_align=0.834  active_stress_div_mag=0.747
+    block_6      enstrophy=0.473  vorticity_signed=0.894  divergence=0.921  nematic_order=0.965  flow_align=0.579  order_grad_mag=0.704  strain_order_align=0.822  active_stress_div_mag=0.726
+    block_7      enstrophy=0.458  vorticity_signed=0.864  divergence=0.896  nematic_order=0.963  flow_align=0.545  order_grad_mag=0.686  strain_order_align=0.814  active_stress_div_mag=0.706
+    block_8      enstrophy=0.459  vorticity_signed=0.843  divergence=0.885  nematic_order=0.961  flow_align=0.512  order_grad_mag=0.681  strain_order_align=0.812  active_stress_div_mag=0.700
+    block_9      enstrophy=0.467  vorticity_signed=0.809  divergence=0.867  nematic_order=0.959  flow_align=0.513  order_grad_mag=0.673  strain_order_align=0.814  active_stress_div_mag=0.691
+    block_10     enstrophy=0.469  vorticity_signed=0.798  divergence=0.859  nematic_order=0.957  flow_align=0.506  order_grad_mag=0.669  strain_order_align=0.812  active_stress_div_mag=0.684
+    block_11     enstrophy=0.461  vorticity_signed=0.785  divergence=0.847  nematic_order=0.957  flow_align=0.495  order_grad_mag=0.660  strain_order_align=0.806  active_stress_div_mag=0.676
+    block_12     enstrophy=0.455  vorticity_signed=0.777  divergence=0.840  nematic_order=0.956  flow_align=0.483  order_grad_mag=0.656  strain_order_align=0.803  active_stress_div_mag=0.673
+    final_norm   enstrophy=0.447  vorticity_signed=0.720  divergence=0.811  nematic_order=0.955  flow_align=0.466  order_grad_mag=0.650  strain_order_align=0.800  active_stress_div_mag=0.669
+  -- pooled NONLINEAR (MLP) probe --
+    block_1      enstrophy=0.997  nematic_order=0.998  flow_align=0.337  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+    block_2      enstrophy=0.996  nematic_order=0.999  flow_align=0.416  order_grad_mag=0.997  strain_order_align=0.999  active_stress_div_mag=0.998
+    block_3      enstrophy=0.995  nematic_order=0.999  flow_align=0.630  order_grad_mag=0.998  strain_order_align=0.999  active_stress_div_mag=0.999
+    block_4      enstrophy=0.997  nematic_order=0.998  flow_align=0.279  order_grad_mag=0.998  strain_order_align=0.998  active_stress_div_mag=0.999
+    block_5      enstrophy=0.987  nematic_order=0.999  flow_align=0.400  order_grad_mag=0.998  strain_order_align=0.997  active_stress_div_mag=0.998
+    block_6      enstrophy=0.989  nematic_order=1.000  flow_align=0.226  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.998
+    block_7      enstrophy=0.991  nematic_order=0.995  flow_align=0.072  order_grad_mag=0.994  strain_order_align=0.998  active_stress_div_mag=0.996
+    block_8      enstrophy=0.993  nematic_order=0.998  flow_align=0.476  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.998
+    block_9      enstrophy=0.988  nematic_order=0.999  flow_align=0.491  order_grad_mag=0.996  strain_order_align=0.999  active_stress_div_mag=0.997
+    block_10     enstrophy=0.994  nematic_order=0.999  flow_align=0.318  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.998
+    block_11     enstrophy=0.991  nematic_order=0.998  flow_align=0.041  order_grad_mag=0.998  strain_order_align=0.997  active_stress_div_mag=0.998
+    block_12     enstrophy=0.993  nematic_order=0.998  flow_align=0.293  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.998
+    final_norm   enstrophy=0.992  nematic_order=0.999  flow_align=0.260  order_grad_mag=0.998  strain_order_align=0.997  active_stress_div_mag=0.997
+  -- per-token NONLINEAR (MLP) probe --
+    block_1      enstrophy=0.993  vorticity_signed=1.000  divergence=1.000  nematic_order=0.999  flow_align=0.998  order_grad_mag=0.998  strain_order_align=0.999  active_stress_div_mag=0.998
+    block_2      enstrophy=0.987  vorticity_signed=0.999  divergence=1.000  nematic_order=0.999  flow_align=0.997  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.996
+    block_3      enstrophy=0.983  vorticity_signed=0.998  divergence=0.999  nematic_order=0.999  flow_align=0.996  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.993
+    block_4      enstrophy=0.973  vorticity_signed=0.996  divergence=0.999  nematic_order=0.998  flow_align=0.992  order_grad_mag=0.986  strain_order_align=0.993  active_stress_div_mag=0.986
+    block_5      enstrophy=0.950  vorticity_signed=0.993  divergence=0.998  nematic_order=0.997  flow_align=0.990  order_grad_mag=0.982  strain_order_align=0.991  active_stress_div_mag=0.983
+    block_6      enstrophy=0.960  vorticity_signed=0.992  divergence=0.998  nematic_order=0.997  flow_align=0.986  order_grad_mag=0.975  strain_order_align=0.989  active_stress_div_mag=0.975
+    block_7      enstrophy=0.941  vorticity_signed=0.990  divergence=0.997  nematic_order=0.997  flow_align=0.984  order_grad_mag=0.965  strain_order_align=0.987  active_stress_div_mag=0.968
+    block_8      enstrophy=0.944  vorticity_signed=0.988  divergence=0.997  nematic_order=0.996  flow_align=0.982  order_grad_mag=0.965  strain_order_align=0.985  active_stress_div_mag=0.969
+    block_9      enstrophy=0.938  vorticity_signed=0.987  divergence=0.996  nematic_order=0.996  flow_align=0.978  order_grad_mag=0.961  strain_order_align=0.982  active_stress_div_mag=0.969
+    block_10     enstrophy=0.926  vorticity_signed=0.982  divergence=0.996  nematic_order=0.995  flow_align=0.975  order_grad_mag=0.955  strain_order_align=0.979  active_stress_div_mag=0.957
+    block_11     enstrophy=0.923  vorticity_signed=0.982  divergence=0.995  nematic_order=0.995  flow_align=0.975  order_grad_mag=0.952  strain_order_align=0.980  active_stress_div_mag=0.957
+    block_12     enstrophy=0.911  vorticity_signed=0.977  divergence=0.994  nematic_order=0.994  flow_align=0.967  order_grad_mag=0.945  strain_order_align=0.976  active_stress_div_mag=0.950
+    final_norm   enstrophy=0.914  vorticity_signed=0.973  divergence=0.993  nematic_order=0.994  flow_align=0.967  order_grad_mag=0.941  strain_order_align=0.974  active_stress_div_mag=0.955
+
+wrote sweep_results/active_matter_nonpooled.json

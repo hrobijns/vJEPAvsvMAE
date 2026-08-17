@@ -1,0 +1,12 @@
+shear_flow: train=896 traj, test=28 traj
+pooled: n_train=300 n_test=28
+  checkpoints/shear_flow_jepa.pt: enstrophy=0.990(L3)  tracer_grad=0.993(L1)  advective_flux=0.800(L2)  strain_rate_mag=0.999(L3)  okubo_weiss=0.998(L2)  pressure_grad_mag=1.000(L3)  tracer_laplacian=0.995(L2)
+  checkpoints/shear_flow_mae.pt: enstrophy=0.988(L1)  tracer_grad=0.997(L2)  advective_flux=0.785(L6)  strain_rate_mag=1.000(L3)  okubo_weiss=0.997(L2)  pressure_grad_mag=1.000(L3)  tracer_laplacian=0.996(L1)
+token: n_train_clips=16 n_test_clips=16
+  checkpoints/shear_flow_jepa.pt: enstrophy=0.683(L1)  vorticity_signed=0.989(L0)  divergence=0.996(L0)  tracer_grad=0.616(L1)  advective_flux=0.806(L1)  strain_rate_mag=0.960(L1)  okubo_weiss=0.865(L1)  pressure_grad_mag=0.867(L1)  tracer_laplacian=0.558(L1)
+  checkpoints/shear_flow_mae.pt: enstrophy=0.665(L4)  vorticity_signed=0.993(L0)  divergence=0.998(L0)  tracer_grad=0.617(L3)  advective_flux=0.874(L1)  strain_rate_mag=0.974(L3)  okubo_weiss=0.874(L3)  pressure_grad_mag=0.893(L3)  tracer_laplacian=0.548(L3)
+noise: stds=[0.0, 0.5, 1.0, 2.0]
+  checkpoints/shear_flow_jepa.pt (L12): std=0.0:0.919  std=0.5:0.906  std=1.0:0.721  std=2.0:0.096
+  checkpoints/shear_flow_mae.pt (L12): std=0.0:0.952  std=0.5:0.933  std=1.0:0.802  std=2.0:0.254
+
+wrote sweep_results/shear_flow_test_eval.json

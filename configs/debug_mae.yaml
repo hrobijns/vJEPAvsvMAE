@@ -12,6 +12,8 @@ data:
   n_frames: 8
   num_workers: 0
   memmap: false
+  valid_stride: 8
+val_every: 10
 encoder:
   patch_t: 2
   patch_h: 16

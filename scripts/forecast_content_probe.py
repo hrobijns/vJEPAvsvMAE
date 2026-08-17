@@ -1,15 +1,15 @@
 """Held-out forecast CONTENT probe: does the frozen encoder's representation of
 the present contain information that forecasts genuinely future physics — as
-opposed to rollout_probe.py's question of whether the model's own pretrained
-predictor/decoder can extract and use it.
+opposed to a probe that reuses the model's own pretrained predictor/decoder
+to extract it.
 
-rollout_probe.py reuses each model's pretrained prediction head under a new
-causal temporal mask that head never saw during training (only spatially-random
-tube masks were used) — a real confound: a weak rollout score could mean either
-"no forecast info in the representation" or "the head doesn't generalize to
-this mask geometry". This script sidesteps that entirely: no predictor, no
-decoder, no masking. Just encode a context window normally (full visible
-forward pass, exactly like every other probe in this project), and freshly
+Reusing a pretrained prediction head under a causal temporal mask it never
+saw during training (only spatially-random tube masks were used) is a real
+confound: a weak score could mean either "no forecast info in the
+representation" or "the head doesn't generalize to this mask geometry". This
+script sidesteps that entirely: no predictor, no decoder, no masking. Just
+encode a context window normally (full visible forward pass, exactly like
+every other probe in this project), and freshly
 train a probe from those features to physics computed on a SEPARATE, later
 window the encoder never saw.
 

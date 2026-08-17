@@ -1,0 +1,111 @@
+device=cuda
+active_matter: train_total=175 -> fit=153 valid=22  test=10
+== family 1: contemporaneous (t+0) ==
+  [t+0] n_samples: train=459 valid=66 test=30
+    pooled t+0 active_matter_jepa.pt    active_stress_div_mag      L 1 [ridge]  test_r2=+0.996(+/-0.000)  ridge=+0.996
+    pooled t+0 active_matter_jepa.pt    enstrophy                  L 2 [ridge]  test_r2=+0.990(+/-0.000)  ridge=+0.990
+    pooled t+0 active_matter_jepa.pt    flow_align                 L 0 [ridge]  test_r2=+0.520(+/-0.000)  ridge=+0.520
+    pooled t+0 active_matter_jepa.pt    nematic_order              L 1 [ridge]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    pooled t+0 active_matter_jepa.pt    order_grad_mag             L 1 [ridge]  test_r2=+0.997(+/-0.000)  ridge=+0.997
+    pooled t+0 active_matter_jepa.pt    strain_order_align         L 3 [ridge]  test_r2=+0.998(+/-0.000)  ridge=+0.998
+    token  t+0 active_matter_jepa.pt    active_stress_div_mag      L 0 [mlp]  test_r2=+0.805(+/-0.012)  ridge=+0.589
+    token  t+0 active_matter_jepa.pt    divergence                 L 0 [ridge]  test_r2=+0.979(+/-0.000)  ridge=+0.979
+    token  t+0 active_matter_jepa.pt    enstrophy                  L 0 [mlp]  test_r2=+0.749(+/-0.017)  ridge=+0.049
+    token  t+0 active_matter_jepa.pt    flow_align                 L 0 [mlp]  test_r2=+0.898(+/-0.013)  ridge=+0.233
+    token  t+0 active_matter_jepa.pt    nematic_order              L 3 [ridge]  test_r2=+0.760(+/-0.000)  ridge=+0.760
+    token  t+0 active_matter_jepa.pt    order_grad_mag             L 0 [mlp]  test_r2=+0.814(+/-0.017)  ridge=+0.569
+    token  t+0 active_matter_jepa.pt    strain_order_align         L 0 [mlp]  test_r2=+0.797(+/-0.019)  ridge=+0.518
+    token  t+0 active_matter_jepa.pt    vorticity_signed           L 0 [ridge]  test_r2=+0.979(+/-0.000)  ridge=+0.979
+    pooled t+0 active_matter_mae.pt     active_stress_div_mag      L 6 [ridge]  test_r2=+0.994(+/-0.000)  ridge=+0.994
+    pooled t+0 active_matter_mae.pt     enstrophy                  L 0 [mlp]  test_r2=+0.997(+/-0.000)  ridge=+0.996
+    pooled t+0 active_matter_mae.pt     flow_align                 L 0 [ridge]  test_r2=+0.653(+/-0.000)  ridge=+0.653
+    pooled t+0 active_matter_mae.pt     nematic_order              L 3 [ridge]  test_r2=+1.000(+/-0.000)  ridge=+1.000
+    pooled t+0 active_matter_mae.pt     order_grad_mag             L 8 [ridge]  test_r2=+0.993(+/-0.000)  ridge=+0.993
+    pooled t+0 active_matter_mae.pt     strain_order_align         L 1 [ridge]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    token  t+0 active_matter_mae.pt     active_stress_div_mag      L 0 [mlp]  test_r2=+0.822(+/-0.003)  ridge=+0.639
+    token  t+0 active_matter_mae.pt     divergence                 L 0 [ridge]  test_r2=+0.986(+/-0.000)  ridge=+0.986
+    token  t+0 active_matter_mae.pt     enstrophy                  L 0 [mlp]  test_r2=+0.738(+/-0.010)  ridge=-0.038
+    token  t+0 active_matter_mae.pt     flow_align                 L 0 [mlp]  test_r2=+0.894(+/-0.004)  ridge=+0.283
+    token  t+0 active_matter_mae.pt     nematic_order              L 4 [ridge]  test_r2=+0.785(+/-0.000)  ridge=+0.785
+    token  t+0 active_matter_mae.pt     order_grad_mag             L 0 [mlp]  test_r2=+0.807(+/-0.008)  ridge=+0.530
+    token  t+0 active_matter_mae.pt     strain_order_align         L 0 [mlp]  test_r2=+0.737(+/-0.006)  ridge=+0.467
+    token  t+0 active_matter_mae.pt     vorticity_signed           L 0 [ridge]  test_r2=+0.984(+/-0.000)  ridge=+0.984
+family 1 done in 3421s
+== family 2: forecast-content ==
+  [forecast] n_samples: train=459 valid=66 test=30  n_token_clips: train=16 valid=16 test=16
+    pooled t+8  active_matter_jepa.pt    active_stress_div_mag      L 4 [mlp]  test_r2=+0.846(+/-0.025)  ridge=+0.794
+    pooled t+8  active_matter_jepa.pt    enstrophy                  L 1 [mlp]  test_r2=+0.974(+/-0.005)  ridge=+0.958
+    pooled t+8  active_matter_jepa.pt    flow_align                 L 8 [ridge]  test_r2=-0.354(+/-0.000)  ridge=-0.354
+    pooled t+8  active_matter_jepa.pt    nematic_order              L 3 [ridge]  test_r2=+0.478(+/-0.000)  ridge=+0.478
+    pooled t+8  active_matter_jepa.pt    order_grad_mag             L 2 [mlp]  test_r2=+0.805(+/-0.025)  ridge=+0.726
+    pooled t+8  active_matter_jepa.pt    strain_order_align         L11 [ridge]  test_r2=+0.970(+/-0.000)  ridge=+0.970
+    token  t+8  active_matter_jepa.pt    active_stress_div_mag      L 9 [ridge]  test_r2=-1.052(+/-0.000)  ridge=-1.052
+    token  t+8  active_matter_jepa.pt    divergence                 L 3 [mlp]  test_r2=-0.047(+/-0.007)  ridge=-0.321
+    token  t+8  active_matter_jepa.pt    enstrophy                  L 4 [mlp]  test_r2=-0.399(+/-0.043)  ridge=-0.534
+    token  t+8  active_matter_jepa.pt    flow_align                 L 5 [mlp]  test_r2=-0.186(+/-0.010)  ridge=-0.567
+    token  t+8  active_matter_jepa.pt    nematic_order              L 3 [mlp]  test_r2=-10.709(+/-0.251)  ridge=-14.828
+    token  t+8  active_matter_jepa.pt    order_grad_mag             L 2 [mlp]  test_r2=-0.592(+/-0.159)  ridge=-0.726
+    token  t+8  active_matter_jepa.pt    strain_order_align         L 9 [ridge]  test_r2=-0.858(+/-0.000)  ridge=-0.858
+    token  t+8  active_matter_jepa.pt    vorticity_signed           L 0 [mlp]  test_r2=-0.008(+/-0.001)  ridge=-0.044
+    pooled t+8  active_matter_mae.pt     active_stress_div_mag      L11 [mlp]  test_r2=+0.898(+/-0.022)  ridge=+0.833
+    pooled t+8  active_matter_mae.pt     enstrophy                  L 8 [ridge]  test_r2=+0.983(+/-0.000)  ridge=+0.983
+    pooled t+8  active_matter_mae.pt     flow_align                 L 1 [ridge]  test_r2=-0.529(+/-0.000)  ridge=-0.529
+    pooled t+8  active_matter_mae.pt     nematic_order              L12 [ridge]  test_r2=+0.667(+/-0.000)  ridge=+0.667
+    pooled t+8  active_matter_mae.pt     order_grad_mag             L 8 [mlp]  test_r2=+0.878(+/-0.016)  ridge=+0.783
+    pooled t+8  active_matter_mae.pt     strain_order_align         L10 [ridge]  test_r2=+0.990(+/-0.000)  ridge=+0.990
+    token  t+8  active_matter_mae.pt     active_stress_div_mag      L 8 [mlp]  test_r2=-0.780(+/-0.081)  ridge=-1.288
+    token  t+8  active_matter_mae.pt     divergence                 L 6 [mlp]  test_r2=-0.084(+/-0.007)  ridge=-0.279
+    token  t+8  active_matter_mae.pt     enstrophy                  L 0 [mlp]  test_r2=-0.478(+/-0.034)  ridge=-0.596
+    token  t+8  active_matter_mae.pt     flow_align                 L 5 [mlp]  test_r2=-0.278(+/-0.005)  ridge=-0.457
+    token  t+8  active_matter_mae.pt     nematic_order              L 3 [mlp]  test_r2=-13.111(+/-0.195)  ridge=-17.130
+    token  t+8  active_matter_mae.pt     order_grad_mag             L 8 [mlp]  test_r2=-0.809(+/-0.098)  ridge=-1.209
+    token  t+8  active_matter_mae.pt     strain_order_align         L 1 [ridge]  test_r2=-0.808(+/-0.000)  ridge=-0.808
+    token  t+8  active_matter_mae.pt     vorticity_signed           L 7 [mlp]  test_r2=-0.013(+/-0.001)  ridge=-0.042
+  [forecast] gap=8 done in 3413s
+    pooled t+32 active_matter_jepa.pt    active_stress_div_mag      L 4 [mlp]  test_r2=+0.800(+/-0.036)  ridge=+0.760
+    pooled t+32 active_matter_jepa.pt    enstrophy                  L 1 [mlp]  test_r2=+0.947(+/-0.004)  ridge=+0.938
+    pooled t+32 active_matter_jepa.pt    flow_align                 L 0 [ridge]  test_r2=+0.193(+/-0.000)  ridge=+0.193
+    pooled t+32 active_matter_jepa.pt    nematic_order              L 1 [mlp]  test_r2=+0.863(+/-0.019)  ridge=+0.815
+    pooled t+32 active_matter_jepa.pt    order_grad_mag             L 3 [mlp]  test_r2=+0.862(+/-0.023)  ridge=+0.711
+    pooled t+32 active_matter_jepa.pt    strain_order_align         L 7 [ridge]  test_r2=+0.959(+/-0.000)  ridge=+0.959
+    token  t+32 active_matter_jepa.pt    active_stress_div_mag      L 5 [ridge]  test_r2=-0.418(+/-0.000)  ridge=-0.418
+    token  t+32 active_matter_jepa.pt    divergence                 L 0 [mlp]  test_r2=-0.209(+/-0.017)  ridge=-0.317
+    token  t+32 active_matter_jepa.pt    enstrophy                  L 2 [mlp]  test_r2=-0.072(+/-0.026)  ridge=-0.369
+    token  t+32 active_matter_jepa.pt    flow_align                 L 0 [mlp]  test_r2=-0.208(+/-0.013)  ridge=-0.557
+    token  t+32 active_matter_jepa.pt    nematic_order              L 4 [mlp]  test_r2=-0.436(+/-0.027)  ridge=-0.691
+    token  t+32 active_matter_jepa.pt    order_grad_mag             L 5 [ridge]  test_r2=-0.417(+/-0.000)  ridge=-0.417
+    token  t+32 active_matter_jepa.pt    strain_order_align         L 1 [ridge]  test_r2=-0.563(+/-0.000)  ridge=-0.563
+    token  t+32 active_matter_jepa.pt    vorticity_signed           L 0 [mlp]  test_r2=-0.002(+/-0.001)  ridge=-0.041
+    pooled t+32 active_matter_mae.pt     active_stress_div_mag      L 6 [mlp]  test_r2=+0.884(+/-0.031)  ridge=+0.782
+    pooled t+32 active_matter_mae.pt     enstrophy                  L 2 [mlp]  test_r2=+0.946(+/-0.007)  ridge=+0.939
+    pooled t+32 active_matter_mae.pt     flow_align                 L 2 [ridge]  test_r2=+0.231(+/-0.000)  ridge=+0.231
+    pooled t+32 active_matter_mae.pt     nematic_order              L 9 [mlp]  test_r2=+0.915(+/-0.019)  ridge=+0.892
+    pooled t+32 active_matter_mae.pt     order_grad_mag             L 5 [mlp]  test_r2=+0.862(+/-0.004)  ridge=+0.777
+    pooled t+32 active_matter_mae.pt     strain_order_align         L12 [ridge]  test_r2=+0.980(+/-0.000)  ridge=+0.980
+    token  t+32 active_matter_mae.pt     active_stress_div_mag      L 4 [ridge]  test_r2=-0.566(+/-0.000)  ridge=-0.566
+    token  t+32 active_matter_mae.pt     divergence                 L12 [ridge]  test_r2=-0.557(+/-0.000)  ridge=-0.557
+    token  t+32 active_matter_mae.pt     enstrophy                  L 8 [mlp]  test_r2=-0.214(+/-0.056)  ridge=-0.335
+    token  t+32 active_matter_mae.pt     flow_align                 L 2 [mlp]  test_r2=-0.420(+/-0.015)  ridge=-0.638
+    token  t+32 active_matter_mae.pt     nematic_order              L 0 [mlp]  test_r2=-0.560(+/-0.015)  ridge=-0.984
+    token  t+32 active_matter_mae.pt     order_grad_mag             L 8 [ridge]  test_r2=-0.437(+/-0.000)  ridge=-0.437
+    token  t+32 active_matter_mae.pt     strain_order_align         L11 [mlp]  test_r2=-0.241(+/-0.062)  ridge=-0.434
+    token  t+32 active_matter_mae.pt     vorticity_signed           L 4 [mlp]  test_r2=-0.030(+/-0.001)  ridge=-0.057
+  [forecast] gap=32 done in 3014s
+family 2 done in 6549s
+== family 3: noise robustness ==
+  [noise] n_samples: train=459 test=30
+    noise  active_matter_jepa.pt    active_stress_div_mag      L 1  std=0:+0.995(ridge=+0.996)  std=0.5:+0.985(ridge=+0.983)  std=1.0:+0.969(ridge=+0.970)  std=2.0:+0.722(ridge=+0.664)
+    noise  active_matter_jepa.pt    enstrophy                  L 2  std=0:+0.989(ridge=+0.990)  std=0.5:+0.987(ridge=+0.986)  std=1.0:+0.979(ridge=+0.969)  std=2.0:+0.957(ridge=+0.857)
+    noise  active_matter_jepa.pt    flow_align                 L 0  std=0:+0.349(ridge=+0.520)  std=0.5:+0.129(ridge=+0.123)  std=1.0:+0.140(ridge=-1.822)  std=2.0:+0.306(ridge=-2.322)
+    noise  active_matter_jepa.pt    nematic_order              L 1  std=0:+0.996(ridge=+0.999)  std=0.5:+0.992(ridge=+0.993)  std=1.0:+0.990(ridge=+0.978)  std=2.0:+0.940(ridge=+0.834)
+    noise  active_matter_jepa.pt    order_grad_mag             L 1  std=0:+0.993(ridge=+0.997)  std=0.5:+0.982(ridge=+0.979)  std=1.0:+0.962(ridge=+0.950)  std=2.0:+0.686(ridge=+0.612)
+    noise  active_matter_jepa.pt    strain_order_align         L 3  std=0:+0.996(ridge=+0.998)  std=0.5:+0.996(ridge=+0.998)  std=1.0:+0.992(ridge=+0.991)  std=2.0:+0.956(ridge=+0.861)
+    noise  active_matter_mae.pt     active_stress_div_mag      L 6  std=0:+0.994(ridge=+0.994)  std=0.5:+0.978(ridge=+0.982)  std=1.0:+0.880(ridge=+0.681)  std=2.0:-0.013(ridge=-2.951)
+    noise  active_matter_mae.pt     enstrophy                  L 0  std=0:+0.997(ridge=+0.996)  std=0.5:+0.983(ridge=+0.959)  std=1.0:+0.960(ridge=+0.782)  std=2.0:+0.270(ridge=-1.211)
+    noise  active_matter_mae.pt     flow_align                 L 0  std=0:+0.398(ridge=+0.653)  std=0.5:+0.114(ridge=-0.313)  std=1.0:-0.150(ridge=-1.263)  std=2.0:-0.033(ridge=-3.775)
+    noise  active_matter_mae.pt     nematic_order              L 3  std=0:+0.999(ridge=+1.000)  std=0.5:+0.995(ridge=+0.991)  std=1.0:+0.973(ridge=+0.799)  std=2.0:+0.512(ridge=-0.732)
+    noise  active_matter_mae.pt     order_grad_mag             L 8  std=0:+0.994(ridge=+0.993)  std=0.5:+0.964(ridge=+0.976)  std=1.0:+0.901(ridge=+0.756)  std=2.0:-0.101(ridge=-3.684)
+    noise  active_matter_mae.pt     strain_order_align         L 1  std=0:+0.998(ridge=+0.999)  std=0.5:+0.994(ridge=+0.991)  std=1.0:+0.971(ridge=+0.869)  std=2.0:+0.558(ridge=-0.326)
+family 3 done in 206s
+
+wrote sweep_results/active_matter_workshop_test_eval.json

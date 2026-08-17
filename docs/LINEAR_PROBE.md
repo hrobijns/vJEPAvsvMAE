@@ -4,8 +4,7 @@ Part of the [step-2 probing study](OVERVIEW.md). This suite asks one
 question in several variants: **does the frozen encoder representation
 linearly (or near-linearly) contain a given piece of physics** — no
 predictor, no decoder, just ridge regression from frozen features to a
-target. Contrast with the [rollout probe suite](ROLLOUT_PROBE.md), which
-uses the predictor/decoder to actually generate forecasts.
+target.
 
 ## Method
 
@@ -116,7 +115,7 @@ Most later scripts import shared utilities (`ridge_r2`, `ridge_r2_grouped`,
 | [`scripts/analyze_encoders.py`](../scripts/analyze_encoders.py) | Main comparison: layer-wise, pooled, ridge-probe against **derived nonlinear physics targets** (dataset-specific — see above) plus `future_enstrophy`. | Also hosts shared utilities used across the whole suite. |
 | [`scripts/analyze_encoders_local.py`](../scripts/analyze_encoders_local.py) | Follow-up: is pooling hiding something? (1) per-token linear probe with patch-aligned local targets, (2) small MLP nonlinear probe on **pooled** features, (3) small MLP nonlinear probe **per-token** (same features/targets as (1), swapping ridge for the MLP). | `--skip-mlp` skips both MLP variants. The pooled MLP was flagged noisy/unreliable in earlier runs — per [arXiv:2602.07050](https://arxiv.org/abs/2602.07050) ("Interpreting Physics in Video World Models"), attentive/per-token probes recover structure that pooled-then-nonlinear probes miss because mean-pooling destroys the local structure a small MLP needs; the per-token MLP tests whether that was a pooling artifact. |
 | [`scripts/analyze_regime.py`](../scripts/analyze_regime.py) | Does the representation know the constant-per-trajectory physical regime (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta)? Pooled by default; `--token-level` additionally asks whether a *single token* already predicts the regime, or whether it only emerges from pooling. | One feature vector per trajectory (pooled) or grouped-by-trajectory CV via `ridge_r2_grouped` (token-level) — both avoid leakage, since a plain random split would let tokens/windows from the same trajectory land in both train and val folds sharing an (near-)identical target. Multi-order-of-magnitude params log10-transformed; shuffled-control column per target as a leakage sanity check. Needs `scripts/extract_regime_metadata.py` sidecar files first. |
-| [`scripts/forecast_content_probe.py`](../scripts/forecast_content_probe.py) | Trains a **fresh** linear **and MLP** probe (pooled and per-token, every layer) from present-time frozen features to a **separate future window's** physics, swept over multiple time gaps (`--gaps`) and injected-noise levels (`--noise-stds`, context only — same convention as `analyze_noise_robustness.py`). | No predictor/decoder at all — removes the "does the pretrained head generalize to new mask geometry" confound present in `rollout_probe.py`. Full rigor stack (depth × linear-vs-MLP × noise), matching the rest of the suite. Each result also reports a `skill_*` field (see below) alongside the raw `probe_*`/`ceiling_*` R². |
+| [`scripts/forecast_content_probe.py`](../scripts/forecast_content_probe.py) | Trains a **fresh** linear **and MLP** probe (pooled and per-token, every layer) from present-time frozen features to a **separate future window's** physics, swept over multiple time gaps (`--gaps`) and injected-noise levels (`--noise-stds`, context only — same convention as `analyze_noise_robustness.py`). | No predictor/decoder at all — avoids the "does the pretrained head generalize to new mask geometry" confound a rollout-style probe would carry. Full rigor stack (depth × linear-vs-MLP × noise), matching the rest of the suite. Each result also reports a `skill_*` field (see below) alongside the raw `probe_*`/`ceiling_*` R². |
 | [`scripts/analyze_noise_robustness.py`](../scripts/analyze_noise_robustness.py) | Sweeps injected Gaussian noise (`--noise-stds`, in z-scored input units) into the input, ridge-probes pooled **and per-token** features — at **every layer**, not just the final one — against the **clean** clip's physics. | Does decodability degrade gracefully or collapse abruptly under corruption, and does that hold at every depth or only at the output — and is that pattern uniform across a token's whole field, or does pooling wash it out? Per-token variant capped via `--token-max-samples` (default 64); for those capped batches, pooled features are derived by mean-pooling the per-token ones rather than a second forward pass. |
 
 Supporting: [`scripts/extract_regime_metadata.py`](../scripts/extract_regime_metadata.py)
@@ -158,12 +157,19 @@ encoder. `scripts/plot_probing_suite.py` implements three core plots from
 
 Full sweep, current target set, all three datasets — pooled linear, per-token
 linear + MLP, full 13-layer depth sweep, full 6-level noise sweep (pooled and
-token), regime probing, forecast/skill-score, and a held-out (`valid`-split)
-generalization check. Raw numbers: `sweep_results/{dataset}_pooled.json`,
-`{dataset}_nonpooled.json`, `{dataset}_regime.json`,
-`{dataset}_noise_robustness.json`, `{dataset}_forecast.json`, and the
-`*_VALID.json` variants for the generalization check. Figures:
-`reports/figures/*.png`, generated by `scripts/plot_probing_suite.py`.
+token), regime probing, and forecast/skill-score. Raw numbers:
+`sweep_results/{dataset}_pooled.json`, `{dataset}_nonpooled.json`,
+`{dataset}_regime.json`, `{dataset}_noise_robustness.json`,
+`{dataset}_forecast.json`. Figures: `reports/figures/*.png`, generated by
+`scripts/plot_probing_suite.py`.
+
+These are train-split cross-validated numbers — useful for characterizing
+the full depth/noise/quantity landscape, but **not** the final reported
+numbers: reporting `max` over 13 layers of train-CV curves as "best-layer
+R²" is itself an unvalidated selection. The held-out, multi-seed numbers
+that should be cited as final results are in [Held-out, multi-seed test
+evaluation](#held-out-multi-seed-test-evaluation-the-reported-numbers)
+below.
 
 ### Contemporaneous decodability (pooled), best-layer R², JEPA vs MAE
 
@@ -355,9 +361,8 @@ Raw R² isn't comparable *across* physics quantities that evolve at very
 different rates: a near-static quantity looks "easy" (high R²) for any
 method — including the naive "assume nothing changes" persistence baseline —
 while a fast-changing or near-degenerate quantity looks "hard" (low/negative
-R²) even for a good model. Averaging raw R² across quantities (as the
-rollout tables in [ROLLOUT_PROBE.md](ROLLOUT_PROBE.md) do) lets one exploding
-or degenerate number dominate and compares unlike things.
+R²) even for a good model. Naively averaging raw R² across quantities lets
+one exploding or degenerate number dominate and compares unlike things.
 
 `skill_score()` in `analyze_encoders.py` fixes this with a standard forecast-
 verification technique (Murphy 1988):
@@ -375,135 +380,191 @@ beyond R² values the suite already produces (NaN-guarded the same way
 
 **Important nuance, confirmed by running this on real data before wiring it
 into any live script:** skill score does not simply *shrink* outlier R²
-values — it *recontextualizes* them. `enstrophy`'s raw `fed_back` rollout R²
-of −15.9 becomes a **more** extreme skill of **−134**, because persistence
-already explains 87% of `enstrophy`'s variance (almost no headroom, so
-failing that badly is a severe *relative* failure). Meanwhile
-`vorticity_signed`'s raw R² of ≈−3 becomes a **tamer** skill of ≈−0.5,
-because persistence is *also* bad there (a near-degenerate target) — there
-was no real baseline to fail relative to. This is the mathematically correct
-interpretation, not a shrinkage artifact.
+values — it *recontextualizes* them. A quantity where persistence already
+explains most of the variance (little headroom left) turns a bad raw R² into
+an *even more* extreme skill score, since failing badly against an easy
+baseline is a severe relative failure; a quantity where persistence itself
+is already poor (a near-degenerate target, no real baseline to fail against)
+turns the same bad raw R² into a comparatively tame skill score. This is the
+mathematically correct interpretation, not a shrinkage artifact.
 
 Wired into `forecast_content_probe.py` (`skill_linear`/`skill_mlp` per
-target, per layer, per noise level, per gap) and `rollout_assessment.py`
-(`skill_latent`/`skill_physics` per target, per step, for both `fed_back` and
-`oracle` against the `persistence` baseline already computed there).
+target, per layer, per noise level, per gap).
 
 Deferred (future work, not implemented): an effective-dimensionality probe
 (iteratively orthogonalize probe directions until R² collapses to the
 shuffled-control baseline) and a token-vs-pooled generalization-gap plot.
 
-### Held-out generalization check (`valid` split)
+### Held-out, multi-seed test evaluation (the reported numbers)
 
-Every result above is fit and cross-validated entirely within The Well's
-`train` split — the same split both encoders pretrained on. To check whether
-the findings hold on genuinely unseen simulation trajectories, we downloaded
-a small slice of the `valid` split (4–5 trajectories per dataset, not the
-full split — this is a spot-check, not a full re-validation) via `--split
-valid` (now supported by `analyze_encoders.py`, `analyze_encoders_local.py`,
-`analyze_noise_robustness.py`, and `forecast_content_probe.py`) and reran the
-pooled, token, and noise-robustness probes against it.
+This is the protocol behind every number that should be cited as a final
+result. It supersedes the train-CV tables above for the three families it
+covers (contemporaneous, forecast-content, noise robustness) — those tables
+remain useful for the full depth/quantity landscape, but the numbers below
+are the honest, held-out ones.
 
-**The noise-robustness finding replicates, and often sharpens, on data the
-encoders never saw at all.** On `active_matter`, MAE's `nematic_order`
-collapses to R² = **−15.4** at *zero* added noise on held-out trajectories
-(vs. clean R²=0.999 on train); under σ=2 it reaches **−78.3**, while JEPA
-stays comparatively contained (−16.7). On `rayleigh_benard`, MAE's
-`buoyancy_grad` is already −2.73 on clean held-out data. This is the
-strongest generalization evidence in the repo: MAE's fragility isn't an
-artifact of synthetic noise injected on in-distribution data — it shows up
-on simulation instances the encoder never pretrained on, at every
-granularity checked.
+**Protocol** (`scripts/workshop_test_eval.py`):
 
-**The clean-data pooled comparison has a real confound worth stating
-plainly.** `rayleigh_benard`'s valid-split pooled R² is *higher* than train
-for both objectives on several quantities (`enstrophy`: JEPA 0.69→0.98)
-— not because generalization improved, but because train's number is
-cross-validated across ~35 files spanning Rayleigh number from 1e6 to 1e10
-(near-onset to strongly turbulent convection), while this valid check has
-only 5 trajectories from one Ra=1e9/Pr=5 file. A probe scored within one
-regime instance is an easier task than one cross-validated across the full
-regime spread, which narrows the apparent JEPA/MAE gap without indicating
-the underlying gap isn't real.
+1. Carve a regime-balanced selection set out of `train` itself: every 8th
+   trajectory (interleaved, not a contiguous prefix/suffix — trajectories
+   are laid out in contiguous per-source-file blocks, so this samples
+   proportionally from every regime file in both halves). The Well's shipped
+   `valid` split isn't used for this — it turned out too small and
+   regime-degenerate to trust (4–5 trajectories per dataset, and for
+   `shear_flow`/`rayleigh_benard` every one of them from a single regime
+   file). The official `test` split is never touched until step 4.
+2. At each of the 13 layers, fit candidate probes on the selection set: an
+   MLP (`TinyMLP`: 128 hidden, dropout, early-stopped against an internal
+   train sub-holdout) at three `weight_decay` values (1e-4/1e-2/1e-1, 3
+   selection seeds each) *and* closed-form ridge regression. Score each
+   candidate as `mean − 2·std` across its selection seeds (ridge has no
+   seed variance, so its score is just its value) — a plain mean-only
+   comparison let a handful of hard, low-signal-to-noise targets pick an
+   MLP configuration that looked fine on this small selection set but was
+   actually unstable (seed-to-seed test R² spread up to ~1.4) once
+   evaluated on the real, untouched test split; the variance penalty and
+   ridge-as-candidate together close that gap (see "Why MLP, and why did it
+   need fixing" below).
+3. Freeze the (layer, method) with the highest score, per (dataset,
+   objective, quantity, feature-kind, time-offset).
+4. If an MLP config won, refit 5 seeded MLPs on `train` at that
+   (layer, weight_decay) and report mean ± std on `test`. If ridge won,
+   report its single deterministic `test` value. Either way, a closed-form
+   ridge fit at the same frozen layer is also always recorded
+   (`ridge_test_r2`) as a transparent audit trail, whichever method won.
 
-**Sample-size caveat**: 20–25 pooled samples and 4–5 trajectories per
-dataset — individual quantity-level numbers here are noisy and shouldn't be
-over-cited, but the noise-robustness gap's direction and magnitude are
-large and consistent enough across datasets to be real signal. Raw numbers:
-`sweep_results/{dataset}_{pooled,nonpooled,noise_robustness}_VALID.json`.
+Three families, each independently following this protocol per quantity:
+**contemporaneous** physics (t+0, pooled and per-token), **forecast-content**
+physics at t+8 and t+32 (context and future windows never overlap, so
+there's no temporal leakage between probe input and target — see
+`forecast_content_probe.py`'s windowing), and **noise robustness** (input
+corruption at each quantity's already-frozen contemporaneous layer, no
+separate noise-layer search — this family always uses a plain MLP,
+`weight_decay=1e-4`, since it reuses a layer already vetted by the
+contemporaneous family and showed no instability in practice). Test-split
+sizes: `active_matter` 10 trajectories, `shear_flow` 28, `rayleigh_benard`
+50 (regime-balanced, Ra 1e6–1e10).
 
-### Held-out test-split evaluation: freezing layer selection
+**Why MLP, and why did it need fixing.** The whole point of running an MLP
+alongside the closed-form-optimal ridge baseline is to see where
+nonlinearity helps — but that comparison is only meaningful if the MLP is
+actually well-trained. A broad sanity check (comparing every reported MLP
+number against a fresh ridge fit at the same frozen layer) found the
+original single fixed `weight_decay=1e-4` let the MLP overfit badly on a
+handful of low-SNR, long-horizon targets (test R² as bad as −0.66 where
+ridge got +0.68, with wild seed-to-seed swings) while a naive fix — just
+raising `weight_decay` everywhere — regressed dozens of already-good cells
+(some `active_matter` token quantities fell from clearly beating ridge to
+below it). The final protocol above (adaptive per-layer weight_decay,
+ridge itself as a fair candidate, variance-penalized selection) resolves
+this properly: across all 276 contemporaneous/forecast-content cells in the
+final run, only 3 (1.1%) still land more than 0.05 below their own ridge
+audit value, each a modest gap (≤0.17) on a token-level or near-null-signal
+target, not a catastrophic one. Every reported number's `ridge_test_r2` is
+saved alongside it in `sweep_results/*_workshop_test_eval.json` for
+cross-checking.
 
-The `valid`-split check above answers "does the pattern replicate on unseen
-trajectories," but it still selects the best-performing layer via CV *within
-that same split* — no different in kind from the train-CV tables earlier in
-this doc, which report `max` over 13 layers' worth of CV curves as "best-
-layer R²." That max-over-13 operation is itself a form of selection that
-isn't validated against independent data, even though each individual
-layer's R² is an honest CV estimate. `scripts/test_split_eval.py` fixes
-this specifically: **the layer is chosen from the existing train-CV curves
-and frozen** *before* any test data is touched; a probe (ridge and MLP) is
-then fit once on `train` at that frozen layer and evaluated once on `test`
-trajectories the encoder never pretrained on and the probe never used for
-any selection (`ridge_fit_eval`/`mlp_fit_eval` in `analyze_encoders.py`/
-`analyze_encoders_local.py`). No retraining — same frozen checkpoints as
-everywhere else. Scoped to the three headline analyses (pooled
-contemporaneous, token-level, noise robustness); regime/rollout/forecast
-remain train-CV only.
+#### Contemporaneous (t+0): near-tied
 
-Test-split sizes: `active_matter` 10 trajectories (all of `test`'s smaller
-files), `shear_flow` 28, `rayleigh_benard` 50 (spanning Rayleigh number
-1e6–1e10 evenly, matching train's regime spread — an initial 6-file sample
-that happened to cluster at Ra=1e9 with no 1e10 coverage produced nonsense
-negative R² for both objectives, a regime-coverage artifact rather than a
-finding, caught and fixed before reporting).
+Pooled deltas are small across all three datasets (|Δ| mostly < 0.02, MAE
+usually a hair ahead) — both objectives already recover the physics at
+genuinely high absolute R² (0.93–1.00 for most quantities) at the moment
+being probed, leaving little room for either to differentiate.
 
-**Pooled contemporaneous physics reproduces almost exactly:**
+#### Forecast-content: the interesting result is dataset-specific, and lives at long horizon
 
-| dataset | quantity | JEPA train→test | MAE train→test |
-|---|---|---|---|
-| active_matter | enstrophy | 0.989 → 0.992 | 0.993 → 0.995 |
-| shear_flow | advective_flux | 0.775 → 0.800 | 0.760 → 0.785 |
-| rayleigh_benard | enstrophy | 0.686 → 0.618 | 0.455 → 0.228 |
-| rayleigh_benard | convective_flux | 0.835 → 0.804 | 0.576 → 0.411 |
-| rayleigh_benard | okubo_weiss | 0.722 → 0.656 | 0.460 → 0.221 |
-| rayleigh_benard | velocity_buoyancy_coherence | 0.583 → 0.440 | −0.049 → −0.056 |
+| dataset | t+8 (pooled) | t+32 (pooled) |
+|---|---|---|
+| `active_matter` | ~tied to slightly MAE-ahead | ~tied — the real JEPA advantage is at **token** level, not pooled |
+| `shear_flow` | small, mixed | **consistent, modest JEPA advantage on all 7 quantities** (Δ +0.001 to +0.110, seed std ≤ 0.05) |
+| `rayleigh_benard` | ~tied | **clean, larger JEPA advantage on all 7 quantities** (Δ +0.008 to +0.195, seed std ≤ 0.05) |
 
-`rayleigh_benard`'s JEPA-ahead-on-coupled-quantities gap doesn't just
-survive on held-out data, it **widens** relative to train (`enstrophy` gap
-0.23→0.39, `okubo_weiss` 0.26→0.44, `convective_flux` 0.26→0.39) — the
-opposite of what you'd expect from an artifact of train-CV selection bias.
+`rayleigh_benard` t+32 is the cleanest single result in the whole sweep:
+JEPA leads MAE on every pooled quantity, at good absolute R² for both (JEPA
+0.80–0.97, MAE 0.63–0.96), with tight seed std (≤0.021) — a real,
+low-variance, growing-with-horizon advantage, not a clipping or instability
+artifact.
 
-**Noise robustness confirms the headline finding, at every noise level, on
-genuinely held-out trajectories:**
+`shear_flow` t+32 shows the same pattern, at smaller magnitude: JEPA leads
+MAE on all 7 pooled quantities (`advective_flux` +0.804 vs +0.720,
+`tracer_grad` +0.754 vs +0.644, etc.), all with tight seed std (≤0.053).
+Earlier runs of this analysis, before the MLP-training fix described above,
+showed `advective_flux` and `tracer_grad` collapsing to catastrophic,
+wildly seed-unstable negative R² here — that was **entirely a training
+artifact** (an under-regularized MLP overfitting a hard, low-SNR target),
+not a real property of either representation; ridge regression recovered
+strong, stable signal for both quantities the whole time (+0.64–0.71), which
+is exactly what first flagged the bug. At **token** level and the shorter
+t+8 horizon, `shear_flow` shows a real, low-variance MAE advantage on
+several quantities (`tracer_grad` Δ=−0.20, `advective_flux` Δ=−0.04,
+`vorticity_signed` Δ=−0.08) — this pattern holds at both gaps and is
+distinct from the now-fixed pooled t+32 instability.
 
-| dataset | σ=0.0 | σ=0.5 | σ=1.0 | σ=2.0 |
+#### Noise robustness (mean R² across quantities, pooled, at each quantity's own frozen layer)
+
+| dataset | σ=0 | σ=0.5 | σ=1.0 | σ=2.0 |
 |---|---|---|---|---|
-| active_matter — JEPA | 0.784 | 0.751 | 0.770 | 0.621 |
-| active_matter — MAE | 0.898 | 0.861 | 0.678 | **−0.784** |
-| shear_flow — JEPA | 0.919 | 0.906 | 0.721 | 0.096 |
-| shear_flow — MAE | 0.952 | 0.933 | 0.802 | 0.254 |
-| rayleigh_benard — JEPA | 0.616 | 0.464 | 0.162 | −0.262 |
-| rayleigh_benard — MAE | 0.542 | 0.331 | 0.194 | −0.354 |
+| `active_matter` — JEPA | 0.886 | 0.845 | 0.839 | 0.761 |
+| `active_matter` — MAE | 0.897 | 0.838 | 0.756 | **0.199** |
+| `shear_flow` — JEPA | 0.965 | 0.951 | 0.800 | 0.749 |
+| `shear_flow` — MAE | 0.949 | 0.937 | 0.863 | 0.741 |
+| `rayleigh_benard` — JEPA | 0.968 | 0.966 | 0.938 | 0.884 |
+| `rayleigh_benard` — MAE | 0.978 | 0.955 | 0.892 | 0.657 |
 
-`active_matter`'s collapse reproduces almost exactly (MAE −0.78 at σ=2 on
-test vs. −1.02 on train, same order of magnitude). `shear_flow` confirms
-MAE stays ahead at *every* noise level on held-out data too — genuinely no
-robustness gap on this dataset. `rayleigh_benard` shows a new nuance not
-visible in the train-CV table: JEPA leads at both ends (clean and heaviest
-noise) but MAE is briefly ahead at σ=1.0 (0.194 vs 0.162) — reported
-honestly rather than smoothed over; the overall pattern (JEPA more robust)
-still holds at the extremes.
+The headline noise-robustness finding replicates on held-out, multi-seed
+evaluation: JEPA and MAE are near-tied at low noise, and MAE collapses
+disproportionately as noise grows — sharply on `active_matter` (0.897→0.199
+by σ=2, a near-total collapse) and `rayleigh_benard` (0.978→0.657), while
+`shear_flow` stays close throughout, with MAE briefly ahead at σ=1.0 —
+reported honestly rather than smoothed over, matching the overall pattern
+(no consistent robustness gap on this dataset).
 
-**Token-level is noisier at this sample size** (16 clips train/test — small
-relative to the pooled evaluation's dozens of trajectories) and individual
-numbers shouldn't be over-cited, but the qualitative pattern holds: on
-`rayleigh_benard`, MAE's MLP goes clearly negative on the coupled quantities
-(`convective_flux` −0.64, `enstrophy` −0.59) while JEPA stays positive on
-some of the same quantities (`convective_flux` +0.34) — MAE actively fails
-where JEPA doesn't, even if the exact magnitudes are noisy at n=16.
+Raw numbers: `sweep_results/{dataset}_workshop_test_eval.json`. Figures:
+`reports/figures/workshop/fig{2,3,4}_*`; per-cell layer choices in
+`reports/figures/workshop/frozen_layers*.txt`.
 
-Raw numbers: `sweep_results/{dataset}_test_eval.json`.
+#### Multiple encoder seeds
+
+Everything above reports probe-seed variance (5 independently-initialized
+MLP fits per cell) at a single pretrained encoder checkpoint per objective.
+That doesn't say anything about run-to-run pretraining variance -- would a
+different random init of the *encoder itself* give the same R²? Once
+`scripts/run_final_training.sh` has produced 3 fresh encoder seeds per
+(dataset, objective) pair, `workshop_test_eval.py` accepts all of them in
+one `--checkpoints` list and probes each completely independently (its own
+held-out layer/weight_decay/ridge selection, since a different encoder
+seed's representation can genuinely peak at a different depth) before
+combining per objective in the output JSON's `"aggregated"` section.
+
+Combining is a **two-level nested decomposition**, not a naive pool of
+every (encoder_seed × probe_seed) draw as if independent: the 5 probe-seed
+draws within one encoder are correlated (same frozen weights), so pooling
+all 15 values would overstate the effective sample size at the level that
+actually matters — whether *retraining the objective* gives the same
+answer. Instead: average away the probe-seed nuisance variance first (one
+mean per encoder seed, already what `select_and_eval` produces), then treat
+those 3 means as the real sample —
+
+```
+SE(grand mean)^2 = s_between^2 / n_seeds + s_within_avg^2 / (n_seeds * n_probe_seeds)
+```
+
+where `s_between` is the sample std (ddof=1) of the 3 per-encoder-seed
+means and `s_within_avg` is the average of each seed's own probe-seed std
+(`aggregate_by_objective()`/`_nested_stats()` in `workshop_test_eval.py`).
+Both the nested SE and the simpler plain std-of-3-means are recorded
+(`nested_se` and `encoder_seed_std`) — with only 2-3 encoder seeds neither
+estimate is precise, so both are kept rather than presenting one as
+settling the question. A single seed per objective (the original,
+still-supported usage) is the degenerate n=1 case of the same formula:
+`encoder_seed_std=0`, `nested_se = within_seed_std / sqrt(n_probe_seeds)`,
+identical to what was reported before this extension.
+
+`plot_workshop_figures.py` reads the `"aggregated"` section directly and
+doesn't need to know how many encoder seeds went into it. Fig 2's
+significance-fade now compares against the *combined* nested SE (probe-seed
+and, if present, encoder-seed), a strictly more conservative bar than
+probe-seed variance alone.
 
 ## Discussion: what kind of representation does each objective build?
 
@@ -546,17 +607,20 @@ models — exactly the pattern in the token-level section above, concentrated
 on `rayleigh_benard`. The same paper's "emergence zone" framing (physics
 becomes readable partway through the network, not at the input or output)
 matches the depth section's MAE-plateaus-early / JEPA-builds-with-depth
-split, again specific to `rayleigh_benard`. The fact that this dataset is
-where JEPA pulls ahead, and `shear_flow` is where it doesn't, is itself
-informative: `rayleigh_benard`'s buoyancy and `active_matter`'s active
-stress both feed back directly into the momentum equation (the field being
-probed *drives* the velocity field that advects it — a genuine feedback
-loop), while `shear_flow`'s tracer is passively advected with no feedback
-onto velocity. Noise-robustness and token-forecast gaps appear specifically
-on the two systems with feedback and are essentially absent on the one
-without it — consistent with the idea that latent-prediction's advantage is
-concentrated where the underlying dynamics are least locally decomposable,
-not a uniform property of the objective.
+split, again specific to `rayleigh_benard`. The fact that this dataset shows
+the largest, cleanest JEPA advantage, and `shear_flow` the smallest, is
+itself informative: `rayleigh_benard`'s buoyancy and `active_matter`'s
+active stress both feed back directly into the momentum equation (the field
+being probed *drives* the velocity field that advects it — a genuine
+feedback loop), while `shear_flow`'s tracer is passively advected with no
+feedback onto velocity. The forecast-content JEPA advantage (see the
+held-out section above) is present on all three datasets at t+32, but it's
+roughly 2–3× larger on `rayleigh_benard` (Δ up to +0.195) than `shear_flow`
+(Δ up to +0.110) — consistent with the idea that latent-prediction's
+advantage scales with how locally decomposable the underlying dynamics are,
+largest where there's a genuine feedback loop, present but smaller where
+there isn't, rather than being a uniform property of the objective or an
+on/off effect.
 
 **Practical implication.** If the downstream use case is a frozen encoder
 feeding a linear or lightly-nonlinear readout — the common pattern for
@@ -569,8 +633,4 @@ shift from the clean simulation data pretraining saw). For simpler,
 more locally-decomposable systems, or for genuinely clean input, the two
 objectives are functionally comparable and MAE's simpler, single-stream
 training loop (no EMA target, no predictor network) may be preferable on
-engineering grounds alone. Neither objective's advantage transfers to
-multi-step autoregressive forecasting through a post-hoc-trained predictor
-(see [ROLLOUT_PROBE.md](ROLLOUT_PROBE.md)) — representational quality, as
-measured by every probe in this document, and forecasting competence through
-a shallow downstream head are empirically not the same axis.
+engineering grounds alone.

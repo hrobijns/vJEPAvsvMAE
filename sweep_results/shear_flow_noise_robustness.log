@@ -1,0 +1,328 @@
+2688 samples total
+  enstrophy: mean=0.0009 std=0.0016
+  tracer_grad: mean=0.0177 std=0.0373
+  advective_flux: mean=0.0000 std=0.0000
+  strain_rate_mag: mean=0.0258 std=0.0167
+  okubo_weiss: mean=0.0016 std=0.0019
+  pressure_grad_mag: mean=0.0155 std=0.0187
+  tracer_laplacian: mean=0.0413 std=0.0848
+
+=== checkpoints/shear_flow_jepa.pt ===
+  noise_std=   0.0  block_1      enstrophy=0.987  tracer_grad=0.737  advective_flux=0.313  strain_rate_mag=0.997  okubo_weiss=0.974  pressure_grad_mag=0.999  tracer_laplacian=0.672
+  noise_std=   0.0  block_2      enstrophy=0.994  tracer_grad=0.835  advective_flux=0.377  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.806
+  noise_std=   0.0  block_3      enstrophy=0.996  tracer_grad=0.873  advective_flux=0.393  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.840
+  noise_std=   0.0  block_4      enstrophy=0.995  tracer_grad=0.878  advective_flux=0.442  strain_rate_mag=0.998  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.851
+  noise_std=   0.0  block_5      enstrophy=0.992  tracer_grad=0.863  advective_flux=0.446  strain_rate_mag=0.998  okubo_weiss=0.985  pressure_grad_mag=0.998  tracer_laplacian=0.837
+  noise_std=   0.0  block_6      enstrophy=0.991  tracer_grad=0.845  advective_flux=0.528  strain_rate_mag=0.998  okubo_weiss=0.984  pressure_grad_mag=0.998  tracer_laplacian=0.820
+  noise_std=   0.0  block_7      enstrophy=0.992  tracer_grad=0.824  advective_flux=0.518  strain_rate_mag=0.998  okubo_weiss=0.987  pressure_grad_mag=0.998  tracer_laplacian=0.793
+  noise_std=   0.0  block_8      enstrophy=0.993  tracer_grad=0.797  advective_flux=0.507  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.998  tracer_laplacian=0.767
+  noise_std=   0.0  block_9      enstrophy=0.991  tracer_grad=0.784  advective_flux=0.501  strain_rate_mag=0.998  okubo_weiss=0.985  pressure_grad_mag=0.998  tracer_laplacian=0.744
+  noise_std=   0.0  block_10     enstrophy=0.990  tracer_grad=0.763  advective_flux=0.497  strain_rate_mag=0.997  okubo_weiss=0.984  pressure_grad_mag=0.997  tracer_laplacian=0.728
+  noise_std=   0.0  block_11     enstrophy=0.988  tracer_grad=0.744  advective_flux=0.491  strain_rate_mag=0.997  okubo_weiss=0.979  pressure_grad_mag=0.997  tracer_laplacian=0.707
+  noise_std=   0.0  block_12     enstrophy=0.984  tracer_grad=0.722  advective_flux=0.477  strain_rate_mag=0.996  okubo_weiss=0.972  pressure_grad_mag=0.997  tracer_laplacian=0.676
+  noise_std=   0.0  final_norm   enstrophy=0.984  tracer_grad=0.725  advective_flux=0.470  strain_rate_mag=0.996  okubo_weiss=0.972  pressure_grad_mag=0.997  tracer_laplacian=0.679
+  noise_std=   0.1  block_1      enstrophy=0.987  tracer_grad=0.736  advective_flux=0.306  strain_rate_mag=0.997  okubo_weiss=0.974  pressure_grad_mag=0.999  tracer_laplacian=0.671
+  noise_std=   0.1  block_2      enstrophy=0.994  tracer_grad=0.834  advective_flux=0.372  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.805
+  noise_std=   0.1  block_3      enstrophy=0.996  tracer_grad=0.875  advective_flux=0.388  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.841
+  noise_std=   0.1  block_4      enstrophy=0.995  tracer_grad=0.880  advective_flux=0.425  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.853
+  noise_std=   0.1  block_5      enstrophy=0.993  tracer_grad=0.870  advective_flux=0.438  strain_rate_mag=0.998  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.845
+  noise_std=   0.1  block_6      enstrophy=0.992  tracer_grad=0.856  advective_flux=0.496  strain_rate_mag=0.998  okubo_weiss=0.986  pressure_grad_mag=0.998  tracer_laplacian=0.834
+  noise_std=   0.1  block_7      enstrophy=0.993  tracer_grad=0.832  advective_flux=0.495  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.998  tracer_laplacian=0.808
+  noise_std=   0.1  block_8      enstrophy=0.993  tracer_grad=0.812  advective_flux=0.481  strain_rate_mag=0.998  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.786
+  noise_std=   0.1  block_9      enstrophy=0.992  tracer_grad=0.793  advective_flux=0.496  strain_rate_mag=0.998  okubo_weiss=0.987  pressure_grad_mag=0.998  tracer_laplacian=0.756
+  noise_std=   0.1  block_10     enstrophy=0.990  tracer_grad=0.773  advective_flux=0.492  strain_rate_mag=0.997  okubo_weiss=0.985  pressure_grad_mag=0.998  tracer_laplacian=0.742
+  noise_std=   0.1  block_11     enstrophy=0.989  tracer_grad=0.750  advective_flux=0.479  strain_rate_mag=0.997  okubo_weiss=0.982  pressure_grad_mag=0.998  tracer_laplacian=0.712
+  noise_std=   0.1  block_12     enstrophy=0.985  tracer_grad=0.726  advective_flux=0.450  strain_rate_mag=0.996  okubo_weiss=0.975  pressure_grad_mag=0.997  tracer_laplacian=0.681
+  noise_std=   0.1  final_norm   enstrophy=0.985  tracer_grad=0.728  advective_flux=0.447  strain_rate_mag=0.996  okubo_weiss=0.976  pressure_grad_mag=0.997  tracer_laplacian=0.682
+  noise_std=  0.25  block_1      enstrophy=0.986  tracer_grad=0.715  advective_flux=0.282  strain_rate_mag=0.996  okubo_weiss=0.971  pressure_grad_mag=0.998  tracer_laplacian=0.648
+  noise_std=  0.25  block_2      enstrophy=0.993  tracer_grad=0.830  advective_flux=0.353  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.798
+  noise_std=  0.25  block_3      enstrophy=0.996  tracer_grad=0.873  advective_flux=0.369  strain_rate_mag=0.998  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.838
+  noise_std=  0.25  block_4      enstrophy=0.996  tracer_grad=0.886  advective_flux=0.388  strain_rate_mag=0.998  okubo_weiss=0.992  pressure_grad_mag=0.999  tracer_laplacian=0.859
+  noise_std=  0.25  block_5      enstrophy=0.994  tracer_grad=0.875  advective_flux=0.408  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.851
+  noise_std=  0.25  block_6      enstrophy=0.994  tracer_grad=0.868  advective_flux=0.453  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.847
+  noise_std=  0.25  block_7      enstrophy=0.993  tracer_grad=0.848  advective_flux=0.490  strain_rate_mag=0.998  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.825
+  noise_std=  0.25  block_8      enstrophy=0.993  tracer_grad=0.827  advective_flux=0.482  strain_rate_mag=0.998  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.799
+  noise_std=  0.25  block_9      enstrophy=0.992  tracer_grad=0.813  advective_flux=0.507  strain_rate_mag=0.997  okubo_weiss=0.988  pressure_grad_mag=0.998  tracer_laplacian=0.775
+  noise_std=  0.25  block_10     enstrophy=0.991  tracer_grad=0.784  advective_flux=0.500  strain_rate_mag=0.997  okubo_weiss=0.987  pressure_grad_mag=0.998  tracer_laplacian=0.750
+  noise_std=  0.25  block_11     enstrophy=0.991  tracer_grad=0.774  advective_flux=0.485  strain_rate_mag=0.997  okubo_weiss=0.985  pressure_grad_mag=0.998  tracer_laplacian=0.735
+  noise_std=  0.25  block_12     enstrophy=0.988  tracer_grad=0.748  advective_flux=0.471  strain_rate_mag=0.996  okubo_weiss=0.981  pressure_grad_mag=0.998  tracer_laplacian=0.706
+  noise_std=  0.25  final_norm   enstrophy=0.988  tracer_grad=0.748  advective_flux=0.471  strain_rate_mag=0.996  okubo_weiss=0.981  pressure_grad_mag=0.998  tracer_laplacian=0.704
+  noise_std=   0.5  block_1      enstrophy=0.984  tracer_grad=0.683  advective_flux=0.232  strain_rate_mag=0.995  okubo_weiss=0.965  pressure_grad_mag=0.997  tracer_laplacian=0.605
+  noise_std=   0.5  block_2      enstrophy=0.992  tracer_grad=0.804  advective_flux=0.301  strain_rate_mag=0.998  okubo_weiss=0.986  pressure_grad_mag=0.999  tracer_laplacian=0.768
+  noise_std=   0.5  block_3      enstrophy=0.996  tracer_grad=0.853  advective_flux=0.302  strain_rate_mag=0.998  okubo_weiss=0.992  pressure_grad_mag=0.999  tracer_laplacian=0.816
+  noise_std=   0.5  block_4      enstrophy=0.995  tracer_grad=0.876  advective_flux=0.316  strain_rate_mag=0.998  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.845
+  noise_std=   0.5  block_5      enstrophy=0.994  tracer_grad=0.871  advective_flux=0.337  strain_rate_mag=0.998  okubo_weiss=0.988  pressure_grad_mag=0.999  tracer_laplacian=0.844
+  noise_std=   0.5  block_6      enstrophy=0.994  tracer_grad=0.856  advective_flux=0.386  strain_rate_mag=0.998  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.834
+  noise_std=   0.5  block_7      enstrophy=0.993  tracer_grad=0.846  advective_flux=0.449  strain_rate_mag=0.997  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.821
+  noise_std=   0.5  block_8      enstrophy=0.992  tracer_grad=0.819  advective_flux=0.445  strain_rate_mag=0.997  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.791
+  noise_std=   0.5  block_9      enstrophy=0.991  tracer_grad=0.801  advective_flux=0.447  strain_rate_mag=0.997  okubo_weiss=0.987  pressure_grad_mag=0.998  tracer_laplacian=0.767
+  noise_std=   0.5  block_10     enstrophy=0.991  tracer_grad=0.783  advective_flux=0.442  strain_rate_mag=0.997  okubo_weiss=0.986  pressure_grad_mag=0.998  tracer_laplacian=0.749
+  noise_std=   0.5  block_11     enstrophy=0.990  tracer_grad=0.763  advective_flux=0.444  strain_rate_mag=0.997  okubo_weiss=0.984  pressure_grad_mag=0.998  tracer_laplacian=0.727
+  noise_std=   0.5  block_12     enstrophy=0.989  tracer_grad=0.747  advective_flux=0.433  strain_rate_mag=0.996  okubo_weiss=0.982  pressure_grad_mag=0.998  tracer_laplacian=0.708
+  noise_std=   0.5  final_norm   enstrophy=0.988  tracer_grad=0.747  advective_flux=0.434  strain_rate_mag=0.996  okubo_weiss=0.981  pressure_grad_mag=0.998  tracer_laplacian=0.707
+  noise_std=   1.0  block_1      enstrophy=0.976  tracer_grad=0.623  advective_flux=0.070  strain_rate_mag=0.989  okubo_weiss=0.937  pressure_grad_mag=0.993  tracer_laplacian=0.524
+  noise_std=   1.0  block_2      enstrophy=0.989  tracer_grad=0.732  advective_flux=0.132  strain_rate_mag=0.993  okubo_weiss=0.975  pressure_grad_mag=0.998  tracer_laplacian=0.676
+  noise_std=   1.0  block_3      enstrophy=0.991  tracer_grad=0.768  advective_flux=0.166  strain_rate_mag=0.995  okubo_weiss=0.983  pressure_grad_mag=0.999  tracer_laplacian=0.709
+  noise_std=   1.0  block_4      enstrophy=0.992  tracer_grad=0.794  advective_flux=0.193  strain_rate_mag=0.995  okubo_weiss=0.983  pressure_grad_mag=0.999  tracer_laplacian=0.734
+  noise_std=   1.0  block_5      enstrophy=0.990  tracer_grad=0.808  advective_flux=0.180  strain_rate_mag=0.994  okubo_weiss=0.979  pressure_grad_mag=0.998  tracer_laplacian=0.757
+  noise_std=   1.0  block_6      enstrophy=0.988  tracer_grad=0.804  advective_flux=0.166  strain_rate_mag=0.994  okubo_weiss=0.974  pressure_grad_mag=0.998  tracer_laplacian=0.752
+  noise_std=   1.0  block_7      enstrophy=0.988  tracer_grad=0.789  advective_flux=0.203  strain_rate_mag=0.993  okubo_weiss=0.975  pressure_grad_mag=0.998  tracer_laplacian=0.744
+  noise_std=   1.0  block_8      enstrophy=0.986  tracer_grad=0.765  advective_flux=0.218  strain_rate_mag=0.993  okubo_weiss=0.971  pressure_grad_mag=0.998  tracer_laplacian=0.717
+  noise_std=   1.0  block_9      enstrophy=0.986  tracer_grad=0.749  advective_flux=0.234  strain_rate_mag=0.993  okubo_weiss=0.971  pressure_grad_mag=0.997  tracer_laplacian=0.701
+  noise_std=   1.0  block_10     enstrophy=0.984  tracer_grad=0.729  advective_flux=0.200  strain_rate_mag=0.992  okubo_weiss=0.969  pressure_grad_mag=0.997  tracer_laplacian=0.680
+  noise_std=   1.0  block_11     enstrophy=0.982  tracer_grad=0.715  advective_flux=0.210  strain_rate_mag=0.991  okubo_weiss=0.964  pressure_grad_mag=0.996  tracer_laplacian=0.661
+  noise_std=   1.0  block_12     enstrophy=0.979  tracer_grad=0.703  advective_flux=0.186  strain_rate_mag=0.991  okubo_weiss=0.960  pressure_grad_mag=0.996  tracer_laplacian=0.648
+  noise_std=   1.0  final_norm   enstrophy=0.979  tracer_grad=0.703  advective_flux=0.181  strain_rate_mag=0.991  okubo_weiss=0.960  pressure_grad_mag=0.996  tracer_laplacian=0.648
+  noise_std=   2.0  block_1      enstrophy=0.952  tracer_grad=0.517  advective_flux=-0.116  strain_rate_mag=0.968  okubo_weiss=0.874  pressure_grad_mag=0.975  tracer_laplacian=0.418
+  noise_std=   2.0  block_2      enstrophy=0.972  tracer_grad=0.629  advective_flux=-0.077  strain_rate_mag=0.981  okubo_weiss=0.918  pressure_grad_mag=0.990  tracer_laplacian=0.519
+  noise_std=   2.0  block_3      enstrophy=0.977  tracer_grad=0.652  advective_flux=-0.041  strain_rate_mag=0.985  okubo_weiss=0.931  pressure_grad_mag=0.994  tracer_laplacian=0.548
+  noise_std=   2.0  block_4      enstrophy=0.978  tracer_grad=0.665  advective_flux=-0.036  strain_rate_mag=0.986  okubo_weiss=0.936  pressure_grad_mag=0.995  tracer_laplacian=0.558
+  noise_std=   2.0  block_5      enstrophy=0.978  tracer_grad=0.661  advective_flux=-0.043  strain_rate_mag=0.985  okubo_weiss=0.933  pressure_grad_mag=0.994  tracer_laplacian=0.554
+  noise_std=   2.0  block_6      enstrophy=0.975  tracer_grad=0.659  advective_flux=-0.050  strain_rate_mag=0.985  okubo_weiss=0.923  pressure_grad_mag=0.994  tracer_laplacian=0.554
+  noise_std=   2.0  block_7      enstrophy=0.973  tracer_grad=0.666  advective_flux=-0.040  strain_rate_mag=0.984  okubo_weiss=0.923  pressure_grad_mag=0.993  tracer_laplacian=0.557
+  noise_std=   2.0  block_8      enstrophy=0.972  tracer_grad=0.662  advective_flux=-0.036  strain_rate_mag=0.983  okubo_weiss=0.924  pressure_grad_mag=0.992  tracer_laplacian=0.559
+  noise_std=   2.0  block_9      enstrophy=0.968  tracer_grad=0.639  advective_flux=-0.028  strain_rate_mag=0.981  okubo_weiss=0.921  pressure_grad_mag=0.991  tracer_laplacian=0.539
+  noise_std=   2.0  block_10     enstrophy=0.966  tracer_grad=0.625  advective_flux=-0.025  strain_rate_mag=0.979  okubo_weiss=0.917  pressure_grad_mag=0.990  tracer_laplacian=0.515
+  noise_std=   2.0  block_11     enstrophy=0.960  tracer_grad=0.599  advective_flux=-0.051  strain_rate_mag=0.976  okubo_weiss=0.910  pressure_grad_mag=0.987  tracer_laplacian=0.498
+  noise_std=   2.0  block_12     enstrophy=0.948  tracer_grad=0.574  advective_flux=-0.082  strain_rate_mag=0.972  okubo_weiss=0.884  pressure_grad_mag=0.983  tracer_laplacian=0.475
+  noise_std=   2.0  final_norm   enstrophy=0.945  tracer_grad=0.581  advective_flux=-0.085  strain_rate_mag=0.971  okubo_weiss=0.881  pressure_grad_mag=0.982  tracer_laplacian=0.485
+  -- per-token --
+    noise_std=   0.0  block_1      enstrophy=0.786  vorticity_signed=0.998  divergence=0.996  tracer_grad=0.772  advective_flux=0.552  strain_rate_mag=0.951  okubo_weiss=0.912  pressure_grad_mag=0.958  tracer_laplacian=0.724
+    noise_std=   0.0  block_2      enstrophy=0.879  vorticity_signed=0.988  divergence=0.978  tracer_grad=0.875  advective_flux=0.630  strain_rate_mag=0.975  okubo_weiss=0.933  pressure_grad_mag=0.976  tracer_laplacian=0.832
+    noise_std=   0.0  block_3      enstrophy=0.841  vorticity_signed=0.935  divergence=0.875  tracer_grad=0.867  advective_flux=0.556  strain_rate_mag=0.964  okubo_weiss=0.897  pressure_grad_mag=0.972  tracer_laplacian=0.824
+    noise_std=   0.0  block_4      enstrophy=0.764  vorticity_signed=0.846  divergence=0.684  tracer_grad=0.827  advective_flux=0.378  strain_rate_mag=0.940  okubo_weiss=0.835  pressure_grad_mag=0.954  tracer_laplacian=0.795
+    noise_std=   0.0  block_5      enstrophy=0.669  vorticity_signed=0.629  divergence=0.322  tracer_grad=0.706  advective_flux=0.204  strain_rate_mag=0.857  okubo_weiss=0.683  pressure_grad_mag=0.922  tracer_laplacian=0.680
+    noise_std=   0.0  block_6      enstrophy=0.578  vorticity_signed=0.539  divergence=0.150  tracer_grad=0.622  advective_flux=0.103  strain_rate_mag=0.756  okubo_weiss=0.532  pressure_grad_mag=0.866  tracer_laplacian=0.609
+    noise_std=   0.0  block_7      enstrophy=0.565  vorticity_signed=0.535  divergence=0.115  tracer_grad=0.565  advective_flux=0.076  strain_rate_mag=0.725  okubo_weiss=0.516  pressure_grad_mag=0.851  tracer_laplacian=0.556
+    noise_std=   0.0  block_8      enstrophy=0.559  vorticity_signed=0.543  divergence=0.099  tracer_grad=0.532  advective_flux=0.062  strain_rate_mag=0.714  okubo_weiss=0.510  pressure_grad_mag=0.843  tracer_laplacian=0.517
+    noise_std=   0.0  block_9      enstrophy=0.519  vorticity_signed=0.478  divergence=0.089  tracer_grad=0.503  advective_flux=0.053  strain_rate_mag=0.696  okubo_weiss=0.483  pressure_grad_mag=0.815  tracer_laplacian=0.483
+    noise_std=   0.0  block_10     enstrophy=0.493  vorticity_signed=0.435  divergence=0.081  tracer_grad=0.461  advective_flux=0.047  strain_rate_mag=0.678  okubo_weiss=0.449  pressure_grad_mag=0.786  tracer_laplacian=0.442
+    noise_std=   0.0  block_11     enstrophy=0.483  vorticity_signed=0.390  divergence=0.074  tracer_grad=0.454  advective_flux=0.039  strain_rate_mag=0.664  okubo_weiss=0.424  pressure_grad_mag=0.776  tracer_laplacian=0.429
+    noise_std=   0.0  block_12     enstrophy=0.460  vorticity_signed=0.317  divergence=0.068  tracer_grad=0.433  advective_flux=0.035  strain_rate_mag=0.646  okubo_weiss=0.395  pressure_grad_mag=0.753  tracer_laplacian=0.411
+    noise_std=   0.0  final_norm   enstrophy=0.462  vorticity_signed=0.313  divergence=0.003  tracer_grad=0.444  advective_flux=-0.002  strain_rate_mag=0.640  okubo_weiss=0.384  pressure_grad_mag=0.751  tracer_laplacian=0.421
+    noise_std=   0.1  block_1      enstrophy=0.716  vorticity_signed=0.992  divergence=0.988  tracer_grad=0.648  advective_flux=0.435  strain_rate_mag=0.922  okubo_weiss=0.841  pressure_grad_mag=0.942  tracer_laplacian=0.578
+    noise_std=   0.1  block_2      enstrophy=0.821  vorticity_signed=0.955  divergence=0.948  tracer_grad=0.805  advective_flux=0.492  strain_rate_mag=0.957  okubo_weiss=0.881  pressure_grad_mag=0.962  tracer_laplacian=0.744
+    noise_std=   0.1  block_3      enstrophy=0.783  vorticity_signed=0.863  divergence=0.773  tracer_grad=0.814  advective_flux=0.443  strain_rate_mag=0.948  okubo_weiss=0.852  pressure_grad_mag=0.959  tracer_laplacian=0.761
+    noise_std=   0.1  block_4      enstrophy=0.715  vorticity_signed=0.767  divergence=0.554  tracer_grad=0.776  advective_flux=0.293  strain_rate_mag=0.917  okubo_weiss=0.787  pressure_grad_mag=0.942  tracer_laplacian=0.735
+    noise_std=   0.1  block_5      enstrophy=0.648  vorticity_signed=0.597  divergence=0.275  tracer_grad=0.685  advective_flux=0.174  strain_rate_mag=0.841  okubo_weiss=0.660  pressure_grad_mag=0.912  tracer_laplacian=0.655
+    noise_std=   0.1  block_6      enstrophy=0.573  vorticity_signed=0.537  divergence=0.144  tracer_grad=0.619  advective_flux=0.098  strain_rate_mag=0.746  okubo_weiss=0.520  pressure_grad_mag=0.861  tracer_laplacian=0.606
+    noise_std=   0.1  block_7      enstrophy=0.561  vorticity_signed=0.547  divergence=0.112  tracer_grad=0.569  advective_flux=0.073  strain_rate_mag=0.722  okubo_weiss=0.509  pressure_grad_mag=0.850  tracer_laplacian=0.560
+    noise_std=   0.1  block_8      enstrophy=0.557  vorticity_signed=0.545  divergence=0.097  tracer_grad=0.541  advective_flux=0.060  strain_rate_mag=0.714  okubo_weiss=0.511  pressure_grad_mag=0.841  tracer_laplacian=0.525
+    noise_std=   0.1  block_9      enstrophy=0.520  vorticity_signed=0.478  divergence=0.087  tracer_grad=0.507  advective_flux=0.052  strain_rate_mag=0.696  okubo_weiss=0.483  pressure_grad_mag=0.813  tracer_laplacian=0.490
+    noise_std=   0.1  block_10     enstrophy=0.493  vorticity_signed=0.438  divergence=0.078  tracer_grad=0.466  advective_flux=0.045  strain_rate_mag=0.674  okubo_weiss=0.437  pressure_grad_mag=0.787  tracer_laplacian=0.447
+    noise_std=   0.1  block_11     enstrophy=0.485  vorticity_signed=0.386  divergence=0.071  tracer_grad=0.452  advective_flux=0.039  strain_rate_mag=0.660  okubo_weiss=0.411  pressure_grad_mag=0.779  tracer_laplacian=0.427
+    noise_std=   0.1  block_12     enstrophy=0.461  vorticity_signed=0.307  divergence=0.063  tracer_grad=0.429  advective_flux=0.034  strain_rate_mag=0.641  okubo_weiss=0.386  pressure_grad_mag=0.755  tracer_laplacian=0.402
+    noise_std=   0.1  final_norm   enstrophy=0.462  vorticity_signed=0.302  divergence=0.002  tracer_grad=0.439  advective_flux=-0.001  strain_rate_mag=0.635  okubo_weiss=0.373  pressure_grad_mag=0.752  tracer_laplacian=0.412
+    noise_std=  0.25  block_1      enstrophy=0.635  vorticity_signed=0.969  divergence=0.969  tracer_grad=0.493  advective_flux=0.320  strain_rate_mag=0.874  okubo_weiss=0.753  pressure_grad_mag=0.917  tracer_laplacian=0.415
+    noise_std=  0.25  block_2      enstrophy=0.734  vorticity_signed=0.876  divergence=0.901  tracer_grad=0.704  advective_flux=0.352  strain_rate_mag=0.924  okubo_weiss=0.796  pressure_grad_mag=0.941  tracer_laplacian=0.624
+    noise_std=  0.25  block_3      enstrophy=0.695  vorticity_signed=0.696  divergence=0.582  tracer_grad=0.719  advective_flux=0.294  strain_rate_mag=0.915  okubo_weiss=0.769  pressure_grad_mag=0.933  tracer_laplacian=0.648
+    noise_std=  0.25  block_4      enstrophy=0.640  vorticity_signed=0.594  divergence=0.388  tracer_grad=0.689  advective_flux=0.200  strain_rate_mag=0.874  okubo_weiss=0.701  pressure_grad_mag=0.910  tracer_laplacian=0.630
+    noise_std=  0.25  block_5      enstrophy=0.596  vorticity_signed=0.537  divergence=0.212  tracer_grad=0.632  advective_flux=0.128  strain_rate_mag=0.805  okubo_weiss=0.596  pressure_grad_mag=0.888  tracer_laplacian=0.596
+    noise_std=  0.25  block_6      enstrophy=0.558  vorticity_signed=0.527  divergence=0.122  tracer_grad=0.599  advective_flux=0.084  strain_rate_mag=0.736  okubo_weiss=0.503  pressure_grad_mag=0.853  tracer_laplacian=0.579
+    noise_std=  0.25  block_7      enstrophy=0.554  vorticity_signed=0.538  divergence=0.099  tracer_grad=0.570  advective_flux=0.064  strain_rate_mag=0.719  okubo_weiss=0.495  pressure_grad_mag=0.845  tracer_laplacian=0.555
+    noise_std=  0.25  block_8      enstrophy=0.544  vorticity_signed=0.531  divergence=0.085  tracer_grad=0.543  advective_flux=0.054  strain_rate_mag=0.712  okubo_weiss=0.503  pressure_grad_mag=0.835  tracer_laplacian=0.522
+    noise_std=  0.25  block_9      enstrophy=0.517  vorticity_signed=0.457  divergence=0.077  tracer_grad=0.505  advective_flux=0.045  strain_rate_mag=0.695  okubo_weiss=0.479  pressure_grad_mag=0.813  tracer_laplacian=0.484
+    noise_std=  0.25  block_10     enstrophy=0.492  vorticity_signed=0.424  divergence=0.068  tracer_grad=0.459  advective_flux=0.039  strain_rate_mag=0.672  okubo_weiss=0.431  pressure_grad_mag=0.788  tracer_laplacian=0.435
+    noise_std=  0.25  block_11     enstrophy=0.481  vorticity_signed=0.379  divergence=0.063  tracer_grad=0.442  advective_flux=0.036  strain_rate_mag=0.660  okubo_weiss=0.404  pressure_grad_mag=0.777  tracer_laplacian=0.415
+    noise_std=  0.25  block_12     enstrophy=0.456  vorticity_signed=0.287  divergence=0.056  tracer_grad=0.421  advective_flux=0.030  strain_rate_mag=0.640  okubo_weiss=0.376  pressure_grad_mag=0.751  tracer_laplacian=0.391
+    noise_std=  0.25  final_norm   enstrophy=0.456  vorticity_signed=0.280  divergence=-0.001  tracer_grad=0.433  advective_flux=-0.003  strain_rate_mag=0.634  okubo_weiss=0.365  pressure_grad_mag=0.747  tracer_laplacian=0.403
+    noise_std=   0.5  block_1      enstrophy=0.550  vorticity_signed=0.904  divergence=0.920  tracer_grad=0.332  advective_flux=0.219  strain_rate_mag=0.810  okubo_weiss=0.659  pressure_grad_mag=0.886  tracer_laplacian=0.273
+    noise_std=   0.5  block_2      enstrophy=0.635  vorticity_signed=0.753  divergence=0.850  tracer_grad=0.567  advective_flux=0.233  strain_rate_mag=0.873  okubo_weiss=0.690  pressure_grad_mag=0.909  tracer_laplacian=0.481
+    noise_std=   0.5  block_3      enstrophy=0.601  vorticity_signed=0.491  divergence=0.400  tracer_grad=0.604  advective_flux=0.188  strain_rate_mag=0.861  okubo_weiss=0.660  pressure_grad_mag=0.890  tracer_laplacian=0.517
+    noise_std=   0.5  block_4      enstrophy=0.558  vorticity_signed=0.397  divergence=0.247  tracer_grad=0.585  advective_flux=0.143  strain_rate_mag=0.817  okubo_weiss=0.593  pressure_grad_mag=0.856  tracer_laplacian=0.506
+    noise_std=   0.5  block_5      enstrophy=0.541  vorticity_signed=0.439  divergence=0.153  tracer_grad=0.571  advective_flux=0.092  strain_rate_mag=0.769  okubo_weiss=0.521  pressure_grad_mag=0.848  tracer_laplacian=0.517
+    noise_std=   0.5  block_6      enstrophy=0.539  vorticity_signed=0.477  divergence=0.101  tracer_grad=0.582  advective_flux=0.069  strain_rate_mag=0.725  okubo_weiss=0.476  pressure_grad_mag=0.836  tracer_laplacian=0.545
+    noise_std=   0.5  block_7      enstrophy=0.540  vorticity_signed=0.499  divergence=0.077  tracer_grad=0.581  advective_flux=0.054  strain_rate_mag=0.722  okubo_weiss=0.482  pressure_grad_mag=0.833  tracer_laplacian=0.549
+    noise_std=   0.5  block_8      enstrophy=0.529  vorticity_signed=0.495  divergence=0.063  tracer_grad=0.546  advective_flux=0.044  strain_rate_mag=0.710  okubo_weiss=0.474  pressure_grad_mag=0.824  tracer_laplacian=0.511
+    noise_std=   0.5  block_9      enstrophy=0.508  vorticity_signed=0.426  divergence=0.056  tracer_grad=0.508  advective_flux=0.035  strain_rate_mag=0.695  okubo_weiss=0.456  pressure_grad_mag=0.804  tracer_laplacian=0.475
+    noise_std=   0.5  block_10     enstrophy=0.483  vorticity_signed=0.398  divergence=0.050  tracer_grad=0.465  advective_flux=0.030  strain_rate_mag=0.669  okubo_weiss=0.410  pressure_grad_mag=0.775  tracer_laplacian=0.428
+    noise_std=   0.5  block_11     enstrophy=0.467  vorticity_signed=0.355  divergence=0.046  tracer_grad=0.441  advective_flux=0.028  strain_rate_mag=0.661  okubo_weiss=0.388  pressure_grad_mag=0.762  tracer_laplacian=0.404
+    noise_std=   0.5  block_12     enstrophy=0.435  vorticity_signed=0.250  divergence=0.043  tracer_grad=0.407  advective_flux=0.023  strain_rate_mag=0.636  okubo_weiss=0.351  pressure_grad_mag=0.732  tracer_laplacian=0.365
+    noise_std=   0.5  final_norm   enstrophy=0.434  vorticity_signed=0.242  divergence=-0.004  tracer_grad=0.423  advective_flux=-0.003  strain_rate_mag=0.632  okubo_weiss=0.344  pressure_grad_mag=0.728  tracer_laplacian=0.379
+    noise_std=   1.0  block_1      enstrophy=0.451  vorticity_signed=0.722  divergence=0.778  tracer_grad=0.153  advective_flux=0.138  strain_rate_mag=0.717  okubo_weiss=0.540  pressure_grad_mag=0.837  tracer_laplacian=0.131
+    noise_std=   1.0  block_2      enstrophy=0.504  vorticity_signed=0.572  divergence=0.740  tracer_grad=0.327  advective_flux=0.142  strain_rate_mag=0.767  okubo_weiss=0.526  pressure_grad_mag=0.849  tracer_laplacian=0.267
+    noise_std=   1.0  block_3      enstrophy=0.497  vorticity_signed=0.396  divergence=0.532  tracer_grad=0.380  advective_flux=0.134  strain_rate_mag=0.765  okubo_weiss=0.509  pressure_grad_mag=0.819  tracer_laplacian=0.307
+    noise_std=   1.0  block_4      enstrophy=0.469  vorticity_signed=0.311  divergence=0.357  tracer_grad=0.382  advective_flux=0.113  strain_rate_mag=0.730  okubo_weiss=0.468  pressure_grad_mag=0.779  tracer_laplacian=0.309
+    noise_std=   1.0  block_5      enstrophy=0.461  vorticity_signed=0.310  divergence=0.221  tracer_grad=0.405  advective_flux=0.088  strain_rate_mag=0.706  okubo_weiss=0.426  pressure_grad_mag=0.766  tracer_laplacian=0.334
+    noise_std=   1.0  block_6      enstrophy=0.450  vorticity_signed=0.298  divergence=0.104  tracer_grad=0.414  advective_flux=0.058  strain_rate_mag=0.660  okubo_weiss=0.365  pressure_grad_mag=0.745  tracer_laplacian=0.359
+    noise_std=   1.0  block_7      enstrophy=0.449  vorticity_signed=0.312  divergence=0.058  tracer_grad=0.414  advective_flux=0.042  strain_rate_mag=0.653  okubo_weiss=0.382  pressure_grad_mag=0.749  tracer_laplacian=0.360
+    noise_std=   1.0  block_8      enstrophy=0.446  vorticity_signed=0.369  divergence=0.039  tracer_grad=0.372  advective_flux=0.032  strain_rate_mag=0.646  okubo_weiss=0.383  pressure_grad_mag=0.738  tracer_laplacian=0.324
+    noise_std=   1.0  block_9      enstrophy=0.431  vorticity_signed=0.340  divergence=0.029  tracer_grad=0.351  advective_flux=0.024  strain_rate_mag=0.640  okubo_weiss=0.377  pressure_grad_mag=0.726  tracer_laplacian=0.311
+    noise_std=   1.0  block_10     enstrophy=0.405  vorticity_signed=0.313  divergence=0.025  tracer_grad=0.339  advective_flux=0.024  strain_rate_mag=0.624  okubo_weiss=0.356  pressure_grad_mag=0.691  tracer_laplacian=0.303
+    noise_std=   1.0  block_11     enstrophy=0.386  vorticity_signed=0.250  divergence=0.022  tracer_grad=0.313  advective_flux=0.020  strain_rate_mag=0.613  okubo_weiss=0.325  pressure_grad_mag=0.677  tracer_laplacian=0.280
+    noise_std=   1.0  block_12     enstrophy=0.337  vorticity_signed=0.164  divergence=0.023  tracer_grad=0.260  advective_flux=0.017  strain_rate_mag=0.574  okubo_weiss=0.280  pressure_grad_mag=0.608  tracer_laplacian=0.227
+    noise_std=   1.0  final_norm   enstrophy=0.339  vorticity_signed=0.161  divergence=-0.004  tracer_grad=0.269  advective_flux=0.002  strain_rate_mag=0.578  okubo_weiss=0.284  pressure_grad_mag=0.615  tracer_laplacian=0.234
+    noise_std=   2.0  block_1      enstrophy=0.295  vorticity_signed=0.411  divergence=0.502  tracer_grad=0.035  advective_flux=0.071  strain_rate_mag=0.564  okubo_weiss=0.411  pressure_grad_mag=0.664  tracer_laplacian=0.035
+    noise_std=   2.0  block_2      enstrophy=0.324  vorticity_signed=0.331  divergence=0.490  tracer_grad=0.075  advective_flux=0.074  strain_rate_mag=0.601  okubo_weiss=0.379  pressure_grad_mag=0.677  tracer_laplacian=0.061
+    noise_std=   2.0  block_3      enstrophy=0.328  vorticity_signed=0.285  divergence=0.461  tracer_grad=0.100  advective_flux=0.073  strain_rate_mag=0.597  okubo_weiss=0.366  pressure_grad_mag=0.656  tracer_laplacian=0.077
+    noise_std=   2.0  block_4      enstrophy=0.323  vorticity_signed=0.270  divergence=0.432  tracer_grad=0.112  advective_flux=0.069  strain_rate_mag=0.582  okubo_weiss=0.356  pressure_grad_mag=0.634  tracer_laplacian=0.082
+    noise_std=   2.0  block_5      enstrophy=0.322  vorticity_signed=0.269  divergence=0.408  tracer_grad=0.116  advective_flux=0.065  strain_rate_mag=0.570  okubo_weiss=0.343  pressure_grad_mag=0.627  tracer_laplacian=0.084
+    noise_std=   2.0  block_6      enstrophy=0.315  vorticity_signed=0.269  divergence=0.365  tracer_grad=0.122  advective_flux=0.060  strain_rate_mag=0.560  okubo_weiss=0.323  pressure_grad_mag=0.609  tracer_laplacian=0.091
+    noise_std=   2.0  block_7      enstrophy=0.298  vorticity_signed=0.242  divergence=0.285  tracer_grad=0.118  advective_flux=0.051  strain_rate_mag=0.539  okubo_weiss=0.299  pressure_grad_mag=0.577  tracer_laplacian=0.090
+    noise_std=   2.0  block_8      enstrophy=0.265  vorticity_signed=0.202  divergence=0.200  tracer_grad=0.110  advective_flux=0.040  strain_rate_mag=0.511  okubo_weiss=0.278  pressure_grad_mag=0.514  tracer_laplacian=0.087
+    noise_std=   2.0  block_9      enstrophy=0.222  vorticity_signed=0.159  divergence=0.128  tracer_grad=0.098  advective_flux=0.027  strain_rate_mag=0.472  okubo_weiss=0.253  pressure_grad_mag=0.438  tracer_laplacian=0.080
+    noise_std=   2.0  block_10     enstrophy=0.204  vorticity_signed=0.129  divergence=0.070  tracer_grad=0.093  advective_flux=0.021  strain_rate_mag=0.455  okubo_weiss=0.234  pressure_grad_mag=0.419  tracer_laplacian=0.076
+    noise_std=   2.0  block_11     enstrophy=0.170  vorticity_signed=0.096  divergence=0.043  tracer_grad=0.088  advective_flux=0.017  strain_rate_mag=0.424  okubo_weiss=0.209  pressure_grad_mag=0.347  tracer_laplacian=0.074
+    noise_std=   2.0  block_12     enstrophy=0.137  vorticity_signed=0.063  divergence=0.035  tracer_grad=0.077  advective_flux=0.014  strain_rate_mag=0.394  okubo_weiss=0.184  pressure_grad_mag=0.292  tracer_laplacian=0.065
+    noise_std=   2.0  final_norm   enstrophy=0.142  vorticity_signed=0.062  divergence=0.028  tracer_grad=0.079  advective_flux=0.009  strain_rate_mag=0.401  okubo_weiss=0.191  pressure_grad_mag=0.306  tracer_laplacian=0.067
+
+=== checkpoints/shear_flow_mae.pt ===
+  noise_std=   0.0  block_1      enstrophy=0.981  tracer_grad=0.812  advective_flux=0.392  strain_rate_mag=0.997  okubo_weiss=0.963  pressure_grad_mag=0.997  tracer_laplacian=0.761
+  noise_std=   0.0  block_2      enstrophy=0.988  tracer_grad=0.857  advective_flux=0.416  strain_rate_mag=0.998  okubo_weiss=0.978  pressure_grad_mag=0.999  tracer_laplacian=0.820
+  noise_std=   0.0  block_3      enstrophy=0.990  tracer_grad=0.894  advective_flux=0.427  strain_rate_mag=0.999  okubo_weiss=0.984  pressure_grad_mag=0.999  tracer_laplacian=0.868
+  noise_std=   0.0  block_4      enstrophy=0.993  tracer_grad=0.902  advective_flux=0.451  strain_rate_mag=0.999  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.882
+  noise_std=   0.0  block_5      enstrophy=0.994  tracer_grad=0.904  advective_flux=0.479  strain_rate_mag=0.999  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.882
+  noise_std=   0.0  block_6      enstrophy=0.995  tracer_grad=0.897  advective_flux=0.472  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.878
+  noise_std=   0.0  block_7      enstrophy=0.995  tracer_grad=0.900  advective_flux=0.527  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.879
+  noise_std=   0.0  block_8      enstrophy=0.995  tracer_grad=0.898  advective_flux=0.539  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=0.999  tracer_laplacian=0.881
+  noise_std=   0.0  block_9      enstrophy=0.995  tracer_grad=0.890  advective_flux=0.560  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.871
+  noise_std=   0.0  block_10     enstrophy=0.995  tracer_grad=0.885  advective_flux=0.580  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.870
+  noise_std=   0.0  block_11     enstrophy=0.995  tracer_grad=0.882  advective_flux=0.582  strain_rate_mag=0.998  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.868
+  noise_std=   0.0  block_12     enstrophy=0.995  tracer_grad=0.875  advective_flux=0.579  strain_rate_mag=0.998  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.863
+  noise_std=   0.0  final_norm   enstrophy=0.994  tracer_grad=0.881  advective_flux=0.583  strain_rate_mag=0.998  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.870
+  noise_std=   0.1  block_1      enstrophy=0.980  tracer_grad=0.807  advective_flux=0.386  strain_rate_mag=0.997  okubo_weiss=0.962  pressure_grad_mag=0.997  tracer_laplacian=0.756
+  noise_std=   0.1  block_2      enstrophy=0.987  tracer_grad=0.854  advective_flux=0.413  strain_rate_mag=0.998  okubo_weiss=0.977  pressure_grad_mag=0.999  tracer_laplacian=0.816
+  noise_std=   0.1  block_3      enstrophy=0.990  tracer_grad=0.893  advective_flux=0.425  strain_rate_mag=0.999  okubo_weiss=0.984  pressure_grad_mag=0.999  tracer_laplacian=0.866
+  noise_std=   0.1  block_4      enstrophy=0.993  tracer_grad=0.902  advective_flux=0.450  strain_rate_mag=0.999  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.881
+  noise_std=   0.1  block_5      enstrophy=0.994  tracer_grad=0.906  advective_flux=0.477  strain_rate_mag=0.999  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.884
+  noise_std=   0.1  block_6      enstrophy=0.995  tracer_grad=0.898  advective_flux=0.474  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.879
+  noise_std=   0.1  block_7      enstrophy=0.995  tracer_grad=0.900  advective_flux=0.526  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.880
+  noise_std=   0.1  block_8      enstrophy=0.996  tracer_grad=0.900  advective_flux=0.544  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=0.999  tracer_laplacian=0.883
+  noise_std=   0.1  block_9      enstrophy=0.995  tracer_grad=0.892  advective_flux=0.562  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.874
+  noise_std=   0.1  block_10     enstrophy=0.995  tracer_grad=0.887  advective_flux=0.577  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.871
+  noise_std=   0.1  block_11     enstrophy=0.995  tracer_grad=0.883  advective_flux=0.578  strain_rate_mag=0.998  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.869
+  noise_std=   0.1  block_12     enstrophy=0.995  tracer_grad=0.876  advective_flux=0.576  strain_rate_mag=0.998  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.863
+  noise_std=   0.1  final_norm   enstrophy=0.993  tracer_grad=0.880  advective_flux=0.578  strain_rate_mag=0.998  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.868
+  noise_std=  0.25  block_1      enstrophy=0.978  tracer_grad=0.790  advective_flux=0.348  strain_rate_mag=0.996  okubo_weiss=0.957  pressure_grad_mag=0.996  tracer_laplacian=0.734
+  noise_std=  0.25  block_2      enstrophy=0.986  tracer_grad=0.844  advective_flux=0.387  strain_rate_mag=0.998  okubo_weiss=0.975  pressure_grad_mag=0.998  tracer_laplacian=0.802
+  noise_std=  0.25  block_3      enstrophy=0.990  tracer_grad=0.890  advective_flux=0.408  strain_rate_mag=0.998  okubo_weiss=0.983  pressure_grad_mag=0.999  tracer_laplacian=0.863
+  noise_std=  0.25  block_4      enstrophy=0.993  tracer_grad=0.904  advective_flux=0.433  strain_rate_mag=0.999  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.882
+  noise_std=  0.25  block_5      enstrophy=0.994  tracer_grad=0.909  advective_flux=0.455  strain_rate_mag=0.999  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.887
+  noise_std=  0.25  block_6      enstrophy=0.995  tracer_grad=0.903  advective_flux=0.462  strain_rate_mag=0.999  okubo_weiss=0.991  pressure_grad_mag=0.999  tracer_laplacian=0.884
+  noise_std=  0.25  block_7      enstrophy=0.995  tracer_grad=0.905  advective_flux=0.500  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.884
+  noise_std=  0.25  block_8      enstrophy=0.996  tracer_grad=0.902  advective_flux=0.523  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.886
+  noise_std=  0.25  block_9      enstrophy=0.996  tracer_grad=0.896  advective_flux=0.550  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.879
+  noise_std=  0.25  block_10     enstrophy=0.996  tracer_grad=0.891  advective_flux=0.564  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.876
+  noise_std=  0.25  block_11     enstrophy=0.995  tracer_grad=0.888  advective_flux=0.565  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=0.999  tracer_laplacian=0.875
+  noise_std=  0.25  block_12     enstrophy=0.995  tracer_grad=0.882  advective_flux=0.562  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.871
+  noise_std=  0.25  final_norm   enstrophy=0.994  tracer_grad=0.878  advective_flux=0.562  strain_rate_mag=0.998  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.867
+  noise_std=   0.5  block_1      enstrophy=0.972  tracer_grad=0.748  advective_flux=0.237  strain_rate_mag=0.994  okubo_weiss=0.943  pressure_grad_mag=0.995  tracer_laplacian=0.681
+  noise_std=   0.5  block_2      enstrophy=0.983  tracer_grad=0.814  advective_flux=0.293  strain_rate_mag=0.997  okubo_weiss=0.969  pressure_grad_mag=0.998  tracer_laplacian=0.763
+  noise_std=   0.5  block_3      enstrophy=0.989  tracer_grad=0.865  advective_flux=0.321  strain_rate_mag=0.998  okubo_weiss=0.981  pressure_grad_mag=0.999  tracer_laplacian=0.834
+  noise_std=   0.5  block_4      enstrophy=0.992  tracer_grad=0.887  advective_flux=0.350  strain_rate_mag=0.999  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.859
+  noise_std=   0.5  block_5      enstrophy=0.994  tracer_grad=0.898  advective_flux=0.367  strain_rate_mag=0.999  okubo_weiss=0.989  pressure_grad_mag=0.999  tracer_laplacian=0.870
+  noise_std=   0.5  block_6      enstrophy=0.995  tracer_grad=0.902  advective_flux=0.393  strain_rate_mag=0.999  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.878
+  noise_std=   0.5  block_7      enstrophy=0.995  tracer_grad=0.900  advective_flux=0.430  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.876
+  noise_std=   0.5  block_8      enstrophy=0.996  tracer_grad=0.898  advective_flux=0.446  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.878
+  noise_std=   0.5  block_9      enstrophy=0.996  tracer_grad=0.897  advective_flux=0.475  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.876
+  noise_std=   0.5  block_10     enstrophy=0.996  tracer_grad=0.894  advective_flux=0.482  strain_rate_mag=0.999  okubo_weiss=0.993  pressure_grad_mag=1.000  tracer_laplacian=0.875
+  noise_std=   0.5  block_11     enstrophy=0.995  tracer_grad=0.891  advective_flux=0.481  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.871
+  noise_std=   0.5  block_12     enstrophy=0.995  tracer_grad=0.885  advective_flux=0.467  strain_rate_mag=0.999  okubo_weiss=0.992  pressure_grad_mag=1.000  tracer_laplacian=0.866
+  noise_std=   0.5  final_norm   enstrophy=0.993  tracer_grad=0.877  advective_flux=0.471  strain_rate_mag=0.998  okubo_weiss=0.990  pressure_grad_mag=0.999  tracer_laplacian=0.859
+  noise_std=   1.0  block_1      enstrophy=0.961  tracer_grad=0.631  advective_flux=0.082  strain_rate_mag=0.987  okubo_weiss=0.913  pressure_grad_mag=0.992  tracer_laplacian=0.539
+  noise_std=   1.0  block_2      enstrophy=0.975  tracer_grad=0.705  advective_flux=0.107  strain_rate_mag=0.994  okubo_weiss=0.944  pressure_grad_mag=0.996  tracer_laplacian=0.617
+  noise_std=   1.0  block_3      enstrophy=0.983  tracer_grad=0.786  advective_flux=0.133  strain_rate_mag=0.996  okubo_weiss=0.962  pressure_grad_mag=0.997  tracer_laplacian=0.731
+  noise_std=   1.0  block_4      enstrophy=0.988  tracer_grad=0.823  advective_flux=0.173  strain_rate_mag=0.996  okubo_weiss=0.973  pressure_grad_mag=0.998  tracer_laplacian=0.785
+  noise_std=   1.0  block_5      enstrophy=0.990  tracer_grad=0.838  advective_flux=0.199  strain_rate_mag=0.997  okubo_weiss=0.976  pressure_grad_mag=0.999  tracer_laplacian=0.803
+  noise_std=   1.0  block_6      enstrophy=0.992  tracer_grad=0.847  advective_flux=0.207  strain_rate_mag=0.997  okubo_weiss=0.980  pressure_grad_mag=0.999  tracer_laplacian=0.815
+  noise_std=   1.0  block_7      enstrophy=0.993  tracer_grad=0.850  advective_flux=0.216  strain_rate_mag=0.997  okubo_weiss=0.983  pressure_grad_mag=0.999  tracer_laplacian=0.820
+  noise_std=   1.0  block_8      enstrophy=0.993  tracer_grad=0.851  advective_flux=0.227  strain_rate_mag=0.997  okubo_weiss=0.985  pressure_grad_mag=0.999  tracer_laplacian=0.820
+  noise_std=   1.0  block_9      enstrophy=0.993  tracer_grad=0.853  advective_flux=0.245  strain_rate_mag=0.997  okubo_weiss=0.986  pressure_grad_mag=0.999  tracer_laplacian=0.820
+  noise_std=   1.0  block_10     enstrophy=0.994  tracer_grad=0.854  advective_flux=0.268  strain_rate_mag=0.997  okubo_weiss=0.987  pressure_grad_mag=0.999  tracer_laplacian=0.821
+  noise_std=   1.0  block_11     enstrophy=0.993  tracer_grad=0.851  advective_flux=0.271  strain_rate_mag=0.997  okubo_weiss=0.986  pressure_grad_mag=0.999  tracer_laplacian=0.819
+  noise_std=   1.0  block_12     enstrophy=0.993  tracer_grad=0.844  advective_flux=0.262  strain_rate_mag=0.997  okubo_weiss=0.985  pressure_grad_mag=0.999  tracer_laplacian=0.811
+  noise_std=   1.0  final_norm   enstrophy=0.989  tracer_grad=0.833  advective_flux=0.263  strain_rate_mag=0.997  okubo_weiss=0.979  pressure_grad_mag=0.998  tracer_laplacian=0.800
+  noise_std=   2.0  block_1      enstrophy=0.916  tracer_grad=0.425  advective_flux=-0.090  strain_rate_mag=0.952  okubo_weiss=0.832  pressure_grad_mag=0.967  tracer_laplacian=0.328
+  noise_std=   2.0  block_2      enstrophy=0.948  tracer_grad=0.540  advective_flux=-0.080  strain_rate_mag=0.975  okubo_weiss=0.880  pressure_grad_mag=0.983  tracer_laplacian=0.412
+  noise_std=   2.0  block_3      enstrophy=0.961  tracer_grad=0.580  advective_flux=-0.070  strain_rate_mag=0.984  okubo_weiss=0.901  pressure_grad_mag=0.989  tracer_laplacian=0.454
+  noise_std=   2.0  block_4      enstrophy=0.966  tracer_grad=0.622  advective_flux=-0.066  strain_rate_mag=0.985  okubo_weiss=0.910  pressure_grad_mag=0.991  tracer_laplacian=0.501
+  noise_std=   2.0  block_5      enstrophy=0.970  tracer_grad=0.635  advective_flux=-0.066  strain_rate_mag=0.986  okubo_weiss=0.914  pressure_grad_mag=0.992  tracer_laplacian=0.516
+  noise_std=   2.0  block_6      enstrophy=0.973  tracer_grad=0.643  advective_flux=-0.058  strain_rate_mag=0.987  okubo_weiss=0.919  pressure_grad_mag=0.993  tracer_laplacian=0.527
+  noise_std=   2.0  block_7      enstrophy=0.975  tracer_grad=0.645  advective_flux=-0.051  strain_rate_mag=0.987  okubo_weiss=0.924  pressure_grad_mag=0.993  tracer_laplacian=0.531
+  noise_std=   2.0  block_8      enstrophy=0.976  tracer_grad=0.647  advective_flux=-0.051  strain_rate_mag=0.987  okubo_weiss=0.926  pressure_grad_mag=0.993  tracer_laplacian=0.533
+  noise_std=   2.0  block_9      enstrophy=0.977  tracer_grad=0.647  advective_flux=-0.039  strain_rate_mag=0.988  okubo_weiss=0.928  pressure_grad_mag=0.994  tracer_laplacian=0.533
+  noise_std=   2.0  block_10     enstrophy=0.978  tracer_grad=0.651  advective_flux=-0.033  strain_rate_mag=0.987  okubo_weiss=0.929  pressure_grad_mag=0.994  tracer_laplacian=0.539
+  noise_std=   2.0  block_11     enstrophy=0.978  tracer_grad=0.654  advective_flux=-0.032  strain_rate_mag=0.988  okubo_weiss=0.928  pressure_grad_mag=0.994  tracer_laplacian=0.543
+  noise_std=   2.0  block_12     enstrophy=0.979  tracer_grad=0.657  advective_flux=-0.030  strain_rate_mag=0.988  okubo_weiss=0.928  pressure_grad_mag=0.994  tracer_laplacian=0.546
+  noise_std=   2.0  final_norm   enstrophy=0.973  tracer_grad=0.642  advective_flux=-0.020  strain_rate_mag=0.988  okubo_weiss=0.918  pressure_grad_mag=0.993  tracer_laplacian=0.536
+  -- per-token --
+    noise_std=   0.0  block_1      enstrophy=0.754  vorticity_signed=0.999  divergence=0.999  tracer_grad=0.823  advective_flux=0.689  strain_rate_mag=0.952  okubo_weiss=0.902  pressure_grad_mag=0.942  tracer_laplacian=0.768
+    noise_std=   0.0  block_2      enstrophy=0.829  vorticity_signed=0.999  divergence=0.997  tracer_grad=0.904  advective_flux=0.714  strain_rate_mag=0.976  okubo_weiss=0.919  pressure_grad_mag=0.963  tracer_laplacian=0.875
+    noise_std=   0.0  block_3      enstrophy=0.857  vorticity_signed=0.998  divergence=0.978  tracer_grad=0.921  advective_flux=0.687  strain_rate_mag=0.984  okubo_weiss=0.934  pressure_grad_mag=0.971  tracer_laplacian=0.891
+    noise_std=   0.0  block_4      enstrophy=0.870  vorticity_signed=0.994  divergence=0.933  tracer_grad=0.925  advective_flux=0.640  strain_rate_mag=0.986  okubo_weiss=0.945  pressure_grad_mag=0.978  tracer_laplacian=0.897
+    noise_std=   0.0  block_5      enstrophy=0.877  vorticity_signed=0.989  divergence=0.883  tracer_grad=0.918  advective_flux=0.586  strain_rate_mag=0.985  okubo_weiss=0.946  pressure_grad_mag=0.981  tracer_laplacian=0.888
+    noise_std=   0.0  block_6      enstrophy=0.878  vorticity_signed=0.980  divergence=0.820  tracer_grad=0.915  advective_flux=0.549  strain_rate_mag=0.984  okubo_weiss=0.946  pressure_grad_mag=0.981  tracer_laplacian=0.886
+    noise_std=   0.0  block_7      enstrophy=0.872  vorticity_signed=0.969  divergence=0.785  tracer_grad=0.905  advective_flux=0.507  strain_rate_mag=0.981  okubo_weiss=0.946  pressure_grad_mag=0.980  tracer_laplacian=0.877
+    noise_std=   0.0  block_8      enstrophy=0.862  vorticity_signed=0.955  divergence=0.754  tracer_grad=0.891  advective_flux=0.476  strain_rate_mag=0.979  okubo_weiss=0.943  pressure_grad_mag=0.979  tracer_laplacian=0.860
+    noise_std=   0.0  block_9      enstrophy=0.856  vorticity_signed=0.949  divergence=0.734  tracer_grad=0.884  advective_flux=0.455  strain_rate_mag=0.977  okubo_weiss=0.940  pressure_grad_mag=0.978  tracer_laplacian=0.851
+    noise_std=   0.0  block_10     enstrophy=0.852  vorticity_signed=0.945  divergence=0.713  tracer_grad=0.886  advective_flux=0.429  strain_rate_mag=0.976  okubo_weiss=0.940  pressure_grad_mag=0.978  tracer_laplacian=0.854
+    noise_std=   0.0  block_11     enstrophy=0.851  vorticity_signed=0.941  divergence=0.686  tracer_grad=0.884  advective_flux=0.405  strain_rate_mag=0.975  okubo_weiss=0.938  pressure_grad_mag=0.978  tracer_laplacian=0.853
+    noise_std=   0.0  block_12     enstrophy=0.847  vorticity_signed=0.939  divergence=0.671  tracer_grad=0.879  advective_flux=0.394  strain_rate_mag=0.974  okubo_weiss=0.937  pressure_grad_mag=0.978  tracer_laplacian=0.848
+    noise_std=   0.0  final_norm   enstrophy=0.827  vorticity_signed=0.931  divergence=0.642  tracer_grad=0.891  advective_flux=0.400  strain_rate_mag=0.963  okubo_weiss=0.893  pressure_grad_mag=0.972  tracer_laplacian=0.864
+    noise_std=   0.1  block_1      enstrophy=0.659  vorticity_signed=0.996  divergence=0.994  tracer_grad=0.693  advective_flux=0.552  strain_rate_mag=0.915  okubo_weiss=0.814  pressure_grad_mag=0.920  tracer_laplacian=0.615
+    noise_std=   0.1  block_2      enstrophy=0.779  vorticity_signed=0.995  divergence=0.991  tracer_grad=0.829  advective_flux=0.578  strain_rate_mag=0.960  okubo_weiss=0.865  pressure_grad_mag=0.949  tracer_laplacian=0.772
+    noise_std=   0.1  block_3      enstrophy=0.820  vorticity_signed=0.992  divergence=0.950  tracer_grad=0.862  advective_flux=0.562  strain_rate_mag=0.975  okubo_weiss=0.898  pressure_grad_mag=0.960  tracer_laplacian=0.810
+    noise_std=   0.1  block_4      enstrophy=0.835  vorticity_signed=0.987  divergence=0.873  tracer_grad=0.878  advective_flux=0.525  strain_rate_mag=0.979  okubo_weiss=0.921  pressure_grad_mag=0.970  tracer_laplacian=0.833
+    noise_std=   0.1  block_5      enstrophy=0.843  vorticity_signed=0.980  divergence=0.811  tracer_grad=0.875  advective_flux=0.487  strain_rate_mag=0.978  okubo_weiss=0.927  pressure_grad_mag=0.975  tracer_laplacian=0.833
+    noise_std=   0.1  block_6      enstrophy=0.846  vorticity_signed=0.968  divergence=0.753  tracer_grad=0.881  advective_flux=0.455  strain_rate_mag=0.976  okubo_weiss=0.929  pressure_grad_mag=0.975  tracer_laplacian=0.842
+    noise_std=   0.1  block_7      enstrophy=0.841  vorticity_signed=0.955  divergence=0.717  tracer_grad=0.873  advective_flux=0.422  strain_rate_mag=0.974  okubo_weiss=0.930  pressure_grad_mag=0.974  tracer_laplacian=0.834
+    noise_std=   0.1  block_8      enstrophy=0.834  vorticity_signed=0.938  divergence=0.691  tracer_grad=0.860  advective_flux=0.397  strain_rate_mag=0.971  okubo_weiss=0.929  pressure_grad_mag=0.973  tracer_laplacian=0.819
+    noise_std=   0.1  block_9      enstrophy=0.829  vorticity_signed=0.930  divergence=0.672  tracer_grad=0.854  advective_flux=0.376  strain_rate_mag=0.969  okubo_weiss=0.926  pressure_grad_mag=0.973  tracer_laplacian=0.811
+    noise_std=   0.1  block_10     enstrophy=0.823  vorticity_signed=0.925  divergence=0.652  tracer_grad=0.853  advective_flux=0.360  strain_rate_mag=0.967  okubo_weiss=0.925  pressure_grad_mag=0.972  tracer_laplacian=0.811
+    noise_std=   0.1  block_11     enstrophy=0.824  vorticity_signed=0.920  divergence=0.627  tracer_grad=0.850  advective_flux=0.344  strain_rate_mag=0.967  okubo_weiss=0.924  pressure_grad_mag=0.973  tracer_laplacian=0.810
+    noise_std=   0.1  block_12     enstrophy=0.819  vorticity_signed=0.916  divergence=0.614  tracer_grad=0.845  advective_flux=0.338  strain_rate_mag=0.965  okubo_weiss=0.923  pressure_grad_mag=0.973  tracer_laplacian=0.804
+    noise_std=   0.1  final_norm   enstrophy=0.795  vorticity_signed=0.903  divergence=0.573  tracer_grad=0.856  advective_flux=0.337  strain_rate_mag=0.951  okubo_weiss=0.869  pressure_grad_mag=0.965  tracer_laplacian=0.819
+    noise_std=  0.25  block_1      enstrophy=0.553  vorticity_signed=0.981  divergence=0.981  tracer_grad=0.507  advective_flux=0.345  strain_rate_mag=0.849  okubo_weiss=0.708  pressure_grad_mag=0.893  tracer_laplacian=0.436
+    noise_std=  0.25  block_2      enstrophy=0.688  vorticity_signed=0.981  divergence=0.977  tracer_grad=0.725  advective_flux=0.372  strain_rate_mag=0.930  okubo_weiss=0.793  pressure_grad_mag=0.927  tracer_laplacian=0.634
+    noise_std=  0.25  block_3      enstrophy=0.747  vorticity_signed=0.976  divergence=0.907  tracer_grad=0.765  advective_flux=0.368  strain_rate_mag=0.956  okubo_weiss=0.843  pressure_grad_mag=0.940  tracer_laplacian=0.682
+    noise_std=  0.25  block_4      enstrophy=0.764  vorticity_signed=0.965  divergence=0.774  tracer_grad=0.786  advective_flux=0.346  strain_rate_mag=0.959  okubo_weiss=0.871  pressure_grad_mag=0.952  tracer_laplacian=0.713
+    noise_std=  0.25  block_5      enstrophy=0.775  vorticity_signed=0.953  divergence=0.695  tracer_grad=0.786  advective_flux=0.322  strain_rate_mag=0.957  okubo_weiss=0.884  pressure_grad_mag=0.958  tracer_laplacian=0.718
+    noise_std=  0.25  block_6      enstrophy=0.773  vorticity_signed=0.936  divergence=0.630  tracer_grad=0.799  advective_flux=0.294  strain_rate_mag=0.955  okubo_weiss=0.887  pressure_grad_mag=0.958  tracer_laplacian=0.735
+    noise_std=  0.25  block_7      enstrophy=0.770  vorticity_signed=0.917  divergence=0.591  tracer_grad=0.788  advective_flux=0.279  strain_rate_mag=0.951  okubo_weiss=0.890  pressure_grad_mag=0.959  tracer_laplacian=0.724
+    noise_std=  0.25  block_8      enstrophy=0.768  vorticity_signed=0.894  divergence=0.560  tracer_grad=0.778  advective_flux=0.262  strain_rate_mag=0.948  okubo_weiss=0.891  pressure_grad_mag=0.959  tracer_laplacian=0.713
+    noise_std=  0.25  block_9      enstrophy=0.763  vorticity_signed=0.880  divergence=0.542  tracer_grad=0.768  advective_flux=0.251  strain_rate_mag=0.943  okubo_weiss=0.887  pressure_grad_mag=0.958  tracer_laplacian=0.703
+    noise_std=  0.25  block_10     enstrophy=0.755  vorticity_signed=0.872  divergence=0.518  tracer_grad=0.762  advective_flux=0.242  strain_rate_mag=0.940  okubo_weiss=0.884  pressure_grad_mag=0.957  tracer_laplacian=0.699
+    noise_std=  0.25  block_11     enstrophy=0.757  vorticity_signed=0.859  divergence=0.493  tracer_grad=0.761  advective_flux=0.233  strain_rate_mag=0.940  okubo_weiss=0.886  pressure_grad_mag=0.957  tracer_laplacian=0.699
+    noise_std=  0.25  block_12     enstrophy=0.753  vorticity_signed=0.851  divergence=0.484  tracer_grad=0.755  advective_flux=0.229  strain_rate_mag=0.939  okubo_weiss=0.887  pressure_grad_mag=0.957  tracer_laplacian=0.694
+    noise_std=  0.25  final_norm   enstrophy=0.719  vorticity_signed=0.822  divergence=0.420  tracer_grad=0.765  advective_flux=0.223  strain_rate_mag=0.917  okubo_weiss=0.813  pressure_grad_mag=0.947  tracer_laplacian=0.708
+    noise_std=   0.5  block_1      enstrophy=0.482  vorticity_signed=0.934  divergence=0.947  tracer_grad=0.297  advective_flux=0.209  strain_rate_mag=0.762  okubo_weiss=0.618  pressure_grad_mag=0.871  tracer_laplacian=0.259
+    noise_std=   0.5  block_2      enstrophy=0.578  vorticity_signed=0.939  divergence=0.944  tracer_grad=0.577  advective_flux=0.221  strain_rate_mag=0.874  okubo_weiss=0.718  pressure_grad_mag=0.901  tracer_laplacian=0.480
+    noise_std=   0.5  block_3      enstrophy=0.648  vorticity_signed=0.936  divergence=0.893  tracer_grad=0.634  advective_flux=0.219  strain_rate_mag=0.916  okubo_weiss=0.781  pressure_grad_mag=0.914  tracer_laplacian=0.532
+    noise_std=   0.5  block_4      enstrophy=0.667  vorticity_signed=0.921  divergence=0.753  tracer_grad=0.649  advective_flux=0.212  strain_rate_mag=0.919  okubo_weiss=0.806  pressure_grad_mag=0.925  tracer_laplacian=0.551
+    noise_std=   0.5  block_5      enstrophy=0.675  vorticity_signed=0.906  divergence=0.651  tracer_grad=0.647  advective_flux=0.199  strain_rate_mag=0.917  okubo_weiss=0.822  pressure_grad_mag=0.931  tracer_laplacian=0.553
+    noise_std=   0.5  block_6      enstrophy=0.668  vorticity_signed=0.886  divergence=0.567  tracer_grad=0.656  advective_flux=0.186  strain_rate_mag=0.911  okubo_weiss=0.827  pressure_grad_mag=0.931  tracer_laplacian=0.563
+    noise_std=   0.5  block_7      enstrophy=0.664  vorticity_signed=0.859  divergence=0.517  tracer_grad=0.647  advective_flux=0.177  strain_rate_mag=0.909  okubo_weiss=0.837  pressure_grad_mag=0.934  tracer_laplacian=0.557
+    noise_std=   0.5  block_8      enstrophy=0.660  vorticity_signed=0.831  divergence=0.483  tracer_grad=0.643  advective_flux=0.166  strain_rate_mag=0.906  okubo_weiss=0.842  pressure_grad_mag=0.936  tracer_laplacian=0.556
+    noise_std=   0.5  block_9      enstrophy=0.659  vorticity_signed=0.814  divergence=0.463  tracer_grad=0.640  advective_flux=0.158  strain_rate_mag=0.902  okubo_weiss=0.839  pressure_grad_mag=0.935  tracer_laplacian=0.555
+    noise_std=   0.5  block_10     enstrophy=0.652  vorticity_signed=0.799  divergence=0.439  tracer_grad=0.633  advective_flux=0.153  strain_rate_mag=0.899  okubo_weiss=0.836  pressure_grad_mag=0.934  tracer_laplacian=0.551
+    noise_std=   0.5  block_11     enstrophy=0.652  vorticity_signed=0.784  divergence=0.417  tracer_grad=0.631  advective_flux=0.148  strain_rate_mag=0.898  okubo_weiss=0.839  pressure_grad_mag=0.933  tracer_laplacian=0.551
+    noise_std=   0.5  block_12     enstrophy=0.654  vorticity_signed=0.770  divergence=0.406  tracer_grad=0.627  advective_flux=0.146  strain_rate_mag=0.898  okubo_weiss=0.840  pressure_grad_mag=0.935  tracer_laplacian=0.550
+    noise_std=   0.5  final_norm   enstrophy=0.617  vorticity_signed=0.726  divergence=0.350  tracer_grad=0.630  advective_flux=0.141  strain_rate_mag=0.868  okubo_weiss=0.745  pressure_grad_mag=0.922  tracer_laplacian=0.556
+    noise_std=   1.0  block_1      enstrophy=0.398  vorticity_signed=0.785  divergence=0.837  tracer_grad=0.107  advective_flux=0.116  strain_rate_mag=0.615  okubo_weiss=0.498  pressure_grad_mag=0.812  tracer_laplacian=0.099
+    noise_std=   1.0  block_2      enstrophy=0.451  vorticity_signed=0.793  divergence=0.838  tracer_grad=0.261  advective_flux=0.116  strain_rate_mag=0.714  okubo_weiss=0.582  pressure_grad_mag=0.851  tracer_laplacian=0.214
+    noise_std=   1.0  block_3      enstrophy=0.492  vorticity_signed=0.805  divergence=0.837  tracer_grad=0.362  advective_flux=0.116  strain_rate_mag=0.787  okubo_weiss=0.656  pressure_grad_mag=0.864  tracer_laplacian=0.288
+    noise_std=   1.0  block_4      enstrophy=0.513  vorticity_signed=0.801  divergence=0.800  tracer_grad=0.375  advective_flux=0.117  strain_rate_mag=0.793  okubo_weiss=0.680  pressure_grad_mag=0.869  tracer_laplacian=0.299
+    noise_std=   1.0  block_5      enstrophy=0.526  vorticity_signed=0.796  divergence=0.753  tracer_grad=0.385  advective_flux=0.111  strain_rate_mag=0.799  okubo_weiss=0.696  pressure_grad_mag=0.871  tracer_laplacian=0.312
+    noise_std=   1.0  block_6      enstrophy=0.523  vorticity_signed=0.787  divergence=0.703  tracer_grad=0.387  advective_flux=0.107  strain_rate_mag=0.800  okubo_weiss=0.706  pressure_grad_mag=0.871  tracer_laplacian=0.313
+    noise_std=   1.0  block_7      enstrophy=0.519  vorticity_signed=0.773  divergence=0.660  tracer_grad=0.382  advective_flux=0.104  strain_rate_mag=0.802  okubo_weiss=0.725  pressure_grad_mag=0.875  tracer_laplacian=0.306
+    noise_std=   1.0  block_8      enstrophy=0.516  vorticity_signed=0.756  divergence=0.629  tracer_grad=0.379  advective_flux=0.099  strain_rate_mag=0.798  okubo_weiss=0.732  pressure_grad_mag=0.881  tracer_laplacian=0.304
+    noise_std=   1.0  block_9      enstrophy=0.515  vorticity_signed=0.739  divergence=0.601  tracer_grad=0.369  advective_flux=0.095  strain_rate_mag=0.793  okubo_weiss=0.729  pressure_grad_mag=0.879  tracer_laplacian=0.297
+    noise_std=   1.0  block_10     enstrophy=0.513  vorticity_signed=0.720  divergence=0.570  tracer_grad=0.360  advective_flux=0.093  strain_rate_mag=0.792  okubo_weiss=0.729  pressure_grad_mag=0.880  tracer_laplacian=0.288
+    noise_std=   1.0  block_11     enstrophy=0.517  vorticity_signed=0.706  divergence=0.554  tracer_grad=0.355  advective_flux=0.091  strain_rate_mag=0.798  okubo_weiss=0.736  pressure_grad_mag=0.882  tracer_laplacian=0.287
+    noise_std=   1.0  block_12     enstrophy=0.518  vorticity_signed=0.695  divergence=0.535  tracer_grad=0.352  advective_flux=0.089  strain_rate_mag=0.797  okubo_weiss=0.739  pressure_grad_mag=0.882  tracer_laplacian=0.289
+    noise_std=   1.0  final_norm   enstrophy=0.508  vorticity_signed=0.667  divergence=0.519  tracer_grad=0.359  advective_flux=0.086  strain_rate_mag=0.766  okubo_weiss=0.637  pressure_grad_mag=0.879  tracer_laplacian=0.297
+    noise_std=   2.0  block_1      enstrophy=0.230  vorticity_signed=0.482  divergence=0.587  tracer_grad=0.018  advective_flux=0.068  strain_rate_mag=0.381  okubo_weiss=0.385  pressure_grad_mag=0.569  tracer_laplacian=0.018
+    noise_std=   2.0  block_2      enstrophy=0.274  vorticity_signed=0.481  divergence=0.587  tracer_grad=0.035  advective_flux=0.067  strain_rate_mag=0.443  okubo_weiss=0.413  pressure_grad_mag=0.639  tracer_laplacian=0.028
+    noise_std=   2.0  block_3      enstrophy=0.295  vorticity_signed=0.484  divergence=0.592  tracer_grad=0.059  advective_flux=0.066  strain_rate_mag=0.485  okubo_weiss=0.444  pressure_grad_mag=0.669  tracer_laplacian=0.043
+    noise_std=   2.0  block_4      enstrophy=0.304  vorticity_signed=0.484  divergence=0.593  tracer_grad=0.066  advective_flux=0.067  strain_rate_mag=0.498  okubo_weiss=0.455  pressure_grad_mag=0.679  tracer_laplacian=0.048
+    noise_std=   2.0  block_5      enstrophy=0.309  vorticity_signed=0.484  divergence=0.590  tracer_grad=0.071  advective_flux=0.066  strain_rate_mag=0.509  okubo_weiss=0.468  pressure_grad_mag=0.685  tracer_laplacian=0.052
+    noise_std=   2.0  block_6      enstrophy=0.311  vorticity_signed=0.484  divergence=0.587  tracer_grad=0.073  advective_flux=0.066  strain_rate_mag=0.513  okubo_weiss=0.474  pressure_grad_mag=0.687  tracer_laplacian=0.053
+    noise_std=   2.0  block_7      enstrophy=0.312  vorticity_signed=0.482  divergence=0.583  tracer_grad=0.075  advective_flux=0.064  strain_rate_mag=0.517  okubo_weiss=0.485  pressure_grad_mag=0.690  tracer_laplacian=0.053
+    noise_std=   2.0  block_8      enstrophy=0.313  vorticity_signed=0.480  divergence=0.579  tracer_grad=0.075  advective_flux=0.064  strain_rate_mag=0.518  okubo_weiss=0.490  pressure_grad_mag=0.693  tracer_laplacian=0.054
+    noise_std=   2.0  block_9      enstrophy=0.312  vorticity_signed=0.478  divergence=0.575  tracer_grad=0.074  advective_flux=0.064  strain_rate_mag=0.520  okubo_weiss=0.494  pressure_grad_mag=0.692  tracer_laplacian=0.053
+    noise_std=   2.0  block_10     enstrophy=0.314  vorticity_signed=0.475  divergence=0.571  tracer_grad=0.072  advective_flux=0.063  strain_rate_mag=0.521  okubo_weiss=0.499  pressure_grad_mag=0.694  tracer_laplacian=0.052
+    noise_std=   2.0  block_11     enstrophy=0.319  vorticity_signed=0.472  divergence=0.569  tracer_grad=0.072  advective_flux=0.062  strain_rate_mag=0.527  okubo_weiss=0.505  pressure_grad_mag=0.700  tracer_laplacian=0.052
+    noise_std=   2.0  block_12     enstrophy=0.319  vorticity_signed=0.471  divergence=0.566  tracer_grad=0.072  advective_flux=0.061  strain_rate_mag=0.532  okubo_weiss=0.510  pressure_grad_mag=0.700  tracer_laplacian=0.053
+    noise_std=   2.0  final_norm   enstrophy=0.323  vorticity_signed=0.450  divergence=0.549  tracer_grad=0.073  advective_flux=0.061  strain_rate_mag=0.487  okubo_weiss=0.408  pressure_grad_mag=0.688  tracer_laplacian=0.054
+
+wrote sweep_results/shear_flow_noise_robustness.json

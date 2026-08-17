@@ -1,0 +1,327 @@
+525 samples total
+  enstrophy: mean=0.0029 std=0.0025
+  nematic_order: mean=1.2484 std=0.3701
+  flow_align: mean=0.0073 std=0.0512
+  order_grad_mag: mean=0.0958 std=0.0397
+  strain_order_align: mean=2.7030 std=1.5162
+  active_stress_div_mag: mean=0.1419 std=0.0608
+
+=== checkpoints/active_matter_jepa.pt ===
+  noise_std=   0.0  block_1      enstrophy=0.985  nematic_order=0.991  flow_align=0.406  order_grad_mag=0.991  strain_order_align=0.996  active_stress_div_mag=0.993
+  noise_std=   0.0  block_2      enstrophy=0.988  nematic_order=0.998  flow_align=0.455  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.996
+  noise_std=   0.0  block_3      enstrophy=0.988  nematic_order=0.997  flow_align=0.301  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.994
+  noise_std=   0.0  block_4      enstrophy=0.987  nematic_order=0.997  flow_align=0.071  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.994
+  noise_std=   0.0  block_5      enstrophy=0.984  nematic_order=0.995  flow_align=-0.075  order_grad_mag=0.991  strain_order_align=0.997  active_stress_div_mag=0.992
+  noise_std=   0.0  block_6      enstrophy=0.982  nematic_order=0.993  flow_align=-0.160  order_grad_mag=0.989  strain_order_align=0.995  active_stress_div_mag=0.990
+  noise_std=   0.0  block_7      enstrophy=0.981  nematic_order=0.992  flow_align=-0.248  order_grad_mag=0.985  strain_order_align=0.995  active_stress_div_mag=0.987
+  noise_std=   0.0  block_8      enstrophy=0.979  nematic_order=0.992  flow_align=-0.201  order_grad_mag=0.983  strain_order_align=0.995  active_stress_div_mag=0.985
+  noise_std=   0.0  block_9      enstrophy=0.980  nematic_order=0.991  flow_align=-0.238  order_grad_mag=0.981  strain_order_align=0.994  active_stress_div_mag=0.984
+  noise_std=   0.0  block_10     enstrophy=0.976  nematic_order=0.988  flow_align=-0.315  order_grad_mag=0.979  strain_order_align=0.994  active_stress_div_mag=0.982
+  noise_std=   0.0  block_11     enstrophy=0.978  nematic_order=0.988  flow_align=-0.246  order_grad_mag=0.978  strain_order_align=0.994  active_stress_div_mag=0.981
+  noise_std=   0.0  block_12     enstrophy=0.977  nematic_order=0.989  flow_align=-0.221  order_grad_mag=0.977  strain_order_align=0.994  active_stress_div_mag=0.980
+  noise_std=   0.0  final_norm   enstrophy=0.976  nematic_order=0.989  flow_align=-0.198  order_grad_mag=0.977  strain_order_align=0.994  active_stress_div_mag=0.980
+  noise_std=   0.1  block_1      enstrophy=0.985  nematic_order=0.990  flow_align=0.381  order_grad_mag=0.990  strain_order_align=0.996  active_stress_div_mag=0.993
+  noise_std=   0.1  block_2      enstrophy=0.988  nematic_order=0.998  flow_align=0.426  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.996
+  noise_std=   0.1  block_3      enstrophy=0.988  nematic_order=0.997  flow_align=0.286  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.994
+  noise_std=   0.1  block_4      enstrophy=0.988  nematic_order=0.997  flow_align=0.110  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.994
+  noise_std=   0.1  block_5      enstrophy=0.985  nematic_order=0.996  flow_align=-0.020  order_grad_mag=0.992  strain_order_align=0.997  active_stress_div_mag=0.993
+  noise_std=   0.1  block_6      enstrophy=0.984  nematic_order=0.995  flow_align=-0.161  order_grad_mag=0.989  strain_order_align=0.996  active_stress_div_mag=0.990
+  noise_std=   0.1  block_7      enstrophy=0.982  nematic_order=0.994  flow_align=-0.157  order_grad_mag=0.985  strain_order_align=0.995  active_stress_div_mag=0.986
+  noise_std=   0.1  block_8      enstrophy=0.980  nematic_order=0.994  flow_align=-0.209  order_grad_mag=0.985  strain_order_align=0.995  active_stress_div_mag=0.987
+  noise_std=   0.1  block_9      enstrophy=0.981  nematic_order=0.992  flow_align=-0.268  order_grad_mag=0.983  strain_order_align=0.994  active_stress_div_mag=0.985
+  noise_std=   0.1  block_10     enstrophy=0.979  nematic_order=0.992  flow_align=-0.305  order_grad_mag=0.980  strain_order_align=0.993  active_stress_div_mag=0.983
+  noise_std=   0.1  block_11     enstrophy=0.981  nematic_order=0.991  flow_align=-0.239  order_grad_mag=0.980  strain_order_align=0.995  active_stress_div_mag=0.983
+  noise_std=   0.1  block_12     enstrophy=0.979  nematic_order=0.992  flow_align=-0.206  order_grad_mag=0.979  strain_order_align=0.994  active_stress_div_mag=0.982
+  noise_std=   0.1  final_norm   enstrophy=0.978  nematic_order=0.992  flow_align=-0.192  order_grad_mag=0.979  strain_order_align=0.994  active_stress_div_mag=0.981
+  noise_std=  0.25  block_1      enstrophy=0.982  nematic_order=0.987  flow_align=0.265  order_grad_mag=0.987  strain_order_align=0.994  active_stress_div_mag=0.991
+  noise_std=  0.25  block_2      enstrophy=0.986  nematic_order=0.997  flow_align=0.420  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_3      enstrophy=0.988  nematic_order=0.997  flow_align=0.325  order_grad_mag=0.994  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_4      enstrophy=0.988  nematic_order=0.998  flow_align=0.209  order_grad_mag=0.994  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_5      enstrophy=0.986  nematic_order=0.998  flow_align=0.080  order_grad_mag=0.992  strain_order_align=0.997  active_stress_div_mag=0.993
+  noise_std=  0.25  block_6      enstrophy=0.986  nematic_order=0.998  flow_align=-0.048  order_grad_mag=0.989  strain_order_align=0.996  active_stress_div_mag=0.991
+  noise_std=  0.25  block_7      enstrophy=0.984  nematic_order=0.997  flow_align=-0.072  order_grad_mag=0.986  strain_order_align=0.996  active_stress_div_mag=0.988
+  noise_std=  0.25  block_8      enstrophy=0.984  nematic_order=0.996  flow_align=-0.130  order_grad_mag=0.984  strain_order_align=0.996  active_stress_div_mag=0.986
+  noise_std=  0.25  block_9      enstrophy=0.984  nematic_order=0.996  flow_align=-0.186  order_grad_mag=0.982  strain_order_align=0.995  active_stress_div_mag=0.984
+  noise_std=  0.25  block_10     enstrophy=0.983  nematic_order=0.996  flow_align=-0.212  order_grad_mag=0.978  strain_order_align=0.995  active_stress_div_mag=0.980
+  noise_std=  0.25  block_11     enstrophy=0.984  nematic_order=0.996  flow_align=-0.137  order_grad_mag=0.979  strain_order_align=0.995  active_stress_div_mag=0.981
+  noise_std=  0.25  block_12     enstrophy=0.983  nematic_order=0.995  flow_align=-0.188  order_grad_mag=0.978  strain_order_align=0.996  active_stress_div_mag=0.981
+  noise_std=  0.25  final_norm   enstrophy=0.983  nematic_order=0.995  flow_align=-0.171  order_grad_mag=0.979  strain_order_align=0.995  active_stress_div_mag=0.981
+  noise_std=   0.5  block_1      enstrophy=0.976  nematic_order=0.983  flow_align=-0.133  order_grad_mag=0.983  strain_order_align=0.990  active_stress_div_mag=0.988
+  noise_std=   0.5  block_2      enstrophy=0.984  nematic_order=0.992  flow_align=0.141  order_grad_mag=0.989  strain_order_align=0.995  active_stress_div_mag=0.992
+  noise_std=   0.5  block_3      enstrophy=0.986  nematic_order=0.995  flow_align=0.173  order_grad_mag=0.988  strain_order_align=0.996  active_stress_div_mag=0.991
+  noise_std=   0.5  block_4      enstrophy=0.985  nematic_order=0.997  flow_align=0.140  order_grad_mag=0.989  strain_order_align=0.996  active_stress_div_mag=0.991
+  noise_std=   0.5  block_5      enstrophy=0.986  nematic_order=0.998  flow_align=0.100  order_grad_mag=0.987  strain_order_align=0.996  active_stress_div_mag=0.989
+  noise_std=   0.5  block_6      enstrophy=0.987  nematic_order=0.998  flow_align=-0.018  order_grad_mag=0.985  strain_order_align=0.996  active_stress_div_mag=0.988
+  noise_std=   0.5  block_7      enstrophy=0.985  nematic_order=0.997  flow_align=-0.038  order_grad_mag=0.982  strain_order_align=0.996  active_stress_div_mag=0.985
+  noise_std=   0.5  block_8      enstrophy=0.985  nematic_order=0.997  flow_align=-0.095  order_grad_mag=0.978  strain_order_align=0.995  active_stress_div_mag=0.981
+  noise_std=   0.5  block_9      enstrophy=0.985  nematic_order=0.996  flow_align=-0.162  order_grad_mag=0.976  strain_order_align=0.995  active_stress_div_mag=0.980
+  noise_std=   0.5  block_10     enstrophy=0.986  nematic_order=0.996  flow_align=-0.111  order_grad_mag=0.977  strain_order_align=0.994  active_stress_div_mag=0.980
+  noise_std=   0.5  block_11     enstrophy=0.986  nematic_order=0.995  flow_align=-0.126  order_grad_mag=0.974  strain_order_align=0.994  active_stress_div_mag=0.977
+  noise_std=   0.5  block_12     enstrophy=0.985  nematic_order=0.995  flow_align=-0.204  order_grad_mag=0.975  strain_order_align=0.994  active_stress_div_mag=0.977
+  noise_std=   0.5  final_norm   enstrophy=0.985  nematic_order=0.996  flow_align=-0.184  order_grad_mag=0.975  strain_order_align=0.993  active_stress_div_mag=0.977
+  noise_std=   1.0  block_1      enstrophy=0.934  nematic_order=0.957  flow_align=-0.829  order_grad_mag=0.948  strain_order_align=0.967  active_stress_div_mag=0.959
+  noise_std=   1.0  block_2      enstrophy=0.956  nematic_order=0.964  flow_align=-0.455  order_grad_mag=0.965  strain_order_align=0.985  active_stress_div_mag=0.975
+  noise_std=   1.0  block_3      enstrophy=0.964  nematic_order=0.967  flow_align=-0.319  order_grad_mag=0.964  strain_order_align=0.988  active_stress_div_mag=0.974
+  noise_std=   1.0  block_4      enstrophy=0.972  nematic_order=0.976  flow_align=-0.279  order_grad_mag=0.967  strain_order_align=0.989  active_stress_div_mag=0.975
+  noise_std=   1.0  block_5      enstrophy=0.973  nematic_order=0.981  flow_align=-0.332  order_grad_mag=0.966  strain_order_align=0.988  active_stress_div_mag=0.972
+  noise_std=   1.0  block_6      enstrophy=0.978  nematic_order=0.983  flow_align=-0.358  order_grad_mag=0.960  strain_order_align=0.989  active_stress_div_mag=0.967
+  noise_std=   1.0  block_7      enstrophy=0.974  nematic_order=0.986  flow_align=-0.294  order_grad_mag=0.957  strain_order_align=0.988  active_stress_div_mag=0.963
+  noise_std=   1.0  block_8      enstrophy=0.975  nematic_order=0.985  flow_align=-0.215  order_grad_mag=0.952  strain_order_align=0.986  active_stress_div_mag=0.957
+  noise_std=   1.0  block_9      enstrophy=0.974  nematic_order=0.984  flow_align=-0.360  order_grad_mag=0.949  strain_order_align=0.985  active_stress_div_mag=0.953
+  noise_std=   1.0  block_10     enstrophy=0.971  nematic_order=0.983  flow_align=-0.325  order_grad_mag=0.942  strain_order_align=0.981  active_stress_div_mag=0.944
+  noise_std=   1.0  block_11     enstrophy=0.969  nematic_order=0.980  flow_align=-0.318  order_grad_mag=0.930  strain_order_align=0.980  active_stress_div_mag=0.934
+  noise_std=   1.0  block_12     enstrophy=0.966  nematic_order=0.979  flow_align=-0.384  order_grad_mag=0.919  strain_order_align=0.979  active_stress_div_mag=0.923
+  noise_std=   1.0  final_norm   enstrophy=0.961  nematic_order=0.980  flow_align=-0.390  order_grad_mag=0.921  strain_order_align=0.977  active_stress_div_mag=0.924
+  noise_std=   2.0  block_1      enstrophy=0.809  nematic_order=0.579  flow_align=-3.080  order_grad_mag=0.494  strain_order_align=0.844  active_stress_div_mag=0.531
+  noise_std=   2.0  block_2      enstrophy=0.863  nematic_order=0.773  flow_align=-2.490  order_grad_mag=0.707  strain_order_align=0.877  active_stress_div_mag=0.724
+  noise_std=   2.0  block_3      enstrophy=0.857  nematic_order=0.816  flow_align=-2.307  order_grad_mag=0.778  strain_order_align=0.881  active_stress_div_mag=0.783
+  noise_std=   2.0  block_4      enstrophy=0.862  nematic_order=0.825  flow_align=-2.282  order_grad_mag=0.781  strain_order_align=0.880  active_stress_div_mag=0.792
+  noise_std=   2.0  block_5      enstrophy=0.867  nematic_order=0.834  flow_align=-2.147  order_grad_mag=0.799  strain_order_align=0.895  active_stress_div_mag=0.813
+  noise_std=   2.0  block_6      enstrophy=0.862  nematic_order=0.835  flow_align=-2.088  order_grad_mag=0.808  strain_order_align=0.890  active_stress_div_mag=0.823
+  noise_std=   2.0  block_7      enstrophy=0.868  nematic_order=0.848  flow_align=-1.858  order_grad_mag=0.817  strain_order_align=0.887  active_stress_div_mag=0.833
+  noise_std=   2.0  block_8      enstrophy=0.864  nematic_order=0.833  flow_align=-1.861  order_grad_mag=0.803  strain_order_align=0.882  active_stress_div_mag=0.822
+  noise_std=   2.0  block_9      enstrophy=0.858  nematic_order=0.839  flow_align=-1.481  order_grad_mag=0.796  strain_order_align=0.882  active_stress_div_mag=0.814
+  noise_std=   2.0  block_10     enstrophy=0.844  nematic_order=0.834  flow_align=-1.671  order_grad_mag=0.780  strain_order_align=0.875  active_stress_div_mag=0.801
+  noise_std=   2.0  block_11     enstrophy=0.853  nematic_order=0.822  flow_align=-1.458  order_grad_mag=0.743  strain_order_align=0.877  active_stress_div_mag=0.763
+  noise_std=   2.0  block_12     enstrophy=0.858  nematic_order=0.817  flow_align=-1.437  order_grad_mag=0.738  strain_order_align=0.879  active_stress_div_mag=0.755
+  noise_std=   2.0  final_norm   enstrophy=0.861  nematic_order=0.812  flow_align=-1.591  order_grad_mag=0.708  strain_order_align=0.871  active_stress_div_mag=0.730
+  -- per-token --
+    noise_std=   0.0  block_1      enstrophy=0.593  vorticity_signed=0.990  divergence=0.995  nematic_order=0.989  flow_align=0.910  order_grad_mag=0.904  strain_order_align=0.926  active_stress_div_mag=0.867
+    noise_std=   0.0  block_2      enstrophy=0.603  vorticity_signed=0.977  divergence=0.989  nematic_order=0.992  flow_align=0.891  order_grad_mag=0.854  strain_order_align=0.925  active_stress_div_mag=0.851
+    noise_std=   0.0  block_3      enstrophy=0.595  vorticity_signed=0.951  divergence=0.980  nematic_order=0.989  flow_align=0.810  order_grad_mag=0.782  strain_order_align=0.903  active_stress_div_mag=0.778
+    noise_std=   0.0  block_4      enstrophy=0.528  vorticity_signed=0.917  divergence=0.969  nematic_order=0.982  flow_align=0.720  order_grad_mag=0.711  strain_order_align=0.868  active_stress_div_mag=0.704
+    noise_std=   0.0  block_5      enstrophy=0.496  vorticity_signed=0.883  divergence=0.953  nematic_order=0.977  flow_align=0.630  order_grad_mag=0.648  strain_order_align=0.840  active_stress_div_mag=0.651
+    noise_std=   0.0  block_6      enstrophy=0.482  vorticity_signed=0.833  divergence=0.939  nematic_order=0.968  flow_align=0.567  order_grad_mag=0.595  strain_order_align=0.817  active_stress_div_mag=0.600
+    noise_std=   0.0  block_7      enstrophy=0.472  vorticity_signed=0.792  divergence=0.925  nematic_order=0.960  flow_align=0.536  order_grad_mag=0.558  strain_order_align=0.807  active_stress_div_mag=0.571
+    noise_std=   0.0  block_8      enstrophy=0.458  vorticity_signed=0.755  divergence=0.910  nematic_order=0.951  flow_align=0.500  order_grad_mag=0.531  strain_order_align=0.794  active_stress_div_mag=0.547
+    noise_std=   0.0  block_9      enstrophy=0.455  vorticity_signed=0.740  divergence=0.904  nematic_order=0.946  flow_align=0.480  order_grad_mag=0.513  strain_order_align=0.785  active_stress_div_mag=0.534
+    noise_std=   0.0  block_10     enstrophy=0.448  vorticity_signed=0.737  divergence=0.900  nematic_order=0.936  flow_align=0.443  order_grad_mag=0.496  strain_order_align=0.777  active_stress_div_mag=0.521
+    noise_std=   0.0  block_11     enstrophy=0.430  vorticity_signed=0.720  divergence=0.889  nematic_order=0.931  flow_align=0.401  order_grad_mag=0.483  strain_order_align=0.769  active_stress_div_mag=0.513
+    noise_std=   0.0  block_12     enstrophy=0.414  vorticity_signed=0.714  divergence=0.888  nematic_order=0.924  flow_align=0.383  order_grad_mag=0.474  strain_order_align=0.765  active_stress_div_mag=0.503
+    noise_std=   0.0  final_norm   enstrophy=0.411  vorticity_signed=0.670  divergence=0.845  nematic_order=0.926  flow_align=0.375  order_grad_mag=0.472  strain_order_align=0.762  active_stress_div_mag=0.501
+    noise_std=   0.1  block_1      enstrophy=0.477  vorticity_signed=0.968  divergence=0.982  nematic_order=0.981  flow_align=0.785  order_grad_mag=0.807  strain_order_align=0.869  active_stress_div_mag=0.776
+    noise_std=   0.1  block_2      enstrophy=0.507  vorticity_signed=0.940  divergence=0.971  nematic_order=0.986  flow_align=0.775  order_grad_mag=0.745  strain_order_align=0.875  active_stress_div_mag=0.753
+    noise_std=   0.1  block_3      enstrophy=0.505  vorticity_signed=0.898  divergence=0.961  nematic_order=0.981  flow_align=0.661  order_grad_mag=0.691  strain_order_align=0.860  active_stress_div_mag=0.694
+    noise_std=   0.1  block_4      enstrophy=0.471  vorticity_signed=0.855  divergence=0.946  nematic_order=0.974  flow_align=0.600  order_grad_mag=0.633  strain_order_align=0.831  active_stress_div_mag=0.631
+    noise_std=   0.1  block_5      enstrophy=0.464  vorticity_signed=0.819  divergence=0.933  nematic_order=0.969  flow_align=0.556  order_grad_mag=0.591  strain_order_align=0.813  active_stress_div_mag=0.599
+    noise_std=   0.1  block_6      enstrophy=0.460  vorticity_signed=0.770  divergence=0.920  nematic_order=0.962  flow_align=0.511  order_grad_mag=0.554  strain_order_align=0.798  active_stress_div_mag=0.562
+    noise_std=   0.1  block_7      enstrophy=0.452  vorticity_signed=0.730  divergence=0.907  nematic_order=0.955  flow_align=0.484  order_grad_mag=0.528  strain_order_align=0.794  active_stress_div_mag=0.546
+    noise_std=   0.1  block_8      enstrophy=0.443  vorticity_signed=0.701  divergence=0.894  nematic_order=0.948  flow_align=0.448  order_grad_mag=0.511  strain_order_align=0.782  active_stress_div_mag=0.526
+    noise_std=   0.1  block_9      enstrophy=0.435  vorticity_signed=0.685  divergence=0.888  nematic_order=0.944  flow_align=0.431  order_grad_mag=0.493  strain_order_align=0.775  active_stress_div_mag=0.515
+    noise_std=   0.1  block_10     enstrophy=0.430  vorticity_signed=0.678  divergence=0.882  nematic_order=0.934  flow_align=0.394  order_grad_mag=0.471  strain_order_align=0.767  active_stress_div_mag=0.498
+    noise_std=   0.1  block_11     enstrophy=0.411  vorticity_signed=0.661  divergence=0.871  nematic_order=0.928  flow_align=0.358  order_grad_mag=0.458  strain_order_align=0.756  active_stress_div_mag=0.491
+    noise_std=   0.1  block_12     enstrophy=0.390  vorticity_signed=0.651  divergence=0.866  nematic_order=0.920  flow_align=0.340  order_grad_mag=0.443  strain_order_align=0.751  active_stress_div_mag=0.476
+    noise_std=   0.1  final_norm   enstrophy=0.387  vorticity_signed=0.601  divergence=0.809  nematic_order=0.922  flow_align=0.332  order_grad_mag=0.444  strain_order_align=0.748  active_stress_div_mag=0.477
+    noise_std=  0.25  block_1      enstrophy=0.342  vorticity_signed=0.898  divergence=0.953  nematic_order=0.959  flow_align=0.551  order_grad_mag=0.623  strain_order_align=0.763  active_stress_div_mag=0.609
+    noise_std=  0.25  block_2      enstrophy=0.394  vorticity_signed=0.856  divergence=0.933  nematic_order=0.972  flow_align=0.575  order_grad_mag=0.559  strain_order_align=0.803  active_stress_div_mag=0.582
+    noise_std=  0.25  block_3      enstrophy=0.405  vorticity_signed=0.791  divergence=0.918  nematic_order=0.965  flow_align=0.458  order_grad_mag=0.552  strain_order_align=0.794  active_stress_div_mag=0.565
+    noise_std=  0.25  block_4      enstrophy=0.392  vorticity_signed=0.717  divergence=0.895  nematic_order=0.958  flow_align=0.406  order_grad_mag=0.514  strain_order_align=0.774  active_stress_div_mag=0.529
+    noise_std=  0.25  block_5      enstrophy=0.400  vorticity_signed=0.669  divergence=0.881  nematic_order=0.953  flow_align=0.406  order_grad_mag=0.496  strain_order_align=0.765  active_stress_div_mag=0.517
+    noise_std=  0.25  block_6      enstrophy=0.398  vorticity_signed=0.613  divergence=0.867  nematic_order=0.949  flow_align=0.384  order_grad_mag=0.473  strain_order_align=0.759  active_stress_div_mag=0.492
+    noise_std=  0.25  block_7      enstrophy=0.399  vorticity_signed=0.577  divergence=0.854  nematic_order=0.945  flow_align=0.358  order_grad_mag=0.465  strain_order_align=0.758  active_stress_div_mag=0.490
+    noise_std=  0.25  block_8      enstrophy=0.393  vorticity_signed=0.558  divergence=0.843  nematic_order=0.940  flow_align=0.346  order_grad_mag=0.448  strain_order_align=0.753  active_stress_div_mag=0.474
+    noise_std=  0.25  block_9      enstrophy=0.390  vorticity_signed=0.546  divergence=0.834  nematic_order=0.935  flow_align=0.333  order_grad_mag=0.427  strain_order_align=0.743  active_stress_div_mag=0.458
+    noise_std=  0.25  block_10     enstrophy=0.373  vorticity_signed=0.527  divergence=0.824  nematic_order=0.927  flow_align=0.293  order_grad_mag=0.407  strain_order_align=0.731  active_stress_div_mag=0.443
+    noise_std=  0.25  block_11     enstrophy=0.363  vorticity_signed=0.512  divergence=0.810  nematic_order=0.920  flow_align=0.262  order_grad_mag=0.387  strain_order_align=0.720  active_stress_div_mag=0.430
+    noise_std=  0.25  block_12     enstrophy=0.340  vorticity_signed=0.500  divergence=0.800  nematic_order=0.909  flow_align=0.231  order_grad_mag=0.365  strain_order_align=0.713  active_stress_div_mag=0.414
+    noise_std=  0.25  final_norm   enstrophy=0.338  vorticity_signed=0.429  divergence=0.694  nematic_order=0.913  flow_align=0.223  order_grad_mag=0.369  strain_order_align=0.712  active_stress_div_mag=0.416
+    noise_std=   0.5  block_1      enstrophy=0.243  vorticity_signed=0.755  divergence=0.901  nematic_order=0.894  flow_align=0.302  order_grad_mag=0.394  strain_order_align=0.613  active_stress_div_mag=0.418
+    noise_std=   0.5  block_2      enstrophy=0.293  vorticity_signed=0.729  divergence=0.879  nematic_order=0.933  flow_align=0.318  order_grad_mag=0.399  strain_order_align=0.687  active_stress_div_mag=0.436
+    noise_std=   0.5  block_3      enstrophy=0.308  vorticity_signed=0.674  divergence=0.857  nematic_order=0.932  flow_align=0.280  order_grad_mag=0.397  strain_order_align=0.705  active_stress_div_mag=0.433
+    noise_std=   0.5  block_4      enstrophy=0.311  vorticity_signed=0.578  divergence=0.821  nematic_order=0.929  flow_align=0.257  order_grad_mag=0.395  strain_order_align=0.699  active_stress_div_mag=0.432
+    noise_std=   0.5  block_5      enstrophy=0.317  vorticity_signed=0.520  divergence=0.810  nematic_order=0.924  flow_align=0.264  order_grad_mag=0.382  strain_order_align=0.696  active_stress_div_mag=0.422
+    noise_std=   0.5  block_6      enstrophy=0.321  vorticity_signed=0.452  divergence=0.790  nematic_order=0.922  flow_align=0.264  order_grad_mag=0.377  strain_order_align=0.696  active_stress_div_mag=0.417
+    noise_std=   0.5  block_7      enstrophy=0.331  vorticity_signed=0.420  divergence=0.784  nematic_order=0.920  flow_align=0.250  order_grad_mag=0.375  strain_order_align=0.703  active_stress_div_mag=0.417
+    noise_std=   0.5  block_8      enstrophy=0.342  vorticity_signed=0.397  divergence=0.774  nematic_order=0.916  flow_align=0.233  order_grad_mag=0.367  strain_order_align=0.710  active_stress_div_mag=0.413
+    noise_std=   0.5  block_9      enstrophy=0.339  vorticity_signed=0.386  divergence=0.765  nematic_order=0.914  flow_align=0.229  order_grad_mag=0.367  strain_order_align=0.703  active_stress_div_mag=0.414
+    noise_std=   0.5  block_10     enstrophy=0.324  vorticity_signed=0.371  divergence=0.754  nematic_order=0.907  flow_align=0.195  order_grad_mag=0.350  strain_order_align=0.689  active_stress_div_mag=0.400
+    noise_std=   0.5  block_11     enstrophy=0.311  vorticity_signed=0.355  divergence=0.740  nematic_order=0.901  flow_align=0.165  order_grad_mag=0.343  strain_order_align=0.673  active_stress_div_mag=0.396
+    noise_std=   0.5  block_12     enstrophy=0.305  vorticity_signed=0.351  divergence=0.728  nematic_order=0.888  flow_align=0.148  order_grad_mag=0.333  strain_order_align=0.663  active_stress_div_mag=0.386
+    noise_std=   0.5  final_norm   enstrophy=0.302  vorticity_signed=0.272  divergence=0.588  nematic_order=0.894  flow_align=0.140  order_grad_mag=0.335  strain_order_align=0.663  active_stress_div_mag=0.389
+    noise_std=   1.0  block_1      enstrophy=0.127  vorticity_signed=0.523  divergence=0.824  nematic_order=0.592  flow_align=0.144  order_grad_mag=0.194  strain_order_align=0.324  active_stress_div_mag=0.221
+    noise_std=   1.0  block_2      enstrophy=0.182  vorticity_signed=0.523  divergence=0.812  nematic_order=0.776  flow_align=0.139  order_grad_mag=0.265  strain_order_align=0.456  active_stress_div_mag=0.307
+    noise_std=   1.0  block_3      enstrophy=0.202  vorticity_signed=0.512  divergence=0.798  nematic_order=0.804  flow_align=0.136  order_grad_mag=0.285  strain_order_align=0.510  active_stress_div_mag=0.330
+    noise_std=   1.0  block_4      enstrophy=0.201  vorticity_signed=0.485  divergence=0.773  nematic_order=0.812  flow_align=0.138  order_grad_mag=0.297  strain_order_align=0.510  active_stress_div_mag=0.343
+    noise_std=   1.0  block_5      enstrophy=0.209  vorticity_signed=0.460  divergence=0.754  nematic_order=0.818  flow_align=0.138  order_grad_mag=0.301  strain_order_align=0.525  active_stress_div_mag=0.351
+    noise_std=   1.0  block_6      enstrophy=0.209  vorticity_signed=0.411  divergence=0.721  nematic_order=0.823  flow_align=0.136  order_grad_mag=0.303  strain_order_align=0.518  active_stress_div_mag=0.355
+    noise_std=   1.0  block_7      enstrophy=0.220  vorticity_signed=0.376  divergence=0.708  nematic_order=0.825  flow_align=0.132  order_grad_mag=0.305  strain_order_align=0.531  active_stress_div_mag=0.352
+    noise_std=   1.0  block_8      enstrophy=0.230  vorticity_signed=0.346  divergence=0.694  nematic_order=0.823  flow_align=0.127  order_grad_mag=0.305  strain_order_align=0.538  active_stress_div_mag=0.352
+    noise_std=   1.0  block_9      enstrophy=0.236  vorticity_signed=0.319  divergence=0.688  nematic_order=0.827  flow_align=0.139  order_grad_mag=0.310  strain_order_align=0.552  active_stress_div_mag=0.358
+    noise_std=   1.0  block_10     enstrophy=0.231  vorticity_signed=0.308  divergence=0.669  nematic_order=0.809  flow_align=0.123  order_grad_mag=0.296  strain_order_align=0.532  active_stress_div_mag=0.345
+    noise_std=   1.0  block_11     enstrophy=0.223  vorticity_signed=0.297  divergence=0.651  nematic_order=0.808  flow_align=0.107  order_grad_mag=0.295  strain_order_align=0.513  active_stress_div_mag=0.343
+    noise_std=   1.0  block_12     enstrophy=0.214  vorticity_signed=0.286  divergence=0.637  nematic_order=0.795  flow_align=0.096  order_grad_mag=0.288  strain_order_align=0.493  active_stress_div_mag=0.335
+    noise_std=   1.0  final_norm   enstrophy=0.215  vorticity_signed=0.226  divergence=0.528  nematic_order=0.807  flow_align=0.094  order_grad_mag=0.291  strain_order_align=0.495  active_stress_div_mag=0.340
+    noise_std=   2.0  block_1      enstrophy=0.008  vorticity_signed=0.312  divergence=0.704  nematic_order=0.104  flow_align=0.056  order_grad_mag=0.021  strain_order_align=0.039  active_stress_div_mag=0.031
+    noise_std=   2.0  block_2      enstrophy=0.057  vorticity_signed=0.314  divergence=0.700  nematic_order=0.343  flow_align=0.054  order_grad_mag=0.103  strain_order_align=0.134  active_stress_div_mag=0.130
+    noise_std=   2.0  block_3      enstrophy=0.074  vorticity_signed=0.312  divergence=0.696  nematic_order=0.424  flow_align=0.053  order_grad_mag=0.133  strain_order_align=0.170  active_stress_div_mag=0.164
+    noise_std=   2.0  block_4      enstrophy=0.086  vorticity_signed=0.309  divergence=0.691  nematic_order=0.473  flow_align=0.052  order_grad_mag=0.151  strain_order_align=0.196  active_stress_div_mag=0.185
+    noise_std=   2.0  block_5      enstrophy=0.095  vorticity_signed=0.310  divergence=0.687  nematic_order=0.511  flow_align=0.053  order_grad_mag=0.163  strain_order_align=0.221  active_stress_div_mag=0.199
+    noise_std=   2.0  block_6      enstrophy=0.101  vorticity_signed=0.309  divergence=0.679  nematic_order=0.531  flow_align=0.050  order_grad_mag=0.172  strain_order_align=0.237  active_stress_div_mag=0.209
+    noise_std=   2.0  block_7      enstrophy=0.109  vorticity_signed=0.307  divergence=0.671  nematic_order=0.561  flow_align=0.050  order_grad_mag=0.185  strain_order_align=0.251  active_stress_div_mag=0.223
+    noise_std=   2.0  block_8      enstrophy=0.111  vorticity_signed=0.300  divergence=0.655  nematic_order=0.568  flow_align=0.047  order_grad_mag=0.188  strain_order_align=0.250  active_stress_div_mag=0.226
+    noise_std=   2.0  block_9      enstrophy=0.113  vorticity_signed=0.295  divergence=0.644  nematic_order=0.584  flow_align=0.045  order_grad_mag=0.196  strain_order_align=0.259  active_stress_div_mag=0.234
+    noise_std=   2.0  block_10     enstrophy=0.105  vorticity_signed=0.291  divergence=0.631  nematic_order=0.550  flow_align=0.042  order_grad_mag=0.183  strain_order_align=0.239  active_stress_div_mag=0.218
+    noise_std=   2.0  block_11     enstrophy=0.104  vorticity_signed=0.287  divergence=0.618  nematic_order=0.544  flow_align=0.038  order_grad_mag=0.180  strain_order_align=0.235  active_stress_div_mag=0.216
+    noise_std=   2.0  block_12     enstrophy=0.100  vorticity_signed=0.282  divergence=0.608  nematic_order=0.529  flow_align=0.037  order_grad_mag=0.174  strain_order_align=0.223  active_stress_div_mag=0.207
+    noise_std=   2.0  final_norm   enstrophy=0.104  vorticity_signed=0.264  divergence=0.575  nematic_order=0.548  flow_align=0.037  order_grad_mag=0.181  strain_order_align=0.233  active_stress_div_mag=0.216
+
+=== checkpoints/active_matter_mae.pt ===
+  noise_std=   0.0  block_1      enstrophy=0.992  nematic_order=0.993  flow_align=0.485  order_grad_mag=0.990  strain_order_align=0.998  active_stress_div_mag=0.992
+  noise_std=   0.0  block_2      enstrophy=0.992  nematic_order=0.999  flow_align=0.468  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.0  block_3      enstrophy=0.990  nematic_order=0.999  flow_align=0.415  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.0  block_4      enstrophy=0.989  nematic_order=0.999  flow_align=0.411  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.0  block_5      enstrophy=0.985  nematic_order=0.999  flow_align=0.347  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.0  block_6      enstrophy=0.982  nematic_order=0.998  flow_align=0.334  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.0  block_7      enstrophy=0.982  nematic_order=0.998  flow_align=0.277  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.0  block_8      enstrophy=0.982  nematic_order=0.997  flow_align=0.322  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.0  block_9      enstrophy=0.983  nematic_order=0.998  flow_align=0.301  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.0  block_10     enstrophy=0.979  nematic_order=0.998  flow_align=0.311  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.0  block_11     enstrophy=0.978  nematic_order=0.999  flow_align=0.310  order_grad_mag=0.996  strain_order_align=0.996  active_stress_div_mag=0.996
+  noise_std=   0.0  block_12     enstrophy=0.978  nematic_order=0.998  flow_align=0.297  order_grad_mag=0.995  strain_order_align=0.995  active_stress_div_mag=0.996
+  noise_std=   0.0  final_norm   enstrophy=0.975  nematic_order=0.998  flow_align=0.284  order_grad_mag=0.994  strain_order_align=0.994  active_stress_div_mag=0.995
+  noise_std=   0.1  block_1      enstrophy=0.991  nematic_order=0.993  flow_align=0.443  order_grad_mag=0.989  strain_order_align=0.997  active_stress_div_mag=0.992
+  noise_std=   0.1  block_2      enstrophy=0.992  nematic_order=0.998  flow_align=0.455  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.1  block_3      enstrophy=0.990  nematic_order=0.999  flow_align=0.450  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.1  block_4      enstrophy=0.989  nematic_order=0.999  flow_align=0.415  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.1  block_5      enstrophy=0.986  nematic_order=0.999  flow_align=0.363  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997
+  noise_std=   0.1  block_6      enstrophy=0.984  nematic_order=0.998  flow_align=0.350  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.1  block_7      enstrophy=0.982  nematic_order=0.998  flow_align=0.305  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.1  block_8      enstrophy=0.983  nematic_order=0.998  flow_align=0.349  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.1  block_9      enstrophy=0.983  nematic_order=0.998  flow_align=0.348  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997
+  noise_std=   0.1  block_10     enstrophy=0.980  nematic_order=0.999  flow_align=0.342  order_grad_mag=0.995  strain_order_align=0.996  active_stress_div_mag=0.996
+  noise_std=   0.1  block_11     enstrophy=0.978  nematic_order=0.999  flow_align=0.340  order_grad_mag=0.995  strain_order_align=0.995  active_stress_div_mag=0.996
+  noise_std=   0.1  block_12     enstrophy=0.977  nematic_order=0.999  flow_align=0.310  order_grad_mag=0.995  strain_order_align=0.995  active_stress_div_mag=0.996
+  noise_std=   0.1  final_norm   enstrophy=0.975  nematic_order=0.998  flow_align=0.309  order_grad_mag=0.995  strain_order_align=0.994  active_stress_div_mag=0.996
+  noise_std=  0.25  block_1      enstrophy=0.986  nematic_order=0.991  flow_align=0.129  order_grad_mag=0.986  strain_order_align=0.995  active_stress_div_mag=0.990
+  noise_std=  0.25  block_2      enstrophy=0.989  nematic_order=0.996  flow_align=0.259  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_3      enstrophy=0.989  nematic_order=0.997  flow_align=0.331  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.996
+  noise_std=  0.25  block_4      enstrophy=0.988  nematic_order=0.998  flow_align=0.284  order_grad_mag=0.994  strain_order_align=0.997  active_stress_div_mag=0.996
+  noise_std=  0.25  block_5      enstrophy=0.987  nematic_order=0.998  flow_align=0.250  order_grad_mag=0.994  strain_order_align=0.997  active_stress_div_mag=0.996
+  noise_std=  0.25  block_6      enstrophy=0.986  nematic_order=0.998  flow_align=0.260  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_7      enstrophy=0.983  nematic_order=0.998  flow_align=0.211  order_grad_mag=0.992  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_8      enstrophy=0.983  nematic_order=0.998  flow_align=0.252  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.995
+  noise_std=  0.25  block_9      enstrophy=0.982  nematic_order=0.998  flow_align=0.308  order_grad_mag=0.993  strain_order_align=0.997  active_stress_div_mag=0.994
+  noise_std=  0.25  block_10     enstrophy=0.981  nematic_order=0.998  flow_align=0.310  order_grad_mag=0.992  strain_order_align=0.996  active_stress_div_mag=0.994
+  noise_std=  0.25  block_11     enstrophy=0.980  nematic_order=0.998  flow_align=0.322  order_grad_mag=0.992  strain_order_align=0.996  active_stress_div_mag=0.994
+  noise_std=  0.25  block_12     enstrophy=0.980  nematic_order=0.998  flow_align=0.273  order_grad_mag=0.992  strain_order_align=0.995  active_stress_div_mag=0.993
+  noise_std=  0.25  final_norm   enstrophy=0.978  nematic_order=0.998  flow_align=0.270  order_grad_mag=0.992  strain_order_align=0.995  active_stress_div_mag=0.994
+  noise_std=   0.5  block_1      enstrophy=0.965  nematic_order=0.961  flow_align=-0.557  order_grad_mag=0.967  strain_order_align=0.985  active_stress_div_mag=0.975
+  noise_std=   0.5  block_2      enstrophy=0.974  nematic_order=0.979  flow_align=-0.334  order_grad_mag=0.979  strain_order_align=0.990  active_stress_div_mag=0.986
+  noise_std=   0.5  block_3      enstrophy=0.978  nematic_order=0.983  flow_align=-0.254  order_grad_mag=0.981  strain_order_align=0.993  active_stress_div_mag=0.988
+  noise_std=   0.5  block_4      enstrophy=0.980  nematic_order=0.987  flow_align=-0.167  order_grad_mag=0.982  strain_order_align=0.994  active_stress_div_mag=0.989
+  noise_std=   0.5  block_5      enstrophy=0.980  nematic_order=0.989  flow_align=-0.114  order_grad_mag=0.983  strain_order_align=0.993  active_stress_div_mag=0.989
+  noise_std=   0.5  block_6      enstrophy=0.980  nematic_order=0.990  flow_align=-0.107  order_grad_mag=0.981  strain_order_align=0.994  active_stress_div_mag=0.986
+  noise_std=   0.5  block_7      enstrophy=0.980  nematic_order=0.990  flow_align=-0.120  order_grad_mag=0.980  strain_order_align=0.994  active_stress_div_mag=0.985
+  noise_std=   0.5  block_8      enstrophy=0.981  nematic_order=0.990  flow_align=-0.063  order_grad_mag=0.977  strain_order_align=0.993  active_stress_div_mag=0.982
+  noise_std=   0.5  block_9      enstrophy=0.980  nematic_order=0.991  flow_align=-0.029  order_grad_mag=0.977  strain_order_align=0.994  active_stress_div_mag=0.982
+  noise_std=   0.5  block_10     enstrophy=0.981  nematic_order=0.990  flow_align=0.071  order_grad_mag=0.976  strain_order_align=0.993  active_stress_div_mag=0.981
+  noise_std=   0.5  block_11     enstrophy=0.981  nematic_order=0.990  flow_align=0.102  order_grad_mag=0.973  strain_order_align=0.993  active_stress_div_mag=0.979
+  noise_std=   0.5  block_12     enstrophy=0.980  nematic_order=0.990  flow_align=0.082  order_grad_mag=0.971  strain_order_align=0.993  active_stress_div_mag=0.977
+  noise_std=   0.5  final_norm   enstrophy=0.979  nematic_order=0.990  flow_align=0.078  order_grad_mag=0.972  strain_order_align=0.992  active_stress_div_mag=0.977
+  noise_std=   1.0  block_1      enstrophy=0.832  nematic_order=0.325  flow_align=-2.872  order_grad_mag=0.515  strain_order_align=0.872  active_stress_div_mag=0.569
+  noise_std=   1.0  block_2      enstrophy=0.874  nematic_order=0.512  flow_align=-2.570  order_grad_mag=0.702  strain_order_align=0.887  active_stress_div_mag=0.732
+  noise_std=   1.0  block_3      enstrophy=0.881  nematic_order=0.610  flow_align=-2.130  order_grad_mag=0.794  strain_order_align=0.898  active_stress_div_mag=0.820
+  noise_std=   1.0  block_4      enstrophy=0.887  nematic_order=0.655  flow_align=-2.031  order_grad_mag=0.819  strain_order_align=0.906  active_stress_div_mag=0.841
+  noise_std=   1.0  block_5      enstrophy=0.889  nematic_order=0.700  flow_align=-1.838  order_grad_mag=0.838  strain_order_align=0.908  active_stress_div_mag=0.856
+  noise_std=   1.0  block_6      enstrophy=0.899  nematic_order=0.718  flow_align=-1.785  order_grad_mag=0.837  strain_order_align=0.905  active_stress_div_mag=0.857
+  noise_std=   1.0  block_7      enstrophy=0.900  nematic_order=0.742  flow_align=-1.570  order_grad_mag=0.823  strain_order_align=0.899  active_stress_div_mag=0.842
+  noise_std=   1.0  block_8      enstrophy=0.906  nematic_order=0.760  flow_align=-1.360  order_grad_mag=0.847  strain_order_align=0.911  active_stress_div_mag=0.864
+  noise_std=   1.0  block_9      enstrophy=0.906  nematic_order=0.757  flow_align=-1.106  order_grad_mag=0.847  strain_order_align=0.918  active_stress_div_mag=0.863
+  noise_std=   1.0  block_10     enstrophy=0.914  nematic_order=0.787  flow_align=-1.159  order_grad_mag=0.839  strain_order_align=0.918  active_stress_div_mag=0.857
+  noise_std=   1.0  block_11     enstrophy=0.907  nematic_order=0.784  flow_align=-1.093  order_grad_mag=0.819  strain_order_align=0.926  active_stress_div_mag=0.845
+  noise_std=   1.0  block_12     enstrophy=0.901  nematic_order=0.803  flow_align=-1.067  order_grad_mag=0.812  strain_order_align=0.929  active_stress_div_mag=0.832
+  noise_std=   1.0  final_norm   enstrophy=0.892  nematic_order=0.786  flow_align=-1.053  order_grad_mag=0.802  strain_order_align=0.927  active_stress_div_mag=0.825
+  noise_std=   2.0  block_1      enstrophy=-1.184  nematic_order=-1.535  flow_align=-3.321  order_grad_mag=-2.689  strain_order_align=-0.999  active_stress_div_mag=-2.528
+  noise_std=   2.0  block_2      enstrophy=-0.648  nematic_order=-1.158  flow_align=-3.356  order_grad_mag=-1.823  strain_order_align=-0.532  active_stress_div_mag=-1.702
+  noise_std=   2.0  block_3      enstrophy=-0.532  nematic_order=-1.027  flow_align=-3.324  order_grad_mag=-1.489  strain_order_align=-0.394  active_stress_div_mag=-1.369
+  noise_std=   2.0  block_4      enstrophy=-0.395  nematic_order=-0.973  flow_align=-3.229  order_grad_mag=-1.351  strain_order_align=-0.276  active_stress_div_mag=-1.255
+  noise_std=   2.0  block_5      enstrophy=-0.321  nematic_order=-0.982  flow_align=-3.088  order_grad_mag=-1.263  strain_order_align=-0.201  active_stress_div_mag=-1.172
+  noise_std=   2.0  block_6      enstrophy=-0.289  nematic_order=-0.917  flow_align=-3.159  order_grad_mag=-1.222  strain_order_align=-0.162  active_stress_div_mag=-1.136
+  noise_std=   2.0  block_7      enstrophy=-0.252  nematic_order=-0.825  flow_align=-3.050  order_grad_mag=-1.168  strain_order_align=-0.147  active_stress_div_mag=-1.081
+  noise_std=   2.0  block_8      enstrophy=-0.234  nematic_order=-0.805  flow_align=-3.070  order_grad_mag=-1.074  strain_order_align=-0.119  active_stress_div_mag=-0.990
+  noise_std=   2.0  block_9      enstrophy=-0.172  nematic_order=-0.758  flow_align=-2.983  order_grad_mag=-1.069  strain_order_align=-0.051  active_stress_div_mag=-0.987
+  noise_std=   2.0  block_10     enstrophy=-0.193  nematic_order=-0.739  flow_align=-2.884  order_grad_mag=-1.049  strain_order_align=-0.068  active_stress_div_mag=-0.962
+  noise_std=   2.0  block_11     enstrophy=-0.209  nematic_order=-0.675  flow_align=-2.796  order_grad_mag=-0.966  strain_order_align=-0.054  active_stress_div_mag=-0.883
+  noise_std=   2.0  block_12     enstrophy=-0.131  nematic_order=-0.636  flow_align=-2.679  order_grad_mag=-0.851  strain_order_align=0.034  active_stress_div_mag=-0.766
+  noise_std=   2.0  final_norm   enstrophy=-0.493  nematic_order=-0.668  flow_align=-2.839  order_grad_mag=-0.972  strain_order_align=-0.309  active_stress_div_mag=-0.860
+  -- per-token --
+    noise_std=   0.0  block_1      enstrophy=0.625  vorticity_signed=0.994  divergence=0.998  nematic_order=0.992  flow_align=0.933  order_grad_mag=0.919  strain_order_align=0.940  active_stress_div_mag=0.912
+    noise_std=   0.0  block_2      enstrophy=0.603  vorticity_signed=0.985  divergence=0.994  nematic_order=0.991  flow_align=0.915  order_grad_mag=0.904  strain_order_align=0.926  active_stress_div_mag=0.900
+    noise_std=   0.0  block_3      enstrophy=0.577  vorticity_signed=0.970  divergence=0.986  nematic_order=0.990  flow_align=0.872  order_grad_mag=0.872  strain_order_align=0.910  active_stress_div_mag=0.866
+    noise_std=   0.0  block_4      enstrophy=0.542  vorticity_signed=0.942  divergence=0.971  nematic_order=0.985  flow_align=0.790  order_grad_mag=0.817  strain_order_align=0.881  active_stress_div_mag=0.818
+    noise_std=   0.0  block_5      enstrophy=0.516  vorticity_signed=0.910  divergence=0.960  nematic_order=0.980  flow_align=0.728  order_grad_mag=0.772  strain_order_align=0.862  active_stress_div_mag=0.773
+    noise_std=   0.0  block_6      enstrophy=0.506  vorticity_signed=0.880  divergence=0.947  nematic_order=0.978  flow_align=0.672  order_grad_mag=0.743  strain_order_align=0.847  active_stress_div_mag=0.743
+    noise_std=   0.0  block_7      enstrophy=0.492  vorticity_signed=0.846  divergence=0.929  nematic_order=0.977  flow_align=0.645  order_grad_mag=0.717  strain_order_align=0.841  active_stress_div_mag=0.717
+    noise_std=   0.0  block_8      enstrophy=0.496  vorticity_signed=0.824  divergence=0.923  nematic_order=0.975  flow_align=0.634  order_grad_mag=0.705  strain_order_align=0.838  active_stress_div_mag=0.711
+    noise_std=   0.0  block_9      enstrophy=0.501  vorticity_signed=0.809  divergence=0.916  nematic_order=0.973  flow_align=0.655  order_grad_mag=0.693  strain_order_align=0.842  active_stress_div_mag=0.703
+    noise_std=   0.0  block_10     enstrophy=0.499  vorticity_signed=0.796  divergence=0.911  nematic_order=0.971  flow_align=0.662  order_grad_mag=0.687  strain_order_align=0.835  active_stress_div_mag=0.690
+    noise_std=   0.0  block_11     enstrophy=0.506  vorticity_signed=0.786  divergence=0.904  nematic_order=0.971  flow_align=0.648  order_grad_mag=0.684  strain_order_align=0.840  active_stress_div_mag=0.684
+    noise_std=   0.0  block_12     enstrophy=0.500  vorticity_signed=0.771  divergence=0.898  nematic_order=0.971  flow_align=0.636  order_grad_mag=0.677  strain_order_align=0.839  active_stress_div_mag=0.676
+    noise_std=   0.0  final_norm   enstrophy=0.501  vorticity_signed=0.769  divergence=0.890  nematic_order=0.971  flow_align=0.633  order_grad_mag=0.678  strain_order_align=0.841  active_stress_div_mag=0.678
+    noise_std=   0.1  block_1      enstrophy=0.423  vorticity_signed=0.942  divergence=0.979  nematic_order=0.973  flow_align=0.760  order_grad_mag=0.747  strain_order_align=0.843  active_stress_div_mag=0.748
+    noise_std=   0.1  block_2      enstrophy=0.445  vorticity_signed=0.922  divergence=0.967  nematic_order=0.974  flow_align=0.760  order_grad_mag=0.753  strain_order_align=0.835  active_stress_div_mag=0.752
+    noise_std=   0.1  block_3      enstrophy=0.444  vorticity_signed=0.898  divergence=0.953  nematic_order=0.975  flow_align=0.707  order_grad_mag=0.739  strain_order_align=0.828  active_stress_div_mag=0.730
+    noise_std=   0.1  block_4      enstrophy=0.438  vorticity_signed=0.857  divergence=0.934  nematic_order=0.971  flow_align=0.639  order_grad_mag=0.692  strain_order_align=0.814  active_stress_div_mag=0.691
+    noise_std=   0.1  block_5      enstrophy=0.429  vorticity_signed=0.811  divergence=0.919  nematic_order=0.968  flow_align=0.577  order_grad_mag=0.667  strain_order_align=0.807  active_stress_div_mag=0.664
+    noise_std=   0.1  block_6      enstrophy=0.419  vorticity_signed=0.783  divergence=0.903  nematic_order=0.965  flow_align=0.539  order_grad_mag=0.646  strain_order_align=0.797  active_stress_div_mag=0.641
+    noise_std=   0.1  block_7      enstrophy=0.421  vorticity_signed=0.756  divergence=0.885  nematic_order=0.963  flow_align=0.539  order_grad_mag=0.611  strain_order_align=0.795  active_stress_div_mag=0.605
+    noise_std=   0.1  block_8      enstrophy=0.430  vorticity_signed=0.754  divergence=0.888  nematic_order=0.963  flow_align=0.552  order_grad_mag=0.611  strain_order_align=0.803  active_stress_div_mag=0.611
+    noise_std=   0.1  block_9      enstrophy=0.444  vorticity_signed=0.761  divergence=0.885  nematic_order=0.963  flow_align=0.581  order_grad_mag=0.604  strain_order_align=0.808  active_stress_div_mag=0.605
+    noise_std=   0.1  block_10     enstrophy=0.451  vorticity_signed=0.756  divergence=0.884  nematic_order=0.962  flow_align=0.596  order_grad_mag=0.606  strain_order_align=0.806  active_stress_div_mag=0.604
+    noise_std=   0.1  block_11     enstrophy=0.454  vorticity_signed=0.746  divergence=0.880  nematic_order=0.963  flow_align=0.596  order_grad_mag=0.607  strain_order_align=0.813  active_stress_div_mag=0.605
+    noise_std=   0.1  block_12     enstrophy=0.447  vorticity_signed=0.737  divergence=0.876  nematic_order=0.963  flow_align=0.581  order_grad_mag=0.602  strain_order_align=0.813  active_stress_div_mag=0.602
+    noise_std=   0.1  final_norm   enstrophy=0.448  vorticity_signed=0.733  divergence=0.867  nematic_order=0.963  flow_align=0.578  order_grad_mag=0.603  strain_order_align=0.814  active_stress_div_mag=0.603
+    noise_std=  0.25  block_1      enstrophy=0.291  vorticity_signed=0.789  divergence=0.922  nematic_order=0.902  flow_align=0.437  order_grad_mag=0.473  strain_order_align=0.689  active_stress_div_mag=0.503
+    noise_std=  0.25  block_2      enstrophy=0.301  vorticity_signed=0.759  divergence=0.901  nematic_order=0.905  flow_align=0.467  order_grad_mag=0.493  strain_order_align=0.710  active_stress_div_mag=0.519
+    noise_std=  0.25  block_3      enstrophy=0.305  vorticity_signed=0.723  divergence=0.877  nematic_order=0.928  flow_align=0.429  order_grad_mag=0.503  strain_order_align=0.701  active_stress_div_mag=0.521
+    noise_std=  0.25  block_4      enstrophy=0.312  vorticity_signed=0.664  divergence=0.851  nematic_order=0.927  flow_align=0.388  order_grad_mag=0.490  strain_order_align=0.704  active_stress_div_mag=0.515
+    noise_std=  0.25  block_5      enstrophy=0.325  vorticity_signed=0.614  divergence=0.834  nematic_order=0.933  flow_align=0.357  order_grad_mag=0.477  strain_order_align=0.714  active_stress_div_mag=0.499
+    noise_std=  0.25  block_6      enstrophy=0.325  vorticity_signed=0.607  divergence=0.823  nematic_order=0.931  flow_align=0.350  order_grad_mag=0.472  strain_order_align=0.713  active_stress_div_mag=0.497
+    noise_std=  0.25  block_7      enstrophy=0.330  vorticity_signed=0.606  divergence=0.805  nematic_order=0.931  flow_align=0.380  order_grad_mag=0.452  strain_order_align=0.720  active_stress_div_mag=0.478
+    noise_std=  0.25  block_8      enstrophy=0.350  vorticity_signed=0.640  divergence=0.826  nematic_order=0.931  flow_align=0.432  order_grad_mag=0.463  strain_order_align=0.741  active_stress_div_mag=0.489
+    noise_std=  0.25  block_9      enstrophy=0.362  vorticity_signed=0.686  divergence=0.842  nematic_order=0.937  flow_align=0.465  order_grad_mag=0.478  strain_order_align=0.758  active_stress_div_mag=0.504
+    noise_std=  0.25  block_10     enstrophy=0.373  vorticity_signed=0.697  divergence=0.843  nematic_order=0.941  flow_align=0.495  order_grad_mag=0.485  strain_order_align=0.761  active_stress_div_mag=0.509
+    noise_std=  0.25  block_11     enstrophy=0.378  vorticity_signed=0.692  divergence=0.839  nematic_order=0.944  flow_align=0.497  order_grad_mag=0.497  strain_order_align=0.768  active_stress_div_mag=0.518
+    noise_std=  0.25  block_12     enstrophy=0.380  vorticity_signed=0.684  divergence=0.834  nematic_order=0.945  flow_align=0.475  order_grad_mag=0.499  strain_order_align=0.771  active_stress_div_mag=0.519
+    noise_std=  0.25  final_norm   enstrophy=0.379  vorticity_signed=0.678  divergence=0.825  nematic_order=0.945  flow_align=0.469  order_grad_mag=0.497  strain_order_align=0.770  active_stress_div_mag=0.517
+    noise_std=   0.5  block_1      enstrophy=0.180  vorticity_signed=0.551  divergence=0.812  nematic_order=0.665  flow_align=0.186  order_grad_mag=0.244  strain_order_align=0.423  active_stress_div_mag=0.282
+    noise_std=   0.5  block_2      enstrophy=0.195  vorticity_signed=0.535  divergence=0.796  nematic_order=0.708  flow_align=0.196  order_grad_mag=0.270  strain_order_align=0.480  active_stress_div_mag=0.309
+    noise_std=   0.5  block_3      enstrophy=0.209  vorticity_signed=0.505  divergence=0.763  nematic_order=0.767  flow_align=0.194  order_grad_mag=0.308  strain_order_align=0.499  active_stress_div_mag=0.348
+    noise_std=   0.5  block_4      enstrophy=0.212  vorticity_signed=0.444  divergence=0.721  nematic_order=0.780  flow_align=0.185  order_grad_mag=0.319  strain_order_align=0.501  active_stress_div_mag=0.362
+    noise_std=   0.5  block_5      enstrophy=0.215  vorticity_signed=0.379  divergence=0.690  nematic_order=0.795  flow_align=0.170  order_grad_mag=0.324  strain_order_align=0.503  active_stress_div_mag=0.366
+    noise_std=   0.5  block_6      enstrophy=0.214  vorticity_signed=0.368  divergence=0.685  nematic_order=0.791  flow_align=0.164  order_grad_mag=0.326  strain_order_align=0.497  active_stress_div_mag=0.365
+    noise_std=   0.5  block_7      enstrophy=0.226  vorticity_signed=0.358  divergence=0.676  nematic_order=0.797  flow_align=0.192  order_grad_mag=0.324  strain_order_align=0.509  active_stress_div_mag=0.362
+    noise_std=   0.5  block_8      enstrophy=0.238  vorticity_signed=0.396  divergence=0.723  nematic_order=0.812  flow_align=0.225  order_grad_mag=0.343  strain_order_align=0.540  active_stress_div_mag=0.378
+    noise_std=   0.5  block_9      enstrophy=0.257  vorticity_signed=0.454  divergence=0.757  nematic_order=0.826  flow_align=0.260  order_grad_mag=0.350  strain_order_align=0.573  active_stress_div_mag=0.385
+    noise_std=   0.5  block_10     enstrophy=0.273  vorticity_signed=0.496  divergence=0.765  nematic_order=0.840  flow_align=0.281  order_grad_mag=0.350  strain_order_align=0.600  active_stress_div_mag=0.386
+    noise_std=   0.5  block_11     enstrophy=0.297  vorticity_signed=0.496  divergence=0.765  nematic_order=0.860  flow_align=0.296  order_grad_mag=0.363  strain_order_align=0.638  active_stress_div_mag=0.399
+    noise_std=   0.5  block_12     enstrophy=0.310  vorticity_signed=0.494  divergence=0.761  nematic_order=0.871  flow_align=0.280  order_grad_mag=0.362  strain_order_align=0.660  active_stress_div_mag=0.402
+    noise_std=   0.5  final_norm   enstrophy=0.307  vorticity_signed=0.483  divergence=0.751  nematic_order=0.869  flow_align=0.272  order_grad_mag=0.361  strain_order_align=0.657  active_stress_div_mag=0.400
+    noise_std=   1.0  block_1      enstrophy=0.018  vorticity_signed=0.297  divergence=0.617  nematic_order=0.114  flow_align=0.080  order_grad_mag=0.041  strain_order_align=0.061  active_stress_div_mag=0.046
+    noise_std=   1.0  block_2      enstrophy=0.036  vorticity_signed=0.297  divergence=0.613  nematic_order=0.197  flow_align=0.080  order_grad_mag=0.067  strain_order_align=0.100  active_stress_div_mag=0.078
+    noise_std=   1.0  block_3      enstrophy=0.048  vorticity_signed=0.296  divergence=0.607  nematic_order=0.249  flow_align=0.078  order_grad_mag=0.089  strain_order_align=0.126  active_stress_div_mag=0.104
+    noise_std=   1.0  block_4      enstrophy=0.055  vorticity_signed=0.293  divergence=0.595  nematic_order=0.271  flow_align=0.077  order_grad_mag=0.099  strain_order_align=0.140  active_stress_div_mag=0.116
+    noise_std=   1.0  block_5      enstrophy=0.066  vorticity_signed=0.288  divergence=0.582  nematic_order=0.307  flow_align=0.076  order_grad_mag=0.114  strain_order_align=0.162  active_stress_div_mag=0.132
+    noise_std=   1.0  block_6      enstrophy=0.067  vorticity_signed=0.283  divergence=0.570  nematic_order=0.312  flow_align=0.076  order_grad_mag=0.118  strain_order_align=0.167  active_stress_div_mag=0.135
+    noise_std=   1.0  block_7      enstrophy=0.071  vorticity_signed=0.278  divergence=0.556  nematic_order=0.326  flow_align=0.074  order_grad_mag=0.123  strain_order_align=0.176  active_stress_div_mag=0.141
+    noise_std=   1.0  block_8      enstrophy=0.073  vorticity_signed=0.275  divergence=0.552  nematic_order=0.332  flow_align=0.075  order_grad_mag=0.133  strain_order_align=0.178  active_stress_div_mag=0.150
+    noise_std=   1.0  block_9      enstrophy=0.078  vorticity_signed=0.262  divergence=0.556  nematic_order=0.347  flow_align=0.074  order_grad_mag=0.144  strain_order_align=0.190  active_stress_div_mag=0.158
+    noise_std=   1.0  block_10     enstrophy=0.082  vorticity_signed=0.254  divergence=0.554  nematic_order=0.368  flow_align=0.072  order_grad_mag=0.152  strain_order_align=0.200  active_stress_div_mag=0.166
+    noise_std=   1.0  block_11     enstrophy=0.097  vorticity_signed=0.240  divergence=0.544  nematic_order=0.421  flow_align=0.075  order_grad_mag=0.171  strain_order_align=0.235  active_stress_div_mag=0.188
+    noise_std=   1.0  block_12     enstrophy=0.108  vorticity_signed=0.234  divergence=0.539  nematic_order=0.457  flow_align=0.071  order_grad_mag=0.187  strain_order_align=0.259  active_stress_div_mag=0.205
+    noise_std=   1.0  final_norm   enstrophy=0.110  vorticity_signed=0.229  divergence=0.529  nematic_order=0.461  flow_align=0.071  order_grad_mag=0.188  strain_order_align=0.258  active_stress_div_mag=0.206
+    noise_std=   2.0  block_1      enstrophy=-0.022  vorticity_signed=0.112  divergence=0.330  nematic_order=-0.031  flow_align=0.002  order_grad_mag=-0.029  strain_order_align=-0.022  active_stress_div_mag=-0.024
+    noise_std=   2.0  block_2      enstrophy=-0.022  vorticity_signed=0.113  divergence=0.330  nematic_order=-0.028  flow_align=0.002  order_grad_mag=-0.028  strain_order_align=-0.021  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_3      enstrophy=-0.021  vorticity_signed=0.113  divergence=0.329  nematic_order=-0.027  flow_align=0.002  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_4      enstrophy=-0.022  vorticity_signed=0.112  divergence=0.328  nematic_order=-0.026  flow_align=0.002  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_5      enstrophy=-0.021  vorticity_signed=0.112  divergence=0.327  nematic_order=-0.026  flow_align=0.002  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_6      enstrophy=-0.021  vorticity_signed=0.113  divergence=0.326  nematic_order=-0.026  flow_align=0.002  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_7      enstrophy=-0.022  vorticity_signed=0.113  divergence=0.325  nematic_order=-0.026  flow_align=0.002  order_grad_mag=-0.029  strain_order_align=-0.020  active_stress_div_mag=-0.024
+    noise_std=   2.0  block_8      enstrophy=-0.022  vorticity_signed=0.114  divergence=0.325  nematic_order=-0.026  flow_align=0.002  order_grad_mag=-0.029  strain_order_align=-0.020  active_stress_div_mag=-0.024
+    noise_std=   2.0  block_9      enstrophy=-0.021  vorticity_signed=0.113  divergence=0.323  nematic_order=-0.026  flow_align=0.001  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_10     enstrophy=-0.021  vorticity_signed=0.114  divergence=0.322  nematic_order=-0.026  flow_align=0.001  order_grad_mag=-0.028  strain_order_align=-0.020  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_11     enstrophy=-0.021  vorticity_signed=0.113  divergence=0.322  nematic_order=-0.025  flow_align=0.001  order_grad_mag=-0.028  strain_order_align=-0.019  active_stress_div_mag=-0.023
+    noise_std=   2.0  block_12     enstrophy=-0.020  vorticity_signed=0.112  divergence=0.321  nematic_order=-0.025  flow_align=0.001  order_grad_mag=-0.028  strain_order_align=-0.019  active_stress_div_mag=-0.023
+    noise_std=   2.0  final_norm   enstrophy=-0.021  vorticity_signed=0.112  divergence=0.314  nematic_order=-0.024  flow_align=0.001  order_grad_mag=-0.028  strain_order_align=-0.018  active_stress_div_mag=-0.023
+
+wrote sweep_results/active_matter_noise_robustness.json

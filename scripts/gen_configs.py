@@ -12,7 +12,16 @@ OBJECTIVES = {
         "lr": 1.0e-4,
         "objective": {
             "mask_ratio": 0.9,
-            "predictor_dim": 384,
+            # Narrowed from 384 (= encoder width) to 192: I-JEPA/V-JEPA's own
+            # design keeps the predictor narrower than the encoder (a
+            # deliberate bottleneck -- forces the encoder to be informative
+            # rather than letting a powerful predictor shortcut the
+            # objective); at encoder_dim=384 that mechanism was absent since
+            # predictor_dim was also 384. This also brings the predictor's
+            # parameter count (~2.8M) in line with the MAE decoder's
+            # (~2.2-2.9M), removing a head-capacity confound between the two
+            # objectives' pretraining budgets.
+            "predictor_dim": 192,
             "predictor_depth": 6,
             "predictor_heads": 6,
             "ema_start": 0.996,
@@ -50,9 +59,23 @@ def make(dataset: str, objective: str, debug: bool = False) -> dict:
             "base_path": "~/well_data" if debug else "/workspace/data",
             "dataset_name": "turbulent_radiative_layer_2D" if debug else dataset,
             "n_frames": 8,
-            "num_workers": 0 if debug else 16,
+            # 16 workers was tuned for the pre-memmap WellDataset path
+            # (~0.5s/clip); memmap reads are near-instant, so fewer workers
+            # are plenty -- and with several concurrent training processes
+            # sharing one pod, many worker pools competing for /dev/shm-backed
+            # DataLoader IPC (semaphores etc, unavoidably shm-backed
+            # regardless of tensor-sharing strategy) can exhaust it.
+            # Measured directly: with 6 full-scale jobs concurrent (24 workers
+            # total at num_workers=4), single memmap __getitem__ calls slowed
+            # to 0.6-3.3s (vs ~1ms isolated) from memory-bandwidth contention;
+            # 3 concurrent jobs (12 workers) ran at full speed during the LR
+            # sweep. Dropped to 2/job so all 6 pairs can still run in parallel
+            # without crossing that contention cliff.
+            "num_workers": 0 if debug else 2,
             "memmap": not debug,
+            "valid_stride": 8,
         },
+        "val_every": 10 if debug else 2000,
         "encoder": {
             "patch_t": 2,
             "patch_h": 16,

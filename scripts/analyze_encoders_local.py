@@ -25,6 +25,7 @@ Usage:
 """
 
 import argparse
+import copy
 import json
 import sys
 from pathlib import Path
@@ -121,10 +122,10 @@ def layerwise_token_features(encoder, clip: torch.Tensor) -> list[torch.Tensor]:
 
 
 class TinyMLP(nn.Module):
-    def __init__(self, in_dim: int, hidden: int = 128):
+    def __init__(self, in_dim: int, hidden: int = 128, dropout: float = 0.1):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(in_dim, hidden), nn.ReLU(), nn.Linear(hidden, 1)
+            nn.Linear(in_dim, hidden), nn.ReLU(), nn.Dropout(dropout), nn.Linear(hidden, 1)
         )
 
     def forward(self, x):
@@ -216,6 +217,90 @@ def mlp_fit_eval(x_train: torch.Tensor, y_train: torch.Tensor,
     ss_res = ((pred_te - yte) ** 2).sum()
     ss_tot = ((yte - yte.mean()) ** 2).sum()
     return (1 - ss_res / ss_tot).item()
+
+
+def _train_mlp_early_stop(x_fit: torch.Tensor, y_fit: torch.Tensor, hidden: int = 128,
+                           dropout: float = 0.1, lr: float = 1e-2, weight_decay: float = 1e-4,
+                           seed: int = 0, min_steps: int = 150, max_steps: int = 4000,
+                           patience: int = 100, check_every: int = 20):
+    """Train one TinyMLP with early stopping monitored on a small internal holdout
+    carved from x_fit/y_fit (never valid or test data — a further split of
+    whatever "fit" set was passed in). Replaces the old fixed-2000-step
+    schedule with an actual convergence check: keeps the best-monitor-loss
+    state dict, restores it before returning. Returns (model, xm, xs, ym, ys)
+    so the caller can standardize an eval set with the SAME (inner-train-only)
+    statistics used during training.
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x_fit, y_fit = x_fit.to(device), y_fit.to(device)
+    g = torch.Generator().manual_seed(seed)
+    n = x_fit.size(0)
+    perm = torch.randperm(n, generator=g)
+    n_mon = max(1, n // 10)
+    mon_idx, tr_idx = perm[:n_mon], perm[n_mon:]
+
+    xm, xs = x_fit[tr_idx].mean(0), x_fit[tr_idx].std(0) + 1e-8
+    ym, ys = y_fit[tr_idx].mean(), y_fit[tr_idx].std() + 1e-8
+    xtr, xmon = (x_fit[tr_idx] - xm) / xs, (x_fit[mon_idx] - xm) / xs
+    ytr, ymon = (y_fit[tr_idx] - ym) / ys, (y_fit[mon_idx] - ym) / ys
+
+    torch.manual_seed(seed)
+    model = TinyMLP(x_fit.size(1), hidden, dropout=dropout).to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=max_steps)
+
+    best_loss, best_state, best_step = float("inf"), None, 0
+    for step in range(max_steps):
+        model.train()
+        opt.zero_grad()
+        loss = F.mse_loss(model(xtr), ytr)
+        loss.backward()
+        opt.step()
+        sched.step()
+
+        if step % check_every == 0 or step == max_steps - 1:
+            model.eval()
+            with torch.no_grad():
+                mon_loss = F.mse_loss(model(xmon), ymon).item()
+            if mon_loss < best_loss:
+                best_loss, best_state, best_step = mon_loss, copy.deepcopy(model.state_dict()), step
+            elif step >= min_steps and step - best_step >= patience:
+                break
+
+    model.load_state_dict(best_state)
+    model.eval()
+    return model, xm, xs, ym, ys
+
+
+def mlp_multiseed(x_fit: torch.Tensor, y_fit: torch.Tensor, x_eval: torch.Tensor, y_eval: torch.Tensor,
+                   seeds=(0, 1, 2, 3, 4), hidden: int = 128, dropout: float = 0.1, lr: float = 1e-2,
+                   weight_decay: float = 1e-4, min_steps: int = 150, max_steps: int = 4000,
+                   patience: int = 100) -> dict:
+    """Fit N independently-seeded TinyMLPs on (x_fit, y_fit) with early
+    stopping (see _train_mlp_early_stop), score each on (x_eval, y_eval),
+    return {"mean": float, "std": float, "per_seed": [float, ...]}.
+
+    Same function serves two roles depending on what's passed: (train, valid)
+    for layer selection, (train, test) for final reporting -- the two
+    numbers are produced by identical code, just different data.
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x_eval, y_eval = x_eval.to(device), y_eval.to(device)
+    r2s = []
+    for seed in seeds:
+        model, xm, xs, ym, ys = _train_mlp_early_stop(
+            x_fit, y_fit, hidden=hidden, dropout=dropout, lr=lr, weight_decay=weight_decay,
+            seed=seed, min_steps=min_steps, max_steps=max_steps, patience=patience,
+        )
+        xev = (x_eval - xm) / xs
+        yev = (y_eval - ym) / ys
+        with torch.no_grad():
+            pred = model(xev)
+        ss_res = ((pred - yev) ** 2).sum()
+        ss_tot = ((yev - yev.mean()) ** 2).sum()
+        r2s.append((1 - ss_res / ss_tot).item())
+    r2_t = torch.tensor(r2s)
+    return {"mean": r2_t.mean().item(), "std": r2_t.std().item(), "per_seed": r2s}
 
 
 def analyze_token_level(ckpt_path: str, clips: torch.Tensor, contemp: dict, max_clips: int,

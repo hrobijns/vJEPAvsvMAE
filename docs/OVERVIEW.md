@@ -24,7 +24,7 @@ NS + tracer), `rayleigh_benard` (4ch, 512×128, buoyancy-driven convection).
 | shared | ViT-S encoder (384d × 12 blocks, 6 heads), 2×16×16 tubelet patches, tube masking @ 0.9, T=8 clips at native resolution, per-channel z-score norm, AdamW + cosine, 100k steps, same batch/steps |
 |---|---|
 | **MAE head** | 4-layer decoder (192d) → MSE on masked patches (`norm_pix`) |
-| **JEPA head** | EMA target encoder (0.996→1.0) + 6-layer predictor (384d) → smooth-L1 on layer-normed target features at masked positions |
+| **JEPA head** | EMA target encoder (0.996→1.0) + 6-layer predictor (192d, narrower than the 384d encoder) → smooth-L1 on layer-normed target features at masked positions |
 
 Full architecture/training detail in [README.md § Design](../README.md#design).
 
@@ -42,21 +42,18 @@ Reproduce via `scripts/extract_training_history.py` (needs the local
 `pod_logs/wandb/` offline-run logs) → `sweep_results/training_history.csv`
 → `scripts/plot_training_curves.py`.
 
-## Two probing pipelines
+## Probing pipeline
 
-- **[Linear probe suite](LINEAR_PROBE.md)** — does the *frozen representation*
-  linearly encode physics (contemporaneous quantities, trajectory-level
-  regime parameters, future content, noise robustness)? No predictor or
-  decoder involved — pure ridge regression on frozen features.
-- **[Rollout probe suite](ROLLOUT_PROBE.md)** — can the model actually
-  *forecast forward*, using its predictor/decoder to generate future
-  latents/pixels, single-step and chained autoregressively?
+**[Linear probe suite](LINEAR_PROBE.md)** — does the *frozen representation*
+linearly encode physics (contemporaneous quantities, trajectory-level regime
+parameters, future content, noise robustness)? No predictor or decoder
+involved — pure ridge regression on frozen features.
 
 ## Headline findings
 
 All numbers below are ridge-probe R² (5-fold CV); "best-layer" means the best
-of the 13 checkpoint layers (12 blocks + final norm). Full tables in the two
-probe docs; raw numbers in `sweep_results/*.json`.
+of the 13 checkpoint layers (12 blocks + final norm). Full tables in
+[LINEAR_PROBE.md](LINEAR_PROBE.md); raw numbers in `sweep_results/*.json`.
 
 **1. Contemporaneous physics — JEPA and MAE are close on `active_matter` and
 `shear_flow`, but JEPA clearly ahead on `rayleigh_benard`.** Both objectives
@@ -82,16 +79,7 @@ decode the constant per-trajectory regime very well (R² 0.77–0.999 at
 mid-layers), with shuffled-control R² near 0 confirming no train/val leakage.
 This is not where JEPA/MAE differ.
 
-**3. Autoregressive rollout — both objectives degrade similarly, and both
-fall behind a naive persistence baseline once errors compound.** Across 8
-autoregressive steps, `fed_back` rollout (using the model's own predicted
-latents as input for the next step) drops well below the `oracle` baseline
-(re-seeded with real context each step) for both objectives, and on
-`active_matter`/`rayleigh_benard` it ends up *worse* than simply predicting
-"nothing changes" (persistence). JEPA and MAE track each other closely here —
-this is not a dimension where JEPA's advantage on `rayleigh_benard` shows up.
-
-**4. Noise robustness — MAE is sharper on clean input, JEPA is more robust to
+**3. Noise robustness — MAE is sharper on clean input, JEPA is more robust to
 corruption, and this replicates on held-out data.** At zero injected noise,
 MAE's final-layer R² is higher than JEPA's on all three datasets (e.g.
 `active_matter` 0.874 vs 0.786, mean across quantities). Under heavy Gaussian
@@ -105,7 +93,7 @@ reproduces and sharpens this: `active_matter`'s MAE `nematic_order` R² is
 token-level noise sweep and the forecast/skill-score results, in
 [LINEAR_PROBE.md](LINEAR_PROBE.md).
 
-**5. `rayleigh_benard` is the one dataset where JEPA leads on essentially
+**4. `rayleigh_benard` is the one dataset where JEPA leads on essentially
 every axis** — clean pooled accuracy, depth (needs more layers to reach peak
 but reaches a higher one), noise robustness, token-level nonlinear
 information MAE simply lacks, and forecast skill at longer horizons. On
@@ -125,26 +113,35 @@ section for the full argument and literature connections.
   `active_matter` (see `scripts/gen_configs.py` comment), not placeholders.
 - **Probing-suite expansion: complete.** Physics targets re-derived from each
   dataset's governing PDE, token-level probing extended to every probe
-  (contemporaneous, regime, rollout, forecast), per-token MLP added, noise
-  robustness sweeps all 13 layers (pooled and token) instead of just the
-  final one, persistence-relative skill scoring added to the forecast and
-  rollout probes, and a held-out `valid`-split generalization check run
-  against all three datasets. Full detail and current numbers in
+  (contemporaneous, regime, forecast), per-token MLP added, noise robustness
+  sweeps all 13 layers (pooled and token) instead of just the final one,
+  persistence-relative skill scoring added to the forecast probe, and a
+  held-out `valid`-split generalization check run against all three
+  datasets. Full detail and current numbers in
   [LINEAR_PROBE.md](LINEAR_PROBE.md) (contemporaneous/depth/noise/forecast/
-  generalization) and [ROLLOUT_PROBE.md](ROLLOUT_PROBE.md) (multi-step
-  rollout — still a pre-expansion snapshot, see that doc's own caveat).
-- **Held-out test-split evaluation: complete for the three headline
-  analyses.** The `valid`-split check above still picks its best layer via
-  CV within that same split; `scripts/test_split_eval.py` fixes the
-  remaining gap by freezing the layer choice from train-CV *before* touching
-  any test data, then fitting once on train and evaluating once on `test`
-  trajectories (10/28/50 for active_matter/shear_flow/rayleigh_benard).
-  Every headline claim reproduces: `rayleigh_benard`'s JEPA-ahead-on-coupled-
-  quantities gap *widens* on test rather than shrinking, `active_matter`'s
-  MAE noise-collapse reproduces almost exactly (−0.78 at σ=2 vs. −1.02 on
-  train), and `shear_flow` confirms no robustness gap on held-out data
-  either. Full numbers and the one regime-coverage pitfall hit and fixed
-  along the way: [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-test-split-evaluation-freezing-layer-selection).
+  generalization).
+- **Held-out, multi-seed test evaluation: complete for the three headline
+  analyses (contemporaneous, forecast-content, noise robustness), with a
+  ridge-vs-MLP training-quality audit built in.** `scripts/workshop_test_eval.py`
+  selects each layer on a regime-balanced slice carved out of `train` (the
+  shipped `valid` split was too small/regime-degenerate to use directly),
+  then fits seeded MLPs on `train` and reports mean±std R² on `test`
+  (10/28/50 trajectories for active_matter/shear_flow/rayleigh_benard),
+  never touched until that final step. A broad sanity check (comparing every
+  MLP number against a closed-form ridge fit at the same frozen layer) found
+  the original fixed `weight_decay` let the MLP badly overfit a handful of
+  hard, low-SNR targets — `shear_flow`'s long-horizon forecast for
+  `advective_flux`/`tracer_grad` looked like a real JEPA seed-instability
+  finding but was entirely a training artifact (ridge recovered strong,
+  stable signal there the whole time). Fixed by making `weight_decay` itself
+  adaptively selected per layer (including ridge as a fair candidate in the
+  same held-out comparison) — 273/276 cells now match or beat their own
+  ridge audit value. `rayleigh_benard`'s t+32 forecast shows the cleanest
+  result in the sweep (consistent, low-variance JEPA advantage on every
+  pooled quantity, largest of the three datasets); `shear_flow` shows the
+  same pattern at smaller magnitude, now cleanly instead of unstably;
+  `active_matter`'s MAE noise-collapse reproduces. Full numbers:
+  [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-multi-seed-test-evaluation-the-reported-numbers).
 - **No held-out validation loss during pretraining, partially mitigated.**
   `src/train.py` only ever trains on `split="train"` — the training-curve
   figure above is training loss only, for all 6 runs, so the 100k-step budget

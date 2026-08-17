@@ -1,0 +1,125 @@
+device=cuda
+shear_flow: train_total=896 -> fit=784 valid=112  test=28
+== family 1: contemporaneous (t+0) ==
+  [t+0] n_samples: train=900 valid=336 test=84
+    pooled t+0 shear_flow_jepa.pt       advective_flux             L 9 [mlp]  test_r2=+0.776(+/-0.014)  ridge=+0.742
+    pooled t+0 shear_flow_jepa.pt       enstrophy                  L 4 [mlp]  test_r2=+0.997(+/-0.001)  ridge=+0.988
+    pooled t+0 shear_flow_jepa.pt       okubo_weiss                L 2 [mlp]  test_r2=+0.995(+/-0.002)  ridge=+0.989
+    pooled t+0 shear_flow_jepa.pt       pressure_grad_mag          L 2 [ridge]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    pooled t+0 shear_flow_jepa.pt       strain_rate_mag            L 2 [ridge]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    pooled t+0 shear_flow_jepa.pt       tracer_grad                L 2 [mlp]  test_r2=+0.950(+/-0.021)  ridge=+0.788
+    pooled t+0 shear_flow_jepa.pt       tracer_laplacian           L 2 [mlp]  test_r2=+0.920(+/-0.032)  ridge=+0.713
+    token  t+0 shear_flow_jepa.pt       advective_flux             L 0 [mlp]  test_r2=+0.938(+/-0.009)  ridge=+0.019
+    token  t+0 shear_flow_jepa.pt       divergence                 L 0 [ridge]  test_r2=+0.992(+/-0.000)  ridge=+0.992
+    token  t+0 shear_flow_jepa.pt       enstrophy                  L 0 [mlp]  test_r2=+0.921(+/-0.042)  ridge=+0.437
+    token  t+0 shear_flow_jepa.pt       okubo_weiss                L 0 [mlp]  test_r2=+0.984(+/-0.003)  ridge=+0.365
+    token  t+0 shear_flow_jepa.pt       pressure_grad_mag          L 0 [mlp]  test_r2=+0.947(+/-0.004)  ridge=+0.844
+    token  t+0 shear_flow_jepa.pt       strain_rate_mag            L 0 [mlp]  test_r2=+0.942(+/-0.011)  ridge=+0.784
+    token  t+0 shear_flow_jepa.pt       tracer_grad                L 0 [mlp]  test_r2=+0.852(+/-0.019)  ridge=-1.559
+    token  t+0 shear_flow_jepa.pt       tracer_laplacian           L 0 [mlp]  test_r2=+0.326(+/-0.021)  ridge=-0.374
+    token  t+0 shear_flow_jepa.pt       vorticity_signed           L 0 [mlp]  test_r2=+0.997(+/-0.000)  ridge=+0.994
+    pooled t+0 shear_flow_mae.pt        advective_flux             L 1 [mlp]  test_r2=+0.923(+/-0.024)  ridge=+0.732
+    pooled t+0 shear_flow_mae.pt        enstrophy                  L 5 [mlp]  test_r2=+0.996(+/-0.001)  ridge=+0.994
+    pooled t+0 shear_flow_mae.pt        okubo_weiss                L 3 [mlp]  test_r2=+0.995(+/-0.001)  ridge=+0.980
+    pooled t+0 shear_flow_mae.pt        pressure_grad_mag          L 6 [mlp]  test_r2=+1.000(+/-0.000)  ridge=+0.999
+    pooled t+0 shear_flow_mae.pt        strain_rate_mag            L 3 [ridge]  test_r2=+0.999(+/-0.000)  ridge=+0.999
+    pooled t+0 shear_flow_mae.pt        tracer_grad                L 5 [mlp]  test_r2=+0.910(+/-0.015)  ridge=+0.802
+    pooled t+0 shear_flow_mae.pt        tracer_laplacian           L 5 [mlp]  test_r2=+0.820(+/-0.035)  ridge=+0.807
+    token  t+0 shear_flow_mae.pt        advective_flux             L 0 [mlp]  test_r2=+0.950(+/-0.005)  ridge=+0.532
+    token  t+0 shear_flow_mae.pt        divergence                 L 0 [ridge]  test_r2=+0.995(+/-0.000)  ridge=+0.995
+    token  t+0 shear_flow_mae.pt        enstrophy                  L 0 [mlp]  test_r2=+0.982(+/-0.002)  ridge=+0.533
+    token  t+0 shear_flow_mae.pt        okubo_weiss                L 0 [mlp]  test_r2=+0.988(+/-0.004)  ridge=+0.285
+    token  t+0 shear_flow_mae.pt        pressure_grad_mag          L 0 [mlp]  test_r2=+0.975(+/-0.003)  ridge=+0.747
+    token  t+0 shear_flow_mae.pt        strain_rate_mag            L 0 [mlp]  test_r2=+0.968(+/-0.006)  ridge=+0.754
+    token  t+0 shear_flow_mae.pt        tracer_grad                L 0 [mlp]  test_r2=+0.923(+/-0.019)  ridge=-0.435
+    token  t+0 shear_flow_mae.pt        tracer_laplacian           L 1 [mlp]  test_r2=+0.301(+/-0.019)  ridge=-0.055
+    token  t+0 shear_flow_mae.pt        vorticity_signed           L 0 [mlp]  test_r2=+0.998(+/-0.000)  ridge=+0.998
+family 1 done in 4206s
+== family 2: forecast-content ==
+  [forecast] n_samples: train=900 valid=336 test=84  n_token_clips: train=16 valid=16 test=16
+    pooled t+8  shear_flow_jepa.pt       advective_flux             L 5 [mlp]  test_r2=-0.239(+/-0.063)  ridge=-0.073
+    pooled t+8  shear_flow_jepa.pt       enstrophy                  L 8 [mlp]  test_r2=+0.967(+/-0.007)  ridge=+0.928
+    pooled t+8  shear_flow_jepa.pt       okubo_weiss                L 5 [mlp]  test_r2=+0.954(+/-0.017)  ridge=+0.923
+    pooled t+8  shear_flow_jepa.pt       pressure_grad_mag          L 9 [mlp]  test_r2=+0.994(+/-0.001)  ridge=+0.992
+    pooled t+8  shear_flow_jepa.pt       strain_rate_mag            L 9 [mlp]  test_r2=+0.994(+/-0.001)  ridge=+0.992
+    pooled t+8  shear_flow_jepa.pt       tracer_grad                L 4 [mlp]  test_r2=+0.936(+/-0.021)  ridge=+0.848
+    pooled t+8  shear_flow_jepa.pt       tracer_laplacian           L 2 [mlp]  test_r2=+0.934(+/-0.015)  ridge=+0.757
+    token  t+8  shear_flow_jepa.pt       advective_flux             L 0 [mlp]  test_r2=+0.478(+/-0.014)  ridge=+0.208
+    token  t+8  shear_flow_jepa.pt       divergence                 L 1 [mlp]  test_r2=+0.789(+/-0.009)  ridge=+0.521
+    token  t+8  shear_flow_jepa.pt       enstrophy                  L 1 [mlp]  test_r2=+0.688(+/-0.007)  ridge=-1.567
+    token  t+8  shear_flow_jepa.pt       okubo_weiss                L 1 [mlp]  test_r2=+0.695(+/-0.007)  ridge=+0.152
+    token  t+8  shear_flow_jepa.pt       pressure_grad_mag          L 1 [mlp]  test_r2=+0.856(+/-0.009)  ridge=-0.119
+    token  t+8  shear_flow_jepa.pt       strain_rate_mag            L 1 [mlp]  test_r2=+0.844(+/-0.003)  ridge=-0.022
+    token  t+8  shear_flow_jepa.pt       tracer_grad                L 1 [mlp]  test_r2=+0.237(+/-0.013)  ridge=-1.406
+    token  t+8  shear_flow_jepa.pt       tracer_laplacian           L 2 [mlp]  test_r2=+0.101(+/-0.010)  ridge=+0.074
+    token  t+8  shear_flow_jepa.pt       vorticity_signed           L 2 [mlp]  test_r2=+0.564(+/-0.018)  ridge=+0.346
+    pooled t+8  shear_flow_mae.pt        advective_flux             L 9 [mlp]  test_r2=-0.071(+/-0.120)  ridge=-0.401
+    pooled t+8  shear_flow_mae.pt        enstrophy                  L 7 [ridge]  test_r2=+0.906(+/-0.000)  ridge=+0.906
+    pooled t+8  shear_flow_mae.pt        okubo_weiss                L 1 [mlp]  test_r2=+0.903(+/-0.010)  ridge=+0.903
+    pooled t+8  shear_flow_mae.pt        pressure_grad_mag          L 4 [mlp]  test_r2=+0.993(+/-0.001)  ridge=+0.992
+    pooled t+8  shear_flow_mae.pt        strain_rate_mag            L 8 [ridge]  test_r2=+0.989(+/-0.000)  ridge=+0.989
+    pooled t+8  shear_flow_mae.pt        tracer_grad                L 2 [mlp]  test_r2=+0.948(+/-0.010)  ridge=+0.875
+    pooled t+8  shear_flow_mae.pt        tracer_laplacian           L 4 [mlp]  test_r2=+0.899(+/-0.026)  ridge=+0.822
+    token  t+8  shear_flow_mae.pt        advective_flux             L 0 [mlp]  test_r2=+0.518(+/-0.009)  ridge=+0.297
+    token  t+8  shear_flow_mae.pt        divergence                 L 0 [mlp]  test_r2=+0.811(+/-0.009)  ridge=+0.698
+    token  t+8  shear_flow_mae.pt        enstrophy                  L 2 [mlp]  test_r2=+0.687(+/-0.005)  ridge=-0.798
+    token  t+8  shear_flow_mae.pt        okubo_weiss                L 2 [mlp]  test_r2=+0.667(+/-0.009)  ridge=+0.209
+    token  t+8  shear_flow_mae.pt        pressure_grad_mag          L 2 [mlp]  test_r2=+0.823(+/-0.003)  ridge=+0.327
+    token  t+8  shear_flow_mae.pt        strain_rate_mag            L 1 [mlp]  test_r2=+0.827(+/-0.015)  ridge=+0.515
+    token  t+8  shear_flow_mae.pt        tracer_grad                L 1 [mlp]  test_r2=+0.433(+/-0.033)  ridge=+0.135
+    token  t+8  shear_flow_mae.pt        tracer_laplacian           L 2 [mlp]  test_r2=+0.117(+/-0.009)  ridge=+0.226
+    token  t+8  shear_flow_mae.pt        vorticity_signed           L 1 [mlp]  test_r2=+0.645(+/-0.007)  ridge=+0.510
+  [forecast] gap=8 done in 4335s
+    pooled t+32 shear_flow_jepa.pt       advective_flux             L 7 [mlp]  test_r2=+0.804(+/-0.050)  ridge=+0.686
+    pooled t+32 shear_flow_jepa.pt       enstrophy                  L 5 [mlp]  test_r2=+0.975(+/-0.006)  ridge=+0.932
+    pooled t+32 shear_flow_jepa.pt       okubo_weiss                L 8 [mlp]  test_r2=+0.926(+/-0.025)  ridge=+0.813
+    pooled t+32 shear_flow_jepa.pt       pressure_grad_mag          L10 [mlp]  test_r2=+0.985(+/-0.002)  ridge=+0.977
+    pooled t+32 shear_flow_jepa.pt       strain_rate_mag            L 9 [mlp]  test_r2=+0.988(+/-0.003)  ridge=+0.983
+    pooled t+32 shear_flow_jepa.pt       tracer_grad                L 4 [mlp]  test_r2=+0.754(+/-0.021)  ridge=+0.605
+    pooled t+32 shear_flow_jepa.pt       tracer_laplacian           L 4 [mlp]  test_r2=+0.735(+/-0.053)  ridge=+0.564
+    token  t+32 shear_flow_jepa.pt       advective_flux             L 0 [mlp]  test_r2=+0.454(+/-0.007)  ridge=+0.128
+    token  t+32 shear_flow_jepa.pt       divergence                 L 0 [mlp]  test_r2=+0.709(+/-0.005)  ridge=+0.642
+    token  t+32 shear_flow_jepa.pt       enstrophy                  L 1 [mlp]  test_r2=+0.604(+/-0.003)  ridge=-0.830
+    token  t+32 shear_flow_jepa.pt       okubo_weiss                L 0 [mlp]  test_r2=+0.657(+/-0.022)  ridge=+0.158
+    token  t+32 shear_flow_jepa.pt       pressure_grad_mag          L 1 [mlp]  test_r2=+0.815(+/-0.006)  ridge=+0.177
+    token  t+32 shear_flow_jepa.pt       strain_rate_mag            L 1 [mlp]  test_r2=+0.817(+/-0.002)  ridge=+0.438
+    token  t+32 shear_flow_jepa.pt       tracer_grad                L 1 [mlp]  test_r2=-0.016(+/-0.018)  ridge=-0.620
+    token  t+32 shear_flow_jepa.pt       tracer_laplacian           L 2 [mlp]  test_r2=-0.028(+/-0.005)  ridge=+0.064
+    token  t+32 shear_flow_jepa.pt       vorticity_signed           L 1 [mlp]  test_r2=+0.528(+/-0.005)  ridge=+0.424
+    pooled t+32 shear_flow_mae.pt        advective_flux             L 0 [mlp]  test_r2=+0.720(+/-0.018)  ridge=+0.615
+    pooled t+32 shear_flow_mae.pt        enstrophy                  L10 [ridge]  test_r2=+0.885(+/-0.000)  ridge=+0.885
+    pooled t+32 shear_flow_mae.pt        okubo_weiss                L 4 [mlp]  test_r2=+0.838(+/-0.045)  ridge=+0.805
+    pooled t+32 shear_flow_mae.pt        pressure_grad_mag          L10 [ridge]  test_r2=+0.980(+/-0.000)  ridge=+0.980
+    pooled t+32 shear_flow_mae.pt        strain_rate_mag            L 9 [mlp]  test_r2=+0.987(+/-0.001)  ridge=+0.983
+    pooled t+32 shear_flow_mae.pt        tracer_grad                L 3 [mlp]  test_r2=+0.644(+/-0.039)  ridge=+0.664
+    pooled t+32 shear_flow_mae.pt        tracer_laplacian           L 2 [mlp]  test_r2=+0.687(+/-0.058)  ridge=+0.673
+    token  t+32 shear_flow_mae.pt        advective_flux             L 0 [mlp]  test_r2=+0.498(+/-0.025)  ridge=+0.243
+    token  t+32 shear_flow_mae.pt        divergence                 L 1 [mlp]  test_r2=+0.741(+/-0.004)  ridge=+0.569
+    token  t+32 shear_flow_mae.pt        enstrophy                  L 1 [mlp]  test_r2=+0.557(+/-0.016)  ridge=+0.155
+    token  t+32 shear_flow_mae.pt        okubo_weiss                L10 [mlp]  test_r2=+0.580(+/-0.011)  ridge=-1.180
+    token  t+32 shear_flow_mae.pt        pressure_grad_mag          L 0 [mlp]  test_r2=+0.792(+/-0.012)  ridge=+0.483
+    token  t+32 shear_flow_mae.pt        strain_rate_mag            L 1 [mlp]  test_r2=+0.810(+/-0.012)  ridge=+0.542
+    token  t+32 shear_flow_mae.pt        tracer_grad                L 2 [mlp]  test_r2=+0.023(+/-0.007)  ridge=-0.093
+    token  t+32 shear_flow_mae.pt        tracer_laplacian           L 5 [mlp]  test_r2=-0.071(+/-0.005)  ridge=-0.341
+    token  t+32 shear_flow_mae.pt        vorticity_signed           L 1 [mlp]  test_r2=+0.424(+/-0.026)  ridge=+0.431
+  [forecast] gap=32 done in 4341s
+family 2 done in 9110s
+== family 3: noise robustness ==
+  [noise] n_samples: train=900 test=84
+    noise  shear_flow_jepa.pt       advective_flux             L 9  std=0:+0.894(ridge=+0.742)  std=0.5:+0.898(ridge=+0.798)  std=1.0:+0.411(ridge=+0.130)  std=2.0:+0.115(ridge=-0.454)
+    noise  shear_flow_jepa.pt       enstrophy                  L 4  std=0:+0.997(ridge=+0.988)  std=0.5:+0.997(ridge=+0.994)  std=1.0:+0.993(ridge=+0.986)  std=2.0:+0.978(ridge=+0.959)
+    noise  shear_flow_jepa.pt       okubo_weiss                L 2  std=0:+0.995(ridge=+0.989)  std=0.5:+0.991(ridge=+0.985)  std=1.0:+0.987(ridge=+0.959)  std=2.0:+0.945(ridge=+0.808)
+    noise  shear_flow_jepa.pt       pressure_grad_mag          L 2  std=0:+1.000(ridge=+0.999)  std=0.5:+0.999(ridge=+0.999)  std=1.0:+0.998(ridge=+0.997)  std=2.0:+0.993(ridge=+0.989)
+    noise  shear_flow_jepa.pt       strain_rate_mag            L 2  std=0:+0.999(ridge=+0.999)  std=0.5:+0.998(ridge=+0.997)  std=1.0:+0.994(ridge=+0.989)  std=2.0:+0.972(ridge=+0.964)
+    noise  shear_flow_jepa.pt       tracer_grad                L 2  std=0:+0.950(ridge=+0.788)  std=0.5:+0.903(ridge=+0.695)  std=1.0:+0.710(ridge=+0.477)  std=2.0:+0.713(ridge=+0.436)
+    noise  shear_flow_jepa.pt       tracer_laplacian           L 2  std=0:+0.920(ridge=+0.713)  std=0.5:+0.869(ridge=+0.598)  std=1.0:+0.505(ridge=+0.271)  std=2.0:+0.528(ridge=-0.044)
+    noise  shear_flow_mae.pt        advective_flux             L 1  std=0:+0.923(ridge=+0.732)  std=0.5:+0.773(ridge=+0.610)  std=1.0:+0.576(ridge=+0.077)  std=2.0:+0.216(ridge=-0.654)
+    noise  shear_flow_mae.pt        enstrophy                  L 5  std=0:+0.996(ridge=+0.994)  std=0.5:+0.996(ridge=+0.994)  std=1.0:+0.996(ridge=+0.993)  std=2.0:+0.980(ridge=+0.961)
+    noise  shear_flow_mae.pt        okubo_weiss                L 3  std=0:+0.995(ridge=+0.980)  std=0.5:+0.992(ridge=+0.981)  std=1.0:+0.986(ridge=+0.946)  std=2.0:+0.936(ridge=+0.793)
+    noise  shear_flow_mae.pt        pressure_grad_mag          L 6  std=0:+1.000(ridge=+0.999)  std=0.5:+0.999(ridge=+0.999)  std=1.0:+0.998(ridge=+0.998)  std=2.0:+0.994(ridge=+0.986)
+    noise  shear_flow_mae.pt        strain_rate_mag            L 3  std=0:+0.999(ridge=+0.999)  std=0.5:+0.999(ridge=+0.999)  std=1.0:+0.997(ridge=+0.995)  std=2.0:+0.978(ridge=+0.969)
+    noise  shear_flow_mae.pt        tracer_grad                L 5  std=0:+0.910(ridge=+0.802)  std=0.5:+0.936(ridge=+0.795)  std=1.0:+0.803(ridge=+0.538)  std=2.0:+0.638(ridge=-0.158)
+    noise  shear_flow_mae.pt        tracer_laplacian           L 5  std=0:+0.820(ridge=+0.807)  std=0.5:+0.861(ridge=+0.762)  std=1.0:+0.687(ridge=+0.320)  std=2.0:+0.447(ridge=-0.920)
+family 3 done in 657s
+
+wrote sweep_results/shear_flow_workshop_test_eval.json

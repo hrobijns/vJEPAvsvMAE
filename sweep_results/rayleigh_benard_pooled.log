@@ -1,0 +1,42 @@
+building probe dataset: 1 offsets/traj, horizon=16, max_traj=300
+300 samples total
+  enstrophy: mean=0.0000 std=0.0000
+  buoyancy_grad: mean=0.0606 std=0.0019
+  convective_flux: mean=0.0000 std=0.0000
+  okubo_weiss: mean=0.0000 std=0.0000
+  velocity_buoyancy_coherence: mean=-0.0000 std=0.0012
+  pressure_grad_mag: mean=0.0279 std=0.0124
+  buoyancy_laplacian: mean=0.0630 std=0.0017
+  future_enstrophy: mean=0.0006 std=0.0018
+
+=== checkpoints/rayleigh_benard_jepa.pt ===
+  block_1      enstrophy=0.456  buoyancy_grad=0.998  convective_flux=0.580  okubo_weiss=0.464  velocity_buoyancy_coherence=-0.004  pressure_grad_mag=1.000  buoyancy_laplacian=0.993  future_enstrophy=0.339
+  block_2      enstrophy=0.430  buoyancy_grad=0.999  convective_flux=0.579  okubo_weiss=0.441  velocity_buoyancy_coherence=-0.010  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.336
+  block_3      enstrophy=0.461  buoyancy_grad=0.999  convective_flux=0.620  okubo_weiss=0.477  velocity_buoyancy_coherence=0.015  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.329
+  block_4      enstrophy=0.616  buoyancy_grad=1.000  convective_flux=0.790  okubo_weiss=0.651  velocity_buoyancy_coherence=0.007  pressure_grad_mag=1.000  buoyancy_laplacian=0.996  future_enstrophy=0.420
+  block_5      enstrophy=0.671  buoyancy_grad=0.999  convective_flux=0.827  okubo_weiss=0.706  velocity_buoyancy_coherence=-0.007  pressure_grad_mag=1.000  buoyancy_laplacian=0.997  future_enstrophy=0.455
+  block_6      enstrophy=0.684  buoyancy_grad=0.999  convective_flux=0.832  okubo_weiss=0.720  velocity_buoyancy_coherence=0.011  pressure_grad_mag=1.000  buoyancy_laplacian=0.997  future_enstrophy=0.465
+  block_7      enstrophy=0.686  buoyancy_grad=0.999  convective_flux=0.835  okubo_weiss=0.722  velocity_buoyancy_coherence=0.050  pressure_grad_mag=1.000  buoyancy_laplacian=0.997  future_enstrophy=0.472
+  block_8      enstrophy=0.669  buoyancy_grad=1.000  convective_flux=0.828  okubo_weiss=0.706  velocity_buoyancy_coherence=0.131  pressure_grad_mag=1.000  buoyancy_laplacian=0.997  future_enstrophy=0.474
+  block_9      enstrophy=0.653  buoyancy_grad=0.999  convective_flux=0.821  okubo_weiss=0.690  velocity_buoyancy_coherence=0.145  pressure_grad_mag=1.000  buoyancy_laplacian=0.997  future_enstrophy=0.455
+  block_10     enstrophy=0.634  buoyancy_grad=0.999  convective_flux=0.809  okubo_weiss=0.672  velocity_buoyancy_coherence=0.179  pressure_grad_mag=1.000  buoyancy_laplacian=0.996  future_enstrophy=0.456
+  block_11     enstrophy=0.571  buoyancy_grad=0.998  convective_flux=0.747  okubo_weiss=0.600  velocity_buoyancy_coherence=0.472  pressure_grad_mag=1.000  buoyancy_laplacian=0.992  future_enstrophy=0.332
+  block_12     enstrophy=0.458  buoyancy_grad=0.996  convective_flux=0.689  okubo_weiss=0.490  velocity_buoyancy_coherence=0.583  pressure_grad_mag=0.999  buoyancy_laplacian=0.989  future_enstrophy=0.209
+  final_norm   enstrophy=0.447  buoyancy_grad=0.996  convective_flux=0.679  okubo_weiss=0.479  velocity_buoyancy_coherence=0.582  pressure_grad_mag=0.999  buoyancy_laplacian=0.989  future_enstrophy=0.216
+
+=== checkpoints/rayleigh_benard_mae.pt ===
+  block_1      enstrophy=0.455  buoyancy_grad=0.999  convective_flux=0.573  okubo_weiss=0.460  velocity_buoyancy_coherence=-0.049  pressure_grad_mag=1.000  buoyancy_laplacian=0.993  future_enstrophy=0.341
+  block_2      enstrophy=0.452  buoyancy_grad=1.000  convective_flux=0.575  okubo_weiss=0.458  velocity_buoyancy_coherence=-0.049  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.340
+  block_3      enstrophy=0.450  buoyancy_grad=1.000  convective_flux=0.576  okubo_weiss=0.457  velocity_buoyancy_coherence=-0.052  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.342
+  block_4      enstrophy=0.448  buoyancy_grad=1.000  convective_flux=0.575  okubo_weiss=0.456  velocity_buoyancy_coherence=-0.056  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.340
+  block_5      enstrophy=0.447  buoyancy_grad=1.000  convective_flux=0.575  okubo_weiss=0.455  velocity_buoyancy_coherence=-0.055  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.340
+  block_6      enstrophy=0.445  buoyancy_grad=1.000  convective_flux=0.574  okubo_weiss=0.454  velocity_buoyancy_coherence=-0.052  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.339
+  block_7      enstrophy=0.446  buoyancy_grad=1.000  convective_flux=0.575  okubo_weiss=0.454  velocity_buoyancy_coherence=-0.055  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.344
+  block_8      enstrophy=0.445  buoyancy_grad=1.000  convective_flux=0.573  okubo_weiss=0.453  velocity_buoyancy_coherence=-0.052  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.344
+  block_9      enstrophy=0.445  buoyancy_grad=1.000  convective_flux=0.574  okubo_weiss=0.453  velocity_buoyancy_coherence=-0.054  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.344
+  block_10     enstrophy=0.444  buoyancy_grad=1.000  convective_flux=0.573  okubo_weiss=0.453  velocity_buoyancy_coherence=-0.052  pressure_grad_mag=1.000  buoyancy_laplacian=0.994  future_enstrophy=0.343
+  block_11     enstrophy=0.441  buoyancy_grad=1.000  convective_flux=0.570  okubo_weiss=0.450  velocity_buoyancy_coherence=-0.049  pressure_grad_mag=1.000  buoyancy_laplacian=0.993  future_enstrophy=0.345
+  block_12     enstrophy=0.442  buoyancy_grad=1.000  convective_flux=0.571  okubo_weiss=0.451  velocity_buoyancy_coherence=-0.050  pressure_grad_mag=1.000  buoyancy_laplacian=0.993  future_enstrophy=0.347
+  final_norm   enstrophy=0.443  buoyancy_grad=1.000  convective_flux=0.572  okubo_weiss=0.452  velocity_buoyancy_coherence=-0.050  pressure_grad_mag=1.000  buoyancy_laplacian=0.993  future_enstrophy=0.346
+
+wrote sweep_results/rayleigh_benard_pooled.json

@@ -13,3 +13,18 @@ dependencies = [
     "torch>=2.7 ; sys_platform == 'linux'",
     "wandb>=0.28.1",
 ]
+
+# Default PyPI torch wheels on linux resolve to whatever CUDA build is newest
+# (cu130 as of writing), which needs a newer driver than many current pods
+# ship (e.g. driver 570.x tops out at CUDA 12.8) and fails at import time
+# with "undefined symbol" errors if `uv run` silently re-syncs back to it.
+# Pin linux torch to the cu128 index explicitly so it stays stable.
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

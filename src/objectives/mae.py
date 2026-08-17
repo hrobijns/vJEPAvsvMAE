@@ -50,7 +50,13 @@ class MAEModel(nn.Module):
             var = target.var(dim=-1, keepdim=True)
             target = (target - mean) / (var + 1e-6).sqrt()
         loss = F.mse_loss(pred, target)
-        return loss, {"loss": loss.item()}
+
+        with torch.no_grad():
+            # Collapse diagnostic: std of encoder output across batch+tokens
+            # per dim, same convention as JEPAModel's context_feat_std so the
+            # two objectives are directly comparable on this axis.
+            ctx_std = feats.reshape(-1, feats.size(-1)).std(dim=0).mean()
+        return loss, {"loss": loss.item(), "context_feat_std": ctx_std.item()}
 
     def post_step(self, step: int, total_steps: int):
         pass  # no EMA; hook kept for API parity with JEPA

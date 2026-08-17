@@ -1,0 +1,12 @@
+active_matter: train=175 traj, test=10 traj
+pooled: n_train=525 n_test=30
+  checkpoints/active_matter_jepa.pt: enstrophy=0.992(L1)  nematic_order=0.999(L2)  flow_align=0.574(L0)  order_grad_mag=0.996(L1)  strain_order_align=0.999(L1)  active_stress_div_mag=0.996(L1)
+  checkpoints/active_matter_mae.pt: enstrophy=0.995(L1)  nematic_order=1.000(L3)  flow_align=0.652(L1)  order_grad_mag=0.997(L2)  strain_order_align=0.999(L1)  active_stress_div_mag=0.997(L3)
+token: n_train_clips=16 n_test_clips=16
+  checkpoints/active_matter_jepa.pt: enstrophy=0.116(L1)  vorticity_signed=0.976(L0)  divergence=0.972(L0)  nematic_order=0.722(L1)  flow_align=0.335(L0)  order_grad_mag=0.645(L0)  strain_order_align=0.658(L1)  active_stress_div_mag=0.568(L1)
+  checkpoints/active_matter_mae.pt: enstrophy=0.047(L0)  vorticity_signed=0.982(L0)  divergence=0.983(L0)  nematic_order=0.767(L1)  flow_align=0.435(L1)  order_grad_mag=0.694(L0)  strain_order_align=0.453(L0)  active_stress_div_mag=0.653(L1)
+noise: stds=[0.0, 0.5, 1.0, 2.0]
+  checkpoints/active_matter_jepa.pt (L12): std=0.0:0.784  std=0.5:0.751  std=1.0:0.770  std=2.0:0.621
+  checkpoints/active_matter_mae.pt (L12): std=0.0:0.898  std=0.5:0.861  std=1.0:0.678  std=2.0:-0.784
+
+wrote sweep_results/active_matter_test_eval.json

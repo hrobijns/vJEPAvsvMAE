@@ -1,0 +1,41 @@
+building probe dataset: 3 offsets/traj, horizon=16
+525 samples total
+  enstrophy: mean=0.0029 std=0.0025
+  nematic_order: mean=1.2451 std=0.3744
+  flow_align: mean=0.0040 std=0.0514
+  order_grad_mag: mean=0.0946 std=0.0398
+  strain_order_align: mean=2.6993 std=1.5196
+  active_stress_div_mag: mean=0.1398 std=0.0610
+  future_enstrophy: mean=0.0032 std=0.0026
+
+=== checkpoints/active_matter_jepa.pt ===
+  block_1      enstrophy=0.985  nematic_order=0.993  flow_align=0.444  order_grad_mag=0.993  strain_order_align=0.995  active_stress_div_mag=0.994  future_enstrophy=0.898
+  block_2      enstrophy=0.989  nematic_order=0.994  flow_align=0.384  order_grad_mag=0.995  strain_order_align=0.997  active_stress_div_mag=0.994  future_enstrophy=0.917
+  block_3      enstrophy=0.985  nematic_order=0.995  flow_align=0.240  order_grad_mag=0.994  strain_order_align=0.996  active_stress_div_mag=0.994  future_enstrophy=0.924
+  block_4      enstrophy=0.986  nematic_order=0.995  flow_align=0.136  order_grad_mag=0.992  strain_order_align=0.996  active_stress_div_mag=0.992  future_enstrophy=0.916
+  block_5      enstrophy=0.983  nematic_order=0.994  flow_align=0.034  order_grad_mag=0.991  strain_order_align=0.995  active_stress_div_mag=0.992  future_enstrophy=0.905
+  block_6      enstrophy=0.978  nematic_order=0.990  flow_align=-0.058  order_grad_mag=0.988  strain_order_align=0.995  active_stress_div_mag=0.988  future_enstrophy=0.904
+  block_7      enstrophy=0.977  nematic_order=0.990  flow_align=-0.213  order_grad_mag=0.984  strain_order_align=0.994  active_stress_div_mag=0.985  future_enstrophy=0.909
+  block_8      enstrophy=0.978  nematic_order=0.989  flow_align=-0.220  order_grad_mag=0.982  strain_order_align=0.994  active_stress_div_mag=0.982  future_enstrophy=0.914
+  block_9      enstrophy=0.976  nematic_order=0.989  flow_align=-0.297  order_grad_mag=0.984  strain_order_align=0.994  active_stress_div_mag=0.985  future_enstrophy=0.902
+  block_10     enstrophy=0.976  nematic_order=0.988  flow_align=-0.219  order_grad_mag=0.983  strain_order_align=0.993  active_stress_div_mag=0.984  future_enstrophy=0.901
+  block_11     enstrophy=0.977  nematic_order=0.986  flow_align=-0.228  order_grad_mag=0.981  strain_order_align=0.993  active_stress_div_mag=0.982  future_enstrophy=0.911
+  block_12     enstrophy=0.976  nematic_order=0.990  flow_align=-0.222  order_grad_mag=0.978  strain_order_align=0.994  active_stress_div_mag=0.980  future_enstrophy=0.910
+  final_norm   enstrophy=0.974  nematic_order=0.991  flow_align=-0.200  order_grad_mag=0.979  strain_order_align=0.993  active_stress_div_mag=0.981  future_enstrophy=0.910
+
+=== checkpoints/active_matter_mae.pt ===
+  block_1      enstrophy=0.993  nematic_order=0.996  flow_align=0.364  order_grad_mag=0.991  strain_order_align=0.997  active_stress_div_mag=0.993  future_enstrophy=0.920
+  block_2      enstrophy=0.993  nematic_order=0.998  flow_align=0.421  order_grad_mag=0.996  strain_order_align=0.998  active_stress_div_mag=0.997  future_enstrophy=0.926
+  block_3      enstrophy=0.992  nematic_order=0.998  flow_align=0.410  order_grad_mag=0.997  strain_order_align=0.998  active_stress_div_mag=0.997  future_enstrophy=0.928
+  block_4      enstrophy=0.991  nematic_order=0.999  flow_align=0.365  order_grad_mag=0.997  strain_order_align=0.997  active_stress_div_mag=0.997  future_enstrophy=0.925
+  block_5      enstrophy=0.987  nematic_order=0.998  flow_align=0.363  order_grad_mag=0.997  strain_order_align=0.997  active_stress_div_mag=0.997  future_enstrophy=0.929
+  block_6      enstrophy=0.984  nematic_order=0.998  flow_align=0.299  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.997  future_enstrophy=0.928
+  block_7      enstrophy=0.980  nematic_order=0.998  flow_align=0.295  order_grad_mag=0.996  strain_order_align=0.997  active_stress_div_mag=0.996  future_enstrophy=0.928
+  block_8      enstrophy=0.982  nematic_order=0.997  flow_align=0.341  order_grad_mag=0.996  strain_order_align=0.996  active_stress_div_mag=0.996  future_enstrophy=0.931
+  block_9      enstrophy=0.981  nematic_order=0.997  flow_align=0.352  order_grad_mag=0.996  strain_order_align=0.995  active_stress_div_mag=0.996  future_enstrophy=0.930
+  block_10     enstrophy=0.979  nematic_order=0.998  flow_align=0.317  order_grad_mag=0.996  strain_order_align=0.995  active_stress_div_mag=0.996  future_enstrophy=0.931
+  block_11     enstrophy=0.981  nematic_order=0.998  flow_align=0.280  order_grad_mag=0.996  strain_order_align=0.995  active_stress_div_mag=0.996  future_enstrophy=0.930
+  block_12     enstrophy=0.978  nematic_order=0.997  flow_align=0.249  order_grad_mag=0.995  strain_order_align=0.993  active_stress_div_mag=0.995  future_enstrophy=0.929
+  final_norm   enstrophy=0.976  nematic_order=0.997  flow_align=0.256  order_grad_mag=0.994  strain_order_align=0.991  active_stress_div_mag=0.994  future_enstrophy=0.926
+
+wrote sweep_results/active_matter_pooled.json

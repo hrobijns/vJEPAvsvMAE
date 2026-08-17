@@ -3,7 +3,7 @@
 # ~525 GB total; ~260 GB for train only).
 # Usage: bash scripts/download_data.sh /workspace/data ["train valid"|"train"]
 #
-# The probing suite (scripts/analyze_*.py, rollout_*.py) only ever reads the
+# The probing suite (scripts/analyze_*.py etc.) only ever reads the
 # train split (src/train.py does too — valid is unused end-to-end, see
 # docs/OVERVIEW.md's "No held-out validation loss" caveat), so pass "train"
 # to roughly halve the download if you're not planning to add a validation

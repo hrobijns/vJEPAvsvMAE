@@ -1,8 +1,7 @@
 """Patchify/unpatchify: (B, C, T, H, W) clip <-> (B, N, patch_dim) tokens,
 time-major token order (matches VideoViT.tokenize's patch_embed conv
-ordering). Shared by MAEModel's training-time patchify and any post-hoc code
-that needs the same conversion (previously duplicated in src/objectives/mae.py
-and scripts/rollout_probe.py)."""
+ordering). Used by MAEModel's training-time patchify and its
+reconstruction-figure logging."""
 
 import torch
 from einops import rearrange

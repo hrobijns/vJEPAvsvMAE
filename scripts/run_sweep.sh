@@ -34,8 +34,7 @@ for ds in active_matter shear_flow rayleigh_benard; do
     --token-max-clips 64 --token-mlp-max-clips 16 \
     --out sweep_results/${ds}_nonpooled.json > sweep_results/${ds}_nonpooled.log 2>&1
 
-  # analyze_regime.py and the rollout probes (rollout_probe.py /
-  # rollout_assessment.py) intentionally skipped for this run, per request —
+  # analyze_regime.py intentionally skipped for this run, per request —
   # scope narrowed to the linear-probe suite (new PDE targets, per-token
   # linear + MLP, full noise layer x token sweep).
 

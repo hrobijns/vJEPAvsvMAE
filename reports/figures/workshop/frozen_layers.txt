@@ -1,0 +1,278 @@
+dataset           quantity                      objectivefeature    layers
+--------------------------------------------------------------------------------
+active_matter     order_grad_mag                jepa  pooled-t0  1
+active_matter     order_grad_mag                jepa  pooled-fc8 2
+active_matter     order_grad_mag                jepa  pooled-fc323
+active_matter     order_grad_mag                mae   pooled-t0  8
+active_matter     order_grad_mag                mae   pooled-fc8 8
+active_matter     order_grad_mag                mae   pooled-fc325
+active_matter     active_stress_div_mag         jepa  pooled-t0  1
+active_matter     active_stress_div_mag         jepa  pooled-fc8 4
+active_matter     active_stress_div_mag         jepa  pooled-fc324
+active_matter     active_stress_div_mag         mae   pooled-t0  6
+active_matter     active_stress_div_mag         mae   pooled-fc8 11
+active_matter     active_stress_div_mag         mae   pooled-fc326
+active_matter     nematic_order                 jepa  pooled-t0  1
+active_matter     nematic_order                 jepa  pooled-fc8 3
+active_matter     nematic_order                 jepa  pooled-fc321
+active_matter     nematic_order                 mae   pooled-t0  3
+active_matter     nematic_order                 mae   pooled-fc8 12
+active_matter     nematic_order                 mae   pooled-fc329
+active_matter     flow_align                    jepa  pooled-t0  0
+active_matter     flow_align                    jepa  pooled-fc8 8
+active_matter     flow_align                    jepa  pooled-fc320
+active_matter     flow_align                    mae   pooled-t0  0
+active_matter     flow_align                    mae   pooled-fc8 1
+active_matter     flow_align                    mae   pooled-fc322
+active_matter     strain_order_align            jepa  pooled-t0  3
+active_matter     strain_order_align            jepa  pooled-fc8 11
+active_matter     strain_order_align            jepa  pooled-fc327
+active_matter     strain_order_align            mae   pooled-t0  1
+active_matter     strain_order_align            mae   pooled-fc8 10
+active_matter     strain_order_align            mae   pooled-fc3212
+active_matter     enstrophy                     jepa  pooled-t0  2
+active_matter     enstrophy                     jepa  pooled-fc8 1
+active_matter     enstrophy                     jepa  pooled-fc321
+active_matter     enstrophy                     mae   pooled-t0  0
+active_matter     enstrophy                     mae   pooled-fc8 8
+active_matter     enstrophy                     mae   pooled-fc322
+active_matter     order_grad_mag                jepa  token-t0   0
+active_matter     order_grad_mag                jepa  token-fc8  2
+active_matter     order_grad_mag                jepa  token-fc32 5
+active_matter     order_grad_mag                mae   token-t0   0
+active_matter     order_grad_mag                mae   token-fc8  8
+active_matter     order_grad_mag                mae   token-fc32 8
+active_matter     active_stress_div_mag         jepa  token-t0   0
+active_matter     active_stress_div_mag         jepa  token-fc8  9
+active_matter     active_stress_div_mag         jepa  token-fc32 5
+active_matter     active_stress_div_mag         mae   token-t0   0
+active_matter     active_stress_div_mag         mae   token-fc8  8
+active_matter     active_stress_div_mag         mae   token-fc32 4
+active_matter     nematic_order                 jepa  token-t0   3
+active_matter     nematic_order                 jepa  token-fc8  3
+active_matter     nematic_order                 jepa  token-fc32 4
+active_matter     nematic_order                 mae   token-t0   4
+active_matter     nematic_order                 mae   token-fc8  3
+active_matter     nematic_order                 mae   token-fc32 0
+active_matter     flow_align                    jepa  token-t0   0
+active_matter     flow_align                    jepa  token-fc8  5
+active_matter     flow_align                    jepa  token-fc32 0
+active_matter     flow_align                    mae   token-t0   0
+active_matter     flow_align                    mae   token-fc8  5
+active_matter     flow_align                    mae   token-fc32 2
+active_matter     strain_order_align            jepa  token-t0   0
+active_matter     strain_order_align            jepa  token-fc8  9
+active_matter     strain_order_align            jepa  token-fc32 1
+active_matter     strain_order_align            mae   token-t0   0
+active_matter     strain_order_align            mae   token-fc8  1
+active_matter     strain_order_align            mae   token-fc32 11
+active_matter     enstrophy                     jepa  token-t0   0
+active_matter     enstrophy                     jepa  token-fc8  4
+active_matter     enstrophy                     jepa  token-fc32 2
+active_matter     enstrophy                     mae   token-t0   0
+active_matter     enstrophy                     mae   token-fc8  0
+active_matter     enstrophy                     mae   token-fc32 8
+active_matter     divergence                    jepa  token-t0   0
+active_matter     divergence                    jepa  token-fc8  3
+active_matter     divergence                    jepa  token-fc32 0
+active_matter     divergence                    mae   token-t0   0
+active_matter     divergence                    mae   token-fc8  6
+active_matter     divergence                    mae   token-fc32 12
+active_matter     vorticity_signed              jepa  token-t0   0
+active_matter     vorticity_signed              jepa  token-fc8  0
+active_matter     vorticity_signed              jepa  token-fc32 0
+active_matter     vorticity_signed              mae   token-t0   0
+active_matter     vorticity_signed              mae   token-fc8  7
+active_matter     vorticity_signed              mae   token-fc32 4
+shear_flow        tracer_grad                   jepa  pooled-t0  2
+shear_flow        tracer_grad                   jepa  pooled-fc8 4
+shear_flow        tracer_grad                   jepa  pooled-fc324
+shear_flow        tracer_grad                   mae   pooled-t0  5
+shear_flow        tracer_grad                   mae   pooled-fc8 2
+shear_flow        tracer_grad                   mae   pooled-fc323
+shear_flow        pressure_grad_mag             jepa  pooled-t0  2
+shear_flow        pressure_grad_mag             jepa  pooled-fc8 9
+shear_flow        pressure_grad_mag             jepa  pooled-fc3210
+shear_flow        pressure_grad_mag             mae   pooled-t0  6
+shear_flow        pressure_grad_mag             mae   pooled-fc8 4
+shear_flow        pressure_grad_mag             mae   pooled-fc3210
+shear_flow        tracer_laplacian              jepa  pooled-t0  2
+shear_flow        tracer_laplacian              jepa  pooled-fc8 2
+shear_flow        tracer_laplacian              jepa  pooled-fc324
+shear_flow        tracer_laplacian              mae   pooled-t0  5
+shear_flow        tracer_laplacian              mae   pooled-fc8 4
+shear_flow        tracer_laplacian              mae   pooled-fc322
+shear_flow        strain_rate_mag               jepa  pooled-t0  2
+shear_flow        strain_rate_mag               jepa  pooled-fc8 9
+shear_flow        strain_rate_mag               jepa  pooled-fc329
+shear_flow        strain_rate_mag               mae   pooled-t0  3
+shear_flow        strain_rate_mag               mae   pooled-fc8 8
+shear_flow        strain_rate_mag               mae   pooled-fc329
+shear_flow        advective_flux                jepa  pooled-t0  9
+shear_flow        advective_flux                jepa  pooled-fc8 5
+shear_flow        advective_flux                jepa  pooled-fc327
+shear_flow        advective_flux                mae   pooled-t0  1
+shear_flow        advective_flux                mae   pooled-fc8 9
+shear_flow        advective_flux                mae   pooled-fc320
+shear_flow        okubo_weiss                   jepa  pooled-t0  2
+shear_flow        okubo_weiss                   jepa  pooled-fc8 5
+shear_flow        okubo_weiss                   jepa  pooled-fc328
+shear_flow        okubo_weiss                   mae   pooled-t0  3
+shear_flow        okubo_weiss                   mae   pooled-fc8 1
+shear_flow        okubo_weiss                   mae   pooled-fc324
+shear_flow        enstrophy                     jepa  pooled-t0  4
+shear_flow        enstrophy                     jepa  pooled-fc8 8
+shear_flow        enstrophy                     jepa  pooled-fc325
+shear_flow        enstrophy                     mae   pooled-t0  5
+shear_flow        enstrophy                     mae   pooled-fc8 7
+shear_flow        enstrophy                     mae   pooled-fc3210
+shear_flow        tracer_grad                   jepa  token-t0   0
+shear_flow        tracer_grad                   jepa  token-fc8  1
+shear_flow        tracer_grad                   jepa  token-fc32 1
+shear_flow        tracer_grad                   mae   token-t0   0
+shear_flow        tracer_grad                   mae   token-fc8  1
+shear_flow        tracer_grad                   mae   token-fc32 2
+shear_flow        pressure_grad_mag             jepa  token-t0   0
+shear_flow        pressure_grad_mag             jepa  token-fc8  1
+shear_flow        pressure_grad_mag             jepa  token-fc32 1
+shear_flow        pressure_grad_mag             mae   token-t0   0
+shear_flow        pressure_grad_mag             mae   token-fc8  2
+shear_flow        pressure_grad_mag             mae   token-fc32 0
+shear_flow        tracer_laplacian              jepa  token-t0   0
+shear_flow        tracer_laplacian              jepa  token-fc8  2
+shear_flow        tracer_laplacian              jepa  token-fc32 2
+shear_flow        tracer_laplacian              mae   token-t0   1
+shear_flow        tracer_laplacian              mae   token-fc8  2
+shear_flow        tracer_laplacian              mae   token-fc32 5
+shear_flow        strain_rate_mag               jepa  token-t0   0
+shear_flow        strain_rate_mag               jepa  token-fc8  1
+shear_flow        strain_rate_mag               jepa  token-fc32 1
+shear_flow        strain_rate_mag               mae   token-t0   0
+shear_flow        strain_rate_mag               mae   token-fc8  1
+shear_flow        strain_rate_mag               mae   token-fc32 1
+shear_flow        advective_flux                jepa  token-t0   0
+shear_flow        advective_flux                jepa  token-fc8  0
+shear_flow        advective_flux                jepa  token-fc32 0
+shear_flow        advective_flux                mae   token-t0   0
+shear_flow        advective_flux                mae   token-fc8  0
+shear_flow        advective_flux                mae   token-fc32 0
+shear_flow        okubo_weiss                   jepa  token-t0   0
+shear_flow        okubo_weiss                   jepa  token-fc8  1
+shear_flow        okubo_weiss                   jepa  token-fc32 0
+shear_flow        okubo_weiss                   mae   token-t0   0
+shear_flow        okubo_weiss                   mae   token-fc8  2
+shear_flow        okubo_weiss                   mae   token-fc32 10
+shear_flow        enstrophy                     jepa  token-t0   0
+shear_flow        enstrophy                     jepa  token-fc8  1
+shear_flow        enstrophy                     jepa  token-fc32 1
+shear_flow        enstrophy                     mae   token-t0   0
+shear_flow        enstrophy                     mae   token-fc8  2
+shear_flow        enstrophy                     mae   token-fc32 1
+shear_flow        divergence                    jepa  token-t0   0
+shear_flow        divergence                    jepa  token-fc8  1
+shear_flow        divergence                    jepa  token-fc32 0
+shear_flow        divergence                    mae   token-t0   0
+shear_flow        divergence                    mae   token-fc8  0
+shear_flow        divergence                    mae   token-fc32 1
+shear_flow        vorticity_signed              jepa  token-t0   0
+shear_flow        vorticity_signed              jepa  token-fc8  2
+shear_flow        vorticity_signed              jepa  token-fc32 1
+shear_flow        vorticity_signed              mae   token-t0   0
+shear_flow        vorticity_signed              mae   token-fc8  1
+shear_flow        vorticity_signed              mae   token-fc32 1
+rayleigh_benard   buoyancy_grad                 jepa  pooled-t0  8
+rayleigh_benard   buoyancy_grad                 jepa  pooled-fc8 7
+rayleigh_benard   buoyancy_grad                 jepa  pooled-fc327
+rayleigh_benard   buoyancy_grad                 mae   pooled-t0  4
+rayleigh_benard   buoyancy_grad                 mae   pooled-fc8 9
+rayleigh_benard   buoyancy_grad                 mae   pooled-fc329
+rayleigh_benard   pressure_grad_mag             jepa  pooled-t0  10
+rayleigh_benard   pressure_grad_mag             jepa  pooled-fc8 9
+rayleigh_benard   pressure_grad_mag             jepa  pooled-fc328
+rayleigh_benard   pressure_grad_mag             mae   pooled-t0  3
+rayleigh_benard   pressure_grad_mag             mae   pooled-fc8 7
+rayleigh_benard   pressure_grad_mag             mae   pooled-fc3212
+rayleigh_benard   buoyancy_laplacian            jepa  pooled-t0  8
+rayleigh_benard   buoyancy_laplacian            jepa  pooled-fc8 7
+rayleigh_benard   buoyancy_laplacian            jepa  pooled-fc328
+rayleigh_benard   buoyancy_laplacian            mae   pooled-t0  2
+rayleigh_benard   buoyancy_laplacian            mae   pooled-fc8 2
+rayleigh_benard   buoyancy_laplacian            mae   pooled-fc324
+rayleigh_benard   convective_flux               jepa  pooled-t0  9
+rayleigh_benard   convective_flux               jepa  pooled-fc8 5
+rayleigh_benard   convective_flux               jepa  pooled-fc326
+rayleigh_benard   convective_flux               mae   pooled-t0  8
+rayleigh_benard   convective_flux               mae   pooled-fc8 5
+rayleigh_benard   convective_flux               mae   pooled-fc3210
+rayleigh_benard   velocity_buoyancy_coherence   jepa  pooled-t0  9
+rayleigh_benard   velocity_buoyancy_coherence   jepa  pooled-fc8 6
+rayleigh_benard   velocity_buoyancy_coherence   jepa  pooled-fc325
+rayleigh_benard   velocity_buoyancy_coherence   mae   pooled-t0  2
+rayleigh_benard   velocity_buoyancy_coherence   mae   pooled-fc8 5
+rayleigh_benard   velocity_buoyancy_coherence   mae   pooled-fc3211
+rayleigh_benard   okubo_weiss                   jepa  pooled-t0  9
+rayleigh_benard   okubo_weiss                   jepa  pooled-fc8 7
+rayleigh_benard   okubo_weiss                   jepa  pooled-fc326
+rayleigh_benard   okubo_weiss                   mae   pooled-t0  4
+rayleigh_benard   okubo_weiss                   mae   pooled-fc8 6
+rayleigh_benard   okubo_weiss                   mae   pooled-fc328
+rayleigh_benard   enstrophy                     jepa  pooled-t0  8
+rayleigh_benard   enstrophy                     jepa  pooled-fc8 9
+rayleigh_benard   enstrophy                     jepa  pooled-fc326
+rayleigh_benard   enstrophy                     mae   pooled-t0  4
+rayleigh_benard   enstrophy                     mae   pooled-fc8 4
+rayleigh_benard   enstrophy                     mae   pooled-fc3210
+rayleigh_benard   buoyancy_grad                 jepa  token-t0   6
+rayleigh_benard   buoyancy_grad                 jepa  token-fc8  3
+rayleigh_benard   buoyancy_grad                 jepa  token-fc32 2
+rayleigh_benard   buoyancy_grad                 mae   token-t0   0
+rayleigh_benard   buoyancy_grad                 mae   token-fc8  3
+rayleigh_benard   buoyancy_grad                 mae   token-fc32 3
+rayleigh_benard   pressure_grad_mag             jepa  token-t0   3
+rayleigh_benard   pressure_grad_mag             jepa  token-fc8  0
+rayleigh_benard   pressure_grad_mag             jepa  token-fc32 1
+rayleigh_benard   pressure_grad_mag             mae   token-t0   0
+rayleigh_benard   pressure_grad_mag             mae   token-fc8  0
+rayleigh_benard   pressure_grad_mag             mae   token-fc32 1
+rayleigh_benard   buoyancy_laplacian            jepa  token-t0   6
+rayleigh_benard   buoyancy_laplacian            jepa  token-fc8  2
+rayleigh_benard   buoyancy_laplacian            jepa  token-fc32 1
+rayleigh_benard   buoyancy_laplacian            mae   token-t0   4
+rayleigh_benard   buoyancy_laplacian            mae   token-fc8  7
+rayleigh_benard   buoyancy_laplacian            mae   token-fc32 10
+rayleigh_benard   convective_flux               jepa  token-t0   6
+rayleigh_benard   convective_flux               jepa  token-fc8  0
+rayleigh_benard   convective_flux               jepa  token-fc32 0
+rayleigh_benard   convective_flux               mae   token-t0   1
+rayleigh_benard   convective_flux               mae   token-fc8  6
+rayleigh_benard   convective_flux               mae   token-fc32 0
+rayleigh_benard   velocity_buoyancy_coherence   jepa  token-t0   2
+rayleigh_benard   velocity_buoyancy_coherence   jepa  token-fc8  3
+rayleigh_benard   velocity_buoyancy_coherence   jepa  token-fc32 0
+rayleigh_benard   velocity_buoyancy_coherence   mae   token-t0   1
+rayleigh_benard   velocity_buoyancy_coherence   mae   token-fc8  6
+rayleigh_benard   velocity_buoyancy_coherence   mae   token-fc32 0
+rayleigh_benard   okubo_weiss                   jepa  token-t0   6
+rayleigh_benard   okubo_weiss                   jepa  token-fc8  2
+rayleigh_benard   okubo_weiss                   jepa  token-fc32 5
+rayleigh_benard   okubo_weiss                   mae   token-t0   0
+rayleigh_benard   okubo_weiss                   mae   token-fc8  3
+rayleigh_benard   okubo_weiss                   mae   token-fc32 7
+rayleigh_benard   enstrophy                     jepa  token-t0   4
+rayleigh_benard   enstrophy                     jepa  token-fc8  3
+rayleigh_benard   enstrophy                     jepa  token-fc32 5
+rayleigh_benard   enstrophy                     mae   token-t0   1
+rayleigh_benard   enstrophy                     mae   token-fc8  3
+rayleigh_benard   enstrophy                     mae   token-fc32 10
+rayleigh_benard   divergence                    jepa  token-t0   2
+rayleigh_benard   divergence                    jepa  token-fc8  11
+rayleigh_benard   divergence                    jepa  token-fc32 0
+rayleigh_benard   divergence                    mae   token-t0   0
+rayleigh_benard   divergence                    mae   token-fc8  8
+rayleigh_benard   divergence                    mae   token-fc32 9
+rayleigh_benard   vorticity_signed              jepa  token-t0   0
+rayleigh_benard   vorticity_signed              jepa  token-fc8  10
+rayleigh_benard   vorticity_signed              jepa  token-fc32 0
+rayleigh_benard   vorticity_signed              mae   token-t0   0
+rayleigh_benard   vorticity_signed              mae   token-fc8  4
+rayleigh_benard   vorticity_signed              mae   token-fc32 0
