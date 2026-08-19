@@ -1,0 +1,14 @@
+{
+  "active_matter": {
+    "jepa": 0.0002,
+    "mae": 0.0001
+  },
+  "rayleigh_benard": {
+    "jepa": 5e-05,
+    "mae": 0.0001
+  },
+  "shear_flow": {
+    "jepa": 0.0002,
+    "mae": 0.0001
+  }
+}

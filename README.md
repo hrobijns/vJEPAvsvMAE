@@ -14,51 +14,60 @@ pipeline. This README covers setup and reproduction.
 
 ## Results (summary)
 
-Full sweep complete on all 3 datasets: pooled + per-token linear/MLP probing,
-13-layer depth sweep, 6-level noise sweep (pooled + token), regime probing,
-forecast/skill-score, and a held-out (`valid`-split) generalization check.
-Full tables and discussion in [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md);
-raw numbers in `sweep_results/*.json`, figures in `reports/figures/`.
+Headline numbers below are from [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) —
+the canonical held-out, multi-seed test-evaluation protocol (layer choice frozen
+from train-CV *before* touching test data, probe fit once on train, reported
+once on held-out test trajectories, mean±std over 3 independently-seeded
+encoders). It's the protocol behind every number that should be cited as a
+final result; see [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) for the full
+method. Raw numbers in `sweep_results/*_workshop_test_eval.json`, figures in
+[reports/figures/](reports/figures/).
 
-- **`rayleigh_benard` is where the two objectives genuinely diverge.** JEPA
-  beats MAE on every axis there: clean pooled accuracy on coupled quantities
-  (`convective_flux` 0.835 vs 0.576), depth (needs L6–L11 to peak vs. MAE's
-  L0–L2 plateau, but reaches a higher peak), noise robustness, real
-  nonlinear-only token-level information MAE lacks entirely, and forecast
-  skill at longer horizons. Purely local quantities (gradients, pressure) are
-  at ceiling for both, on every dataset.
-- **`active_matter`/`shear_flow` show no clean-data gap** — sometimes MAE is
-  fractionally ahead — but `active_matter` still shows a large noise-
-  robustness split (MAE's R² goes negative under input noise; JEPA degrades
-  gracefully), while `shear_flow` shows no split on any axis at all. Likely
-  mechanism: `rayleigh_benard`'s buoyancy and `active_matter`'s active stress
-  both feed back into the momentum equation (two-way coupling); `shear_flow`'s
-  tracer is passively advected (one-way) — see LINEAR_PROBE.md's Discussion.
-- **Regime parameters (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta) are
-  decoded equally well by both objectives** — not where JEPA/MAE differ.
-- **A held-out generalization check** (small `valid`-split slice, encoders
-  never pretrained on it) reproduces and sharpens the noise-robustness
-  finding — MAE's `active_matter` `nematic_order` R² is −15.4 at *zero* added
-  noise on unseen trajectories. Sample size is small (4–5 trajectories per
-  dataset), so treat as directional, not precise.
-- **A proper held-out `test`-split evaluation** (layer choice frozen from
-  train-CV *before* touching test data, probe fit once on train, evaluated
-  once on 10/28/50 held-out trajectories) confirms every headline claim
-  above — `rayleigh_benard`'s JEPA-ahead gap *widens* on test rather than
-  shrinking, and `active_matter`'s MAE noise-collapse reproduces almost
-  exactly (−0.78 at σ=2 vs. −1.02 on train). See LINEAR_PROBE.md's "Held-out
-  test-split evaluation" section.
+**`rayleigh_benard` is the paper's headline dataset** — the only one with a
+complete 3-seed × {JEPA, MAE} run at the current (192-d predictor)
+architecture. `active_matter`/`shear_flow` report on a single representative
+encoder seed per objective; see "Pretrained encoders" below for why.
+
+- **Contemporaneous physics** (pooled, present-time): the two objectives are
+  close on most quantities — MAE fractionally ahead on the small-scale/
+  high-frequency ones (`enstrophy` 0.996 vs 0.991, `okubo_weiss` 0.996 vs
+  0.993, `convective_flux` 0.992 vs 0.985) — except `buoyancy_grad`, where
+  JEPA leads (0.965 vs 0.942). Purely local/differential quantities
+  (`pressure_grad_mag`) are near ceiling for both (≥0.997).
+- **JEPA's advantage grows with forecast horizon.** At t+32, JEPA leads on
+  every pooled quantity, often by a wide margin (`buoyancy_grad` 0.864 vs
+  0.743, `okubo_weiss` 0.901 vs 0.835, `velocity_buoyancy_coherence` 0.790 vs
+  0.678) — the clearest quantitative signal in the whole sweep. JEPA is the
+  only objective explicitly trained to predict *in time*, not just reconstruct
+  the present.
+- **Noise robustness** (clean-fit protocol: probe fit once on clean features,
+  no refitting, evaluated across a noise grid): JEPA is substantially more
+  robust than MAE at low-to-moderate corruption on the differential
+  quantities (e.g. `buoyancy_grad` Pearson r 0.91 vs 0.30 at σ=0.1), though
+  this compresses at extreme noise (σ=1.0), where the two are closer or MAE
+  edges ahead on a few quantities. Full table with both R² and Pearson r
+  (R² alone goes arbitrarily negative under distribution shift, a real
+  representational-fragility signature, not a bug) in LINEAR_PROBE.md.
+- **Regime parameters** (Rayleigh, Prandtl) are decoded near-ceiling by both
+  objectives (R² ≥ 0.99) — not where JEPA/MAE differ. Shuffled-control checks
+  collapse to ~0 R², confirming no train/val leakage.
+- **Depth**: JEPA needs deeper layers than MAE to reach peak decodability
+  (pooled mean layer 7.5 vs 4.4 out of 0–12) — except `buoyancy_grad`, JEPA's
+  clearest accuracy win, which peaks *shallower* for JEPA (5.3) than MAE (8.0).
 
 ## Pretrained encoders
 
-[`checkpoints/`](checkpoints/) has the final (100k-step) trained encoder for
-all 6 runs — one JEPA and one MAE encoder per dataset:
+`checkpoints/` has two subfolders:
 
-| file | dataset | objective | params |
-|---|---|---|---|
-| `active_matter_jepa.pt` / `active_matter_mae.pt` | active_matter (11ch, 256×256) | JEPA / MAE | 23.5M |
-| `shear_flow_jepa.pt` / `shear_flow_mae.pt` | shear_flow (4ch, 256×512) | JEPA / MAE | 23.5M |
-| `rayleigh_benard_jepa.pt` / `rayleigh_benard_mae.pt` | rayleigh_benard (4ch, 512×128) | JEPA / MAE | 23.5M |
+- [`checkpoints/neuripsworkshop/`](checkpoints/neuripsworkshop/) — the 6
+  `rayleigh_benard` checkpoints (3 JEPA seeds + 3 MAE seeds) behind this
+  repo's headline results, current (192-d predictor) architecture. See its
+  own README for exact per-file provenance and training config.
+- [`checkpoints/old/`](checkpoints/old/) — the earlier single-seed set (one
+  JEPA + one MAE per dataset, all 3 datasets), kept for quick-start/demo use
+  on `active_matter`/`shear_flow`, which don't yet have a current-architecture
+  3-seed run. See its own README for the predictor-width caveat on two of
+  these files.
 
 Each `.pt` bundles the trained weights **and** the exact config used to
 produce them (architecture, LR, mask ratio, objective hyperparameters) — it's
@@ -69,14 +78,14 @@ self-contained, no separate config file needed.
 ```python
 from scripts.load_encoder import load_encoder
 
-encoder, config, spec = load_encoder("checkpoints/active_matter_jepa.pt")
+encoder, config, spec = load_encoder("checkpoints/neuripsworkshop/rayleigh_benard_jepa_seed1.pt")
 # encoder: ViT-S in eval() mode. spec: ClipSpec(n_channels, n_frames, height, width)
 # clip: (B, C, T, H, W) tensor, z-score normalized per The Well's own stats
 features = encoder(clip)  # (B, n_tokens, 384) — no masking applied at inference
 ```
 
-`uv run python scripts/load_encoder.py checkpoints/<name>.pt` runs this as a
-standalone sanity check (loads + random forward pass).
+`uv run python scripts/load_encoder.py checkpoints/<tier>/<name>.pt` runs
+this as a standalone sanity check (loads + random forward pass).
 
 To probe what these encoders actually learned — layer-wise physics decodability,
 pooled vs. per-token comparisons — see [scripts/analyze_encoders.py](scripts/analyze_encoders.py)
@@ -86,28 +95,81 @@ be pointed at your own tensors of the same shape.
 
 ## Probing suite (step 2)
 
-Beyond contemporaneous physics decodability, six more probes ask whether the
-representations differ in *what kind* of physics they capture:
+[scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) is the
+canonical protocol — 4 probe families (contemporaneous, forecast-content,
+noise robustness, regime), each with layer choice frozen from train-CV before
+touching held-out test data, and mean±std reported over 3 encoder seeds
+(rayleigh_benard only — see "Pretrained encoders" above). It's the source of
+every headline number in this README and in
+[docs/OVERVIEW.md](docs/OVERVIEW.md); full method and tables in
+[docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md).
 
-| script | question | found |
-|---|---|---|
-| [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity (enstrophy, divergence, okubo-weiss, nematic order, ...)? Also supports `--split valid` for a held-out generalization check. | JEPA and MAE tie on `active_matter`/`shear_flow`; JEPA clearly ahead on `rayleigh_benard`'s coupled quantities. |
-| [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) plus a small MLP nonlinear readout — does spatial detail or nonlinearity recover signal pooling/linearity hides? | On `rayleigh_benard`, JEPA has real nonlinear-only local information (e.g. `convective_flux` MLP 0.90) that MAE lacks even nonlinearly (0.07). Elsewhere, MLP gains are symmetric between objectives. |
-| [scripts/analyze_regime.py](scripts/analyze_regime.py) | does the pooled representation know the *regime* (Reynolds/Schmidt, Rayleigh/Prandtl, activity/alignment) — one value per trajectory, probed with train/val split by trajectory to avoid leakage | Both objectives decode regime near-perfectly (R² 0.77–0.999) — not where JEPA/MAE differ. |
-| [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) | does a *fresh* linear/MLP probe on frozen present-time features forecast future physics, swept over multiple time gaps and noise levels, scored with a persistence-relative skill score? | On `rayleigh_benard`, JEPA's forecast-skill advantage *grows* with horizon; token-level flips `active_matter`'s ranking to JEPA despite MAE leading pooled. |
-| [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) | injects Gaussian noise (several std levels) directly into the input physical variables before encoding, then ridge-probes (pooled and per-token, every layer) against the *clean* clip's physics — does decodability degrade gracefully or collapse abruptly? | MAE is the sharper decoder at zero noise but collapses far more sharply than JEPA once corrupted, on `active_matter`/`rayleigh_benard` (confirmed on held-out `valid`-split data too); `shear_flow` shows no split. |
+Two supporting scripts do the earlier-stage, train-CV version of this analysis
+(no held-out test split, single seed) — useful for exploring the
+depth/layer-emergence landscape or a new dataset before committing to the
+expensive held-out protocol:
 
-Supporting scripts: [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py)
-(recovers per-trajectory regime params from Well filenames, needed by
-`analyze_regime.py`). [scripts/run_sweep.sh](scripts/run_sweep.sh) runs the
-full probing suite across all 3 datasets on a remote GPU box; results land in
-`sweep_results/*.json`, summarized in
-[reports/](reports/) (per-dataset PDF summaries + `probing_sweep_report.html`).
+| script | question |
+|---|---|
+| [scripts/analyze_encoders.py](scripts/analyze_encoders.py) | layer-wise, pooled: which layer best decodes each physical quantity? Also supports `--split valid` for a held-out generalization check. |
+| [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) | same targets, per-token (non-pooled) plus a small MLP nonlinear readout — does spatial detail or nonlinearity recover signal pooling/linearity hides? |
 
-**How they were trained**: 100k steps, AdamW + cosine LR (JEPA 1e-4, MAE 5e-5 —
-picked via a small LR sweep on active_matter, see [Design](#design) below),
-tube masking at 0.9, on a single A100. See git history / [scripts/gen_configs.py](scripts/gen_configs.py)
-for the exact config that produced each checkpoint.
+Supporting script: [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py)
+recovers per-trajectory regime params (Reynolds/Schmidt, Rayleigh/Prandtl,
+alpha/zeta) from Well filenames, feeding `workshop_test_eval.py`'s regime
+family.
+
+### Probing a new physical quantity
+
+You don't need the full held-out pipeline to try an idea — `analyze_encoders.py`
+exposes its building blocks (loading, features, ridge probe) as plain
+functions. Minimal example, probing a made-up quantity against every layer of
+a frozen encoder:
+
+```python
+import numpy as np
+import torch
+from scripts.analyze_encoders import (
+    load_checkpoint_encoder, compute_layerwise_features_batched, ridge_r2,
+)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+encoder, spec = load_checkpoint_encoder(
+    "checkpoints/neuripsworkshop/rayleigh_benard_jepa_seed1.pt", device)
+
+# clips: (N, C, T, H, W) float tensor, z-scored per The Well's own stats,
+# same channel order as `spec` — see src/data/well.py if loading raw Well
+# data yourself, or read directly from a preprocessed memmap:
+mm = np.load("/path/to/data/memmap/rayleigh_benard/train.npy", mmap_mode="r")
+clips = torch.from_numpy(np.array(mm[0:8, :, 0:8])).float()  # 8 trajectories, first 8 frames
+
+# your target: one scalar per clip, whatever physics you're curious about
+my_target = clips[:, 0].mean(dim=(1, 2, 3))  # placeholder — replace with a real derived quantity
+
+per_layer_feats = compute_layerwise_features_batched(encoder, clips)  # list of (N, D), one per layer
+for layer_idx, feats in enumerate(per_layer_feats):
+    print(f"layer {layer_idx}: R^2 = {ridge_r2(feats, my_target):.3f}")
+```
+
+For a target requiring finite-difference derivatives (gradients, curl,
+divergence, Laplacian), reuse `curl2d`/`grad2d`/`divergence2d`/`laplacian2d`/
+`tensor_div2d`/`okubo_weiss` from the same file rather than reimplementing
+them — see `contemporaneous_targets()` for how each dataset's existing
+targets are built from these, and
+[docs/LINEAR_PROBE.md § Physics targets](docs/LINEAR_PROBE.md#physics-targets-derived-from-each-simulations-governing-pde)
+for the derivation of each one (useful as a template for deriving a new
+target from a dataset's governing PDE). To go from this kind of one-off
+exploration to a properly held-out, multi-seed, citable number, add your
+target to `contemporaneous_targets()` (or the relevant family in
+`workshop_test_eval.py`) and it's automatically covered by the full protocol.
+
+**How they were trained**: 100k steps, AdamW + cosine LR, tube masking at 0.9,
+on a single A100/A40. Learning rate is tuned per (dataset, objective) via a
+short mini-sweep on a pilot seed (`scripts/run_lr_minisweep.sh` +
+`scripts/pick_lr.py`, selected on held-out validation loss) — see
+[configs/tuned_lr.json](configs/tuned_lr.json) for the exact values used. See
+git history / [scripts/gen_configs.py](scripts/gen_configs.py) for the exact
+config that produced each checkpoint.
 
 ## Reproducing from scratch
 
@@ -123,6 +185,12 @@ Repeat `preprocess_memmap.py` + `train.py` for `shear_flow` and `rayleigh_benard
 (configs already exist for both objectives × all 3 datasets). Each run takes
 roughly 6–11 hours on a single A100; see the RunPod workflow below for
 running on rented GPUs.
+
+For the full 3-seed final training used for `rayleigh_benard`'s headline
+results, `configs/tuned_lr.json` must exist first (already committed — it's
+the output of `scripts/run_lr_minisweep.sh` + `scripts/pick_lr.py`), then:
+`bash scripts/run_final_training.sh` runs all (dataset, objective, seed)
+combinations reading LR from that file.
 
 ## Design
 
@@ -177,19 +245,21 @@ for the step-2 probing study).
 
 ## Repo map
 
-- [checkpoints/](checkpoints/) — 6 pretrained encoders (see above)
-- [src/data/well.py](src/data/well.py) — Well → (C,T,H,W) clip dataset
+- [checkpoints/](checkpoints/) — pretrained encoders (see "Pretrained encoders" above)
+- [src/data/well.py](src/data/well.py) — Well → (C,T,H,W) clip dataset, trajectory-disjoint train/val split
 - [src/masking.py](src/masking.py) — shared tube masking
 - [src/models/vit.py](src/models/vit.py) — shared ViT encoder
 - [src/objectives/mae.py](src/objectives/mae.py), [src/objectives/jepa.py](src/objectives/jepa.py) — the two heads
-- [src/train.py](src/train.py) — unified entrypoint
+- [src/train.py](src/train.py) — unified entrypoint, incl. held-out val loop + best-val checkpoint selection
 - [scripts/gen_configs.py](scripts/gen_configs.py) — regenerates `configs/`
 - [scripts/preprocess_memmap.py](scripts/preprocess_memmap.py) — Well HDF5 → fast fp16 memmap (needed before training/analysis)
+- [scripts/download_data.sh](scripts/download_data.sh) — downloads the 3 datasets from The Well
 - [scripts/load_encoder.py](scripts/load_encoder.py) — load a checkpoint + sanity-check forward pass
-- [scripts/linear_probe.py](scripts/linear_probe.py) — ridge-probe frozen features against physics targets
-- [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — layer-wise pooled/non-pooled physics probing (the JEPA-vs-MAE comparison)
-- [scripts/analyze_regime.py](scripts/analyze_regime.py), [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py) — does pooled representation encode regime params?
-- [scripts/forecast_content_probe.py](scripts/forecast_content_probe.py) — forecasting probe (see "Probing suite" above)
-- [scripts/analyze_noise_robustness.py](scripts/analyze_noise_robustness.py) — Gaussian input-noise representation-stability probe (see "Probing suite" above)
-- [scripts/run_sweep.sh](scripts/run_sweep.sh) — runs the full probing suite across all 3 datasets; outputs to `sweep_results/`, summarized in [reports/](reports/)
-- [docs/](docs/) — research-summary writeup and per-probe deep dives (architecture, variables, results)
+- [scripts/run_lr_minisweep.sh](scripts/run_lr_minisweep.sh), [scripts/pick_lr.py](scripts/pick_lr.py) — per-(dataset,objective) LR mini-sweep → `configs/tuned_lr.json`
+- [scripts/run_final_training.sh](scripts/run_final_training.sh) — 3-seed final training for all (dataset, objective) pairs
+- [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) — **canonical probing pipeline**: contemporaneous, forecast, noise-robustness, regime, held-out test split, multi-seed
+- [scripts/plot_workshop_figures.py](scripts/plot_workshop_figures.py) — renders the paper's figures from `workshop_test_eval.py`'s output
+- [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — earlier-stage train-CV pooled/non-pooled probing (see "Probing suite" above)
+- [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py) — recovers per-trajectory regime params from Well filenames
+- [scripts/extract_training_history.py](scripts/extract_training_history.py), [scripts/plot_training_curves.py](scripts/plot_training_curves.py) — training-loss curve extraction/plotting
+- [docs/](docs/) — research-summary writeup and probing deep dive (architecture, variables, results)

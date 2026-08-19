@@ -103,299 +103,41 @@ summarizes.
 
 ## Scripts (form a suite, not independent tools)
 
-Most later scripts import shared utilities (`ridge_r2`, `ridge_r2_grouped`,
-`build_dataset`, `contemporaneous_targets`, `compute_layerwise_features_batched`,
-`load_checkpoint_encoder`) from `analyze_encoders.py`, and
-(`local_target_maps`, `layerwise_token_features`, `mlp_r2`) from
-`analyze_encoders_local.py`.
+The canonical, citable-numbers pipeline is
+[`scripts/workshop_test_eval.py`](../scripts/workshop_test_eval.py) — see
+"Held-out, multi-seed test evaluation" below for its full protocol. It imports
+shared utilities (`ridge_r2`, `build_dataset`, `contemporaneous_targets`,
+`compute_layerwise_features_batched`, `load_checkpoint_encoder`) from
+`analyze_encoders.py`, and (`local_target_maps`, `layerwise_token_features`,
+`_train_mlp_early_stop`) from `analyze_encoders_local.py`.
 
 | script | question | notes |
 |---|---|---|
-| [`scripts/linear_probe.py`](../scripts/linear_probe.py) | Basic pass/fail sanity check: pooled features vs. a near-circular energy target, vs. a pixel-mean baseline. | Simplest/oldest probe, saturates near R²=1 (target is close to circular) — a smoke test, not part of the main comparison. |
-| [`scripts/analyze_encoders.py`](../scripts/analyze_encoders.py) | Main comparison: layer-wise, pooled, ridge-probe against **derived nonlinear physics targets** (dataset-specific — see above) plus `future_enstrophy`. | Also hosts shared utilities used across the whole suite. |
-| [`scripts/analyze_encoders_local.py`](../scripts/analyze_encoders_local.py) | Follow-up: is pooling hiding something? (1) per-token linear probe with patch-aligned local targets, (2) small MLP nonlinear probe on **pooled** features, (3) small MLP nonlinear probe **per-token** (same features/targets as (1), swapping ridge for the MLP). | `--skip-mlp` skips both MLP variants. The pooled MLP was flagged noisy/unreliable in earlier runs — per [arXiv:2602.07050](https://arxiv.org/abs/2602.07050) ("Interpreting Physics in Video World Models"), attentive/per-token probes recover structure that pooled-then-nonlinear probes miss because mean-pooling destroys the local structure a small MLP needs; the per-token MLP tests whether that was a pooling artifact. |
-| [`scripts/analyze_regime.py`](../scripts/analyze_regime.py) | Does the representation know the constant-per-trajectory physical regime (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta)? Pooled by default; `--token-level` additionally asks whether a *single token* already predicts the regime, or whether it only emerges from pooling. | One feature vector per trajectory (pooled) or grouped-by-trajectory CV via `ridge_r2_grouped` (token-level) — both avoid leakage, since a plain random split would let tokens/windows from the same trajectory land in both train and val folds sharing an (near-)identical target. Multi-order-of-magnitude params log10-transformed; shuffled-control column per target as a leakage sanity check. Needs `scripts/extract_regime_metadata.py` sidecar files first. |
-| [`scripts/forecast_content_probe.py`](../scripts/forecast_content_probe.py) | Trains a **fresh** linear **and MLP** probe (pooled and per-token, every layer) from present-time frozen features to a **separate future window's** physics, swept over multiple time gaps (`--gaps`) and injected-noise levels (`--noise-stds`, context only — same convention as `analyze_noise_robustness.py`). | No predictor/decoder at all — avoids the "does the pretrained head generalize to new mask geometry" confound a rollout-style probe would carry. Full rigor stack (depth × linear-vs-MLP × noise), matching the rest of the suite. Each result also reports a `skill_*` field (see below) alongside the raw `probe_*`/`ceiling_*` R². |
-| [`scripts/analyze_noise_robustness.py`](../scripts/analyze_noise_robustness.py) | Sweeps injected Gaussian noise (`--noise-stds`, in z-scored input units) into the input, ridge-probes pooled **and per-token** features — at **every layer**, not just the final one — against the **clean** clip's physics. | Does decodability degrade gracefully or collapse abruptly under corruption, and does that hold at every depth or only at the output — and is that pattern uniform across a token's whole field, or does pooling wash it out? Per-token variant capped via `--token-max-samples` (default 64); for those capped batches, pooled features are derived by mean-pooling the per-token ones rather than a second forward pass. |
+| [`scripts/analyze_encoders.py`](../scripts/analyze_encoders.py) | Earlier-stage, train-CV comparison: layer-wise, pooled, ridge-probe against **derived nonlinear physics targets** (dataset-specific — see above) plus `future_enstrophy`. | Useful for exploring the depth/layer-emergence landscape on a new dataset before committing to the expensive held-out protocol. Also hosts shared utilities used across the whole suite. |
+| [`scripts/analyze_encoders_local.py`](../scripts/analyze_encoders_local.py) | Same train-CV framing, but per-token (non-pooled) plus a small MLP nonlinear readout — does spatial detail or nonlinearity recover signal pooling/linearity hides? | `--skip-mlp` skips the MLP variant. |
 
 Supporting: [`scripts/extract_regime_metadata.py`](../scripts/extract_regime_metadata.py)
-reconstructs per-trajectory regime params from Well filenames (best-effort
-regex parsing), needed by `analyze_regime.py`.
+reconstructs per-trajectory regime params (Reynolds/Schmidt, Rayleigh/Prandtl,
+alpha/zeta) from Well filenames (best-effort regex parsing), feeding
+`workshop_test_eval.py`'s regime family.
 
-## Experiment design: depth × noise robustness
+## Earlier-stage train-CV exploration (superseded)
 
-Two axes the physics-content results above don't yet make explicit:
-**depth** (where in the encoder does a quantity become linearly readable?)
-and **noise robustness** (how fragile is that readability, and at what
-depth?). Both are directly informed by
-[arXiv:2602.07050](https://arxiv.org/abs/2602.07050), which studies an
-analogous question (where physics emerges across depth in V-JEPA-2/VideoMAE)
-and finds a sharp "Physics Emergence Zone" transition partway through the
-encoder. `scripts/plot_probing_suite.py` implements three core plots from
-`sweep_results/*.json`:
+Before the held-out multi-seed protocol below existed, this repo ran a
+broader train-CV exploration across all three datasets — full 13-layer depth
+sweep, 6-level noise sweep (pooled and token), regime probing, and a
+forecast/skill-score analysis (`skill = 1 - (1-R²_probe)/(1-R²_persistence)`,
+a standard forecast-verification technique for comparing quantities with very
+different intrinsic predictability). It first surfaced the qualitative shape
+of every finding below it — MAE peaking at shallow layers vs. JEPA needing
+depth on `rayleigh_benard`, MAE's sharper-but-more-fragile noise behavior,
+JEPA's forecast advantage growing with horizon — but reports `max` over
+train-CV curves as "best-layer R²," which is itself an unvalidated selection,
+not a held-out estimate. Superseded by the protocol below; see git history at
+or before commit `92da170` for the full tables and the plotting script that
+generated them.
 
-1. **Emergence-depth plot** — R² vs. layer, one curve per quantity, JEPA vs.
-   MAE overlaid, plus a summary scatter of each quantity's `emergence_layer`
-   (first layer reaching 80% of that quantity's own peak R²). Formalizes the
-   qualitative "MAE peaks early (L1–2), JEPA peaks mid-late (L6–12) on
-   `rayleigh_benard`" observation (see [OVERVIEW.md](OVERVIEW.md)) into a
-   citable per-quantity number.
-2. **Noise × layer heatmap** — R² over the full (layer, noise-std) grid per
-   quantity, from `analyze_noise_robustness.py`'s now-layer-swept output.
-   Answers "is robustness a final-layer-only property, or does it hold at
-   intermediate depths too?"
-3. **Token linear-vs-MLP comparison** — bar comparison of per-token linear
-   vs. per-token MLP R² at the final layer, per quantity. Tests whether any
-   quantity is present nonlinearly-but-not-linearly at the token level.
-4. **Forecast skill vs. quantity difficulty** — skill score (defined in the
-   Results section below) vs. `R²_persistence` per quantity, one point per
-   (quantity, gap), JEPA vs. MAE. Visualizes whether an objective's forecast
-   advantage concentrates in genuinely hard-to-forecast quantities or in ones
-   that were already easy for the naive baseline.
-
-## Results
-
-Full sweep, current target set, all three datasets — pooled linear, per-token
-linear + MLP, full 13-layer depth sweep, full 6-level noise sweep (pooled and
-token), regime probing, and forecast/skill-score. Raw numbers:
-`sweep_results/{dataset}_pooled.json`, `{dataset}_nonpooled.json`,
-`{dataset}_regime.json`, `{dataset}_noise_robustness.json`,
-`{dataset}_forecast.json`. Figures: `reports/figures/*.png`, generated by
-`scripts/plot_probing_suite.py`.
-
-These are train-split cross-validated numbers — useful for characterizing
-the full depth/noise/quantity landscape, but **not** the final reported
-numbers: reporting `max` over 13 layers of train-CV curves as "best-layer
-R²" is itself an unvalidated selection. The held-out, multi-seed numbers
-that should be cited as final results are in [Held-out, multi-seed test
-evaluation](#held-out-multi-seed-test-evaluation-the-reported-numbers)
-below.
-
-### Contemporaneous decodability (pooled), best-layer R², JEPA vs MAE
-
-`active_matter`:
-
-| quantity | JEPA best | MAE best |
-|---|---|---|
-| enstrophy | 0.989 | 0.993 |
-| nematic_order | 0.995 | 0.999 |
-| flow_align | 0.444 | 0.421 |
-| order_grad_mag | 0.995 | 0.997 |
-| strain_order_align | 0.997 | 0.998 |
-| active_stress_div_mag | 0.994 | 0.997 |
-| future_enstrophy | 0.924 | 0.931 |
-
-`shear_flow`:
-
-| quantity | JEPA best | MAE best |
-|---|---|---|
-| enstrophy | 0.993 | 0.992 |
-| tracer_grad | 0.994 | 0.996 |
-| advective_flux | 0.775 | 0.760 |
-| strain_rate_mag | 1.000 | 1.000 |
-| okubo_weiss | 0.998 | 0.998 |
-| pressure_grad_mag | 0.999 | 1.000 |
-| tracer_laplacian | 0.988 | 0.991 |
-| future_enstrophy | 0.979 | 0.978 |
-
-`rayleigh_benard` — the dataset where JEPA and MAE diverge most:
-
-| quantity | JEPA best | MAE best | gap |
-|---|---|---|---|
-| enstrophy | 0.686 | 0.455 | +0.23 |
-| buoyancy_grad | 1.000 | 1.000 | — |
-| convective_flux | 0.835 | 0.576 | +0.26 |
-| okubo_weiss | 0.722 | 0.460 | +0.26 |
-| velocity_buoyancy_coherence | 0.583 | −0.049 | +0.63 |
-| pressure_grad_mag | 1.000 | 1.000 | — |
-| buoyancy_laplacian | 0.997 | 0.994 | +0.00 |
-| future_enstrophy | 0.474 | 0.347 | +0.13 |
-
-The split is quantity-specific, not blanket: purely local, near-differential
-quantities (`buoyancy_grad`, `pressure_grad_mag`, `buoyancy_laplacian` — the
-ones a pixel-reconstruction objective directly rewards keeping) are at
-ceiling for both objectives on every dataset. The gap opens specifically on
-`rayleigh_benard`'s genuinely *coupled* quantities — `convective_flux` (the
-literal buoyancy-work term driving convection) and
-`velocity_buoyancy_coherence`, where MAE is at or below zero R². On
-`active_matter`/`shear_flow`, clean pooled accuracy is a wash between the two
-objectives — sometimes MAE fractionally ahead.
-
-`vorticity_signed`/`divergence` are dropped as *pooled* targets everywhere
-(see above) but remain informative at token level — see below.
-
-### Depth: where does physics become linearly readable?
-
-`emergence_layer` = first of 13 layers (L0–L12) where a quantity's pooled
-R² crosses 80% of its own peak. On `active_matter` and `shear_flow`, both
-objectives converge almost immediately — emergence layer 0–3 for nearly every
-quantity, no "building up" story on either dataset despite real differences
-on other axes (noise, below). `rayleigh_benard` is qualitatively different:
-MAE's peak accuracy on the coupled quantities is reached by L0–L2 and doesn't
-improve with depth; JEPA needs L6–L11 to reach 80% of its own (higher) peak.
-Figures: `reports/figures/{dataset}_emergence_curves.png` (full layer-wise
-curves) and `{dataset}_emergence_summary.png` (per-quantity summary).
-MAE's early plateau + JEPA's mid-to-late peak on `rayleigh_benard` formalizes
-the qualitative observation in [OVERVIEW.md](OVERVIEW.md) into a citable,
-quantity-level number.
-
-### Token level: does a nonlinear readout find what linear can't?
-
-Per-token linear vs. 2-layer-MLP readout, best layer. On `rayleigh_benard`,
-the coupled quantities show a real, objective-specific nonlinear-only gap —
-JEPA's MLP gain lands near ceiling, MAE's stays low even nonlinearly:
-
-| quantity | JEPA lin | JEPA MLP | MAE lin | MAE MLP |
-|---|---|---|---|---|
-| convective_flux | 0.285 | 0.895 | 0.006 | 0.067 |
-| velocity_buoyancy_coherence | 0.258 | 0.778 | 0.005 | 0.059 |
-| divergence | 0.147 | 0.445 | 0.006 | 0.114 |
-| vorticity_signed | 0.064 | 0.351 | −0.001 | −0.012 |
-| buoyancy_grad | 0.982 | 1.000 | 0.990 | 1.000 |
-
-On `active_matter`/`shear_flow`, MLP gains are present and roughly symmetric
-between objectives on every quantity (e.g. `active_matter` `enstrophy`: JEPA
-0.702→0.991, MAE 0.686→0.993) — a generic pooling/small-model effect, not an
-objective-specific one. MAE's near-zero `convective_flux`/
-`velocity_buoyancy_coherence` on `rayleigh_benard` stays near-zero even with
-the nonlinear readout — the information isn't extractable from MAE's local
-features, linearly or not. Figures:
-`reports/figures/{dataset}_token_linear_vs_mlp.png`.
-
-### Regime-parameter decodability (pooled), best-layer R²
-
-| dataset | param | JEPA best | MAE best | shuffled control (both) |
-|---|---|---|---|---|
-| active_matter | alpha | 0.997 | 0.998 | ≈ −0.4 to −0.5 |
-| active_matter | zeta | 0.959 | 0.975 | ≈ −0.6 to −0.7 |
-| shear_flow | Reynolds | 0.805 | 0.822 | ≈ −0.05 |
-| shear_flow | Schmidt | 0.774 | 0.825 | ≈ −0.06 |
-| rayleigh_benard | Rayleigh | 0.998 | 0.999 | ≈ −0.05 |
-| rayleigh_benard | Prandtl | 0.993 | 0.993 | ≈ −0.06 |
-
-Both objectives decode regime parameters well and are closely matched (MAE
-marginally ahead in most cases); shuffled controls near 0 confirm the
-grouped-by-trajectory split isn't leaking. A global, low-frequency,
-trajectory-constant scalar is trivial for either pretraining objective to
-preserve — regime decodability is not where JEPA and MAE differ. Useful as a
-negative control: the JEPA/MAE split elsewhere in this doc is specific to
-locally-coupled, spatially-resolved dynamics, not "physics content" in
-general.
-
-### Noise robustness (pooled, final layer), mean R² across quantities
-
-| dataset | noise std → | 0.0 | 0.1 | 0.25 | 0.5 | 1.0 | 2.0 |
-|---|---|---|---|---|---|---|---|
-| active_matter | JEPA | 0.786 | 0.789 | 0.794 | 0.790 | 0.729 | 0.398 |
-| active_matter | MAE | 0.874 | 0.878 | 0.871 | 0.831 | 0.530 | **−1.024** |
-| shear_flow | JEPA | 0.832 | 0.830 | 0.841 | 0.836 | 0.780 | 0.680 |
-| shear_flow | MAE | 0.902 | 0.901 | 0.898 | 0.884 | 0.837 | 0.718 |
-| rayleigh_benard | JEPA | 0.933 | 0.936 | 0.935 | 0.930 | 0.905 | 0.842 |
-| rayleigh_benard | MAE | 0.943 | 0.945 | 0.941 | 0.921 | 0.849 | 0.646 |
-
-Same pattern at the **token** level (mean R² across quantities, final
-layer), but with a dataset-specific twist:
-
-| dataset | noise std → | 0.0 | 0.25 | 1.0 | 2.0 |
-|---|---|---|---|---|---|
-| active_matter | JEPA | 0.620 | 0.512 | 0.374 | 0.270 |
-| active_matter | MAE | 0.745 | 0.635 | 0.256 | **0.039** |
-| shear_flow | JEPA | 0.380 | 0.368 | 0.276 | 0.143 |
-| shear_flow | MAE | **0.820** | 0.704 | 0.524 | **0.344** |
-| rayleigh_benard | JEPA | **0.855** | 0.808 | 0.679 | **0.553** |
-| rayleigh_benard | MAE | 0.697 | 0.610 | 0.419 | 0.291 |
-
-MAE starts higher (sharper decoder) at zero noise on every dataset, both
-granularities, but degrades faster once the input is corrupted. The
-collapse is dataset-specific in magnitude: outright negative (pooled) on
-`active_matter`, moderate on `rayleigh_benard`, mild on `shear_flow`.
-`shear_flow` is the one dataset where MAE stays *ahead* of JEPA at every
-noise level, both pooled and token — this dataset shows no JEPA robustness
-advantage at all (see Discussion for why). `rayleigh_benard` is the reverse
-at token level: JEPA leads at every noise level, consistent with its
-contemporaneous and depth results above. Noise std is in z-scored input
-units (std ≥ 1.0 is heavy corruption relative to the unit-variance input).
-Figures: `reports/figures/{dataset}_noise_heatmap_*.png` (layer × noise grid
-per quantity).
-
-### Forecast skill score: predicting future physics, fairly
-
-`forecast_content_probe.py` probes *future* physics from present-time frozen
-features (gap frames ahead), scored with the persistence-relative skill
-score (see below) rather than raw R², so quantities of very different
-intrinsic predictability are comparable. Pooled, clean input, best layer,
-skill (MLP), gap=8 vs. gap=32:
-
-| dataset | example quantity | JEPA skill (gap=8 → 32) | MAE skill (gap=8 → 32) |
-|---|---|---|---|
-| active_matter | strain_order_align | 0.904 → 0.936 | 0.912 → 0.928 |
-| shear_flow | okubo_weiss | 0.978 → 0.935 | 0.978 → 0.930 |
-| rayleigh_benard | convective_flux | 0.900 → 0.861 | 0.916 → 0.661 |
-| rayleigh_benard | enstrophy | 0.891 → 0.759 | 0.916 → 0.522 |
-
-On `active_matter`/`shear_flow`, MAE is fractionally ahead or tied on clean
-pooled forecasting, mirroring the contemporaneous-probe result — and, unlike
-`rayleigh_benard`, the gap doesn't widen at the longer horizon. On
-`rayleigh_benard`, JEPA's advantage **grows** with forecast horizon: roughly
-tied at gap=8, clearly ahead at gap=32 (`convective_flux` 0.861 vs 0.661;
-`enstrophy` 0.759 vs 0.522) — MAE's forecast skill decays faster as the
-target moves further from the input than JEPA's does.
-
-**Under noise** (linear probe, final layer, gap=8), the split from the
-contemporaneous probe reappears and sharpens: on `active_matter`, MAE's skill
-at σ=2 falls to **−6 to −9** across quantities (worse than persistence by an
-order of magnitude) vs. JEPA's −1 to −2; on `rayleigh_benard`,
-`buoyancy_laplacian` skill goes to −5.3 (MAE) vs. −1.2 (JEPA) at σ=2.
-
-**Token-level** flips the `active_matter` ranking outright: JEPA beats MAE on
-every quantity, linear and MLP alike (`divergence` MLP: 0.81 vs 0.69;
-`vorticity_signed` MLP: 0.73 vs 0.65) — pooling was hiding a real JEPA
-forecasting advantage the same way it hid the `flow_align` contemporaneous
-signal. `shear_flow`'s token-level forecast results show no such reversal —
-MAE stays ahead token-level too, consistent with every other axis on this
-dataset. Figures: `reports/figures/{dataset}_forecast_skill_difficulty.png`.
-
-#### A fair metric for comparing forecast quality across quantities
-
-Raw R² isn't comparable *across* physics quantities that evolve at very
-different rates: a near-static quantity looks "easy" (high R²) for any
-method — including the naive "assume nothing changes" persistence baseline —
-while a fast-changing or near-degenerate quantity looks "hard" (low/negative
-R²) even for a good model. Naively averaging raw R² across quantities lets
-one exploding or degenerate number dominate and compares unlike things.
-
-`skill_score()` in `analyze_encoders.py` fixes this with a standard forecast-
-verification technique (Murphy 1988):
-
-```
-skill = 1 - (1 - R²_probe) / (1 - R²_persistence)
-```
-
-0 → exactly as good as persistence. 1 → closes the entire remaining gap to a
-perfect ceiling. Negative → worse than the naive baseline. It's algebraically
-equivalent to `1 - MSE_probe/MSE_persistence`, so it needs no new computation
-beyond R² values the suite already produces (NaN-guarded the same way
-`ridge_r2_grouped` guards degenerate CV folds, for the case where
-`R²_persistence` is itself ≈1 and there's no headroom to score against).
-
-**Important nuance, confirmed by running this on real data before wiring it
-into any live script:** skill score does not simply *shrink* outlier R²
-values — it *recontextualizes* them. A quantity where persistence already
-explains most of the variance (little headroom left) turns a bad raw R² into
-an *even more* extreme skill score, since failing badly against an easy
-baseline is a severe relative failure; a quantity where persistence itself
-is already poor (a near-degenerate target, no real baseline to fail against)
-turns the same bad raw R² into a comparatively tame skill score. This is the
-mathematically correct interpretation, not a shrinkage artifact.
-
-Wired into `forecast_content_probe.py` (`skill_linear`/`skill_mlp` per
-target, per layer, per noise level, per gap).
-
-Deferred (future work, not implemented): an effective-dimensionality probe
-(iteratively orthogonalize probe directions until R² collapses to the
-shuffled-control baseline) and a token-vs-pooled generalization-gap plot.
-
-### Held-out, multi-seed test evaluation (the reported numbers)
+## Held-out, multi-seed test evaluation (the reported numbers)
 
 This is the protocol behind every number that should be cited as a final
 result. It supersedes the train-CV tables above for the three families it
@@ -435,9 +177,9 @@ are the honest, held-out ones.
 
 Three families, each independently following this protocol per quantity:
 **contemporaneous** physics (t+0, pooled and per-token), **forecast-content**
-physics at t+8 and t+32 (context and future windows never overlap, so
-there's no temporal leakage between probe input and target — see
-`forecast_content_probe.py`'s windowing), and **noise robustness** (input
+physics at t+8 and t+32 (context and future windows never overlap — future
+starts at `off + n_frames + gap` — so there's no temporal leakage between
+probe input and target), and **noise robustness** (input
 corruption at each quantity's already-frozen contemporaneous layer, no
 separate noise-layer search — this family always uses a plain MLP,
 `weight_decay=1e-4`, since it reuses a layer already vetted by the
@@ -466,24 +208,30 @@ cross-checking.
 
 #### Contemporaneous (t+0): near-tied
 
-Pooled deltas are small across all three datasets (|Δ| mostly < 0.02, MAE
-usually a hair ahead) — both objectives already recover the physics at
-genuinely high absolute R² (0.93–1.00 for most quantities) at the moment
-being probed, leaving little room for either to differentiate.
+`rayleigh_benard` (real 3-encoder-seed numbers): pooled deltas are small
+(|Δ| ≤ 0.023 on every quantity) — both objectives already recover the
+physics at genuinely high absolute R² (0.94–1.00) at the moment being
+probed, leaving little room for either to differentiate. MAE is fractionally
+ahead on the small-scale/high-frequency quantities (`enstrophy`,
+`okubo_weiss`, `convective_flux`, `pressure_grad_mag`); JEPA's one clear win
+is `buoyancy_grad` (Δ +0.023). `active_matter`/`shear_flow` (single encoder
+seed) show the same near-tied pattern.
 
 #### Forecast-content: the interesting result is dataset-specific, and lives at long horizon
 
 | dataset | t+8 (pooled) | t+32 (pooled) |
 |---|---|---|
 | `active_matter` | ~tied to slightly MAE-ahead | ~tied — the real JEPA advantage is at **token** level, not pooled |
-| `shear_flow` | small, mixed | **consistent, modest JEPA advantage on all 7 quantities** (Δ +0.001 to +0.110, seed std ≤ 0.05) |
-| `rayleigh_benard` | ~tied | **clean, larger JEPA advantage on all 7 quantities** (Δ +0.008 to +0.195, seed std ≤ 0.05) |
+| `shear_flow` | small, mixed | **consistent, modest JEPA advantage on all 7 quantities** (Δ +0.001 to +0.110, single seed) |
+| `rayleigh_benard` | MAE fractionally ahead on every quantity (Δ −0.001 to −0.021) | **clean, larger JEPA advantage on 6 of 7 quantities** (Δ −0.001 to +0.121, 3 encoder seeds, `encoder_seed_std` ≤ 0.039) |
 
 `rayleigh_benard` t+32 is the cleanest single result in the whole sweep:
-JEPA leads MAE on every pooled quantity, at good absolute R² for both (JEPA
-0.80–0.97, MAE 0.63–0.96), with tight seed std (≤0.021) — a real,
-low-variance, growing-with-horizon advantage, not a clipping or instability
-artifact.
+JEPA leads MAE on 6 of 7 pooled quantities (tied on `pressure_grad_mag`), at
+good absolute R² for both (JEPA 0.79–0.97, MAE 0.68–0.97), with tight
+encoder-seed std (`buoyancy_grad` Δ +0.121±0.012,
+`velocity_buoyancy_coherence` Δ +0.112±0.039) — a real, low-variance,
+growing-with-horizon advantage confirmed across independently-initialized
+encoders, not a clipping, instability, or single-seed-luck artifact.
 
 `shear_flow` t+32 shows the same pattern, at smaller magnitude: JEPA leads
 MAE on all 7 pooled quantities (`advective_flux` +0.804 vs +0.720,
@@ -500,7 +248,42 @@ several quantities (`tracer_grad` Δ=−0.20, `advective_flux` Δ=−0.04,
 `vorticity_signed` Δ=−0.08) — this pattern holds at both gaps and is
 distinct from the now-fixed pooled t+32 instability.
 
-#### Noise robustness (mean R² across quantities, pooled, at each quantity's own frozen layer)
+#### Noise robustness
+
+`rayleigh_benard` was regenerated this session with an improved protocol:
+**clean-fit, no-refit** (probe fit once on clean training features, never
+recalibrated, then evaluated across a fine noise grid) rather than the
+original **matched-noise** design (probe refit at every noise level, which
+turned out to be measuring readout re-adaptation more than representation
+robustness). Under clean-fit, R² can go arbitrarily negative under enough
+distribution shift — a real representational-fragility signature, not a
+bug — so both R² and Pearson r (scale/offset-invariant, stays interpretable
+even where R² has collapsed) are reported. `active_matter`/`shear_flow`
+below still use the original matched-noise protocol (not yet regenerated) —
+the two tables are not directly comparable methodologically.
+
+`rayleigh_benard` (clean-fit, ridge, Pearson r, mean over 3 encoder seeds):
+
+| quantity | σ=0 | σ=0.1 | σ=0.3 | σ=0.5 | σ=1.0 |
+|---|---|---|---|---|---|
+| `buoyancy_grad` | 0.96 / 0.96 | 0.91 / 0.30 | 0.82 / 0.22 | 0.69 / 0.25 | 0.46 / 0.22 |
+| `buoyancy_laplacian` | 0.97 / 0.96 | 0.92 / 0.41 | 0.84 / 0.23 | 0.68 / 0.19 | 0.38 / 0.14 |
+| `enstrophy` | 0.99 / 1.00 | 0.96 / 0.82 | 0.93 / 0.54 | 0.82 / 0.53 | 0.40 / 0.46 |
+| `okubo_weiss` | 0.99 / 1.00 | 0.92 / 0.66 | 0.86 / 0.29 | 0.72 / 0.31 | 0.24 / 0.38 |
+| `convective_flux` | 0.99 / 0.99 | 0.99 / 0.96 | 0.97 / 0.89 | 0.93 / 0.84 | 0.77 / 0.78 |
+| `pressure_grad_mag` | 1.00 / 1.00 | 0.99 / 0.97 | 0.98 / 0.96 | 0.96 / 0.98 | 0.94 / 0.99 |
+| `velocity_buoyancy_coherence` | 0.96 / 0.97 | 0.94 / 0.92 | 0.89 / 0.86 | 0.81 / 0.80 | 0.58 / 0.59 |
+
+(cell = JEPA / MAE.) JEPA's robustness edge is real and large at low-to-
+moderate corruption on the differential quantities (`buoyancy_grad`,
+`buoyancy_laplacian`, `enstrophy`, `okubo_weiss`) but **not universal at
+extreme noise**: at σ=1.0, MAE edges ahead on `enstrophy`, `okubo_weiss`,
+and `pressure_grad_mag`. Both ridge and MLP readouts agree on this pattern
+(MLP numbers in `sweep_results/rayleigh_benard_workshop_test_eval.json`'s
+`aggregated.noise_robustness`, not reproduced here).
+
+`active_matter`/`shear_flow` (matched-noise protocol, mean R² across
+quantities, pooled, single encoder seed):
 
 | dataset | σ=0 | σ=0.5 | σ=1.0 | σ=2.0 |
 |---|---|---|---|---|
@@ -508,33 +291,37 @@ distinct from the now-fixed pooled t+32 instability.
 | `active_matter` — MAE | 0.897 | 0.838 | 0.756 | **0.199** |
 | `shear_flow` — JEPA | 0.965 | 0.951 | 0.800 | 0.749 |
 | `shear_flow` — MAE | 0.949 | 0.937 | 0.863 | 0.741 |
-| `rayleigh_benard` — JEPA | 0.968 | 0.966 | 0.938 | 0.884 |
-| `rayleigh_benard` — MAE | 0.978 | 0.955 | 0.892 | 0.657 |
 
-The headline noise-robustness finding replicates on held-out, multi-seed
-evaluation: JEPA and MAE are near-tied at low noise, and MAE collapses
-disproportionately as noise grows — sharply on `active_matter` (0.897→0.199
-by σ=2, a near-total collapse) and `rayleigh_benard` (0.978→0.657), while
-`shear_flow` stays close throughout, with MAE briefly ahead at σ=1.0 —
-reported honestly rather than smoothed over, matching the overall pattern
-(no consistent robustness gap on this dataset).
+Under the matched-noise protocol, `active_matter`'s MAE collapses sharply
+(0.897→0.199) while `shear_flow` stays close throughout — this was the
+original finding that motivated re-examining the noise protocol in the first
+place (matched-noise lets the probe re-adapt at every level, which can mask
+or exaggerate how fragile the underlying frozen representation actually is;
+see `rayleigh_benard`'s clean-fit numbers above for the corrected picture on
+that dataset).
 
 Raw numbers: `sweep_results/{dataset}_workshop_test_eval.json`. Figures:
-`reports/figures/workshop/fig{2,3,4}_*`; per-cell layer choices in
-`reports/figures/workshop/frozen_layers*.txt`.
+`reports/figures/fig{2,3,4}_*`; per-cell layer choices in
+`reports/figures/frozen_layers*.txt`.
 
 #### Multiple encoder seeds
 
-Everything above reports probe-seed variance (5 independently-initialized
-MLP fits per cell) at a single pretrained encoder checkpoint per objective.
-That doesn't say anything about run-to-run pretraining variance -- would a
-different random init of the *encoder itself* give the same R²? Once
-`scripts/run_final_training.sh` has produced 3 fresh encoder seeds per
-(dataset, objective) pair, `workshop_test_eval.py` accepts all of them in
-one `--checkpoints` list and probes each completely independently (its own
-held-out layer/weight_decay/ridge selection, since a different encoder
-seed's representation can genuinely peak at a different depth) before
-combining per objective in the output JSON's `"aggregated"` section.
+Probe-seed variance alone (5 independently-initialized MLP fits per cell, at
+a single pretrained encoder checkpoint per objective) doesn't say anything
+about run-to-run pretraining variance — would a different random init of the
+*encoder itself* give the same R²? `rayleigh_benard` now has this answered
+for real: `scripts/run_final_training.sh` produced 3 fresh encoder seeds per
+(dataset, objective) pair, and `workshop_test_eval.py` was run with all of
+them in one `--checkpoints` list — each probed completely independently
+(its own held-out layer/weight_decay/ridge selection, since a different
+encoder seed's representation can genuinely peak at a different depth)
+before combining per objective in the output JSON's `"aggregated"` section
+(`n_encoder_seeds: 3` throughout `sweep_results/rayleigh_benard_workshop_test_eval.json`).
+`active_matter`/`shear_flow` remain the single-seed case below — their
+current-architecture (192-d predictor) 3-seed JEPA retrain was started but
+stopped incomplete (recurring pod GPU-host fault); their MAE side and the
+`rayleigh_benard` results are unaffected by this, since MAE has no predictor
+and `rayleigh_benard`'s full 3-seed run already completed.
 
 Combining is a **two-level nested decomposition**, not a naive pool of
 every (encoder_seed × probe_seed) draw as if independent: the 5 probe-seed

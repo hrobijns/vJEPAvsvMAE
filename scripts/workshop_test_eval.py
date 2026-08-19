@@ -1,14 +1,14 @@
 """Held-out, multi-seed, MLP-only workshop probing run: the "formal sweep" the
 Fig 2-4 plan (see plot_workshop_figures.py's docstring) explicitly deferred.
 
-Fixes the one real rigor gap found in the existing suite: plot_workshop_figures.py
-picks each cell's "best layer" via argmax over the SAME train-split data the R^2
-is then read from -- exactly the bias test_split_eval.py was built to eliminate,
-except that fix was never wired into the actual workshop figures, and even
-test_split_eval.py only freezes the layer via 5-fold CV *within* train, never
-touching a genuinely disjoint set. Here: fit on a train subset, select the
-layer on a held-out slice (mean R^2 over multiple seeds), report once on the
-official test split (mean +/- std over multiple seeds).
+Fixes the one real rigor gap found in the earlier train-CV suite (see git
+history at or before commit 92da170): picking each cell's "best layer" via
+argmax over the SAME train-split data the R^2 is then read from is an
+unvalidated selection, not a held-out estimate -- even a 5-fold-CV-within-train
+version of that fix never touches a genuinely disjoint set. Here: fit on a
+train subset, select the layer on a held-out slice (mean R^2 over multiple
+seeds), report once on the official test split (mean +/- std over multiple
+seeds).
 
 The held-out selection slice is carved OUT OF TRAIN, not the Well-shipped
 `valid` split: that split turned out to be too small/regime-degenerate to
@@ -26,19 +26,23 @@ MLP-only throughout (mlp_multiseed(), see analyze_encoders_local.py, has
 early stopping + dropout + seed-averaging -- none of which the rest of the
 suite's single-seed, fixed-step-count MLP had).
 
-Three families, matching what Fig 2/3/4 need:
+Four families:
   1. Contemporaneous (t+0) physics, pooled + token.
   2. Forecast-content physics at each --gaps value (t+8, t+32), pooled + token
      -- context/future windows never overlap (future starts at
-     off + n_frames + gap, see forecast_content_probe.py's docstring), so
-     there is no temporal leakage between probe input and probe target.
+     off + n_frames + gap), so there is no temporal leakage between probe
+     input and probe target.
   3. Noise robustness, pooled, at each quantity's ALREADY-frozen contemporaneous
      layer (no separate noise-layer search -- reusing the clean-optimal layer
      is the existing convention elsewhere in the suite and keeps this a simple
      adjustment, not new machinery).
-
-Regime and rollout probing are out of scope for this pass (separate analysis
-track, unaffected by the fig2/3/4 rigor gap this script fixes).
+  4. Regime: trajectory-constant governing physical parameters (Reynolds/
+     Schmidt, Rayleigh/Prandtl, alpha/zeta -- see regime_family()), pooled
+     only, one row per trajectory. Same train->select-on-valid->report-on-test
+     protocol and same held-out-seed rigor as families 1-3, superseding the
+     earlier 1-seed, ridge-only analyze_regime.py for this task. Requires
+     {train,test}.regime.json (scripts/extract_regime_metadata.py); silently
+     skipped (not a hard error) if missing, so it stays optional per-dataset.
 
 Multi-encoder-seed usage: pass every seed's checkpoint for both objectives in
 one `--checkpoints` list (order doesn't matter) -- each is probed completely
@@ -56,7 +60,7 @@ whether it was actually the best step) if your training run saved one.
 
 Usage (single seed per objective, still supported):
     uv run python scripts/workshop_test_eval.py \
-        --checkpoints checkpoints/active_matter_jepa.pt checkpoints/active_matter_mae.pt \
+        --checkpoints checkpoints/old/active_matter_jepa.pt checkpoints/old/active_matter_mae.pt \
         --data-root /workspace/data --dataset active_matter \
         --out sweep_results/active_matter_workshop_test_eval.json
 
@@ -86,11 +90,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.analyze_encoders import (
     contemporaneous_targets, layerwise_features, load_checkpoint_encoder, ridge_fit_eval,
 )
-from scripts.analyze_encoders_local import layerwise_token_features, local_target_maps, mlp_multiseed
+from scripts.analyze_encoders_local import (
+    _train_mlp_early_stop, layerwise_token_features, local_target_maps, mlp_multiseed,
+)
 from src.data.well import train_valid_trajectory_split
 
 N_FRAMES = 8
 ROLES = ("train", "valid", "test")  # "train"=fit subset, "valid"=held-out selection subset (both carved from train.npy)
+REGIME_LOG_TRANSFORM = {"Reynolds", "Schmidt", "Rayleigh", "Prandtl"}
 
 
 def _ckpt_display(ckpt_path: str) -> str:
@@ -461,6 +468,83 @@ def forecast_family(mm: dict, traj: dict, dataset: str, encoders: dict, patch_si
 # ---------------------------------------------------------------------------
 # Family 3: noise robustness (pooled, at each quantity's already-frozen layer)
 # ---------------------------------------------------------------------------
+# Clean-fit / noisy-test protocol (standard corruption-robustness framing,
+# matches ImageNet-C style evaluation): both readouts (ridge and MLP,
+# mirroring the ridge-vs-MLP pairing used everywhere else in this suite)
+# are fit ONCE on clean (std=0) training features, then evaluated -- with
+# NO refitting -- against test features at each noise level. This replaced
+# an earlier matched-noise design (fit AND test at the same std, letting
+# the probe recalibrate to whatever noise level it's scored on) after that
+# design produced smooth but misleadingly optimistic degradation curves:
+# on rayleigh_benard, the matched design showed MAE as uniformly more
+# noise-robust than JEPA, but a clean-fit test (no recalibration allowed)
+# showed the reverse on most quantities -- MAE's readout adapts well, but
+# JEPA's underlying representation is actually the more intrinsically
+# stable one. Reports R^2 (can go arbitrarily negative once the
+# clean-calibrated readout's scale/offset stops matching the noise-shifted
+# feature distribution -- a real signature of fragility, not a bug) AND
+# Pearson r (scale/offset invariant, so it still reveals genuinely
+# surviving signal even where R^2 has collapsed to a large negative number
+# that isn't otherwise comparable across quantities/objectives), for both
+# methods.
+NOISE_STDS_DEFAULT = (0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0)
+
+
+def _pearson_r(pred: torch.Tensor, y_true: torch.Tensor) -> float:
+    pred_c = pred - pred.mean()
+    y_c = y_true - y_true.mean()
+    denom = pred_c.norm() * y_c.norm() + 1e-12
+    return (pred_c @ y_c / denom).item()
+
+
+def _r2(pred: torch.Tensor, y_true: torch.Tensor) -> float:
+    ss_res = ((pred - y_true) ** 2).sum()
+    ss_tot = ((y_true - y_true.mean()) ** 2).sum()
+    return (1 - ss_res / ss_tot).item()
+
+
+def _ridge_fit_predict(x_train: torch.Tensor, y_train: torch.Tensor, x_test: torch.Tensor,
+                        lam: float = 1e-2) -> torch.Tensor:
+    xm, xs = x_train.mean(0), x_train.std(0) + 1e-8
+    xtr, xte = (x_train - xm) / xs, (x_test - xm) / xs
+    ym = y_train.mean()
+    a = xtr.T @ xtr + lam * xtr.size(0) * torch.eye(x_train.size(1))
+    w = torch.linalg.solve(a, xtr.T @ (y_train - ym))
+    return xte @ w + ym
+
+
+def _mlp_fit_clean(x_train: torch.Tensor, y_train: torch.Tensor, seeds: tuple,
+                    hidden: int = 128, dropout: float = 0.1, lr: float = 1e-2,
+                    weight_decay: float = 1e-4, min_steps: int = 150, max_steps: int = 4000,
+                    patience: int = 100) -> list:
+    """Fit len(seeds) independently-seeded TinyMLPs once on CLEAN
+    (x_train, y_train) via _train_mlp_early_stop, returning the fitted
+    (model, xm, xs, ym, ys) tuples for reuse across every noise level --
+    fitting cost is independent of how fine the noise grid is."""
+    return [
+        _train_mlp_early_stop(x_train, y_train, hidden=hidden, dropout=dropout, lr=lr,
+                               weight_decay=weight_decay, seed=seed, min_steps=min_steps,
+                               max_steps=max_steps, patience=patience)
+        for seed in seeds
+    ]
+
+
+def _mlp_predict_multiseed(fits: list, x_test: torch.Tensor) -> list:
+    """Apply each already clean-fitted model to x_test, returning per-seed
+    predictions de-normalized back to y's original (not z-scored) scale,
+    moved back to CPU -- layerwise_features()/ridge already keep everything
+    on CPU (only the MLP forward pass itself needs the GPU), so this keeps
+    a single CPU convention for the R^2/Pearson comparisons that follow."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x_test_dev = x_test.to(device)
+    preds = []
+    for model, xm, xs, ym, ys in fits:
+        xte = (x_test_dev - xm) / xs
+        with torch.no_grad():
+            pred_norm = model(xte)
+        preds.append((pred_norm * ys + ym).cpu())
+    return preds
+
 
 def noise_family(mm: dict, traj: dict, dataset: str, encoders: dict, n_offsets: int, n_frames: int,
                   max_traj: dict, noise_stds: list, frozen_layers: dict, seeds: tuple) -> dict:
@@ -481,21 +565,163 @@ def noise_family(mm: dict, traj: dict, dataset: str, encoders: dict, n_offsets: 
         for q, layer_idx in frozen_layers[ckpt].items():
             if q not in noise_by_role["train"][0] or q not in noise_by_role["test"][0]:
                 continue
+            xtr_clean = noise_by_role["train"][1][ckpt]["0"][layer_idx]
+            ytr = noise_by_role["train"][0][q]
+            yte = noise_by_role["test"][0][q]  # stays CPU -- matches ridge_pred and mlp preds (see above)
+            mlp_fits = _mlp_fit_clean(xtr_clean, ytr, seeds=seeds)
             by_std = {}
             for std in noise_stds:
                 skey = str(std)
-                xtr = noise_by_role["train"][1][ckpt][skey][layer_idx]
                 xte = noise_by_role["test"][1][ckpt][skey][layer_idx]
-                ytr, yte = noise_by_role["train"][0][q], noise_by_role["test"][0][q]
-                r = mlp_multiseed(xtr, ytr, xte, yte, seeds=seeds)
-                ridge_r2 = ridge_fit_eval(xtr, ytr, xte, yte)
-                by_std[skey] = {"test_r2_mean": r["mean"], "test_r2_std": r["std"], "test_r2_per_seed": r["per_seed"],
-                                 "ridge_test_r2": ridge_r2}
+
+                ridge_pred = _ridge_fit_predict(xtr_clean, ytr, xte)
+                ridge_r2 = _r2(ridge_pred, yte)
+                ridge_pr = _pearson_r(ridge_pred, yte)
+
+                mlp_preds = _mlp_predict_multiseed(mlp_fits, xte)
+                mlp_r2s = [_r2(p, yte) for p in mlp_preds]
+                mlp_prs = [_pearson_r(p, yte) for p in mlp_preds]
+                mlp_r2_t, mlp_pr_t = torch.tensor(mlp_r2s), torch.tensor(mlp_prs)
+
+                by_std[skey] = {
+                    "ridge_r2": ridge_r2, "ridge_pearson_r": ridge_pr,
+                    "mlp_r2_mean": mlp_r2_t.mean().item(), "mlp_r2_std": mlp_r2_t.std().item(),
+                    "mlp_pearson_r_mean": mlp_pr_t.mean().item(), "mlp_pearson_r_std": mlp_pr_t.std().item(),
+                }
             per_q[q] = {"frozen_layer": layer_idx, "by_noise": by_std}
             print(f"    noise  {_ckpt_display(ckpt):32s} {q:26s} L{layer_idx:2d}  " +
-                  "  ".join(f"std={s}:{per_q[q]['by_noise'][str(s)]['test_r2_mean']:+.3f}"
-                            f"(ridge={per_q[q]['by_noise'][str(s)]['ridge_test_r2']:+.3f})" for s in noise_stds),
+                  "  ".join(f"std={s}:ridge_r2={by_std[str(s)]['ridge_r2']:+.2f}"
+                            f",mlp_r2={by_std[str(s)]['mlp_r2_mean']:+.2f}"
+                            for s in noise_stds),
                   flush=True)
+        out[ckpt] = per_q
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Family 4: regime (trajectory-constant governing physical parameters)
+# ---------------------------------------------------------------------------
+
+def _load_regime_records(data_root: str, dataset: str, split: str) -> list | None:
+    path = Path(data_root) / "memmap" / dataset / f"{split}.regime.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
+def _regime_targets_for_trajectories(records: list, trajs: list) -> tuple[list, dict]:
+    """Filters trajs to those with a fully-populated regime record (some
+    filenames don't match extract_regime_metadata.py's regex), returns
+    (kept_trajs, {param_name: [raw_value, ...]}) row-aligned with kept_trajs."""
+    param_names = [k for k in records[0].keys() if k != "file"]
+    kept = [t for t in trajs if all(records[t][p] is not None for p in param_names)]
+    raw = {p: [records[t][p] for t in kept] for p in param_names}
+    return kept, raw
+
+
+@torch.no_grad()
+def collect_regime_pooled(mm: np.ndarray, kept_trajs: list, encoders: dict, n_offsets: int,
+                           n_frames: int = N_FRAMES, batch_size: int = 16) -> dict:
+    """One feature row per trajectory (mean-pooled over n_offsets sampled
+    windows within that trajectory), not one row per window -- regime is
+    constant across a whole trajectory, so per-window rows of the same
+    trajectory would carry an (almost) identical target, and
+    train_valid_trajectory_split() only guarantees no *trajectory* is split
+    across roles, not that individual windows are non-redundant within one."""
+    if not kept_trajs:
+        return {name: [] for name in encoders}
+    _, _, t, _, _ = mm.shape
+    max_off = t - n_frames
+    offsets = np.linspace(0, max_off, n_offsets).astype(int)
+    seeds = [(traj, off) for traj in kept_trajs for off in offsets]  # trajectory-major order
+
+    feats_acc = {name: None for name in encoders}
+    for start in range(0, len(seeds), batch_size):
+        clip = load_batch(mm, seeds[start:start + batch_size], n_frames=n_frames)
+        for name, encoder in encoders.items():
+            device = next(encoder.parameters()).device
+            layer_feats = layerwise_features(encoder, clip.to(device))
+            if feats_acc[name] is None:
+                feats_acc[name] = [[] for _ in layer_feats]
+            for i, f in enumerate(layer_feats):
+                feats_acc[name][i].append(f)
+    feats = {name: [torch.cat(fs) for fs in per_layer] for name, per_layer in feats_acc.items()}
+    n_traj = len(kept_trajs)
+    return {
+        name: [f.view(n_traj, n_offsets, -1).mean(dim=1) for f in per_layer]
+        for name, per_layer in feats.items()
+    }
+
+
+def regime_family(mm: dict, traj: dict, dataset: str, data_root: str, encoders: dict,
+                   n_offsets: int, max_traj: dict, seeds: tuple) -> dict | None:
+    """Does the pooled representation know the trajectory-constant physical
+    regime (Reynolds/Schmidt for shear_flow, Rayleigh/Prandtl for
+    rayleigh_benard, alpha/zeta for active_matter)? Same
+    train->select-on-valid->report-on-test protocol as the other families
+    (select_and_eval()), just with trajectory-level rows instead of
+    window/token-level ones. Log-transforms Re/Ra/Sc/Pr (span multiple
+    orders of magnitude); regresses active_matter's alpha/zeta raw.
+
+    Each real target also gets a `{name}_shuffled_control` companion column
+    (same features, independently permuted target per role, seeded) as a
+    leakage sanity check -- this should collapse toward R^2~=0. A real,
+    non-collapsed control R^2 would mean the split leaks trajectory identity
+    somehow, not that the encoder is unusually good.
+
+    Returns None (family skipped, not a hard error) if regime metadata is
+    missing for this dataset -- run extract_regime_metadata.py --split
+    {train,test} first."""
+    records = {
+        role: _load_regime_records(data_root, dataset, "train" if role == "valid" else role)
+        for role in ROLES
+    }
+    if any(r is None for r in records.values()):
+        missing = [role for role, r in records.items() if r is None]
+        print(f"  [regime] regime metadata missing for {dataset} ({missing}) -- skipping regime family "
+              f"(run extract_regime_metadata.py --split {{train,test}} first)", flush=True)
+        return None
+
+    kept, raw_targets = {}, {}
+    for role in ROLES:
+        n_traj_role = mm[role].shape[0]
+        trajs = _select_trajectories(n_traj_role, traj[role], max_traj[role])
+        k, rt = _regime_targets_for_trajectories(records[role], trajs)
+        kept[role], raw_targets[role] = k, rt
+    param_names = sorted(set(raw_targets["train"]) & set(raw_targets["valid"]) & set(raw_targets["test"]))
+    print(f"  [regime] n_trajectories: " + " ".join(f"{r}={len(kept[r])}" for r in ROLES)
+          + f"  params: {param_names}", flush=True)
+    if not param_names:
+        print(f"  [regime] no regime params survived filtering for {dataset}, skipping", flush=True)
+        return None
+
+    pooled = {role: collect_regime_pooled(mm[role], kept[role], encoders, n_offsets) for role in ROLES}
+
+    targets = {role: {} for role in ROLES}
+    for role in ROLES:
+        for p in param_names:
+            vals = np.array(raw_targets[role][p], dtype=np.float64)
+            if p in REGIME_LOG_TRANSFORM:
+                vals = np.log10(vals)
+            y = torch.from_numpy(vals).float()
+            targets[role][p] = y
+            perm = torch.randperm(y.size(0), generator=torch.Generator().manual_seed(0))
+            targets[role][f"{p}_shuffled_control"] = y[perm]
+
+    out = {}
+    all_quantities = list(param_names) + [f"{p}_shuffled_control" for p in param_names]
+    for ckpt in encoders:
+        per_q = {}
+        for q in all_quantities:
+            per_q[q] = select_and_eval(
+                pooled["train"][ckpt], targets["train"][q],
+                pooled["valid"][ckpt], targets["valid"][q],
+                pooled["test"][ckpt], targets["test"][q],
+                seeds=seeds,
+            )
+            print(f"    regime {_ckpt_display(ckpt):32s} {q:26s} "
+                  f"L{per_q[q]['frozen_layer']:2d} [{per_q[q]['method']}]  test_r2={per_q[q]['test_r2_mean']:+.3f}"
+                  f"(+/-{per_q[q]['test_r2_std']:.3f})  ridge={per_q[q]['ridge_test_r2']:+.3f}", flush=True)
         out[ckpt] = per_q
     return out
 
@@ -601,8 +827,29 @@ def aggregate_by_objective(results: dict, encoders: dict, n_probe_seeds: int) ->
             }
             for gap, gap_data in results["forecast"].items()
         }
+    if "regime" in results:
+        agg["regime"] = _aggregate_quantity_map(results["regime"], groups, n_probe_seeds)
     if "noise_robustness" in results:
+        # Ridge is deterministic (no probe-seed draws), so its encoder-seed
+        # mean/std is a plain average across checkpoints. MLP's per-checkpoint
+        # by_noise entries are themselves already a probe-seed mean/std
+        # (mlp_r2_mean/mlp_r2_std from noise_family()'s multi-seed fit) --
+        # here we take the grand mean of those per-checkpoint means across
+        # encoder seeds (the "between-seed" component), not the full nested
+        # SE decomposition _nested_stats() does for the MLP-based families
+        # elsewhere -- sufficient for this exploratory sweep, not intended
+        # as a publication-grade SE claim the way select_and_eval()'s
+        # headline numbers are.
         nr = results["noise_robustness"]
+
+        def _agg_field(ckpts, q, skey, field):
+            vals = [nr[ckpt][q]["by_noise"][skey][field] for ckpt in ckpts
+                     if q in nr.get(ckpt, {}) and skey in nr[ckpt][q]["by_noise"]]
+            if not vals:
+                return None
+            n = len(vals)
+            return {"mean": float(np.mean(vals)), "std": float(np.std(vals, ddof=1)) if n > 1 else 0.0, "n": n}
+
         quantities = set()
         for res in nr.values():
             quantities |= set(res)
@@ -616,17 +863,19 @@ def aggregate_by_objective(results: dict, encoders: dict, n_probe_seeds: int) ->
                         std_keys |= set(nr[ckpt][q]["by_noise"])
                 by_std = {}
                 for skey in std_keys:
-                    # by_noise entries don't carry their own frozen_layer (it's
-                    # fixed once per quantity, stored one level up in nr[ckpt][q])
-                    # -- inject it so _nested_stats/plot_workshop_figures.py can
-                    # still report which layer each noise curve came from.
-                    seed_results = [
-                        {**nr[ckpt][q]["by_noise"][skey], "frozen_layer": nr[ckpt][q]["frozen_layer"]}
-                        for ckpt in ckpts
-                        if q in nr.get(ckpt, {}) and skey in nr[ckpt][q]["by_noise"]
-                    ]
-                    if seed_results:
-                        by_std[skey] = _nested_stats(seed_results, n_probe_seeds)
+                    ridge_r2 = _agg_field(ckpts, q, skey, "ridge_r2")
+                    if ridge_r2 is None:
+                        continue
+                    by_std[skey] = {
+                        "ridge_r2_mean": ridge_r2["mean"], "ridge_r2_std": ridge_r2["std"],
+                        "ridge_pearson_r_mean": _agg_field(ckpts, q, skey, "ridge_pearson_r")["mean"],
+                        "ridge_pearson_r_std": _agg_field(ckpts, q, skey, "ridge_pearson_r")["std"],
+                        "mlp_r2_mean": _agg_field(ckpts, q, skey, "mlp_r2_mean")["mean"],
+                        "mlp_r2_std": _agg_field(ckpts, q, skey, "mlp_r2_mean")["std"],
+                        "mlp_pearson_r_mean": _agg_field(ckpts, q, skey, "mlp_pearson_r_mean")["mean"],
+                        "mlp_pearson_r_std": _agg_field(ckpts, q, skey, "mlp_pearson_r_mean")["std"],
+                        "n_encoder_seeds": ridge_r2["n"],
+                    }
                 if by_std:
                     agg["noise_robustness"][q][obj] = by_std
     return agg
@@ -652,12 +901,20 @@ def main():
     ap.add_argument("--valid-max-traj", type=int, default=None)
     ap.add_argument("--test-max-traj", type=int, default=None)
     ap.add_argument("--token-max-clips", type=int, default=16)
-    ap.add_argument("--noise-stds", type=float, nargs="+", default=[0, 0.5, 1.0, 2.0])
+    ap.add_argument("--noise-stds", type=float, nargs="+", default=list(NOISE_STDS_DEFAULT))
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
+    ap.add_argument("--skip-contemporaneous", action="store_true",
+                     help="also skips noise (family 3), which depends on family 1's frozen layers")
     ap.add_argument("--skip-forecast", action="store_true")
     ap.add_argument("--skip-noise", action="store_true")
+    ap.add_argument("--skip-regime", action="store_true",
+                     help="skips family 4 (governing physical parameters -- Reynolds/Schmidt, "
+                          "Rayleigh/Prandtl, alpha/zeta); silently no-ops anyway if "
+                          "{train,test}.regime.json don't exist for this dataset")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    if args.skip_contemporaneous and not args.skip_noise:
+        raise SystemExit("--skip-contemporaneous requires --skip-noise (noise reuses family 1's frozen layers)")
 
     seeds = tuple(args.seeds)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -698,14 +955,15 @@ def main():
         if args.out:
             Path(args.out).write_text(json.dumps(results, indent=2))
 
-    print("== family 1: contemporaneous (t+0) ==", flush=True)
-    t0 = time.time()
-    results["contemporaneous"] = contemporaneous_family(
-        mm, traj, args.dataset, encoders, patch_size, args.n_offsets, args.n_frames, max_traj,
-        args.token_max_clips, seeds,
-    )
-    print(f"family 1 done in {time.time()-t0:.0f}s", flush=True)
-    _save_partial()
+    if not args.skip_contemporaneous:
+        print("== family 1: contemporaneous (t+0) ==", flush=True)
+        t0 = time.time()
+        results["contemporaneous"] = contemporaneous_family(
+            mm, traj, args.dataset, encoders, patch_size, args.n_offsets, args.n_frames, max_traj,
+            args.token_max_clips, seeds,
+        )
+        print(f"family 1 done in {time.time()-t0:.0f}s", flush=True)
+        _save_partial()
 
     if not args.skip_forecast:
         print("== family 2: forecast-content ==", flush=True)
@@ -729,6 +987,15 @@ def main():
             frozen_layers, seeds,
         )
         print(f"family 3 done in {time.time()-t0:.0f}s", flush=True)
+        _save_partial()
+
+    if not args.skip_regime:
+        print("== family 4: regime (governing physical parameters) ==", flush=True)
+        t0 = time.time()
+        reg = regime_family(mm, traj, args.dataset, args.data_root, encoders, args.n_offsets, max_traj, seeds)
+        if reg is not None:
+            results["regime"] = reg
+        print(f"family 4 done in {time.time()-t0:.0f}s", flush=True)
         _save_partial()
 
     print("== aggregating across encoder seeds (per objective) ==", flush=True)

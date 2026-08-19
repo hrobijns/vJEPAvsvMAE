@@ -30,17 +30,19 @@ Full architecture/training detail in [README.md § Design](../README.md#design).
 
 ### Training curves
 
-![Training loss curves: V-JEPA vs. VideoMAE encoders on The Well](figures/training_curves.png)
-
-All six runs converge cleanly over the full 100k steps (log-scale y-axis;
-note JEPA's smooth-L1-on-latents loss and MAE's pixel-MSE loss are on
-different scales and not directly comparable). JEPA's loss on `shear_flow`
-and `rayleigh_benard` shows a transient rise-then-recover in the first
-~30k steps — worth a caveat/footnote if this figure goes in the paper, since
-we haven't dug into whether it's EMA-target warmup or something else.
-Reproduce via `scripts/extract_training_history.py` (needs the local
-`pod_logs/wandb/` offline-run logs) → `sweep_results/training_history.csv`
-→ `scripts/plot_training_curves.py`.
+All runs converge cleanly over the full 100k steps (JEPA's smooth-L1-on-latents
+loss and MAE's pixel-MSE loss are on different scales and not directly
+comparable). JEPA's loss on `shear_flow` and `rayleigh_benard` shows a
+transient rise-then-recover in the first ~30k steps in the original
+single-seed runs — worth a caveat/footnote if this ever gets plotted for the
+paper, since we haven't dug into whether it's EMA-target warmup or something
+else. For the 3-seed `rayleigh_benard` runs, each `runs/<run_name>/history.jsonl`
+records train+val loss and feature-std diagnostics directly (`src/train.py`'s
+held-out val loop, no wandb dependency) — this is the current source for
+training curves; `scripts/plot_training_curves.py` can render it. (The
+original single-seed runs' curves depended on now-removed `pod_logs/wandb/`
+offline logs and are no longer reproducible from this repo alone — only the
+qualitative observation above survives.)
 
 ## Probing pipeline
 
@@ -51,109 +53,92 @@ involved — pure ridge regression on frozen features.
 
 ## Headline findings
 
-All numbers below are ridge-probe R² (5-fold CV); "best-layer" means the best
-of the 13 checkpoint layers (12 blocks + final norm). Full tables in
-[LINEAR_PROBE.md](LINEAR_PROBE.md); raw numbers in `sweep_results/*.json`.
+`rayleigh_benard` numbers below are from the held-out, multi-seed test
+evaluation (`scripts/workshop_test_eval.py`, 3 independently-trained encoder
+seeds per objective — the paper's citable numbers). `active_matter`/
+`shear_flow` numbers are single-seed. Full tables in
+[LINEAR_PROBE.md](LINEAR_PROBE.md); raw numbers in
+`sweep_results/*_workshop_test_eval.json`.
 
-**1. Contemporaneous physics — JEPA and MAE are close on `active_matter` and
-`shear_flow`, but JEPA clearly ahead on `rayleigh_benard`.** Both objectives
-decode purely local, near-differential quantities at ceiling on every dataset
-(gradients, pressure: R² ≈ 1.0) — a pixel-reconstruction objective directly
-rewards keeping exactly this kind of information. Pooled `vorticity_signed`/
-`divergence` are dropped as targets (mathematically ≈0 on every clip by
-Stokes'/the divergence theorem — not a representational gap, a degenerate
-target; still probed at token level). On `rayleigh_benard`, JEPA is well
-ahead of MAE specifically on the *coupled* quantities:
+**1. Contemporaneous physics on `rayleigh_benard` — close, with a
+quantity-specific split.** Pooled deltas are small (|Δ| ≤ 0.023) — MAE
+fractionally ahead on small-scale/high-frequency quantities, JEPA ahead on
+`buoyancy_grad`:
 
-| quantity | JEPA best-R² | MAE best-R² |
+| quantity | JEPA mean±std | MAE mean±std |
 |---|---|---|
-| `velocity_buoyancy_coherence` | 0.583 | −0.049 |
-| `convective_flux` | 0.835 | 0.576 |
-| `okubo_weiss` | 0.722 | 0.460 |
-| `enstrophy` | 0.686 | 0.455 |
-| `future_enstrophy` | 0.474 | 0.347 |
+| `buoyancy_grad` | 0.965±0.019 | 0.942±0.006 |
+| `convective_flux` | 0.985±0.002 | 0.992±0.001 |
+| `enstrophy` | 0.991±0.002 | 0.996±0.001 |
+| `okubo_weiss` | 0.993±0.000 | 0.996±0.000 |
+| `velocity_buoyancy_coherence` | 0.945±0.002 | 0.954±0.003 |
 
-**2. Regime parameters (Reynolds/Schmidt, Rayleigh/Prandtl, alpha/zeta) —
-roughly matched, MAE slightly ahead in several cases.** Both objectives
-decode the constant per-trajectory regime very well (R² 0.77–0.999 at
-mid-layers), with shuffled-control R² near 0 confirming no train/val leakage.
-This is not where JEPA/MAE differ.
+Purely local, near-differential quantities (`pressure_grad_mag`) are at
+ceiling for both objectives (≥0.997) — a pixel-reconstruction objective
+directly rewards keeping exactly this kind of information.
 
-**3. Noise robustness — MAE is sharper on clean input, JEPA is more robust to
-corruption, and this replicates on held-out data.** At zero injected noise,
-MAE's final-layer R² is higher than JEPA's on all three datasets (e.g.
-`active_matter` 0.874 vs 0.786, mean across quantities). Under heavy Gaussian
-corruption (z-scored std 2.0), MAE collapses on `active_matter` (R² → −1.02)
-and degrades sharply on `rayleigh_benard` (0.943 → 0.646, vs JEPA's 0.933 →
-0.842); the two are close on `shear_flow` (MAE stays fractionally ahead
-throughout — the one dataset with no robustness gap at all). A held-out
-`valid`-split check (encoders never pretrained on these trajectories)
-reproduces and sharpens this: `active_matter`'s MAE `nematic_order` R² is
-−15.4 at *zero* added noise on unseen data. Full detail, including the
-token-level noise sweep and the forecast/skill-score results, in
-[LINEAR_PROBE.md](LINEAR_PROBE.md).
+**2. JEPA's forecast advantage grows with horizon.** At t+32, JEPA leads MAE
+on 6 of 7 pooled quantities (`buoyancy_grad` +0.121±0.012,
+`velocity_buoyancy_coherence` +0.112±0.039), reversing the near-tie (MAE
+fractionally ahead) at t+8. JEPA is the only objective explicitly trained to
+predict *in time*, not just reconstruct the present.
 
-**4. `rayleigh_benard` is the one dataset where JEPA leads on essentially
-every axis** — clean pooled accuracy, depth (needs more layers to reach peak
-but reaches a higher one), noise robustness, token-level nonlinear
-information MAE simply lacks, and forecast skill at longer horizons. On
-`active_matter` and `shear_flow`, clean-data accuracy is a wash or
-MAE-favoring. The likely mechanism: `rayleigh_benard`'s buoyancy and
-`active_matter`'s active stress both feed back directly into the momentum
-equation (two-way coupling), while `shear_flow`'s tracer is passively
-advected (one-way) — see [LINEAR_PROBE.md](LINEAR_PROBE.md)'s Discussion
-section for the full argument and literature connections.
+**3. Regime parameters (Rayleigh, Prandtl) — decoded near-ceiling by both,
+not where JEPA/MAE differ.** R² ≥ 0.99 for both objectives; shuffled-control
+R² near 0 confirms no leakage.
+
+**4. Noise robustness — JEPA is substantially more robust at low-to-moderate
+corruption, though this compresses at extreme noise.** Regenerated this
+session with an improved clean-fit protocol (probe fit once on clean
+features, never recalibrated — the original matched-noise design was
+measuring readout re-adaptation more than representation robustness). At
+σ=0.1, JEPA's Pearson r on `buoyancy_grad` is 0.91 vs MAE's 0.30; the gap
+narrows through σ=0.3–0.5 and at σ=1.0 the two are close or MAE edges ahead
+on a few quantities (`enstrophy`, `okubo_weiss`). Full grid (both R² and
+Pearson r, ridge and MLP) in [LINEAR_PROBE.md](LINEAR_PROBE.md).
+
+**5. `rayleigh_benard` is the paper's headline dataset — the only one with a
+complete 3-seed run at the current architecture.** `active_matter`/
+`shear_flow` show a similar clean-data wash between objectives but their
+current-architecture (192-d predictor) 3-seed JEPA retrain stopped
+incomplete (recurring pod GPU-host fault); see "Status / caveats" below.
 
 ## Status / caveats
 
-- `reports/*.pdf` and `reports/probing_sweep_report.html` predate the current
-  target set and sweep — treat this doc, [LINEAR_PROBE.md](LINEAR_PROBE.md),
-  and `sweep_results/*.json` as the current source of truth, not the PDFs.
-- LR values (JEPA 1e-4, MAE 5e-5) are the result of a completed LR sweep on
-  `active_matter` (see `scripts/gen_configs.py` comment), not placeholders.
-- **Probing-suite expansion: complete.** Physics targets re-derived from each
-  dataset's governing PDE, token-level probing extended to every probe
-  (contemporaneous, regime, forecast), per-token MLP added, noise robustness
-  sweeps all 13 layers (pooled and token) instead of just the final one,
-  persistence-relative skill scoring added to the forecast probe, and a
-  held-out `valid`-split generalization check run against all three
-  datasets. Full detail and current numbers in
-  [LINEAR_PROBE.md](LINEAR_PROBE.md) (contemporaneous/depth/noise/forecast/
-  generalization).
-- **Held-out, multi-seed test evaluation: complete for the three headline
-  analyses (contemporaneous, forecast-content, noise robustness), with a
-  ridge-vs-MLP training-quality audit built in.** `scripts/workshop_test_eval.py`
-  selects each layer on a regime-balanced slice carved out of `train` (the
-  shipped `valid` split was too small/regime-degenerate to use directly),
-  then fits seeded MLPs on `train` and reports mean±std R² on `test`
-  (10/28/50 trajectories for active_matter/shear_flow/rayleigh_benard),
-  never touched until that final step. A broad sanity check (comparing every
-  MLP number against a closed-form ridge fit at the same frozen layer) found
-  the original fixed `weight_decay` let the MLP badly overfit a handful of
-  hard, low-SNR targets — `shear_flow`'s long-horizon forecast for
-  `advective_flux`/`tracer_grad` looked like a real JEPA seed-instability
-  finding but was entirely a training artifact (ridge recovered strong,
-  stable signal there the whole time). Fixed by making `weight_decay` itself
-  adaptively selected per layer (including ridge as a fair candidate in the
-  same held-out comparison) — 273/276 cells now match or beat their own
-  ridge audit value. `rayleigh_benard`'s t+32 forecast shows the cleanest
-  result in the sweep (consistent, low-variance JEPA advantage on every
-  pooled quantity, largest of the three datasets); `shear_flow` shows the
-  same pattern at smaller magnitude, now cleanly instead of unstably;
-  `active_matter`'s MAE noise-collapse reproduces. Full numbers:
+- Figures live in [reports/figures/](../reports/figures/),
+  generated by `scripts/plot_workshop_figures.py` from
+  `sweep_results/*_workshop_test_eval.json` — treat this doc,
+  [LINEAR_PROBE.md](LINEAR_PROBE.md), and those JSON files as the current
+  source of truth.
+- LR is tuned **per (dataset, objective)**, not a single global value — see
+  `configs/tuned_lr.json` (selected via a short mini-sweep on a pilot seed,
+  on held-out validation loss; `scripts/run_lr_minisweep.sh` +
+  `scripts/pick_lr.py`).
+- **Held-out, multi-seed test evaluation: complete for `rayleigh_benard`
+  (3 encoder seeds × {JEPA, MAE}), single-seed for `active_matter`/
+  `shear_flow`.** `scripts/workshop_test_eval.py` selects each layer on a
+  regime-balanced slice carved out of `train` (the shipped `valid` split was
+  too small/regime-degenerate to use directly), then fits seeded MLPs on
+  `train` and reports mean±std R² on `test` (10/28/50 trajectories for
+  active_matter/shear_flow/rayleigh_benard), never touched until that final
+  step. A broad sanity check (comparing every MLP number against a
+  closed-form ridge fit at the same frozen layer) found the original fixed
+  `weight_decay` let the MLP badly overfit a handful of hard, low-SNR
+  targets; fixed by making `weight_decay` itself adaptively selected per
+  layer (including ridge as a fair candidate in the same held-out
+  comparison). Full protocol and numbers:
   [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-multi-seed-test-evaluation-the-reported-numbers).
-- **No held-out validation loss during pretraining, partially mitigated.**
-  `src/train.py` only ever trains on `split="train"` — the training-curve
-  figure above is training loss only, for all 6 runs, so the 100k-step budget
-  can't be directly justified against a held-out objective-loss curve.
-  Intermediate 25/50/75% checkpoints were also deleted in the repo cleanup,
-  so probe performance can't be reconstructed at earlier steps. What *is* now
-  covered: a held-out `valid`-split check (small slice, 4–5 trajectories per
-  dataset — not a full re-validation) reruns the pooled/token/noise-
-  robustness probes against data the encoders never pretrained on at all; see
-  [LINEAR_PROBE.md](LINEAR_PROBE.md#held-out-generalization-check-valid-split).
-  The noise-robustness finding replicates (and sharpens) there, which is
-  reassuring but doesn't by itself rule out the pretraining schedule running
-  past a generalization optimum — that would need an actual val-loss eval
-  loop and retained milestone checkpoints, still not implemented. Revisit if
-  a reviewer pushes on this.
+  `active_matter`/`shear_flow`'s current-architecture (192-d predictor)
+  3-seed JEPA retrain was in progress but stopped incomplete (recurring pod
+  GPU-host fault); their committed checkpoints/numbers predate the
+  384→192-d predictor-narrowing (MAE is unaffected — no predictor).
+- **Held-out validation loss during pretraining: implemented.** `src/train.py`
+  now trains against a trajectory-disjoint validation split carved out of
+  `train` (the shipped `valid` split was too small/degenerate for this too),
+  tracks best-val-loss checkpoint selection independently per objective (JEPA's
+  latent loss and MAE's pixel loss are never compared to each other), and logs
+  per-dimension feature-std collapse diagnostics for both objectives
+  throughout training. Every milestone checkpoint
+  (`encoder_{025,050,075,100}pct.pt` + `encoder_best_val.pt`) is retained per
+  run, not deleted, so probe performance can be reconstructed at any step if
+  needed. This closes the gap noted in earlier revisions of this doc.

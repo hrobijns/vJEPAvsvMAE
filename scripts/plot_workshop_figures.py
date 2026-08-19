@@ -1,5 +1,4 @@
-"""Publication figures 2-4 for the NeurIPS workshop paper (see the plan at
-/Users/hugo/.claude/plans/writing-a-neurips-workshop-harmonic-wilkinson.md).
+"""Publication figures 2-4 for the NeurIPS workshop paper.
 Figure 1 (architecture diagram) is made separately.
 
 This is the "formal sweep" version: all three figures now read exclusively
@@ -50,11 +49,12 @@ probed), for the paper's methods text.
 
 Usage:
     uv run python scripts/plot_workshop_figures.py \
-        --sweep-dir sweep_results --out-dir reports/figures/workshop \
+        --sweep-dir sweep_results --out-dir reports/figures \
         --datasets active_matter shear_flow rayleigh_benard
 """
 
 import argparse
+import json
 from pathlib import Path
 
 import matplotlib
@@ -63,7 +63,16 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plot_probing_suite import _load, layer_labels
+
+def _load(path: Path):
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
+def layer_labels(n_layers: int) -> list[str]:
+    return [f"L{i}" for i in range(n_layers - 1)] + ["norm"]
+
 
 OBJECTIVES = ("jepa", "mae")
 COLORS = {"jepa": "#3b6fd4", "mae": "#d4703b"}
@@ -290,6 +299,272 @@ def plot_variable_time_heatmap(sweep_dir: Path, out_dir: Path, datasets: list[st
     print(f"[var-time-heatmap] wrote fig2_variable_time_heatmap.{{pdf,png}} ({n_ds} datasets x 2 rows)")
 
 
+GREY = "#c8c8c8"
+LOW_SIGNAL_THRESHOLD = 0.15  # both R^2 below this -> neither objective actually decodes it
+HEATMAP_CLIP = 0.2  # color-scale range for delta R^2 -- data is small-magnitude, unlike fig2's +/-1.0
+
+
+def plot_rb_detailed_heatmap(sweep_dir: Path, out_dir: Path, dataset: str = "rayleigh_benard"):
+    """RB-only variant of the variable x time heatmap: each cell shows model
+    A's R^2 (top), the A-B delta in large bold text (middle), and model B's
+    R^2 (bottom), instead of the delta-only + significance-fade design in
+    plot_variable_time_heatmap. Cells where BOTH objectives score below
+    LOW_SIGNAL_THRESHOLD are greyed out -- neither objective actually decodes
+    that (quantity, gap), so the delta between two near-noise numbers isn't a
+    meaningful comparison (explained in the figure caption, not on-figure).
+    Pooled and token panels sit side by side; cells are narrow and tall,
+    sized to just fit the 3-line text stack. Legend is deliberately minimal:
+    a colorbar (concise title only) and one example cell with generic
+    "Model A/B" labels -- no on-figure prose."""
+    data = _load(sweep_dir / f"{dataset}_workshop_test_eval.json")
+    if data is None or "aggregated" not in data:
+        print(f"[rb-detailed-heatmap] skip: missing {dataset}_workshop_test_eval.json "
+              f"or it predates the 'aggregated' section")
+        return
+    agg = data["aggregated"]
+    pooled_c = agg["contemporaneous"]["pooled"]
+    token_c = agg["contemporaneous"]["token"]
+    forecast_pooled = {gap: agg["forecast"][str(gap)]["pooled"] for gap in GAPS}
+    forecast_token = {gap: agg["forecast"][str(gap)]["token"] for gap in GAPS}
+
+    local_rows, coupled_rows = ROW_GROUPS[dataset]["local"], ROW_GROUPS[dataset]["coupled"]
+    pooled_rows = local_rows + coupled_rows
+    token_rows = local_rows + coupled_rows + TOKEN_ONLY_ROWS
+    n_local_p = len(local_rows)
+    n_local_t, n_local_coupled_t = len(local_rows), len(local_rows) + len(coupled_rows)
+
+    def build_grids(rows, contemp_source, forecast_source):
+        jepa_grid = np.full((len(rows), 3), np.nan)
+        mae_grid = np.full((len(rows), 3), np.nan)
+        for i, q in enumerate(rows):
+            ej, em = _entry(contemp_source, q, "jepa"), _entry(contemp_source, q, "mae")
+            if ej is not None:
+                jepa_grid[i, 0] = ej["mean"]
+            if em is not None:
+                mae_grid[i, 0] = em["mean"]
+            for gi, gap in enumerate(GAPS):
+                ej, em = _entry(forecast_source[gap], q, "jepa"), _entry(forecast_source[gap], q, "mae")
+                if ej is not None:
+                    jepa_grid[i, 1 + gi] = ej["mean"]
+                if em is not None:
+                    mae_grid[i, 1 + gi] = em["mean"]
+        return jepa_grid, mae_grid
+
+    pooled_jepa, pooled_mae = build_grids(pooled_rows, pooled_c, forecast_pooled)
+    token_jepa, token_mae = build_grids(token_rows, token_c, forecast_token)
+
+    def draw(ax, rows, jepa_grid, mae_grid, dividers, show_title):
+        delta_grid = jepa_grid - mae_grid
+        both_low = (jepa_grid < LOW_SIGNAL_THRESHOLD) & (mae_grid < LOW_SIGNAL_THRESHOLD)
+        display = np.clip(delta_grid, -HEATMAP_CLIP, HEATMAP_CLIP)
+        ax.imshow(display, aspect="auto", cmap="RdBu", vmin=-HEATMAP_CLIP, vmax=HEATMAP_CLIP)
+        for i in range(delta_grid.shape[0]):
+            for j in range(delta_grid.shape[1]):
+                j_r2, m_r2, d = jepa_grid[i, j], mae_grid[i, j], delta_grid[i, j]
+                if np.isnan(d):
+                    continue
+                if both_low[i, j]:
+                    ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, facecolor=GREY, edgecolor="none", zorder=1))
+                    txt_color = "0.35"
+                else:
+                    txt_color = "white" if abs(d) > 0.6 * HEATMAP_CLIP else "black"
+                clipped = abs(d) > HEATMAP_CLIP
+                d_label = f"{d:+.2f}" + ("*" if clipped else "")
+                ax.text(j, i - 0.29, f"{j_r2:.2f}", ha="center", va="center", fontsize=7.5, color=txt_color, zorder=2)
+                ax.text(j, i, d_label, ha="center", va="center", fontsize=10.5, fontweight="bold", color=txt_color, zorder=2)
+                ax.text(j, i + 0.29, f"{m_r2:.2f}", ha="center", va="center", fontsize=7.5, color=txt_color, zorder=2)
+        ax.set_xticks(range(3))
+        ax.set_xticklabels(["t+0", "t+8", "t+32"], fontsize=10, fontweight="bold")
+        ax.xaxis.tick_top()
+        ax.set_yticks(range(len(rows)))
+        ax.set_yticklabels([_nice_quantity(r) for r in rows], fontsize=10)
+        ax.set_xlim(-0.5, 2.5)
+        ax.set_ylim(len(rows) - 0.5, -0.5)
+        for boundary in dividers:
+            if 0 < boundary < len(rows):
+                ax.axhline(boundary - 0.5, color="0.3", lw=1.0)
+        if show_title:
+            ax.set_title(_nice_dataset(dataset), fontsize=13, pad=10)
+
+    # Explicit inch-based layout so cells stay narrow+tall (just fitting the
+    # 3-line text stack) regardless of matplotlib's default axes sizing, and
+    # so the pooled/token panels (different row counts) sit side by side
+    # top-aligned with visually matched cell size.
+    CELL_W_IN, CELL_H_IN = 0.62, 0.60
+    LABEL_W_IN, PANEL_GAP_IN = 1.75, 0.55
+    LEFT_MARGIN_IN, RIGHT_MARGIN_IN = 0.1, 0.1
+    TOP_MARGIN_IN, LEGEND_H_IN, BOTTOM_MARGIN_IN = 0.85, 1.15, 0.1
+
+    pooled_w_in = LABEL_W_IN + 3 * CELL_W_IN
+    token_w_in = LABEL_W_IN + 3 * CELL_W_IN
+    pooled_h_in = len(pooled_rows) * CELL_H_IN
+    token_h_in = len(token_rows) * CELL_H_IN
+    grid_h_in = max(pooled_h_in, token_h_in)
+
+    fig_w_in = LEFT_MARGIN_IN + pooled_w_in + PANEL_GAP_IN + token_w_in + RIGHT_MARGIN_IN
+    fig_h_in = TOP_MARGIN_IN + grid_h_in + LEGEND_H_IN + BOTTOM_MARGIN_IN
+    fig = plt.figure(figsize=(fig_w_in, fig_h_in))
+
+    grid_w_in = 3 * CELL_W_IN
+    top_y_in = fig_h_in - TOP_MARGIN_IN
+    pooled_grid_left_in = LEFT_MARGIN_IN + LABEL_W_IN
+    ax_pooled = fig.add_axes((pooled_grid_left_in / fig_w_in, (top_y_in - pooled_h_in) / fig_h_in,
+                               grid_w_in / fig_w_in, pooled_h_in / fig_h_in))
+    token_grid_left_in = LEFT_MARGIN_IN + pooled_w_in + PANEL_GAP_IN + LABEL_W_IN
+    ax_token = fig.add_axes((token_grid_left_in / fig_w_in, (top_y_in - token_h_in) / fig_h_in,
+                              grid_w_in / fig_w_in, token_h_in / fig_h_in))
+
+    draw(ax_pooled, pooled_rows, pooled_jepa, pooled_mae, (n_local_p,), False)
+    draw(ax_token, token_rows, token_jepa, token_mae, (n_local_t, n_local_coupled_t), False)
+    ax_pooled.text(0, 1.0 + 0.5 / max(len(pooled_rows), 1), "POOLED", transform=ax_pooled.transAxes,
+                    fontsize=10, fontweight="bold", ha="left", va="bottom")
+    ax_token.text(0, 1.0 + 0.5 / max(len(token_rows), 1), "TOKEN", transform=ax_token.transAxes,
+                   fontsize=10, fontweight="bold", ha="left", va="bottom")
+    fig.text(0.5, 1 - 0.06, _nice_dataset(dataset), fontsize=14, ha="center", va="top")
+
+    # Legend: colorbar (concise title, normalized to +/-HEATMAP_CLIP) + one
+    # example cell with generic Model A/B labels -- no other on-figure text.
+    legend_bottom_in = BOTTOM_MARGIN_IN
+    cbar_w_in, cbar_h_in = 1.9, 0.22
+    cbar_left_in = LEFT_MARGIN_IN + 0.1
+    cbar_ax = fig.add_axes((cbar_left_in / fig_w_in, (legend_bottom_in + 0.35) / fig_h_in,
+                             cbar_w_in / fig_w_in, cbar_h_in / fig_h_in))
+    sm = plt.cm.ScalarMappable(cmap="RdBu", norm=plt.Normalize(vmin=-HEATMAP_CLIP, vmax=HEATMAP_CLIP))
+    cbar = fig.colorbar(sm, cax=cbar_ax, orientation="horizontal")
+    cbar.set_label(r"$\Delta R^2$", fontsize=10)
+    cbar.ax.tick_params(labelsize=8)
+
+    key_w_in, key_h_in = 0.9, 0.9
+    key_left_in = cbar_left_in + cbar_w_in + 0.9
+    key_ax = fig.add_axes((key_left_in / fig_w_in, legend_bottom_in / fig_h_in,
+                            key_w_in / fig_w_in, key_h_in / fig_h_in))
+    key_ax.set_xlim(0, 1)
+    key_ax.set_ylim(0, 1)
+    key_ax.axis("off")
+    key_ax.imshow([[0.06]], extent=(0, 1, 0, 1), aspect="auto", cmap="RdBu",
+                   vmin=-HEATMAP_CLIP, vmax=HEATMAP_CLIP, zorder=1)
+    key_ax.text(0.5, 0.78, "Model A $R^2$", ha="center", va="center", fontsize=7, zorder=2)
+    key_ax.text(0.5, 0.5, r"$\Delta R^2$", ha="center", va="center", fontsize=10.5, fontweight="bold", zorder=2)
+    key_ax.text(0.5, 0.22, "Model B $R^2$", ha="center", va="center", fontsize=7, zorder=2)
+    key_ax.add_patch(plt.Rectangle((0, 0), 1, 1, facecolor="none", edgecolor="0.3", lw=0.8, zorder=3, transform=key_ax.transAxes))
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / "fig2_rb_detailed_heatmap.pdf", dpi=200)
+    fig.savefig(out_dir / "fig2_rb_detailed_heatmap.png", dpi=200)
+    plt.close(fig)
+    print("[rb-detailed-heatmap] wrote fig2_rb_detailed_heatmap.{pdf,png}")
+
+
+def plot_rb_depth_story(sweep_dir: Path, out_dir: Path, dataset: str = "rayleigh_benard",
+                          gap: int = 32, highlight_quantity: str = "buoyancy_grad"):
+    """Two-panel JEPA-advantage-vs-depth story for the forecast (t+{gap})
+    family, where the biggest, most consistent JEPA lead lives (see
+    LINEAR_PROBE.md's forecast-content section). Left: mean R^2-vs-layer
+    curve averaged across every pooled forecast quantity -- JEPA leads at
+    every layer. Right: `highlight_quantity` alone (default buoyancy_grad,
+    chosen by inspecting every quantity's delta-vs-layer curve for the
+    cleanest near-monotonic growth in JEPA's advantage with depth, not just
+    the largest peak) -- the same pattern, much more pronounced: JEPA keeps
+    climbing through mid-depth while MAE plateaus early."""
+    data = _load(sweep_dir / f"{dataset}_workshop_test_eval.json")
+    if data is None or "aggregated" not in data:
+        print(f"[rb-depth-story] skip: missing {dataset}_workshop_test_eval.json "
+              f"or it predates the 'aggregated' section")
+        return
+    fc = data["aggregated"]["forecast"][str(gap)]["pooled"]
+    qs = [q for q in fc if "jepa" in fc[q] and "mae" in fc[q]]
+    n_layers = len(fc[qs[0]]["jepa"]["mean_valid_r2_curve"])
+    x = np.arange(n_layers)
+
+    jepa_all = np.array([fc[q]["jepa"]["mean_valid_r2_curve"] for q in qs])
+    mae_all = np.array([fc[q]["mae"]["mean_valid_r2_curve"] for q in qs])
+    jepa_avg, mae_avg = jepa_all.mean(0), mae_all.mean(0)
+
+    jepa_hl = np.array(fc[highlight_quantity]["jepa"]["mean_valid_r2_curve"])
+    mae_hl = np.array(fc[highlight_quantity]["mae"]["mean_valid_r2_curve"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.0), sharex=True)
+
+    def panel(ax, jepa_y, mae_y, title):
+        ax.fill_between(x, jepa_y, mae_y, where=jepa_y >= mae_y, color=COLORS["jepa"], alpha=0.12, zorder=0)
+        ax.plot(x, jepa_y, color=COLORS["jepa"], lw=2.6, marker="o", ms=5, label="JEPA", zorder=2)
+        ax.plot(x, mae_y, color=COLORS["mae"], lw=2.6, marker="o", ms=5, label="MAE", zorder=2)
+        ax.set_xticks(x)
+        ax.set_xticklabels(layer_labels(n_layers), fontsize=8.5, rotation=90)
+        ax.set_xlabel("Encoder layer", fontsize=11)
+        ax.set_title(title, fontsize=12)
+        ax.tick_params(axis="y", labelsize=10)
+        ax.grid(axis="y", color="0.9", lw=0.6, zorder=-1)
+
+    panel(axes[0], jepa_avg, mae_avg, f"All {len(qs)} quantities (mean), t+{gap}")
+    panel(axes[1], jepa_hl, mae_hl, f"{_nice_quantity(highlight_quantity)}, t+{gap}")
+    axes[0].set_ylabel(r"$R^2$", fontsize=12)
+    axes[0].legend(fontsize=10, loc="lower right")
+    fig.suptitle(f"{_nice_dataset(dataset)}: JEPA's forecast advantage vs. encoder depth", fontsize=13)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / "fig3_rb_depth_story.pdf", dpi=200, bbox_inches="tight")
+    fig.savefig(out_dir / "fig3_rb_depth_story.png", dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print("[rb-depth-story] wrote fig3_rb_depth_story.{pdf,png}")
+
+
+def plot_rb_noise_story(sweep_dir: Path, out_dir: Path, dataset: str = "rayleigh_benard"):
+    """Small-multiples noise-robustness plot, RB only: one subplot per
+    quantity (JEPA vs MAE, Pearson r vs. noise std, +/- encoder-seed std
+    band), rather than a single averaged curve -- the per-quantity texture
+    is the actual finding here (JEPA's robustness edge is large on the
+    differential quantities at low-to-moderate noise, but compresses or
+    reverses at extreme noise on a few others; averaging would wash that
+    out). Uses Pearson r, not R^2 -- R^2 goes arbitrarily negative under the
+    clean-fit protocol's distribution shift and isn't comparable once deeply
+    negative, while Pearson r stays interpretable throughout."""
+    data = _load(sweep_dir / f"{dataset}_workshop_test_eval.json")
+    if data is None or "aggregated" not in data or "noise_robustness" not in data["aggregated"]:
+        print(f"[rb-noise-story] skip: missing {dataset}_workshop_test_eval.json "
+              f"or its 'aggregated.noise_robustness' section")
+        return
+    nr = data["aggregated"]["noise_robustness"]
+    noise_stds = data["noise_stds"]
+    qs = sorted(q for q in nr if "jepa" in nr[q] and "mae" in nr[q])
+
+    n_cols = 4
+    n_rows = -(-len(qs) // n_cols)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3.1 * n_cols, 2.7 * n_rows), sharex=True, sharey=True)
+    axes = axes.flatten()
+
+    for ax, q in zip(axes, qs):
+        for obj in OBJECTIVES:
+            mean = np.array([nr[q][obj][str(s)]["ridge_pearson_r_mean"] for s in noise_stds])
+            std = np.array([nr[q][obj][str(s)]["ridge_pearson_r_std"] for s in noise_stds])
+            ax.plot(noise_stds, mean, color=COLORS[obj], lw=2.2, marker="o", ms=4, label=obj.upper(), zorder=2)
+            ax.fill_between(noise_stds, mean - std, mean + std, color=COLORS[obj], alpha=0.15, zorder=1)
+        ax.set_title(_nice_quantity(q), fontsize=11)
+        ax.set_xscale("symlog", linthresh=0.05)
+        ax.set_xticks(noise_stds)
+        ax.set_xticklabels([str(s) for s in noise_stds], fontsize=7, rotation=45)
+        ax.tick_params(axis="y", labelsize=9)
+        ax.grid(axis="y", color="0.9", lw=0.6, zorder=0)
+    for ax in axes[len(qs):]:
+        ax.axis("off")
+
+    axes[0].set_ylim(-0.05, 1.05)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, fontsize=11, loc="lower right",
+               bbox_to_anchor=(0.98, 0.02) if len(qs) < len(axes) else (0.5, -0.02),
+               ncol=1 if len(qs) < len(axes) else 2)
+    for row in range(n_rows):
+        axes[row * n_cols].set_ylabel("Pearson $r$", fontsize=10)
+    fig.text(0.5, 0.0, r"Input noise $\sigma$ (z-scored units)", ha="center", fontsize=11)
+    fig.suptitle(f"{_nice_dataset(dataset)}: noise robustness, clean-fit protocol (ridge, mean $\\pm$ encoder-seed std)", fontsize=12.5)
+    fig.tight_layout(rect=(0.01, 0.03, 1, 0.94))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / "fig4_rb_noise_story.pdf", dpi=200, bbox_inches="tight")
+    fig.savefig(out_dir / "fig4_rb_noise_story.png", dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print("[rb-noise-story] wrote fig4_rb_noise_story.{pdf,png}")
+
+
 def _depth_or_noise_panel(ax, x_vals, jepa_curves, mae_curves, xlabel, xscale=None):
     """jepa_curves/mae_curves: dict[quantity] -> list[R^2] aligned to x_vals.
     Plots only the across-variable mean curve for each objective (no
@@ -362,12 +637,26 @@ def plot_noise_curves(sweep_dir: Path, out_dir: Path, datasets: list[str]):
             continue
         noise_stds = data["noise_stds"]
         quantities = sorted(q for q in nr if "jepa" in nr[q] and "mae" in nr[q])
+        # Two schemas coexist across datasets: rayleigh_benard was regenerated
+        # this session with the clean-fit/no-refit ridge+MLP noise protocol
+        # (per-std dict has "ridge_r2_mean"; frozen_layer lives in the raw
+        # per-checkpoint section, same layer reused across every noise level).
+        # active_matter/shear_flow still carry the older matched-noise
+        # protocol (per-std dict has "mean" and "frozen_layers" directly).
+        std0 = str(noise_stds[0])
+        new_schema = quantities and "ridge_r2_mean" in nr[quantities[0]]["jepa"][std0]
+        nr_raw = data.get("noise_robustness", {})
         for q in quantities:
-            frozen_records.append((dataset, q, "jepa", "pooled", nr[q]["jepa"][str(noise_stds[0])]["frozen_layers"]))
-            frozen_records.append((dataset, q, "mae", "pooled", nr[q]["mae"][str(noise_stds[0])]["frozen_layers"]))
+            for obj in ("jepa", "mae"):
+                if new_schema:
+                    layers = [nr_raw[ckpt][q]["frozen_layer"] for ckpt in nr_raw if obj in ckpt and q in nr_raw[ckpt]]
+                else:
+                    layers = nr[q][obj][std0]["frozen_layers"]
+                frozen_records.append((dataset, q, obj, "pooled", layers))
 
-        jepa_curves = {q: [nr[q]["jepa"][str(s)]["mean"] for s in noise_stds] for q in quantities}
-        mae_curves = {q: [nr[q]["mae"][str(s)]["mean"] for s in noise_stds] for q in quantities}
+        value_key = "ridge_r2_mean" if new_schema else "mean"
+        jepa_curves = {q: [nr[q]["jepa"][str(s)][value_key] for s in noise_stds] for q in quantities}
+        mae_curves = {q: [nr[q]["mae"][str(s)][value_key] for s in noise_stds] for q in quantities}
         panels.append((dataset, noise_stds, jepa_curves, mae_curves))
 
     _write_frozen_layers(out_dir, frozen_records, filename="frozen_layers_noise.txt")
@@ -397,7 +686,7 @@ def plot_noise_curves(sweep_dir: Path, out_dir: Path, datasets: list[str]):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sweep-dir", default="sweep_results")
-    ap.add_argument("--out-dir", default="reports/figures/workshop")
+    ap.add_argument("--out-dir", default="reports/figures")
     ap.add_argument("--datasets", nargs="+", default=["active_matter", "shear_flow", "rayleigh_benard"])
     args = ap.parse_args()
 
@@ -405,6 +694,10 @@ def main():
     plot_variable_time_heatmap(sweep_dir, out_dir, args.datasets)
     plot_depth_curves(sweep_dir, out_dir, args.datasets)
     plot_noise_curves(sweep_dir, out_dir, args.datasets)
+    if "rayleigh_benard" in args.datasets:
+        plot_rb_detailed_heatmap(sweep_dir, out_dir)
+        plot_rb_depth_story(sweep_dir, out_dir)
+        plot_rb_noise_story(sweep_dir, out_dir)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ wheels/
 runs/
 wandb/
 *.pt
-!checkpoints/*.pt
+!checkpoints/**/*.pt
 local_data/
 local_runs/
 local_analysis*.json

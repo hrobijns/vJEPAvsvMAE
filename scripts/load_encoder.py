@@ -1,7 +1,7 @@
 """Load one of the pretrained encoders and sanity-check it with a forward pass.
 
 Usage:
-    uv run python scripts/load_encoder.py checkpoints/active_matter_jepa.pt
+    uv run python scripts/load_encoder.py checkpoints/old/active_matter_jepa.pt
 """
 
 import argparse
