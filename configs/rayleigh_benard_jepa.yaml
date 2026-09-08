@@ -7,12 +7,13 @@ log_every: 50
 save_every: 1000
 img_every: 5000
 data:
-  base_path: /workspace/data
+  base_path: local_data
   dataset_name: rayleigh_benard
   n_frames: 8
   num_workers: 2
   memmap: true
   valid_stride: 8
+  frame_limit: 101
 val_every: 2000
 encoder:
   patch_t: 2

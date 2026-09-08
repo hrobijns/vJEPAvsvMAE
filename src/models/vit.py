@@ -6,8 +6,6 @@ visible subset of tokens (context/MAE-style) or on all tokens (JEPA target
 encoder).
 """
 
-import math
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

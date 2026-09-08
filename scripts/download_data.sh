@@ -1,28 +1,11 @@
 #!/usr/bin/env bash
-# Download the three experiment datasets (train + valid splits by default,
-# ~525 GB total; ~260 GB for train only).
-# Usage: bash scripts/download_data.sh /workspace/data ["train valid"|"train"]
-#
-# The probing suite (scripts/analyze_*.py etc.) only ever reads the
-# train split (src/train.py does too — valid is unused end-to-end, see
-# docs/OVERVIEW.md's "No held-out validation loss" caveat), so pass "train"
-# to roughly halve the download if you're not planning to add a validation
-# eval loop.
+# Usage: bash scripts/download_data.sh DATA_ROOT DATASET ["train valid test"]
 set -euo pipefail
-
-BASE_PATH="${1:?usage: download_data.sh <base_path> [splits]}"
-SPLITS="${2:-train valid}"
-
-# --no-parallel is only needed on hosts with curl < 7.66 (some cluster login
-# nodes); check `curl --version` and drop it below if this host has a newer one.
-PARALLEL_FLAG="--no-parallel"
-
-for dataset in active_matter shear_flow rayleigh_benard; do
-    for split in $SPLITS; do
-        echo "=== downloading $dataset/$split ==="
-        uv run the-well-download --base-path "$BASE_PATH" --dataset "$dataset" --split "$split" $PARALLEL_FLAG
-    done
+base_path="${1:?provide a data root}"
+dataset="${2:?provide rayleigh_benard, active_matter, or shear_flow}"
+splits="${3:-train valid test}"
+case "$dataset" in rayleigh_benard|active_matter|shear_flow) ;; *) echo "unsupported dataset: $dataset" >&2; exit 1;; esac
+for split in $splits; do
+    case "$split" in train|valid|test) ;; *) echo "unsupported split: $split" >&2; exit 1;; esac
+    uv run --locked the-well-download --base-path "$base_path" --dataset "$dataset" --split "$split"
 done
-
-echo "done. disk usage:"
-du -sh "$BASE_PATH"/datasets/*

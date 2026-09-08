@@ -1,141 +1,177 @@
-"""Wrapper around the_well's WellDataset producing (C, T, H, W) clips.
-
-Both objectives (JEPA / MAE) consume identical clips: T consecutive timesteps
-of all physical fields at native resolution, z-score normalized per channel
-using The Well's precomputed stats.
-"""
+"""Trajectory-disjoint training clips from HDF5 or normalized full-rollout caches."""
 
 from dataclasses import dataclass
+from functools import lru_cache
+import json
 from pathlib import Path
 
 import numpy as np
 import torch
-from the_well.data import WellDataset
-from the_well.data.normalization import ZScoreNormalization
+
+from src.data.source import WellSource, normalize
+from src.evaluation.artifacts import canonical_hash, sha256_file
+
+MEMMAP_SCHEMA = "well-training-cache-1"
 
 
 @dataclass
 class ClipSpec:
-    """Shape metadata inferred from the dataset, needed to build the models."""
-
     n_channels: int
     n_frames: int
     height: int
     width: int
 
 
-class WellClipDataset(torch.utils.data.Dataset):
-    """Yields dicts with key "clip": float32 tensor of shape (C, T, H, W)."""
+def train_valid_trajectory_split(n_traj, valid_stride=8):
+    """Internal pretraining validation; official valid/test remain for probes."""
+    if n_traj < 2 or valid_stride < 2:
+        raise ValueError("need at least two trajectories and stride >= 2")
+    valid = list(range(0, n_traj, valid_stride))
+    held = set(valid)
+    return [i for i in range(n_traj) if i not in held], valid
 
+
+def _windows(records, trajectories, n_frames, frame_limit):
+    if n_frames < 1 or (frame_limit is not None and frame_limit < n_frames):
+        raise ValueError("invalid frame limit")
+    ids = list(range(len(records))) if trajectories is None else list(trajectories)
+    if (
+        not ids
+        or len(set(ids)) != len(ids)
+        or any(i < 0 or i >= len(records) for i in ids)
+    ):
+        raise ValueError("invalid or duplicate trajectory selection")
+    counts = [
+        (r["frames"] if frame_limit is None else min(r["frames"], frame_limit))
+        - n_frames
+        + 1
+        for r in (records[i] for i in ids)
+    ]
+    if min(counts) < 1:
+        raise ValueError("a trajectory is shorter than a clip")
+    return ids, np.cumsum([0, *counts])
+
+
+class _ClipDataset(torch.utils.data.Dataset):
+    def __len__(self):
+        return int(self.offsets[-1])
+
+    def window(self, index):
+        if not 0 <= index < len(self):
+            raise IndexError(index)
+        local = int(np.searchsorted(self.offsets, index, side="right") - 1)
+        return self.traj_ids[local], int(index - self.offsets[local])
+
+
+class WellClipDataset(_ClipDataset):
     def __init__(
         self,
-        base_path: str,
-        dataset_name: str,
-        split: str = "train",
-        n_frames: int = 8,
+        base_path,
+        dataset_name,
+        split="train",
+        n_frames=8,
+        trajectories=None,
+        frame_limit=101,
     ):
-        # the-well-download writes to <base>/datasets/<name>/, but WellDataset
-        # joins base/name directly; accept either layout.
-        if not str(base_path).startswith("hf://"):
-            nested = Path(base_path) / "datasets"
-            if (nested / dataset_name).is_dir():
-                base_path = str(nested)
-        self.inner = WellDataset(
-            well_base_path=base_path,
-            well_dataset_name=dataset_name,
-            well_split_name=split,
-            n_steps_input=n_frames,
-            n_steps_output=0,
-            use_normalization=True,
-            normalization_type=ZScoreNormalization,
-            flatten_tensors=True,
-            return_grid=False,
-            boundary_return_type=None,
+        self.source = WellSource(base_path, dataset_name, split, n_frames)
+        self.records = self.source.records
+        self.traj_ids, self.offsets = _windows(
+            self.records, trajectories, n_frames, frame_limit
         )
-        self.n_frames = n_frames
+        self.n_traj = len(self.records)
+        self.identity = self.source.identity
+        self.spec = ClipSpec(len(self.source.channels), n_frames, *self.source.shape)
 
-    def __len__(self) -> int:
-        return len(self.inner)
-
-    def __getitem__(self, idx: int) -> dict:
-        sample = self.inner[idx]
-        fields = sample["input_fields"]  # (T, H, W, C)
-        clip = fields.permute(3, 0, 1, 2).contiguous().float()  # (C, T, H, W)
+    def __getitem__(self, index):
+        trajectory, start = self.window(index)
+        # Match the training cache's fp16 storage precision on either backend.
+        clip = normalize(
+            self.source.clip(trajectory, start), self.source.means, self.source.stds
+        ).half()
         return {"clip": clip}
 
-    @property
-    def spec(self) -> ClipSpec:
-        clip = self[0]["clip"]
-        c, t, h, w = clip.shape
-        return ClipSpec(n_channels=c, n_frames=t, height=h, width=w)
+
+@lru_cache(maxsize=8)
+def _checked_array(path, size, mtime_ns, expected):
+    if sha256_file(path) != expected:
+        raise ValueError(f"training cache content hash mismatch: {path}")
 
 
-def train_valid_trajectory_split(n_traj: int, valid_stride: int = 8) -> tuple[list, list]:
-    """Carve a trajectory-disjoint pseudo-valid set out of train (the Well's
-    shipped `valid` split is too small/regime-degenerate to use directly for
-    checkpoint selection — see docs/OVERVIEW.md). Every valid_stride-th
-    trajectory index goes to `valid`, the rest to `fit` — interleaved, not a
-    contiguous prefix/suffix, so both halves draw proportionally from every
-    regime file's contiguous index block (preprocess_memmap.py lays
-    trajectories out in contiguous per-source-file blocks).
-
-    Note this split is trajectory-disjoint, not regime-disjoint: `valid`
-    trajectories can come from the same regime/source file as `fit`
-    trajectories, just a different simulation run. It's a weaker
-    generalization test than the official, regime-balanced `test` split —
-    good enough for checkpoint/hyperparameter selection, not for claims about
-    generalization to unseen physical regimes.
-    """
-    valid_idx = list(range(0, n_traj, valid_stride))
-    valid_set = set(valid_idx)
-    fit_idx = [i for i in range(n_traj) if i not in valid_set]
-    return fit_idx, valid_idx
-
-
-class MemmapClipDataset(torch.utils.data.Dataset):
-    """Fast clip dataset over a memmap produced by scripts/preprocess_memmap.py.
-
-    File layout: float32 .npy of shape (n_traj, C, T, H, W), already normalized
-    (channels-first so a clip is a near-contiguous slice copy needing no
-    transpose — ~ms instead of the ~0.5 s per item that WellDataset's per-item
-    pipeline costs). Window set (stride-1 windows per trajectory) matches
-    WellDataset's. A .meta.json sidecar guards against stale old-layout files.
-    """
-
+class MemmapClipDataset(_ClipDataset):
     def __init__(
         self,
-        base_path: str,
-        dataset_name: str,
-        split: str,
-        n_frames: int = 8,
-        trajectories: list | None = None,
+        base_path,
+        dataset_name,
+        split,
+        n_frames=8,
+        trajectories=None,
+        frame_limit=101,
     ):
-        d = Path(base_path) / "memmap" / dataset_name
-        self.path = d / f"{split}.npy"
-        meta = d / f"{split}.meta.json"
-        if not self.path.exists() or not meta.exists():
-            raise FileNotFoundError(
-                f"{self.path} (+ meta) missing — run scripts/preprocess_memmap.py first"
+        directory = Path(base_path).expanduser() / "memmap" / dataset_name
+        self.path = directory / f"{split}.npy"
+        meta_path = directory / f"{split}.meta.json"
+        meta = json.loads(meta_path.read_text())
+        claim = meta.get("sha256")
+        body = {k: v for k, v in meta.items() if k != "sha256"}
+        if canonical_hash(body) != claim or meta.get("schema") != MEMMAP_SCHEMA:
+            raise ValueError(
+                "invalid training cache metadata; regenerate with python -m src.data.preprocess"
             )
-        if '"NCTHW"' not in meta.read_text():
-            raise ValueError(f"{self.path} has stale layout — re-run preprocessing")
-        self.mm = np.load(self.path, mmap_mode="r")
+        if (
+            meta.get("dataset") != dataset_name
+            or meta.get("split") != split
+            or meta.get("layout") != "NCTHW"
+            or meta.get("dtype") != "float16"
+            or meta.get("normalization") != "the_well_zscore"
+            or not meta.get("complete")
+        ):
+            raise ValueError("incompatible or incomplete training cache")
+        self.mm = np.load(self.path, mmap_mode="r", allow_pickle=False)
+        if (
+            self.mm.ndim != 5
+            or self.mm.dtype != np.float16
+            or list(self.mm.shape) != meta["shape"]
+        ):
+            raise ValueError("training cache shape/dtype mismatch")
+        self.records = meta["source"]["trajectories"]
+        n, c, t, h, w = self.mm.shape
+        if (
+            len(self.records) != n
+            or len(meta["source"]["channels"]) != c
+            or meta["source"]["shape"] != [h, w]
+            or any(r["frames"] != t for r in self.records)
+        ):
+            raise ValueError("training cache truncation or source metadata mismatch")
+        if canonical_hash(meta["source"]) != meta["source_identity"]:
+            raise ValueError("training cache source identity mismatch")
+        stats = meta["source"]["normalization"]
+        if (
+            len(stats["means"]) != c
+            or len(stats["stds"]) != c
+            or not np.isfinite(stats["means"]).all()
+            or not np.isfinite(stats["stds"]).all()
+            or min(stats["stds"]) <= 0
+        ):
+            raise ValueError("invalid training cache normalization")
+        stat = self.path.stat()
+        _checked_array(
+            str(self.path.resolve()),
+            stat.st_size,
+            stat.st_mtime_ns,
+            meta["array_sha256"],
+        )
+        self.traj_ids, self.offsets = _windows(
+            self.records, trajectories, n_frames, frame_limit
+        )
         self.n_frames = n_frames
-        n_traj, _, t, _, _ = self.mm.shape
-        self.traj_ids = trajectories if trajectories is not None else list(range(n_traj))
-        self.windows_per_traj = t - n_frames + 1
-        self.length = len(self.traj_ids) * self.windows_per_traj
+        self.n_traj = n
+        self.identity = meta["source_identity"]
+        self.spec = ClipSpec(c, n_frames, h, w)
 
-    def __len__(self) -> int:
-        return self.length
-
-    def __getitem__(self, idx: int) -> dict:
-        local_traj, off = divmod(idx, self.windows_per_traj)
-        traj = self.traj_ids[local_traj]
-        window = np.array(self.mm[traj, :, off : off + self.n_frames])  # (C,T,H,W)
-        return {"clip": torch.from_numpy(window)}
-
-    @property
-    def spec(self) -> ClipSpec:
-        _, c, _, h, w = self.mm.shape
-        return ClipSpec(n_channels=c, n_frames=self.n_frames, height=h, width=w)
+    def __getitem__(self, index):
+        trajectory, start = self.window(index)
+        return {
+            "clip": torch.from_numpy(
+                np.array(self.mm[trajectory, :, start : start + self.n_frames])
+            )
+        }

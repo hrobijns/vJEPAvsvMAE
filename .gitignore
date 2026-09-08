@@ -21,7 +21,8 @@ analysis_*.json
 pod_logs/
 .DS_Store
 
-# Corrected Rayleigh--Benard analysis outputs
+# Generated analysis outputs
+/outputs/
 /sweep_results/
 
 # Reference materials

@@ -2,10 +2,10 @@
 
 Usage:
     python -m src.train --config configs/active_matter_jepa.yaml
-    python -m src.train --config configs/debug_mae.yaml --data-root ~/well_data
+    python -m src.train --config configs/rayleigh_benard_mae.yaml --data-root ~/well_data
 
-Everything except the `objective` section of the config is shared between the
-JEPA and MAE runs of a pair.
+The encoders and data pipeline are shared; objective heads and learning rates
+are configured separately.
 """
 
 import argparse
@@ -13,7 +13,6 @@ import json
 import math
 import os
 import random
-import shutil
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -22,42 +21,61 @@ import numpy as np
 import torch
 import yaml
 
-# DataLoader workers pass tensors back to the main process via /dev/shm by
-# default -- with the training data itself also served from /dev/shm (for
-# throughput, see src/data/well.py), and several concurrent training
-# processes each running many workers, that default strategy exhausts shm
-# ("unable to allocate shared memory... Resource temporarily unavailable").
-# file_system sharing uses regular temp files instead, sidestepping it.
-torch.multiprocessing.set_sharing_strategy("file_system")
-
-from src.data.well import ClipSpec, MemmapClipDataset, WellClipDataset, train_valid_trajectory_split
+from src.data.well import (
+    ClipSpec,
+    MemmapClipDataset,
+    WellClipDataset,
+    train_valid_trajectory_split,
+)
 from src.models.vit import build_encoder
 from src.objectives.jepa import JEPAModel
 from src.objectives.mae import MAEModel
+from src.evaluation.artifacts import canonical_hash
 
 MILESTONE_FRACS = (0.25, 0.5, 0.75, 1.0)
 
 
+def training_identity(config, dataset, fit_indices, valid_indices):
+    """Bind resume to data, sampling, architecture, and optimization settings."""
+    return canonical_hash(
+        {
+            "source": dataset.identity,
+            "fit": fit_indices,
+            "valid": valid_indices,
+            "sampling": {
+                key: config["data"].get(key)
+                for key in ("n_frames", "frame_limit", "valid_stride")
+            },
+            "objective_name": config["objective_name"],
+            "objective": config["objective"],
+            "encoder": config["encoder"],
+            "optim": config["optim"],
+            "seed": config["seed"],
+            "bf16": config.get("bf16", True),
+        }
+    )
+
+
+def validate_resume(checkpoint, identity):
+    if checkpoint.get("training_identity") != identity:
+        raise ValueError(
+            "checkpoint data/configuration differs or lacks resume identity; use a new run directory"
+        )
+
+
 def retry_io(fn, *args, retries=15, delay=3.0, max_delay=60.0, **kwargs):
-    """The network filesystem backing /workspace has shown transient write
-    failures (observed: "Disk quota Exceeded" that cleared on the very next
-    retry, and sustained "[Errno 5] Input/output error" spells lasting well
-    past a minute) severe enough to raise an uncaught OSError and kill the
-    whole process -- expensive given runs take hours, and especially costly
-    during unattended stretches with no one to notice and relaunch a dead
-    run. Retry checkpoint/log writes with exponential backoff (capped) before
-    giving up for real; the original flat 8-retries/3s (24s total) budget
-    survived brief blips but not the sustained multi-minute ones observed in
-    practice -- 15 attempts with a 60s cap totals ~12.5 minutes, long enough
-    to ride out those without hanging indefinitely on a truly dead mount."""
+    """Retry transient filesystem failures with bounded exponential backoff."""
     for attempt in range(retries):
         try:
             return fn(*args, **kwargs)
         except OSError as e:
             if attempt == retries - 1:
                 raise
-            print(f"WARNING: transient I/O error ({e}), retrying in {delay}s "
-                  f"(attempt {attempt+1}/{retries})", flush=True)
+            print(
+                f"WARNING: transient I/O error ({e}), retrying in {delay}s "
+                f"(attempt {attempt + 1}/{retries})",
+                flush=True,
+            )
             time.sleep(delay)
             delay = min(delay * 2, max_delay)
 
@@ -66,13 +84,7 @@ def set_seed(seed: int):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    # cudnn.deterministic=True was tried for tighter multi-seed reproducibility
-    # but cost a ~4x throughput hit on A40 (measured: 15 vs 117 clips/s at
-    # steady state) — not worth it against a hard wall-clock budget, and it
-    # was only ever a "reduces, doesn't eliminate" nicety on top of the seed
-    # itself, not part of the actual training recipe (steps/LR/batch/seed are
-    # what's held identical across the comparison). cudnn.benchmark=True is
-    # safe here since every run in a given config uses a fixed clip shape.
+    # Seeds do not force deterministic CUDA kernels; retain the workshop recipe.
 
 
 @torch.no_grad()
@@ -144,9 +156,16 @@ def main():
     ap.add_argument("--data-root", default=None, help="overrides data.base_path")
     ap.add_argument("--steps", type=int, default=None, help="overrides total_steps")
     ap.add_argument("--lr", type=float, default=None, help="overrides optim.lr")
-    ap.add_argument("--mask-ratio", type=float, default=None, help="overrides objective.mask_ratio")
+    ap.add_argument(
+        "--mask-ratio", type=float, default=None, help="overrides objective.mask_ratio"
+    )
     ap.add_argument("--out", default=None, help="overrides output dir")
-    ap.add_argument("--seed", type=int, default=None, help="overrides seed; appends _seed{N} to run_name")
+    ap.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="overrides seed; appends _seed{N} to run_name",
+    )
     ap.add_argument("--no-wandb", action="store_true")
     args = ap.parse_args()
 
@@ -176,22 +195,30 @@ def main():
     dataset_name = dcfg["dataset_name"]
     n_frames = dcfg.get("n_frames", 8)
 
-    if dcfg.get("memmap", False):
-        # Trajectory-disjoint pseudo-validation carved out of `train` — the
-        # Well's shipped `valid` split is too small/regime-degenerate for
-        # stable checkpoint selection (see train_valid_trajectory_split's
-        # docstring). Used only for checkpoint selection, not for claims
-        # about generalization to unseen physical regimes.
-        n_traj = MemmapClipDataset(base_path, dataset_name, split="train", n_frames=n_frames).mm.shape[0]
-        fit_idx, valid_idx = train_valid_trajectory_split(n_traj, dcfg.get("valid_stride", 8))
-        fit_ds = MemmapClipDataset(base_path, dataset_name, split="train", n_frames=n_frames, trajectories=fit_idx)
-        val_ds = MemmapClipDataset(base_path, dataset_name, split="train", n_frames=n_frames, trajectories=valid_idx)
-    else:
-        fit_ds = WellClipDataset(base_path, dataset_name, split="train", n_frames=n_frames)
-        val_ds = WellClipDataset(base_path, dataset_name, split="valid", n_frames=n_frames)
+    dataset_type = MemmapClipDataset if dcfg.get("memmap", False) else WellClipDataset
+    # Both backends reserve validation trajectories within official train.
+    # The official valid and test splits belong exclusively to downstream probes.
+    if "frame_limit" not in dcfg:
+        raise ValueError("data.frame_limit must explicitly specify temporal support")
+    data_kwargs = dict(
+        base_path=base_path,
+        dataset_name=dataset_name,
+        split="train",
+        n_frames=n_frames,
+        frame_limit=dcfg["frame_limit"],
+    )
+    inventory = dataset_type(**data_kwargs)
+    fit_idx, valid_idx = train_valid_trajectory_split(
+        inventory.n_traj, dcfg.get("valid_stride", 8)
+    )
+    fit_ds = dataset_type(**data_kwargs, trajectories=fit_idx)
+    val_ds = dataset_type(**data_kwargs, trajectories=valid_idx)
+    identity = training_identity(cfg, inventory, fit_idx, valid_idx)
 
     spec = fit_ds.spec
-    print(f"dataset {dataset_name}: {len(fit_ds)} fit clips, {len(val_ds)} val clips, spec={spec}")
+    print(
+        f"dataset {dataset_name}: {len(fit_ds)} fit clips, {len(val_ds)} val clips, spec={spec}"
+    )
 
     loader = torch.utils.data.DataLoader(
         fit_ds,
@@ -203,6 +230,8 @@ def main():
         persistent_workers=dcfg.get("num_workers", 4) > 0,
     )
     batches = infinite_loader(loader)
+    if len(loader) == 0:
+        raise ValueError("batch size exceeds the available training clips")
 
     # A second large persistent worker pool alongside the fit loader's
     # deadlocked in practice (measured: hung indefinitely on its first
@@ -222,7 +251,7 @@ def main():
 
     model = build_model(cfg["objective_name"], spec, cfg).to(device)
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"model: {cfg['objective_name']}, {n_params/1e6:.1f}M trainable params")
+    print(f"model: {cfg['objective_name']}, {n_params / 1e6:.1f}M trainable params")
 
     ocfg = cfg["optim"]
     optimizer = make_optimizer(model, ocfg)
@@ -233,7 +262,8 @@ def main():
     best_val_step = 0
     latest = out_dir / "latest.pt"
     if latest.exists():
-        ckpt = retry_io(torch.load, latest, map_location=device)
+        ckpt = retry_io(torch.load, latest, map_location=device, weights_only=False)
+        validate_resume(ckpt, identity)
         model.load_state_dict(ckpt["model"])
         optimizer.load_state_dict(ckpt["optimizer"])
         start_step = ckpt["step"]
@@ -241,37 +271,11 @@ def main():
         best_val_step = ckpt.get("best_val_step", 0)
         print(f"resumed from {latest} at step {start_step}")
 
-    # history.jsonl is written every log_every steps (frequent) -- every
-    # training crash observed in practice traced to exactly this write
-    # hitting the flaky network mount backing /workspace (never a checkpoint
-    # save, which is 20x less frequent and always survived). The container's
-    # own root filesystem is a separate, local, non-network disk that has
-    # shown no such failures -- write the hot path there instead, and only
-    # touch /workspace at the same infrequent cadence as checkpoint saves
-    # (already retry_io-hardened), where a local disk loss costs at most
-    # save_every steps of curve granularity, never training progress itself
-    # (that's recovered from latest.pt regardless).
-    local_history_dir = Path("/root/.vjepa_local_history") / run_name
-    local_history_dir.mkdir(parents=True, exist_ok=True)
-    local_history_path = local_history_dir / "history.jsonl"
-    workspace_history_path = out_dir / "history.jsonl"
-    if workspace_history_path.exists() and not local_history_path.exists():
-        # Resuming on a fresh local disk (e.g. after a pod restart) -- reseed
-        # the local mirror from the last durable copy so the next sync still
-        # writes a complete file, not just the fragment since this restart.
-        shutil.copyfile(workspace_history_path, local_history_path)
-    history_f = open(local_history_path, "a")
-
-    def _write_history_line(step: int, phase: str, metrics: dict):
-        history_f.write(json.dumps({"step": step, "phase": phase, **metrics}) + "\n")
-        history_f.flush()
+    history_f = (out_dir / "history.jsonl").open("a")
 
     def log_history(step: int, phase: str, metrics: dict):
-        _write_history_line(step, phase, metrics)
-
-    def sync_history_to_workspace():
+        history_f.write(json.dumps({"step": step, "phase": phase, **metrics}) + "\n")
         history_f.flush()
-        retry_io(shutil.copyfile, local_history_path, workspace_history_path)
 
     wandb_run = None
     if cfg.get("wandb", {}).get("enabled", False) and not args.no_wandb:
@@ -322,12 +326,18 @@ def main():
             ips = log_every * clip.size(0) / (time.time() - t0)
             t0 = time.time()
             line = " ".join(f"{k}={v:.4f}" for k, v in metrics.items())
-            print(f"step {step+1}/{total_steps} lr={lr:.2e} {line} clips/s={ips:.1f}")
-            log_history(step + 1, "train", {**metrics, "lr": lr, "grad_norm": grad_norm.item()})
+            print(f"step {step + 1}/{total_steps} lr={lr:.2e} {line} clips/s={ips:.1f}")
+            log_history(
+                step + 1, "train", {**metrics, "lr": lr, "grad_norm": grad_norm.item()}
+            )
             if wandb_run:
                 wandb_run.log(
-                    {**metrics, "lr": lr, "grad_norm": grad_norm.item(),
-                     "clips_per_s": ips},
+                    {
+                        **metrics,
+                        "lr": lr,
+                        "grad_norm": grad_norm.item(),
+                        "clips_per_s": ips,
+                    },
                     step=step + 1,
                 )
 
@@ -338,18 +348,24 @@ def main():
             orig, recon = model.reconstruction_figure(clip[:1])
             model.train()
             wandb_run.log(
-                {"recon": [wandb.Image(orig, caption="original"),
-                           wandb.Image(recon, caption="reconstruction")]},
+                {
+                    "recon": [
+                        wandb.Image(orig, caption="original"),
+                        wandb.Image(recon, caption="reconstruction"),
+                    ]
+                },
                 step=step + 1,
             )
 
         if (step + 1) % val_every == 0 or (step + 1) == total_steps:
             val_metrics = evaluate(model, val_loader, device, use_amp, val_max_batches)
             line = " ".join(f"{k}={v:.4f}" for k, v in val_metrics.items())
-            print(f"step {step+1}/{total_steps} VAL {line}")
+            print(f"step {step + 1}/{total_steps} VAL {line}")
             log_history(step + 1, "val", val_metrics)
             if wandb_run:
-                wandb_run.log({f"val_{k}": v for k, v in val_metrics.items()}, step=step + 1)
+                wandb_run.log(
+                    {f"val_{k}": v for k, v in val_metrics.items()}, step=step + 1
+                )
 
             for k, v in val_metrics.items():
                 if not k.endswith("_feat_std"):
@@ -367,9 +383,14 @@ def main():
                 best_val_step = step + 1
                 retry_io(
                     torch.save,
-                    {"encoder": model.encoder.state_dict(), "config": cfg,
-                     "spec": asdict(spec), "step": step + 1,
-                     "val_loss": best_val_loss},
+                    {
+                        "encoder": model.encoder.state_dict(),
+                        "config": cfg,
+                        "spec": asdict(spec),
+                        "step": step + 1,
+                        "training_identity": identity,
+                        "val_loss": best_val_loss,
+                    },
                     out_dir / "encoder_best_val.pt",
                 )
 
@@ -380,22 +401,28 @@ def main():
                 "step": step + 1,
                 "config": cfg,
                 "spec": asdict(spec),
+                "training_identity": identity,
                 "best_val_loss": best_val_loss,
                 "best_val_step": best_val_step,
             }
             retry_io(torch.save, ckpt, latest)
-            sync_history_to_workspace()
             if (step + 1) in milestones:
                 frac = milestones[step + 1]
                 retry_io(
                     torch.save,
-                    {"encoder": model.encoder.state_dict(), "config": cfg,
-                     "spec": asdict(spec), "step": step + 1},
-                    out_dir / f"encoder_{int(frac*100):03d}pct.pt",
+                    {
+                        "encoder": model.encoder.state_dict(),
+                        "config": cfg,
+                        "spec": asdict(spec),
+                        "step": step + 1,
+                        "training_identity": identity,
+                    },
+                    out_dir / f"encoder_{int(frac * 100):03d}pct.pt",
                 )
 
-    print(f"training complete — best val loss {best_val_loss:.4f} at step {best_val_step}")
-    sync_history_to_workspace()
+    print(
+        f"training complete — best val loss {best_val_loss:.4f} at step {best_val_step}"
+    )
     history_f.close()
     if wandb_run:
         wandb_run.finish()

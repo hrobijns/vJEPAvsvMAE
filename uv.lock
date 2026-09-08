@@ -1417,6 +1417,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "einops" },
+    { name = "h5py" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pyyaml" },
@@ -1429,6 +1430,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "einops", specifier = ">=0.8.2" },
+    { name = "h5py", specifier = ">=3.12" },
     { name = "matplotlib", specifier = ">=3.11.1" },
     { name = "numpy", specifier = "<2" },
     { name = "pyyaml", specifier = ">=6.0.3" },

@@ -1,0 +1,12 @@
+dataset: active_matter
+frame_limit: 101
+n_frames: 8
+gaps:
+- 0
+- 8
+- 32
+patch:
+- 2
+- 16
+- 16
+token_samples: 64

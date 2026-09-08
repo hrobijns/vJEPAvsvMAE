@@ -1,10 +1,11 @@
 [project]
 name = "vjepa-vmae-comparison"
 version = "0.1.0"
-description = "Add your description here"
+description = "Controlled JEPA and masked-autoencoder comparisons on physical simulations from The Well"
 requires-python = ">=3.11"
 dependencies = [
     "einops>=0.8.2",
+    "h5py>=3.12",
     "matplotlib>=3.11.1",
     "numpy<2",
     "pyyaml>=6.0.3",
