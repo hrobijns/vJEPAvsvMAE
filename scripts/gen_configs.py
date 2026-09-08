@@ -1,10 +1,16 @@
-"""Regenerate configs/. Run: uv run python scripts/gen_configs.py"""
+"""Regenerate configs/. Run: uv run python scripts/gen_configs.py.
 
+The Rayleigh--Bénard release configs use the rates frozen in
+``configs/tuned_lr.json``; other datasets retain their existing rates.
+"""
+
+import json
 from pathlib import Path
 
 import yaml
 
 CONFIG_DIR = Path(__file__).parent.parent / "configs"
+TUNED_LRS = json.loads((CONFIG_DIR / "tuned_lr.json").read_text())
 
 DATASETS = ["active_matter", "shear_flow", "rayleigh_benard"]
 OBJECTIVES = {
@@ -45,6 +51,7 @@ OBJECTIVES = {
 
 def make(dataset: str, objective: str, debug: bool = False) -> dict:
     spec = OBJECTIVES[objective]
+    learning_rate = float(TUNED_LRS[dataset][objective]) if dataset == "rayleigh_benard" and not debug else spec["lr"]
     name = f"{'debug' if debug else dataset}_{objective}"
     return {
         "run_name": name,
@@ -89,7 +96,7 @@ def make(dataset: str, objective: str, debug: bool = False) -> dict:
             "batch_size": 4 if debug else 64,
             "total_steps": 50 if debug else 100_000,
             "warmup_steps": 10 if debug else 5000,
-            "lr": spec["lr"],
+            "lr": learning_rate,
             "min_lr": 1.0e-6,
             "weight_decay": 0.05,
             "betas": [0.9, 0.95],

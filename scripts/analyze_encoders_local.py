@@ -418,6 +418,8 @@ def main():
     ap.add_argument("--checkpoints", nargs="+", required=True)
     ap.add_argument("--data-root", required=True)
     ap.add_argument("--dataset", default="active_matter")
+    ap.add_argument("--allow-legacy-rb", action="store_true",
+                    help="explicitly run the invalid legacy RB targets for forensic reproduction")
     ap.add_argument("--n-offsets", type=int, default=3)
     ap.add_argument("--horizon", type=int, default=16)
     ap.add_argument("--max-traj", type=int, default=None,
@@ -435,6 +437,8 @@ def main():
                           "held-out generalization check against the pretraining data)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    from scripts.rb_legacy_guard import guard_legacy_rb
+    guard_legacy_rb(args.dataset, args.allow_legacy_rb)
 
     print(f"building probe dataset ({args.split})...")
     clips, contemp, _future = build_dataset(args.data_root, args.dataset, args.n_offsets, args.horizon,

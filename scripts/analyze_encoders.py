@@ -442,6 +442,8 @@ def main():
     ap.add_argument("--checkpoints", nargs="+", required=True)
     ap.add_argument("--data-root", required=True)
     ap.add_argument("--dataset", default="active_matter")
+    ap.add_argument("--allow-legacy-rb", action="store_true",
+                    help="explicitly run the invalid legacy RB targets for forensic reproduction")
     ap.add_argument("--n-offsets", type=int, default=3, help="windows per trajectory")
     ap.add_argument("--horizon", type=int, default=16, help="future prediction horizon (frames)")
     ap.add_argument("--max-traj", type=int, default=None,
@@ -453,6 +455,8 @@ def main():
                           "held-out generalization check against the pretraining data)")
     ap.add_argument("--out", default=None, help="write JSON results here")
     args = ap.parse_args()
+    from scripts.rb_legacy_guard import guard_legacy_rb
+    guard_legacy_rb(args.dataset, args.allow_legacy_rb)
 
     print(f"building probe dataset ({args.split}): {args.n_offsets} offsets/traj, horizon={args.horizon}, max_traj={args.max_traj}")
     clips, contemp, future = build_dataset(args.data_root, args.dataset, args.n_offsets, args.horizon,

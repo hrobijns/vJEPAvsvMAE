@@ -93,6 +93,7 @@ from scripts.analyze_encoders import (
 from scripts.analyze_encoders_local import (
     _train_mlp_early_stop, layerwise_token_features, local_target_maps, mlp_multiseed,
 )
+from scripts.rb_legacy_guard import guard_legacy_rb
 from src.data.well import train_valid_trajectory_split
 
 N_FRAMES = 8
@@ -890,6 +891,8 @@ def main():
     ap.add_argument("--checkpoints", nargs="+", required=True)
     ap.add_argument("--data-root", required=True)
     ap.add_argument("--dataset", required=True)
+    ap.add_argument("--allow-legacy-rb", action="store_true",
+                    help="explicitly run the known-invalid legacy RB path for forensic reproduction only")
     ap.add_argument("--n-offsets", type=int, default=3)
     ap.add_argument("--gaps", type=int, nargs="+", default=[8, 32])
     ap.add_argument("--n-frames", type=int, default=N_FRAMES)
@@ -913,6 +916,7 @@ def main():
                           "{train,test}.regime.json don't exist for this dataset")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    guard_legacy_rb(args.dataset, args.allow_legacy_rb)
     if args.skip_contemporaneous and not args.skip_noise:
         raise SystemExit("--skip-contemporaneous requires --skip-noise (noise reuses family 1's frozen layers)")
 
