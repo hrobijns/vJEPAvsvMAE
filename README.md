@@ -4,26 +4,31 @@ Controlled comparison of a latent-prediction objective (V-JEPA-style) against a
 pixel-reconstruction objective (VideoMAE-style) with **identical encoders**, on
 2D physics simulations from [The Well](https://polymathic-ai.org/the_well/).
 End goal: test whether the JEPA objective encodes more physical variables in
-its latent space (probing suite = step 2, separate from this repo's step-1
-training infrastructure).
+its latent space, using training, frozen-encoder probing, and analysis outputs.
+
+**Migration checkpoint:** the [current RB workflow](#current-rb-evaluation)
+supersedes the legacy Rayleigh–Bénard target calculations and results.
+Historical workshop/paper material remains for context, not as validation of
+this workflow. See [known limitations and integration follow-up](#known-limitations-and-integration-follow-up)
+before interpreting new outputs.
 
 See [docs/OVERVIEW.md](docs/OVERVIEW.md) for a research-summary writeup
 (motivation, architecture, headline results), and
 [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) for a deep dive on the probing
 pipeline. This README covers setup and reproduction.
 
-## Results (summary)
+## Historical results (legacy RB; superseded)
 
-Headline numbers below are from [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) —
-the canonical held-out, multi-seed test-evaluation protocol (layer choice frozen
+Numbers below are retained from [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) —
+the historical held-out, multi-seed test-evaluation protocol (layer choice frozen
 from train-CV *before* touching test data, probe fit once on train, reported
 once on held-out test trajectories, mean±std over 3 independently-seeded
-encoders). It's the protocol behind every number that should be cited as a
-final result; see [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) for the full
-method. Raw numbers in `sweep_results/*_workshop_test_eval.json`, figures in
+encoders). These are not corrected RB results and should not be cited as
+current findings. [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md) describes the
+legacy method. Raw numbers in `sweep_results/*_workshop_test_eval.json`, figures in
 [reports/figures/](reports/figures/).
 
-**`rayleigh_benard` is the paper's headline dataset** — the only one with a
+**`rayleigh_benard` was the workshop's headline dataset** — the only one with a
 complete 3-seed × {JEPA, MAE} run at the current (192-d predictor)
 architecture. `active_matter`/`shear_flow` report on a single representative
 encoder seed per objective; see "Pretrained encoders" below for why.
@@ -61,7 +66,7 @@ encoder seed per objective; see "Pretrained encoders" below for why.
 
 - [`checkpoints/neuripsworkshop/`](checkpoints/neuripsworkshop/) — the 6
   `rayleigh_benard` checkpoints (3 JEPA seeds + 3 MAE seeds) behind this
-  repo's headline results, current (192-d predictor) architecture. See its
+  repo's historical results, current (192-d predictor) architecture. See its
   own README for exact per-file provenance and training config.
 - [`checkpoints/old/`](checkpoints/old/) — the earlier single-seed set (one
   JEPA + one MAE per dataset, all 3 datasets), kept for quick-start/demo use
@@ -87,22 +92,26 @@ features = encoder(clip)  # (B, n_tokens, 384) — no masking applied at inferen
 `uv run python scripts/load_encoder.py checkpoints/<tier>/<name>.pt` runs
 this as a standalone sanity check (loads + random forward pass).
 
-To probe what these encoders actually learned — layer-wise physics decodability,
-pooled vs. per-token comparisons — see [scripts/analyze_encoders.py](scripts/analyze_encoders.py)
-and [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py).
-Both need the corresponding dataset's memmap (see "Reproducing" below) or can
-be pointed at your own tensors of the same shape.
+For Rayleigh–Bénard probing, use the [current RB workflow](#current-rb-evaluation).
+The legacy [scripts/analyze_encoders.py](scripts/analyze_encoders.py) and
+[scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) remain
+available for other datasets and exploratory work; their RB entrypoints
+require explicit `--allow-legacy-rb` opt-in.
 
-## Probing suite (step 2)
+## Legacy probing suite
 
 [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) is the
-canonical protocol — 4 probe families (contemporaneous, forecast-content,
+historical protocol — 4 probe families (contemporaneous, forecast-content,
 noise robustness, regime), each with layer choice frozen from train-CV before
 touching held-out test data, and mean±std reported over 3 encoder seeds
 (rayleigh_benard only — see "Pretrained encoders" above). It's the source of
-every headline number in this README and in
+the archived numbers in this README and in
 [docs/OVERVIEW.md](docs/OVERVIEW.md); full method and tables in
 [docs/LINEAR_PROBE.md](docs/LINEAR_PROBE.md).
+
+Its RB entrypoint also requires `--allow-legacy-rb`; opting in does not make
+the legacy targets valid. Other datasets' implementations are unchanged by
+this migration and have not received the RB-specific corrections.
 
 Two supporting scripts do the earlier-stage, train-CV version of this analysis
 (no held-out test split, single seed) — useful for exploring the
@@ -119,7 +128,127 @@ recovers per-trajectory regime params (Reynolds/Schmidt, Rayleigh/Prandtl,
 alpha/zeta) from Well filenames, feeding `workshop_test_eval.py`'s regime
 family.
 
-### Probing a new physical quantity
+## Current RB evaluation
+
+[scripts/rb_eval_v2.py](scripts/rb_eval_v2.py) is the RB entrypoint for this
+checkpoint. It reads full official `valid`/`test` HDF5 trajectories directly,
+not the legacy 101-frame memmaps. Each split must contain 175 trajectories
+(35 regimes × 5 replicates), with 200 frames per trajectory. Targets use
+physical units, periodic-x/Chebyshev-y derivatives, and physical quadrature;
+encoder inputs use The Well's normalization. Probe selection uses validation
+data, not test scores.
+
+Run from the repository root. The commands below download data and perform
+substantial computation; feature extraction uses CUDA when available. Use a
+fresh output directory for each run: completed caches, features, and result
+files are not overwritten. Keep manifests with their arrays and results.
+
+```bash
+uv sync --locked
+BASE=/path/to/data
+OUTPUT=sweep_results/rb_v2
+mkdir -p "$OUTPUT"
+
+uv run python scripts/rb_eval_v2.py validate-checkpoints \
+  checkpoints/neuripsworkshop/rayleigh_benard_{jepa,mae}_seed{1,2,3}.pt \
+  > "$OUTPUT/checkpoints.json"
+
+for split in valid test; do
+  uv run the-well-download --base-path "$BASE" --dataset rayleigh_benard --split "$split"
+  uv run python scripts/rb_eval_v2.py prepare-cache \
+    --base "$BASE" --split "$split" --cache-root "$OUTPUT/cache"
+done
+
+for objective in jepa mae; do
+  for seed in 1 2 3; do
+    checkpoint_id="${objective}_seed${seed}"
+    uv run python scripts/rb_eval_v2.py extract-features \
+      --checkpoint "checkpoints/neuripsworkshop/rayleigh_benard_${checkpoint_id}.pt" \
+      --cache-root "$OUTPUT/cache" --feature-root "$OUTPUT/features"
+    uv run python scripts/rb_eval_v2.py fit-selected-probes \
+      --feature-dir "$OUTPUT/features/$checkpoint_id" --cache-root "$OUTPUT/cache" \
+      --output "$OUTPUT/selected/$checkpoint_id.json"
+  done
+done
+
+uv run python scripts/rb_eval_v2.py aggregate \
+  "$OUTPUT"/selected/{jepa,mae}_seed{1,2,3}.json \
+  --output "$OUTPUT/selected_aggregate.json"
+uv run python scripts/rb_eval_v2.py persistence-baseline \
+  --cache-root "$OUTPUT/cache" --output "$OUTPUT/persistence_baseline.json"
+uv run python scripts/rb_eval_v2.py balanced-token-control \
+  --cache-root "$OUTPUT/cache" --output "$OUTPUT/token_position_control.json"
+```
+
+The six endpoint checkpoints are tracked with Git LFS; if the `.pt` files
+are only pointer files, fetch their payloads with `git lfs pull` first.
+The general download wrapper defaults to `train valid`, so it does not
+replace the explicit RB `test` download above. Memmap preprocessing is still
+used for training and now preserves full trajectories and metadata; existing
+incompatible memmaps must be moved aside and regenerated, not silently reused.
+
+Selected probes cover pooled/token targets on `original_support` at gaps
+0, 8, and 32, with validation-selected Ridge/MLP choices. Per-checkpoint JSON
+contains row-level metrics and selections; the aggregate retains those rows,
+source metadata, and seed summaries. Aggregate exactly one result family
+from the same run across the six endpoints; do not mix protocols or caches.
+
+For optional selected-probe noise and MLP-depth outputs, reuse the saved
+selection and its features. Repeat for each checkpoint, changing `checkpoint_id`:
+
+```bash
+checkpoint_id=jepa_seed1
+uv run python scripts/rb_eval_v2.py fit-selected-noise \
+  --feature-dir "$OUTPUT/features/$checkpoint_id" \
+  --selected-feature-dir "$OUTPUT/features/$checkpoint_id" \
+  --cache-root "$OUTPUT/cache" --selected-result "$OUTPUT/selected/$checkpoint_id.json" \
+  --output "$OUTPUT/selected_noise/$checkpoint_id.json"
+uv run python scripts/rb_eval_v2.py fit-mlp-depth \
+  --feature-dir "$OUTPUT/features/$checkpoint_id" --cache-root "$OUTPUT/cache" \
+  --selected-result "$OUTPUT/selected/$checkpoint_id.json" \
+  --output "$OUTPUT/mlp_depth/$checkpoint_id.json"
+```
+
+Aggregate each optional family separately using the same six-file pattern.
+`fit-probes` is the separate base-protocol path: it accepts `--feature-dir`,
+`--cache-root`, and `--output` like `fit-selected-probes`, but covers both
+`original_support` and `developed` strata with a different probe/target grid.
+Only aggregates from that base path are supported by
+`plot --aggregate <base-aggregate.json> --output-dir <figures-directory>`;
+it writes PDFs, a summary TSV, and a plot manifest. Do not pass selected-probe,
+selected-noise, or MLP-depth aggregates to that plotter. Those workflows
+currently provide JSON for downstream analysis. See each subcommand's
+`--help` for options.
+
+### Known limitations and integration follow-up
+
+The migration preserves committed fixes, not a finished unified architecture.
+Independent review found these inherited issues; fixes are deliberately
+deferred to a separate integration planning pass:
+
+- **Aggregation compatibility:** incompatible cache hashes/protocols can be
+  combined without rejection. Add compatibility checks and regression tests.
+- **Array integrity:** manifest self-hashes are checked, but hashes of the
+  actual consumed feature/target files are not verified. Validate file contents
+  against the recorded hashes rather than treating manifests alone as proof.
+- **MLP replay precision:** selection and replay use different target precision
+  and ensemble-averaging conventions. A near-constant synthetic target failed
+  the clean-endpoint check. Align scoring and add low-variance regression cases.
+- **Plot compatibility:** the plotter assumes base-protocol rows and fails on
+  selected-probe aggregates. Define a consistent output contract during integration.
+- **One supported workflow:** plan shared interfaces and dataset-specific
+  mathematics across data preparation, training, extraction, probing, and
+  analysis outputs. Consolidate legacy/`v2` paths only after parity/correctness
+  checks; merely renaming files is not sufficient.
+
+All 46 unit tests, analytic operator checks, six checkpoint validations, and
+JEPA/MAE seed-1 CPU forward-pass smoke tests passed during migration. No full
+scientific rerun was performed, and the review did not establish that actual
+experiment results were affected. Passing those checks does not resolve the
+known limitations. The source fork checkout remains intact; no broader
+refactoring or deletion of existing upstream content is part of this checkpoint.
+
+## Exploratory probing with legacy helpers
 
 You don't need the full held-out pipeline to try an idea — `analyze_encoders.py`
 exposes its building blocks (loading, features, ridge probe) as plain
@@ -150,6 +279,11 @@ per_layer_feats = compute_layerwise_features_batched(encoder, clips)  # list of 
 for layer_idx, feats in enumerate(per_layer_feats):
     print(f"layer {layer_idx}: R^2 = {ridge_r2(feats, my_target):.3f}")
 ```
+
+For RB physical targets, use [scripts/rb_targets_v2.py](scripts/rb_targets_v2.py)
+and its geometry-aware operators, not the legacy helpers below. The following
+guidance describes the existing exploratory path for other datasets, not a
+new validation of their target definitions.
 
 For a target requiring finite-difference derivatives (gradients, curl,
 divergence, Laplacian), reuse `curl2d`/`grad2d`/`divergence2d`/`laplacian2d`/
@@ -186,7 +320,7 @@ Repeat `preprocess_memmap.py` + `train.py` for `shear_flow` and `rayleigh_benard
 roughly 6–11 hours on a single A100; see the RunPod workflow below for
 running on rented GPUs.
 
-For the full 3-seed final training used for `rayleigh_benard`'s headline
+For the full 3-seed final training used for `rayleigh_benard`'s historical
 results, `configs/tuned_lr.json` must exist first (already committed — it's
 the output of `scripts/run_lr_minisweep.sh` + `scripts/pick_lr.py`), then:
 `bash scripts/run_final_training.sh` runs all (dataset, objective, seed)
@@ -257,7 +391,10 @@ for the step-2 probing study).
 - [scripts/load_encoder.py](scripts/load_encoder.py) — load a checkpoint + sanity-check forward pass
 - [scripts/run_lr_minisweep.sh](scripts/run_lr_minisweep.sh), [scripts/pick_lr.py](scripts/pick_lr.py) — per-(dataset,objective) LR mini-sweep → `configs/tuned_lr.json`
 - [scripts/run_final_training.sh](scripts/run_final_training.sh) — 3-seed final training for all (dataset, objective) pairs
-- [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) — **canonical probing pipeline**: contemporaneous, forecast, noise-robustness, regime, held-out test split, multi-seed
+- [scripts/rb_eval_v2.py](scripts/rb_eval_v2.py), [scripts/rb_pipeline_v2.py](scripts/rb_pipeline_v2.py) — current RB CLI and cache/extraction/probing/output implementation
+- [scripts/rb_targets_v2.py](scripts/rb_targets_v2.py), [scripts/rb_derivatives.py](scripts/rb_derivatives.py), [scripts/rb_quadrature.py](scripts/rb_quadrature.py) — RB physical targets and geometry-aware operators
+- [tests/](tests/) — preprocessing, configuration, target, checkpoint, and pipeline tests
+- [scripts/workshop_test_eval.py](scripts/workshop_test_eval.py) — legacy probing pipeline; RB requires explicit opt-in
 - [scripts/plot_workshop_figures.py](scripts/plot_workshop_figures.py) — renders the paper's figures from `workshop_test_eval.py`'s output
 - [scripts/analyze_encoders.py](scripts/analyze_encoders.py), [scripts/analyze_encoders_local.py](scripts/analyze_encoders_local.py) — earlier-stage train-CV pooled/non-pooled probing (see "Probing suite" above)
 - [scripts/extract_regime_metadata.py](scripts/extract_regime_metadata.py) — recovers per-trajectory regime params from Well filenames

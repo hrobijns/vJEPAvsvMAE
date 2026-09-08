@@ -20,3 +20,6 @@ local_analysis*.json
 analysis_*.json
 pod_logs/
 .DS_Store
+
+# Corrected Rayleigh--Benard analysis outputs
+/sweep_results/
