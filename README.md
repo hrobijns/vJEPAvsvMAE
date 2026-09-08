@@ -8,12 +8,13 @@ clip**: JEPA predicts EMA-encoder features; MAE reconstructs normalized pixels.
 Neither currently trains on future clips. The encoder, tube masking, and input
 pipeline are shared; the heads, losses, and learning rates differ.
 
-This checkout contains one analysis workflow. The corrected RB workshop
-methodology is the regression baseline. Current configurations explicitly limit
-training and evaluation to **frames 0–100 inclusive**, or the available frames
-for shorter trajectories. Training caches store full trajectories; sampling a
-cache does not imply using every stored frame. Full-trajectory experiments and
-future-prediction objectives belong to the next ICLR implementation phase.
+This checkout contains one analysis workflow. Current configurations use the
+**whole available trajectory** for training and evaluation (`frame_limit: null`).
+Eight-frame training clips overlap with starting times spaced one frame apart.
+The source determines trajectory length; there is no 200-frame cap. The RB data
+checked here have 200 frames, shear flow is documented with 200, and active
+matter with 81. The corrected workshop analysis remains the regression baseline,
+with its 101-frame evaluation configuration under `configs/workshop/`.
 
 ## Setup and data
 
@@ -38,12 +39,24 @@ uv run --locked python -m src.data.preprocess \
   --base /path/to/data --dataset rayleigh_benard --split train
 uv run --locked python -m src.train \
   --config configs/rayleigh_benard_jepa.yaml --data-root /path/to/data \
-  --seed 1 --no-wandb
+  --seed 1 --out runs/full_trajectories --no-wandb
 ```
 
 Repeat with the MAE configuration and desired seeds. Replace the dataset name
 with `active_matter` or `shear_flow` for the other systems. The trainer also
 accepts `--lr`, `--steps`, `--mask-ratio`, and `--out` overrides.
+
+Defaults remain eight-frame inputs, batch size 64, and 100,000 optimizer steps.
+The trainer reports available clip counts and planned exposure at startup.
+History rows and checkpoints include `data_exposure`: eligible training and
+validation clips, planned clips and equivalent passes, and clips processed and
+equivalent passes at the recorded step. Processed clips equal completed updates
+times batch size; repetitions count, and validation clips do not. Equivalent
+passes divide processed clips by the number of eligible training clips, so they
+are not counts of unique examples or independently generated simulations.
+Resume continues these counters from the saved optimizer step. At batch 64,
+100,000 steps process 6.4 million clips: about 27.1 passes over RB's 236,425
+full-trajectory training windows, compared with 55.6 over the workshop's 115,150.
 
 Both the memmap and HDF5 backends reserve every eighth official-training
 trajectory for pretraining validation. Official validation and test splits are
@@ -51,6 +64,8 @@ reserved for downstream analysis. Training caches retain the source trajectory
 index, channels, normalization, full lengths, and content hashes. Old caches
 must be rebuilt; they are not silently accepted or overwritten. Interrupted
 preprocessing can resume when its source contract still matches.
+Completed caches in the current format already contain full trajectories and
+can be reused when removing a sampling cap.
 
 Checkpoints contain their configuration, input shape, and training identity.
 `latest.pt` resumes only when source, temporal support, split, model, and
@@ -58,6 +73,9 @@ optimization settings agree. Historical checkpoints remain loadable for
 analysis but cannot automatically resume a new training run. Reported workshop
 models are final 100,000-step endpoints; `encoder_best_val.pt` is an additional
 training diagnostic, not the endpoint-selection rule for the comparison.
+Encoder checkpoints at 25%, 50%, 75%, and 100% of the planned steps support
+learning-curve analysis. The 100,000-step budget is a starting choice; assess
+training sufficiency on validation data before changing the comparison budget.
 
 ## Frozen-encoder analysis
 
@@ -67,7 +85,7 @@ three systems.
 
 ```bash
 BASE=/path/to/data
-OUT=outputs/rb_regression
+OUT=outputs/rb_full_trajectories
 
 for split in valid test; do
   uv run --locked python -m src.evaluate prepare-cache \
@@ -77,7 +95,7 @@ done
 
 for objective in jepa mae; do
   for seed in 1 2 3; do
-    checkpoint="checkpoints/neuripsworkshop/rayleigh_benard_${objective}_seed${seed}.pt"
+    checkpoint="runs/full_trajectories/rayleigh_benard_${objective}_seed${seed}/encoder_100pct.pt"
     uv run --locked python -m src.evaluate extract-features \
       --checkpoint "$checkpoint" --cache-root "$OUT/cache" \
       --feature-root "$OUT/features"
@@ -103,9 +121,18 @@ for kind in probes noise; do
 done
 ```
 
+For workshop reproduction, use
+`configs/workshop/eval_rayleigh_benard.yaml`, a fresh output root such as
+`outputs/rb_workshop`, and replace the checkpoint assignment above with
+`checkpoint="checkpoints/neuripsworkshop/rayleigh_benard_${objective}_seed${seed}.pt"`.
+This uses the same analysis code with explicit frames 0–100. Full-trajectory
+analysis of those historical weights is a separate experiment: it does not make
+them models trained on full trajectories. New temporal protocols require new
+analysis artifacts; existing completed outputs are not overwritten or mixed.
+
 `fit-probes` produces the main selection, separate Ridge/MLP results, pooled
 depth curves, regime decoding, regime/time and position controls, the combined
-encoder-plus-control readout, and persistence baselines. `evaluate-noise`
+encoder-plus-control probe, and persistence baselines. `evaluate-noise`
 loads the actual fitted clean probes; it does not refit them.
 
 Aggregates retain individual checkpoint rows, per-target summaries, and

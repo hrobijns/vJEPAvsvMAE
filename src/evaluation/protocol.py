@@ -11,7 +11,7 @@ from src.physics.systems import SYSTEMS
 @dataclass(frozen=True)
 class Protocol:
     dataset: str
-    frame_limit: int | None = 101
+    frame_limit: int | None = None
     n_frames: int = 8
     gaps: tuple[int, ...] = (0, 8, 32)
     patch: tuple[int, int, int] = (2, 16, 16)

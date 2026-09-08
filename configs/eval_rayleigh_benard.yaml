@@ -1,5 +1,5 @@
 dataset: rayleigh_benard
-frame_limit: 101
+frame_limit: null
 n_frames: 8
 gaps:
 - 0

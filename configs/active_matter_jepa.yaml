@@ -13,7 +13,7 @@ data:
   num_workers: 2
   memmap: true
   valid_stride: 8
-  frame_limit: 101
+  frame_limit: null
 val_every: 2000
 encoder:
   patch_t: 2

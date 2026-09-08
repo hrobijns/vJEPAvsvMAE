@@ -71,7 +71,7 @@ class WellClipDataset(_ClipDataset):
         split="train",
         n_frames=8,
         trajectories=None,
-        frame_limit=101,
+        frame_limit=None,
     ):
         self.source = WellSource(base_path, dataset_name, split, n_frames)
         self.records = self.source.records
@@ -105,7 +105,7 @@ class MemmapClipDataset(_ClipDataset):
         split,
         n_frames=8,
         trajectories=None,
-        frame_limit=101,
+        frame_limit=None,
     ):
         directory = Path(base_path).expanduser() / "memmap" / dataset_name
         self.path = directory / f"{split}.npy"

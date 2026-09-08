@@ -130,6 +130,12 @@ class WellSource:
                                 raise ValueError(
                                     f"expected a uniform periodic {axis} grid"
                                 )
+                            # Shear-flow exports label both axes [0, 1].
+                            # Physical derivatives still use lengths (1, 2).
+                            if dataset == "shear_flow" and np.allclose(
+                                grid[[0, -1]], (0, 1), rtol=1e-4, atol=1e-7
+                            ):
+                                continue
                             # Some Well exports include the endpoint in coordinates
                             # while the simulation fields exclude it.
                             if not any(

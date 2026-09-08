@@ -1,5 +1,5 @@
-dataset: shear_flow
-frame_limit: null
+dataset: rayleigh_benard
+frame_limit: 101
 n_frames: 8
 gaps:
 - 0

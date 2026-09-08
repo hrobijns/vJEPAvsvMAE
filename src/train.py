@@ -63,6 +63,20 @@ def validate_resume(checkpoint, identity):
         )
 
 
+def training_exposure(step, optim, fit_clips, valid_clips):
+    """Count clips used by completed updates, including repeated examples."""
+    processed = step * optim["batch_size"]
+    planned = optim["total_steps"] * optim["batch_size"]
+    return {
+        "eligible_train_clips": fit_clips,
+        "eligible_validation_clips": valid_clips,
+        "planned_clips": planned,
+        "planned_equivalent_passes": planned / fit_clips,
+        "clips_processed": processed,
+        "equivalent_passes": processed / fit_clips,
+    }
+
+
 def retry_io(fn, *args, retries=15, delay=3.0, max_delay=60.0, **kwargs):
     """Retry transient filesystem failures with bounded exponential backoff."""
     for attempt in range(retries):
@@ -271,10 +285,18 @@ def main():
         best_val_step = ckpt.get("best_val_step", 0)
         print(f"resumed from {latest} at step {start_step}")
 
+    exposure = training_exposure(start_step, ocfg, len(fit_ds), len(val_ds))
+    print(f"training exposure: {json.dumps(exposure)}")
+
     history_f = (out_dir / "history.jsonl").open("a")
 
     def log_history(step: int, phase: str, metrics: dict):
-        history_f.write(json.dumps({"step": step, "phase": phase, **metrics}) + "\n")
+        history_f.write(
+            json.dumps(
+                {"step": step, "phase": phase, **metrics, "data_exposure": exposure}
+            )
+            + "\n"
+        )
         history_f.flush()
 
     wandb_run = None
@@ -322,11 +344,15 @@ def main():
         if not torch.isfinite(loss):
             raise RuntimeError(f"non-finite loss at step {step}: {loss.item()}")
 
+        exposure = training_exposure(step + 1, ocfg, len(fit_ds), len(val_ds))
         if (step + 1) % log_every == 0:
             ips = log_every * clip.size(0) / (time.time() - t0)
             t0 = time.time()
             line = " ".join(f"{k}={v:.4f}" for k, v in metrics.items())
-            print(f"step {step + 1}/{total_steps} lr={lr:.2e} {line} clips/s={ips:.1f}")
+            print(
+                f"step {step + 1}/{total_steps} lr={lr:.2e} {line} clips/s={ips:.1f} "
+                f"clips={exposure['clips_processed']} passes={exposure['equivalent_passes']:.3f}"
+            )
             log_history(
                 step + 1, "train", {**metrics, "lr": lr, "grad_norm": grad_norm.item()}
             )
@@ -337,6 +363,7 @@ def main():
                         "lr": lr,
                         "grad_norm": grad_norm.item(),
                         "clips_per_s": ips,
+                        **{f"data/{k}": v for k, v in exposure.items()},
                     },
                     step=step + 1,
                 )
@@ -389,6 +416,7 @@ def main():
                         "spec": asdict(spec),
                         "step": step + 1,
                         "training_identity": identity,
+                        "data_exposure": exposure,
                         "val_loss": best_val_loss,
                     },
                     out_dir / "encoder_best_val.pt",
@@ -402,6 +430,7 @@ def main():
                 "config": cfg,
                 "spec": asdict(spec),
                 "training_identity": identity,
+                "data_exposure": exposure,
                 "best_val_loss": best_val_loss,
                 "best_val_step": best_val_step,
             }
@@ -416,6 +445,7 @@ def main():
                         "spec": asdict(spec),
                         "step": step + 1,
                         "training_identity": identity,
+                        "data_exposure": exposure,
                     },
                     out_dir / f"encoder_{int(frac * 100):03d}pct.pt",
                 )

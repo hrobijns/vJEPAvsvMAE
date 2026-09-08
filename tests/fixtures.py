@@ -49,6 +49,9 @@ def write_well(root, dataset, split, frames=6, trajectories=5, shape=None):
         d = f.create_group("dimensions")
         d.attrs["spatial_dims"] = ["x", "y"]
         for key, value in [("x", xx), ("y", yy), ("time", np.arange(frames) * 0.25)]:
+            # Reproduce the exported labels; fields below use physical X, Y.
+            if dataset == "shear_flow" and key in ("x", "y"):
+                value = np.linspace(0, 1, len(value), dtype=np.float32)
             d.create_dataset(key, data=value)
             d[key].attrs["sample_varying"] = False
         scalars = f.create_group("scalars")

@@ -119,7 +119,7 @@ class PhysicsTests(unittest.TestCase):
 
 class ProtocolTests(unittest.TestCase):
     def test_sampling_support_and_shorter_trajectories(self):
-        p = Protocol("rayleigh_benard")
+        p = Protocol("rayleigh_benard", frame_limit=101)
         self.assertEqual(p.offsets(200, 0)["pooled"], [0, 26, 53])
         self.assertEqual(
             [p.offsets(200, i)["token"][0] for i in range(5)], [0, 13, 26, 40, 53]
@@ -128,6 +128,23 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(Protocol("active_matter").offsets(81, 4)["token"], [33])
         with self.assertRaises(ValueError):
             p.offsets(30, 0)
+
+    def test_full_trajectory_evaluation_samples(self):
+        for dataset in ("rayleigh_benard", "shear_flow"):
+            p = Protocol(dataset)
+            self.assertIsNone(p.frame_limit)
+            self.assertEqual(p.offsets(200, 0)["pooled"], [0, 76, 152])
+            self.assertEqual(
+                [p.offsets(200, i)["token"][0] for i in range(5)],
+                [0, 38, 76, 114, 152],
+            )
+            self.assertEqual(p.target_start(152, 32) + 8, 200)
+            # Full support follows the source length, including beyond 200.
+            self.assertEqual(p.target_start(p.offsets(240, 4)["token"][0], 32) + 8, 240)
+            self.assertEqual(p.token_samples, 64)
+        p = Protocol("active_matter")
+        self.assertEqual(p.offsets(81, 0)["pooled"], [0, 16, 33])
+        self.assertEqual(p.target_start(33, 32) + 8, 81)
 
     def test_folds_preserve_trajectories_and_rb_rotation(self):
         rows = sample_rows()
@@ -401,18 +418,28 @@ class WorkflowTests(unittest.TestCase):
             tempfile.TemporaryDirectory() as tmp,
             contextlib.redirect_stdout(io.StringIO()),
         ):
-            write_well(tmp, "shear_flow", "train", frames=12)
+            write_well(tmp, "shear_flow", "train", frames=200)
             preprocess(tmp, "shear_flow")
-            hdf = WellClipDataset(tmp, "shear_flow", n_frames=2, frame_limit=7)
-            mm = MemmapClipDataset(
-                tmp, "shear_flow", "train", n_frames=2, frame_limit=7
-            )
-            self.assertEqual(len(mm), 5 * 6)
+            hdf = WellClipDataset(tmp, "shear_flow", frame_limit=101)
+            mm = MemmapClipDataset(tmp, "shear_flow", "train", frame_limit=101)
+            self.assertEqual(len(mm), 5 * 94)
             self.assertEqual(hdf.identity, mm.identity)
-            for i in (0, 5, 6, 29):
+            for i in (0, 93, 94, 469):
                 torch.testing.assert_close(
                     hdf[i]["clip"], mm[i]["clip"], rtol=0, atol=0
                 )
+            full_hdf = WellClipDataset(tmp, "shear_flow")
+            full_mm = MemmapClipDataset(tmp, "shear_flow", "train")
+            self.assertEqual(len(full_mm), 5 * 193)
+            self.assertEqual(len(full_hdf), len(full_mm))
+            self.assertEqual(full_mm.window(192), (0, 192))
+            self.assertEqual(full_mm.window(193), (1, 0))
+            self.assertEqual(full_mm.window(964), (4, 192))
+            for i in (0, 101, 192, 193, 964):
+                torch.testing.assert_close(
+                    full_hdf[i]["clip"], full_mm[i]["clip"], rtol=0, atol=0
+                )
+            self.assertFalse(torch.equal(full_mm[93]["clip"], full_mm[192]["clip"]))
             fit, held = train_valid_trajectory_split(5)
             self.assertFalse(set(fit) & set(held))
             with self.assertRaises(IndexError):

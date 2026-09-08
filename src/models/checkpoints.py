@@ -37,5 +37,6 @@ def load_encoder(path):
         },
         config_sha256=canonical_hash(config),
         training_identity=payload.get("training_identity"),
+        data_exposure=payload.get("data_exposure"),
     )
     return encoder, config, metadata

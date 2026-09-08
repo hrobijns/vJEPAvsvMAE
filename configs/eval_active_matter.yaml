@@ -1,5 +1,5 @@
 dataset: active_matter
-frame_limit: 101
+frame_limit: null
 n_frames: 8
 gaps:
 - 0
