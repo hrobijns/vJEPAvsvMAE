@@ -1,8 +1,44 @@
-# Analysis contract
+# Training and analysis contract
 
 The implementation retains the corrected workshop analysis while separating
-system-specific physics from sampling, probes, and reporting. It does not
-implement future-clip pretraining or attentive probes.
+system-specific physics from sampling, probes, and reporting. Four pretraining
+objectives share this analysis; attentive probes remain a later research change.
+
+## Pretraining objectives
+
+Every online encoder takes an eight-frame context with 90% random tube masking:
+the same spatial positions are hidden throughout the clip. The encoder is a
+12-block, width-384 ViT with 2×16×16 patches. Both JEPA predictors use six blocks;
+both MAE decoders use four. All heads have width 192 and six attention heads.
+These retain the existing family-specific head capacities; this comparison does
+not claim identical compute or parameter counts across families.
+
+`jepa` predicts EMA-encoder features at masked positions in the current clip;
+`mae` predicts normalized pixels at those same masked positions. `jepa_future`
+and `mae_future` instead predict every patch of the immediately following
+eight-frame clip. For context frames 0–7, the future target is 8–15. There is
+no additional gap, no hidden-context loss, and no autoregressive rollout.
+
+The future heads jointly process visible context features and one query per
+future patch. Their fixed positions distinguish temporal patch indices 0–3
+in the context from 4–7 in the future. Each encoder invocation still processes
+one eight-frame clip, using its own positions 0–3. Future values never enter
+the online encoder or prediction head.
+
+Both JEPA variants use smooth-L1 loss on target features after per-token layer
+normalization. The target encoder processes the full target clip with stopped
+gradients and follows the online encoder by EMA, with cosine momentum from
+0.996 toward 1 over the training budget. Predictor parameters use gradients,
+not EMA. Both MAE variants use per-patch normalized pixel MSE (patch variance
+uses PyTorch's sample-variance convention; epsilon 1e-6) and have no EMA encoder.
+Future MAE diagnostic images remain in normalized patch units and do not use
+future patch statistics to rescale predictions into physical fields.
+
+The adjacent future-only target follows the task structure of
+[Qu et al.](https://arxiv.org/abs/2603.13227). Our eight-frame masked inputs and
+EMA-based JEPA retain our controlled comparison's recipe; Qu et al. use
+16-frame unmasked contexts and VICReg without an EMA teacher. This is an
+analogous task, not a reproduction of their architecture or training recipe.
 
 ## Physical inputs and targets
 
@@ -45,8 +81,12 @@ scientific metadata. Channel order and geometry are validated at ingestion.
 ## Sampling and selection
 
 Current training and evaluation configurations use each trajectory's full
-available length (`frame_limit: null`). All overlapping eight-frame training
-clips are eligible, with starts spaced one frame apart. The source determines
+available length (`frame_limit: null`). Starts are spaced one frame apart.
+Current objectives use all `T - 7` eight-frame windows in a trajectory of length
+`T`; future objectives use all `T - 15` adjacent context/target pairs. This gives
+193 versus 185 examples for 200 frames, or 74 versus 66 for 81 frames. Current
+objectives keep their extra final starts. Pairs never cross trajectory boundaries,
+and a trajectory shorter than the requested window is rejected. The source determines
 the length: there is no fixed 200-frame cap. Training retains the internal
 trajectory split, batch size 64, and the 100,000-step starting budget.
 
@@ -57,6 +97,10 @@ size, including repetitions and excluding validation. Equivalent passes divide
 by eligible training clips; the last incomplete training batch is dropped.
 These counters continue from the checkpoint step on resume and do not measure
 distinct clips or independent physical observations.
+A future context/target pair counts once in these counters; its target does
+not double processed exposure. Dataset caches retain full trajectories and
+serve both tasks without a format change. Objective names bind resume identity
+to the target policy while keeping all encoder checkpoint shapes at eight frames.
 
 The workshop regression configuration explicitly caps support at 101 frames.
 Both protocols use the following unchanged evaluation rules. An eight-frame
@@ -130,11 +174,31 @@ identities, analysis code, checkpoint geometry/training protocol, and the
 explicit expected roster. New schema artifacts must be regenerated from data;
 there is no converter that treats old result JSON as current evidence.
 
-## Next experiment phase
+## Required next experiment stages
 
-Add latent/pixel × same-clip/future-clip objectives, validate the four-way comparison
-on RB, and scale to all three systems. Choose richer non-RB physical quantities
-and add attentive probing as separate research changes. Preserve matched data,
-context and masking policies, and record optimization/data-exposure budgets.
-Old checkpoint LRs and the workshop's observed differences are not new ICLR
-results.
+1. **Repeat LR selection before full scientific training.** All four objectives
+   need new sweeps because both current objectives now also use full trajectories.
+   Start with RB, then complete the corresponding sweeps before full runs on each
+   additional system. Use seed 0 and 8,000 optimizer steps per candidate, with the
+   existing 5,000-step warmup and cosine schedule over the 8,000-step pilot budget.
+   Both JEPA variants use candidates `5e-5, 1e-4, 2e-4`; both MAE variants use
+   `2.5e-5, 5e-5, 1e-4`. This is 12 pilots per system, 36 across all three.
+   Select each dataset/objective's rate by its minimum recorded internal
+   pretraining validation loss across the completed pilot, never test or probe
+   performance. Inspect collapse diagnostics. Retain all candidate losses, selected
+   rates, and run locations. Current configuration rates remain provisional.
+2. **Train fresh scientific seeds 1, 2, and 3** using the selected rates and the
+   100,000-step starting budget. Seed-0 pilots are excluded from final results.
+   Compare final endpoints; best-validation checkpoints remain diagnostics.
+   Assess training sufficiency through validation losses and intermediate
+   checkpoints before deciding whether the shared budget needs to increase.
+3. **Extend the analysis.** Add physical-quantity probes for the adjacent clip
+   (8–15 for context 0–7), alongside the existing current and more distant
+   targets (0–7, 16–23, 40–47). Existing `gap=0` denotes the current clip, so this
+   extension must represent the adjacent target explicitly without changing the
+   meaning of workshop results. Attentive probes and richer non-RB physical
+   quantities are separate research changes.
+
+The implementation checks and short GPU runs do not replace these stages or
+establish model convergence. Historical learning rates and workshop differences
+are not new ICLR results.

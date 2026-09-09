@@ -7,16 +7,14 @@ import torch
 from src.data.well import ClipSpec
 from src.evaluation.artifacts import canonical_hash, sha256_file
 from src.models.vit import build_encoder
+from src.objectives import OBJECTIVES
 
 
 def load_encoder(path):
     payload = torch.load(path, map_location="cpu", weights_only=False)
     config = payload["config"]
     spec = ClipSpec(**payload["spec"])
-    if min(asdict(spec).values()) < 1 or config["objective_name"] not in (
-        "jepa",
-        "mae",
-    ):
+    if min(asdict(spec).values()) < 1 or config["objective_name"] not in OBJECTIVES:
         raise ValueError("invalid encoder checkpoint")
     encoder = build_encoder(spec, config["encoder"])
     encoder.load_state_dict(payload["encoder"], strict=True)

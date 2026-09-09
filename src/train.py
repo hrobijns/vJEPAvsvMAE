@@ -1,4 +1,4 @@
-"""Unified training entrypoint for both objectives.
+"""Unified training entrypoint for current-clip and future-clip JEPA and MAE.
 
 Usage:
     python -m src.train --config configs/active_matter_jepa.yaml
@@ -64,7 +64,7 @@ def validate_resume(checkpoint, identity):
 
 
 def training_exposure(step, optim, fit_clips, valid_clips):
-    """Count clips used by completed updates, including repeated examples."""
+    """Count input examples used by updates; a future pair counts once."""
     processed = step * optim["batch_size"]
     planned = optim["total_steps"] * optim["batch_size"]
     return {
@@ -101,6 +101,10 @@ def set_seed(seed: int):
     # Seeds do not force deterministic CUDA kernels; retain the workshop recipe.
 
 
+def batch_to_device(batch, device):
+    return {key: value.to(device, non_blocking=True).float() for key, value in batch.items()}
+
+
 @torch.no_grad()
 def evaluate(model, val_loader, device, use_amp, max_batches=None):
     """Mean loss + mean collapse-diagnostic metrics over the val loader."""
@@ -109,9 +113,9 @@ def evaluate(model, val_loader, device, use_amp, max_batches=None):
     for i, batch in enumerate(val_loader):
         if max_batches is not None and i >= max_batches:
             break
-        clip = batch["clip"].to(device, non_blocking=True).float()
+        batch = batch_to_device(batch, device)
         with torch.autocast("cuda", torch.bfloat16, enabled=use_amp):
-            _, metrics = model(clip)
+            _, metrics = model(**batch)
         for k, v in metrics.items():
             totals[k] = totals.get(k, 0.0) + v
         n += 1
@@ -122,10 +126,10 @@ def evaluate(model, val_loader, device, use_amp, max_batches=None):
 def build_model(objective: str, spec: ClipSpec, cfg: dict) -> torch.nn.Module:
     encoder = build_encoder(spec, cfg.get("encoder", {}))
     obj_cfg = cfg.get("objective", {})
-    if objective == "jepa":
-        return JEPAModel(encoder, obj_cfg)
-    if objective == "mae":
-        return MAEModel(encoder, obj_cfg)
+    if objective in ("jepa", "jepa_future"):
+        return JEPAModel(encoder, obj_cfg, future=objective == "jepa_future")
+    if objective in ("mae", "mae_future"):
+        return MAEModel(encoder, obj_cfg, future=objective == "mae_future")
     raise ValueError(f"unknown objective {objective!r}")
 
 
@@ -220,6 +224,7 @@ def main():
         split="train",
         n_frames=n_frames,
         frame_limit=dcfg["frame_limit"],
+        future=cfg["objective_name"] in ("jepa_future", "mae_future"),
     )
     inventory = dataset_type(**data_kwargs)
     fit_idx, valid_idx = train_valid_trajectory_split(
@@ -328,10 +333,10 @@ def main():
 
         batch = next(batches)
         # memmaps store fp16 to halve host->device bytes; cast on-GPU
-        clip = batch["clip"].to(device, non_blocking=True).float()
+        batch = batch_to_device(batch, device)
 
         with torch.autocast("cuda", torch.bfloat16, enabled=use_amp):
-            loss, metrics = model(clip)
+            loss, metrics = model(**batch)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         grad_norm = torch.nn.utils.clip_grad_norm_(
@@ -346,7 +351,7 @@ def main():
 
         exposure = training_exposure(step + 1, ocfg, len(fit_ds), len(val_ds))
         if (step + 1) % log_every == 0:
-            ips = log_every * clip.size(0) / (time.time() - t0)
+            ips = log_every * batch["clip"].size(0) / (time.time() - t0)
             t0 = time.time()
             line = " ".join(f"{k}={v:.4f}" for k, v in metrics.items())
             print(
@@ -372,13 +377,22 @@ def main():
             import wandb
 
             model.eval()
-            orig, recon = model.reconstruction_figure(clip[:1])
+            orig, recon = model.reconstruction_figure(
+                **{key: value[:1] for key, value in batch.items()}
+            )
             model.train()
+            captions = (
+                ("future target (normalized patches)", "future prediction (normalized patches)")
+                if model.future and model.norm_pix
+                else ("future target", "future prediction")
+                if model.future
+                else ("original", "reconstruction")
+            )
             wandb_run.log(
                 {
-                    "recon": [
-                        wandb.Image(orig, caption="original"),
-                        wandb.Image(recon, caption="reconstruction"),
+                    "future_prediction" if model.future else "recon": [
+                        wandb.Image(orig, caption=captions[0]),
+                        wandb.Image(recon, caption=captions[1]),
                     ]
                 },
                 step=step + 1,

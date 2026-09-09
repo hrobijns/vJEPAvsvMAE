@@ -7,6 +7,7 @@ import csv
 import numpy as np
 
 from src.evaluation.artifacts import Artifact, seal, staged_directory, write_json
+from src.objectives import OBJECTIVES
 
 METRICS = ("test_r2", "test_pearson_r", "test_mse", "test_log_mse")
 
@@ -26,7 +27,7 @@ def _summary(values, metric):
 
 
 def aggregate(
-    paths, output, objectives=("jepa", "mae"), seeds=(1, 2, 3), kind="probes"
+    paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probes"
 ):
     if (
         not objectives

@@ -3,14 +3,25 @@
 A controlled comparison of frozen representations learned by matched video
 encoders on Rayleigh–Bénard convection, active matter, and shear flow.
 
-Both current objectives predict masked content **within the same eight-frame
-clip**: JEPA predicts EMA-encoder features; MAE reconstructs normalized pixels.
-Neither currently trains on future clips. The encoder, tube masking, and input
-pipeline are shared; the heads, losses, and learning rates differ.
+Four objectives separate latent versus pixel prediction from current versus
+future targets. Every online encoder receives eight frames with 90% tube masking.
+
+| Objective | Context | Prediction target |
+|---|---|---|
+| `jepa` | Masked frames 0–7 | EMA features at masked positions in 0–7 |
+| `mae` | Masked frames 0–7 | Normalized pixels at masked positions in 0–7 |
+| `jepa_future` | Masked frames 0–7 | EMA features at every position in 8–15 |
+| `mae_future` | Masked frames 0–7 | Normalized pixels at every position in 8–15 |
+
+Future objectives predict the adjacent clip jointly and use no reconstruction
+loss on the context. JEPA uses a six-layer predictor and an EMA target encoder;
+MAE uses a four-layer decoder and direct pixel targets. Both heads have width
+192. The shared ViT encoder has width 384 and 12 blocks, with 2×16×16 patches.
 
 This checkout contains one analysis workflow. Current configurations use the
 **whole available trajectory** for training and evaluation (`frame_limit: null`).
 Eight-frame training clips overlap with starting times spaced one frame apart.
+Future examples pair each context with the immediately following eight frames.
 The source determines trajectory length; there is no 200-frame cap. The RB data
 checked here have 200 frames, shear flow is documented with 200, and active
 matter with 81. The corrected workshop analysis remains the regression baseline,
@@ -34,6 +45,10 @@ Checked-in YAML files are the configuration source of truth. Existing learning
 rates remain starting settings from the previous experiments; they have not
 been retuned for future ICLR experiments.
 
+**Before full scientific training, repeat the learning-rate sweeps for all four
+objectives.** The required pilot recipe and subsequent analysis work are recorded
+under [Next experiment stages](#next-experiment-stages).
+
 ```bash
 uv run --locked python -m src.data.preprocess \
   --base /path/to/data --dataset rayleigh_benard --split train
@@ -42,7 +57,8 @@ uv run --locked python -m src.train \
   --seed 1 --out runs/full_trajectories --no-wandb
 ```
 
-Repeat with the MAE configuration and desired seeds. Replace the dataset name
+Repeat with `mae`, `jepa_future`, and `mae_future` configurations and desired
+seeds. Replace the dataset name
 with `active_matter` or `shear_flow` for the other systems. The trainer also
 accepts `--lr`, `--steps`, `--mask-ratio`, and `--out` overrides.
 
@@ -54,6 +70,13 @@ equivalent passes at the recorded step. Processed clips equal completed updates
 times batch size; repetitions count, and validation clips do not. Equivalent
 passes divide processed clips by the number of eligible training clips, so they
 are not counts of unique examples or independently generated simulations.
+For future objectives, one context/target pair counts as one input example;
+the target does not double the processed-clip count. A trajectory of length `T`
+has `T - 7` current windows or `T - 15` future pairs. These give 193 versus 185
+examples at 200 frames, and 74 versus 66 at 81 frames. Each objective uses all
+its eligible starts; current objectives retain the final eight starts that
+cannot supply a future target.
+
 Resume continues these counters from the saved optimizer step. At batch 64,
 100,000 steps process 6.4 million clips: about 27.1 passes over RB's 236,425
 full-trajectory training windows, compared with 55.6 over the workshop's 115,150.
@@ -65,7 +88,7 @@ index, channels, normalization, full lengths, and content hashes. Old caches
 must be rebuilt; they are not silently accepted or overwritten. Interrupted
 preprocessing can resume when its source contract still matches.
 Completed caches in the current format already contain full trajectories and
-can be reused when removing a sampling cap.
+can be reused for current and future objectives without regeneration.
 
 Checkpoints contain their configuration, input shape, and training identity.
 `latest.pt` resumes only when source, temporal support, split, model, and
@@ -76,6 +99,10 @@ training diagnostic, not the endpoint-selection rule for the comparison.
 Encoder checkpoints at 25%, 50%, 75%, and 100% of the planned steps support
 learning-curve analysis. The 100,000-step budget is a starting choice; assess
 training sufficiency on validation data before changing the comparison budget.
+Current and future objectives have distinct resume identities even though their
+encoder geometry and learned parameter shapes agree. MAE future images, when
+patch normalization is enabled, compare normalized predictions and targets;
+they are not rescaled using future patch means or variances.
 
 ## Frozen-encoder analysis
 
@@ -93,7 +120,7 @@ for split in valid test; do
     --split "$split" --cache-root "$OUT/cache"
 done
 
-for objective in jepa mae; do
+for objective in jepa mae jepa_future mae_future; do
   for seed in 1 2 3; do
     checkpoint="runs/full_trajectories/rayleigh_benard_${objective}_seed${seed}/encoder_100pct.pt"
     uv run --locked python -m src.evaluate extract-features \
@@ -114,7 +141,7 @@ done
 
 for kind in probes noise; do
   uv run --locked python -m src.evaluate aggregate "$OUT/$kind/"* \
-    --kind "$kind" --objectives jepa mae --seeds 1 2 3 \
+    --kind "$kind" --objectives jepa mae jepa_future mae_future --seeds 1 2 3 \
     --output "$OUT/${kind}_aggregate"
   uv run --locked python -m src.evaluate plot \
     --aggregate-dir "$OUT/${kind}_aggregate" --output "$OUT/${kind}_plots"
@@ -123,12 +150,17 @@ done
 
 For workshop reproduction, use
 `configs/workshop/eval_rayleigh_benard.yaml`, a fresh output root such as
-`outputs/rb_workshop`, and replace the checkpoint assignment above with
+`outputs/rb_workshop`, restrict the loop and aggregate `--objectives` to
+`jepa mae`, and replace the checkpoint assignment above with
 `checkpoint="checkpoints/neuripsworkshop/rayleigh_benard_${objective}_seed${seed}.pt"`.
 This uses the same analysis code with explicit frames 0–100. Full-trajectory
 analysis of those historical weights is a separate experiment: it does not make
 them models trained on full trajectories. New temporal protocols require new
 analysis artifacts; existing completed outputs are not overwritten or mixed.
+
+The existing probe targets remain frames 0–7, 16–23, and 40–47 for a context
+at 0–7. Adding the adjacent target at 8–15 is an explicit later analysis task.
+Future-model training validation already measures the adjacent prediction loss.
 
 `fit-probes` produces the main selection, separate Ridge/MLP results, pooled
 depth curves, regime decoding, regime/time and position controls, the combined
@@ -153,6 +185,26 @@ For the other systems, select `configs/eval_active_matter.yaml` or
 initial physical target is enstrophy; their governing parameters are also
 probed. Richer target sets are deliberately deferred. The six retained RB
 checkpoints cannot be substituted for models of another system.
+
+## Next experiment stages
+
+1. **Run LR sweeps before full training**, starting with RB and repeating for
+   each additional system. Sweep all four objectives with seed 0, 8,000 steps,
+   and the existing 5,000-step warmup. JEPA candidates are `5e-5, 1e-4, 2e-4`;
+   MAE candidates are `2.5e-5, 5e-5, 1e-4`, shared within each family. Select by
+   minimum recorded internal validation loss during each completed pilot,
+   inspect collapse diagnostics, and save candidate scores, selected rates,
+   and run locations. Do not select using test or probe performance.
+2. **Train fresh seeds 1, 2, and 3** with selected rates and the initial
+   100,000-step budget. Compare final endpoints and assess training sufficiency
+   using validation and learning curves. Seed-0 pilots are not final results.
+3. **Extend the analysis**, explicitly including physical-quantity probes for
+   the adjacent clip (8–15). Add attentive probes and richer physical targets
+   for the other systems as separate research changes.
+
+See [the methods contract](docs/METHODS.md#required-next-experiment-stages) for
+selection details. Short implementation checks do not replace the LR sweeps
+or establish scientific performance.
 
 ## Methods and repository layout
 
@@ -201,3 +253,24 @@ and MAE/memmap training jobs were interrupted after step 2 and restarted through
 step 6 with two data-loader workers; optimizer counters, parameter updates,
 checkpoint identities, and continuous training histories were checked.
 These CPU checks are not a full scientific rerun or a test of GPU execution.
+
+Future-objective validation passed all 24 unit tests, including four focused
+tests of future-only losses, information boundaries, gradients/EMA, and pixel
+diagnostics. Paired-window/backend and resume-identity checks extend existing
+tests. A direct CPU comparison against the previous commit reproduced current
+JEPA/MAE losses, metrics, post-update model/EMA weights, and MAE images exactly;
+all six retained workshop encoder checkpoints still load.
+
+All twelve dataset/objective combinations also completed 64-step training on
+an NVIDIA L40S using real data subsets, native resolution, eight-frame inputs,
+batch size 64, and bf16. JEPA variants used HDF5; MAE variants used memmap.
+Both RB future objectives were interrupted at step 16 and resumed to step 64.
+Checks covered finite nonzero encoder/head gradients, frozen JEPA teacher
+gradients, milestone checkpoint reloads, continuous histories, and exposure
+counts. All four encoders completed feature extraction, probes, noise evaluation,
+aggregation, and plotting on every system, producing 21 PDFs. Analysis used seed
+0, ten-step MLP fits, and noise levels 0/.1 with one corruption draw. Local
+verification evidence is under ignored
+`outputs/future_objectives_verification/`. These short jobs establish workflow
+operation, not convergence; the required LR sweeps and scientific runs remain
+the next stages.

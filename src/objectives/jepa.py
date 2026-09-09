@@ -1,8 +1,9 @@
 """V-JEPA-style objective: masked feature prediction in latent space.
 
-Targets come from an EMA "target encoder" run on the full (unmasked) clip;
+Targets come from an EMA "target encoder" run on the full (unmasked) target clip;
 targets are layer-normalized (no affine) and gradients are stopped. The online
-encoder sees only visible tokens; a narrow predictor fills in masked positions.
+encoder sees only visible context tokens. Predict masked current positions or
+every position of the adjacent future clip, depending on the objective.
 """
 
 import copy
@@ -18,9 +19,10 @@ from src.models.vit import VideoViT
 
 
 class JEPAModel(nn.Module):
-    def __init__(self, encoder: VideoViT, cfg: dict):
+    def __init__(self, encoder: VideoViT, cfg: dict, future: bool = False):
         super().__init__()
         self.encoder = encoder
+        self.future = future
         self.mask_ratio = cfg.get("mask_ratio", 0.9)
         self.ema_start = cfg.get("ema_start", 0.996)
         self.ema_end = cfg.get("ema_end", 1.0)
@@ -32,12 +34,19 @@ class JEPAModel(nn.Module):
             dim=cfg.get("predictor_dim", 384),
             depth=cfg.get("predictor_depth", 6),
             num_heads=cfg.get("predictor_heads", 6),
+            future=future,
         )
         self.target_encoder = copy.deepcopy(encoder)
         for p in self.target_encoder.parameters():
             p.requires_grad = False
 
-    def forward(self, clip: torch.Tensor) -> tuple[torch.Tensor, dict]:
+    def forward(
+        self, clip: torch.Tensor, target_clip: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, dict]:
+        if (target_clip is not None) != self.future:
+            raise ValueError("target_clip is required only for future prediction")
+        if self.future and target_clip.shape != clip.shape:
+            raise ValueError("context and future clips must have the same shape")
         b = clip.size(0)
         keep_idx, mask_idx, _ = tube_mask(
             b,
@@ -51,9 +60,9 @@ class JEPAModel(nn.Module):
         pred = self.predictor(context, keep_idx, mask_idx)
 
         with torch.no_grad():
-            target_all = self.target_encoder(clip)  # full clip, all tokens
+            target_all = self.target_encoder(target_clip if self.future else clip)
             target_all = F.layer_norm(target_all, (target_all.size(-1),))
-            target = gather_tokens(target_all, mask_idx)
+            target = target_all if self.future else gather_tokens(target_all, mask_idx)
 
         loss = F.smooth_l1_loss(pred, target)
 

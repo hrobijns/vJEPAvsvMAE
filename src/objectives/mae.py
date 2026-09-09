@@ -1,4 +1,4 @@
-"""VideoMAE-style objective: masked patch reconstruction in pixel space."""
+"""Pixel prediction for masked current patches or every patch of the next clip."""
 
 import torch
 import torch.nn as nn
@@ -11,9 +11,10 @@ from src.models.vit import VideoViT
 
 
 class MAEModel(nn.Module):
-    def __init__(self, encoder: VideoViT, cfg: dict):
+    def __init__(self, encoder: VideoViT, cfg: dict, future: bool = False):
         super().__init__()
         self.encoder = encoder
+        self.future = future
         self.mask_ratio = cfg.get("mask_ratio", 0.9)
         self.norm_pix = cfg.get("norm_pix", True)
         self.decoder = MAEDecoder(
@@ -25,13 +26,30 @@ class MAEModel(nn.Module):
             dim=cfg.get("decoder_dim", 192),
             depth=cfg.get("decoder_depth", 4),
             num_heads=cfg.get("decoder_heads", 6),
+            future=future,
         )
 
     def patchify(self, x: torch.Tensor) -> torch.Tensor:
         """(B, C, T, H, W) -> (B, N, patch_dim), same token order as encoder."""
         return _patchify(x, self.encoder.patch_size)
 
-    def forward(self, clip: torch.Tensor) -> tuple[torch.Tensor, dict]:
+    def _target_patches(self, clip, mask_idx):
+        target = self.patchify(clip)
+        if not self.future:
+            target = gather_tokens(target, mask_idx)
+        if self.norm_pix:
+            mean = target.mean(dim=-1, keepdim=True)
+            var = target.var(dim=-1, keepdim=True)
+            target = (target - mean) / (var + 1e-6).sqrt()
+        return target
+
+    def forward(
+        self, clip: torch.Tensor, target_clip: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, dict]:
+        if (target_clip is not None) != self.future:
+            raise ValueError("target_clip is required only for future prediction")
+        if self.future and target_clip.shape != clip.shape:
+            raise ValueError("context and future clips must have the same shape")
         b = clip.size(0)
         keep_idx, mask_idx, _ = tube_mask(
             b,
@@ -44,11 +62,7 @@ class MAEModel(nn.Module):
         feats = self.encoder(clip, keep_idx)
         pred = self.decoder(feats, keep_idx, mask_idx)
 
-        target = gather_tokens(self.patchify(clip), mask_idx)
-        if self.norm_pix:
-            mean = target.mean(dim=-1, keepdim=True)
-            var = target.var(dim=-1, keepdim=True)
-            target = (target - mean) / (var + 1e-6).sqrt()
+        target = self._target_patches(target_clip if self.future else clip, mask_idx)
         loss = F.mse_loss(pred, target)
 
         with torch.no_grad():
@@ -62,12 +76,16 @@ class MAEModel(nn.Module):
         pass  # no EMA; hook kept for API parity with JEPA
 
     @torch.no_grad()
-    def reconstruction_figure(self, clip: torch.Tensor):
+    def reconstruction_figure(
+        self, clip: torch.Tensor, target_clip: torch.Tensor | None = None
+    ):
         """Full-field reconstruction of channel 0, frame 0 for W&B logging.
 
         Returns (original, reconstructed) numpy arrays (H, W) for one sample.
         Masked patches are filled with predictions (de-normalized per patch if
         norm_pix), visible patches with ground truth.
+        Future predictions and targets stay in normalized patch units; no
+        target-derived means/variances are used to rescale predictions.
         """
         b = clip.size(0)
         keep_idx, mask_idx, _ = tube_mask(
@@ -80,6 +98,16 @@ class MAEModel(nn.Module):
         )
         feats = self.encoder(clip, keep_idx)
         pred = self.decoder(feats, keep_idx, mask_idx)
+        if self.future:
+            target = self._target_patches(target_clip, mask_idx)
+            clips = [
+                _unpatchify(
+                    patches, self.encoder.grid_t, self.encoder.grid_h,
+                    self.encoder.grid_w, self.encoder.patch_size,
+                )
+                for patches in (target, pred)
+            ]
+            return tuple(x[0, 0, 0].float().cpu().numpy() for x in clips)
         patches = self.patchify(clip)
         if self.norm_pix:
             tgt = gather_tokens(patches, mask_idx)

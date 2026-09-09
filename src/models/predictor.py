@@ -1,4 +1,4 @@
-"""JEPA predictor: predicts target-encoder features at masked positions."""
+"""JEPA predictor for masked current patches or all patches of the next clip."""
 
 import torch
 import torch.nn as nn
@@ -17,11 +17,14 @@ class JEPAPredictor(nn.Module):
         dim: int = 384,
         depth: int = 6,
         num_heads: int = 6,
+        future: bool = False,
     ):
         super().__init__()
         self.proj_in = nn.Linear(encoder_dim, dim)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, dim))
-        pos = sincos_3d(dim, grid_t, grid_h, grid_w)
+        self.future = future
+        self.n_tokens = grid_t * grid_h * grid_w
+        pos = sincos_3d(dim, grid_t * (2 if future else 1), grid_h, grid_w)
         self.register_buffer("pos_embed", pos.unsqueeze(0), persistent=False)
         self.blocks = nn.ModuleList([Block(dim, num_heads) for _ in range(depth)])
         self.norm = nn.LayerNorm(dim)
@@ -34,11 +37,15 @@ class JEPAPredictor(nn.Module):
         keep_idx: torch.Tensor,  # (B, Nv)
         mask_idx: torch.Tensor,  # (B, Nm)
     ) -> torch.Tensor:
-        """Returns predicted features at masked positions: (B, Nm, De).
+        """Return features for hidden current patches or every future patch.
 
         Context tokens and mask tokens are processed jointly (positions from
-        pos_embed); predictions are read out at the masked positions.
+        pos_embed); only target tokens produce predictions.
         """
+        if self.future:
+            mask_idx = torch.arange(
+                self.n_tokens, 2 * self.n_tokens, device=keep_idx.device
+            ).expand(context_feats.size(0), -1)
         ctx = self.proj_in(context_feats) + gather_tokens(
             self.pos_embed.expand(context_feats.size(0), -1, -1), keep_idx
         )

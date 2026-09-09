@@ -48,7 +48,7 @@ def _windows(records, trajectories, n_frames, frame_limit):
         for r in (records[i] for i in ids)
     ]
     if min(counts) < 1:
-        raise ValueError("a trajectory is shorter than a clip")
+        raise ValueError("a trajectory is shorter than the requested training window")
     return ids, np.cumsum([0, *counts])
 
 
@@ -62,6 +62,13 @@ class _ClipDataset(torch.utils.data.Dataset):
         local = int(np.searchsorted(self.offsets, index, side="right") - 1)
         return self.traj_ids[local], int(index - self.offsets[local])
 
+    def __getitem__(self, index):
+        trajectory, start = self.window(index)
+        example = {"clip": self._clip(trajectory, start)}
+        if self.future:
+            example["target_clip"] = self._clip(trajectory, start + self.spec.n_frames)
+        return example
+
 
 class WellClipDataset(_ClipDataset):
     def __init__(
@@ -72,23 +79,23 @@ class WellClipDataset(_ClipDataset):
         n_frames=8,
         trajectories=None,
         frame_limit=None,
+        future=False,
     ):
         self.source = WellSource(base_path, dataset_name, split, n_frames)
         self.records = self.source.records
         self.traj_ids, self.offsets = _windows(
-            self.records, trajectories, n_frames, frame_limit
+            self.records, trajectories, n_frames * (2 if future else 1), frame_limit
         )
+        self.future = future
         self.n_traj = len(self.records)
         self.identity = self.source.identity
         self.spec = ClipSpec(len(self.source.channels), n_frames, *self.source.shape)
 
-    def __getitem__(self, index):
-        trajectory, start = self.window(index)
+    def _clip(self, trajectory, start):
         # Match the training cache's fp16 storage precision on either backend.
-        clip = normalize(
+        return normalize(
             self.source.clip(trajectory, start), self.source.means, self.source.stds
         ).half()
-        return {"clip": clip}
 
 
 @lru_cache(maxsize=8)
@@ -106,6 +113,7 @@ class MemmapClipDataset(_ClipDataset):
         n_frames=8,
         trajectories=None,
         frame_limit=None,
+        future=False,
     ):
         directory = Path(base_path).expanduser() / "memmap" / dataset_name
         self.path = directory / f"{split}.npy"
@@ -161,17 +169,15 @@ class MemmapClipDataset(_ClipDataset):
             meta["array_sha256"],
         )
         self.traj_ids, self.offsets = _windows(
-            self.records, trajectories, n_frames, frame_limit
+            self.records, trajectories, n_frames * (2 if future else 1), frame_limit
         )
+        self.future = future
         self.n_frames = n_frames
         self.n_traj = n
         self.identity = meta["source_identity"]
         self.spec = ClipSpec(c, n_frames, h, w)
 
-    def __getitem__(self, index):
-        trajectory, start = self.window(index)
-        return {
-            "clip": torch.from_numpy(
-                np.array(self.mm[trajectory, :, start : start + self.n_frames])
-            )
-        }
+    def _clip(self, trajectory, start):
+        return torch.from_numpy(
+            np.array(self.mm[trajectory, :, start : start + self.n_frames])
+        )

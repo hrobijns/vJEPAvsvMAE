@@ -36,6 +36,7 @@ from src.evaluation.protocol import (
 )
 from src.evaluation.reporting import aggregate, plot
 from src.models.vit import build_encoder
+from src.objectives import OBJECTIVES
 from src.physics.systems import SYSTEMS
 from src.physics import rayleigh_benard as rb, rb_derivatives as R
 from src.physics.quadrature import quad_weights
@@ -440,6 +441,30 @@ class WorkflowTests(unittest.TestCase):
                     full_hdf[i]["clip"], full_mm[i]["clip"], rtol=0, atol=0
                 )
             self.assertFalse(torch.equal(full_mm[93]["clip"], full_mm[192]["clip"]))
+            for frames in (81, 200):
+                paired_hdf = WellClipDataset(tmp, "shear_flow", frame_limit=frames, future=True)
+                paired_mm = MemmapClipDataset(tmp, "shear_flow", "train", frame_limit=frames, future=True)
+                count = frames - 15
+                self.assertEqual(len(paired_hdf), 5 * count)
+                self.assertEqual(len(paired_mm), len(paired_hdf))
+                self.assertEqual(paired_hdf.spec.n_frames, 8)
+                self.assertEqual(paired_hdf.window(count - 1), (0, frames - 16))
+                self.assertEqual(paired_hdf.window(count), (1, 0))
+                for index in (0, count - 1, count, len(paired_hdf) - 1):
+                    trajectory, start = paired_hdf.window(index)
+                    pair = paired_hdf[index]
+                    for key, offset in (("clip", 0), ("target_clip", 8)):
+                        torch.testing.assert_close(pair[key], paired_mm[index][key], rtol=0, atol=0)
+                        torch.testing.assert_close(
+                            pair[key], full_mm[trajectory * 193 + start + offset]["clip"],
+                            rtol=0, atol=0,
+                        )
+                with self.assertRaises(IndexError):
+                    paired_hdf[len(paired_hdf)]
+            for backend in (WellClipDataset, MemmapClipDataset):
+                with self.assertRaises(ValueError):
+                    backend(tmp, "shear_flow", "train", frame_limit=15, future=True)
+                self.assertEqual(len(backend(tmp, "shear_flow", "train", frame_limit=16, future=True)), 5)
             fit, held = train_valid_trajectory_split(5)
             self.assertFalse(set(fit) & set(held))
             with self.assertRaises(IndexError):
@@ -467,6 +492,14 @@ class WorkflowTests(unittest.TestCase):
         dataset = SimpleNamespace(identity="data")
         identity = training_identity(config, dataset, [1], [0])
         validate_resume({"training_identity": identity}, identity)
+        for objective in OBJECTIVES[1:]:
+            config["objective_name"] = objective
+            with self.assertRaisesRegex(ValueError, "differs"):
+                validate_resume(
+                    {"training_identity": identity},
+                    training_identity(config, dataset, [1], [0]),
+                )
+        config["objective_name"] = "jepa"
         config["data"]["frame_limit"] = None
         with self.assertRaises(ValueError):
             validate_resume(

@@ -11,6 +11,7 @@ from src.evaluation.pipeline import evaluate_noise, fit_probes
 from src.evaluation.protocol import Protocol
 from src.evaluation.reporting import aggregate, plot
 from src.models.checkpoints import load_encoder
+from src.objectives import OBJECTIVES
 
 
 def build_parser():
@@ -46,7 +47,7 @@ def build_parser():
     combine.add_argument("paths", nargs="+")
     combine.add_argument("--output", required=True)
     combine.add_argument("--kind", choices=("probes", "noise"), default="probes")
-    combine.add_argument("--objectives", nargs="+", default=["jepa", "mae"])
+    combine.add_argument("--objectives", nargs="+", default=list(OBJECTIVES))
     combine.add_argument("--seeds", nargs="+", type=int, default=[1, 2, 3])
     figures = sub.add_parser("plot")
     figures.add_argument("--aggregate-dir", required=True)
