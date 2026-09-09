@@ -41,13 +41,15 @@ and `<base>/datasets/<dataset>` layouts are accepted.
 
 ## Training
 
-Checked-in YAML files are the configuration source of truth. Existing learning
-rates remain starting settings from the previous experiments; they have not
-been retuned for future ICLR experiments.
+Checked-in YAML files are the configuration source of truth. The completed RB
+sweep selected `5e-5` for JEPA, `1e-4` for MAE, `2e-4` for future JEPA, and `1e-4`
+for future MAE, using minimum recorded internal validation loss from 8,000-step
+seed-0 pilots. All twelve pilots completed and their diagnostics were reviewed.
 
-**Before full scientific training, repeat the learning-rate sweeps for all four
-objectives.** The required pilot recipe and subsequent analysis work are recorded
-under [Next experiment stages](#next-experiment-stages).
+**Active matter and shear flow rates remain provisional.** Complete their
+four-objective learning-rate sweeps before full scientific training. The pilot
+recipe and subsequent analysis work are recorded under
+[Next experiment stages](#next-experiment-stages).
 
 ```bash
 uv run --locked python -m src.data.preprocess \
@@ -188,9 +190,9 @@ checkpoints cannot be substituted for models of another system.
 
 ## Next experiment stages
 
-1. **Run LR sweeps before full training**, starting with RB and repeating for
-   each additional system. Sweep all four objectives with seed 0, 8,000 steps,
-   and the existing 5,000-step warmup. JEPA candidates are `5e-5, 1e-4, 2e-4`;
+1. **Run LR sweeps before full training** for each system; RB is complete, while
+   active matter and shear flow remain. Sweep all four objectives with seed 0,
+   8,000 steps, and the existing 5,000-step warmup. JEPA candidates are `5e-5, 1e-4, 2e-4`;
    MAE candidates are `2.5e-5, 5e-5, 1e-4`, shared within each family. Select by
    minimum recorded internal validation loss during each completed pilot,
    inspect collapse diagnostics, and save candidate scores, selected rates,
@@ -205,6 +207,57 @@ checkpoints cannot be substituted for models of another system.
 See [the methods contract](docs/METHODS.md#required-next-experiment-stages) for
 selection details. Short implementation checks do not replace the LR sweeps
 or establish scientific performance.
+
+After preparing the full training cache, create the twelve independent pilots
+and submit them as four GPU jobs. Each job runs one objective's three rates in
+sequence, reusing its local cache. The four objectives can run concurrently,
+subject to cluster resources.
+Use the appropriate account and GPU partition for your cluster.
+
+```bash
+SWEEP=outputs/lr_sweeps/rayleigh_benard
+uv run --locked python scripts/lr_sweep.py prepare \
+  --dataset rayleigh_benard --base /path/to/full/data --output "$SWEEP" --workers 4
+sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
+  --array=0-3%4 --output="$SWEEP/logs/%A_%a.log" \
+  scripts/slurm_lr_sweep.sbatch "$SWEEP" 4
+# Run after all twelve pilots finish successfully.
+uv run --locked python scripts/lr_sweep.py collect --output "$SWEEP"
+```
+
+The Slurm launcher copies the full normalized training cache to local disk and
+reuses it for subsequent pilots in that job. `WELL_CACHE_ROOT` overrides the default
+`/tmp/well-training-cache-$UID`; choose a path on your cluster's local SSD with
+enough free space (RB's cache is about 137 GiB). Some clusters give each job a
+private `/tmp`; cross-job reuse requires a local directory visible to both jobs.
+Callers using the same directory share a copy lock, interrupted copies resume
+while the scratch files remain available, and the training loader verifies the
+full content hash.
+This changes storage location only. Raw HDF5 files and probe splits are not copied.
+The worker count is frozen during preparation; four is a measured RB setting,
+so check throughput when changing machines or systems.
+To run all twelve pilots as separate GPU jobs, submit `--array=0-11%12` and omit
+the trailing `4`; this permits more concurrency but may require more copies.
+
+Each run retains both the planned configuration and `runtime_config.yaml`, whose
+only change is the local data path. Invocation and completion records retain both
+hashes and the source identity. For training outside the sweep, the same staging
+command prints the data path to pass to `src.train --data-root`:
+
+```bash
+LOCAL_DATA=$(uv run --locked python scripts/stage_training_cache.py \
+  --base /path/to/full/data --dataset rayleigh_benard \
+  --cache-root "/tmp/well-training-cache-$UID")
+uv run --locked python -m src.train --config configs/rayleigh_benard_jepa.yaml \
+  --data-root "$LOCAL_DATA"
+```
+
+The manifest freezes candidate configurations and source provenance. Each pilot
+uses the whole internal validation split every 2,000 steps. The collector requires
+all twelve completed runs and writes `selection.json` with every candidate's
+validation history, diagnostic flags, chosen rate, and run location. Inspect the
+diagnostics before adopting the rates; collection does not change training YAMLs
+or start the final scientific runs. The same commands support the other systems.
 
 ## Methods and repository layout
 
