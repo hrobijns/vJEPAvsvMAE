@@ -100,8 +100,9 @@ Completed caches in the current format already contain full trajectories and
 can be reused for current and future objectives without regeneration.
 
 Checkpoints contain their configuration, input shape, and training identity.
-`latest.pt` resumes only when source, temporal support, split, model, and
-optimization settings agree. Historical checkpoints remain loadable for
+`latest.pt` resumes only when source, temporal support, split, model,
+optimization, seed, validation/image settings, and source-code hash agree.
+The data location and loader worker count may change. Historical checkpoints remain loadable for
 analysis but cannot automatically resume a new training run. Reported workshop
 models are final 100,000-step endpoints; `encoder_best_val.pt` is an additional
 training diagnostic, not the endpoint-selection rule for the comparison.
@@ -112,6 +113,42 @@ Current and future objectives have distinct resume identities even though their
 encoder geometry and learned parameter shapes agree. MAE future images, when
 patch normalization is enabled, compare normalized predictions and targets;
 they are not rescaled using future patch means or variances.
+
+For training across Slurm allocations, prepare one run YAML with the desired
+`seed`, unique `run_name`, shared `out_dir`, full-cache `data.base_path`, and
+`data.num_workers: 4`. Keep this configuration and the source code fixed for the
+run. Submit from the repository root after creating the log directory:
+
+```bash
+mkdir -p outputs/full_training/logs
+sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
+  --output=outputs/full_training/logs/%j.log \
+  scripts/slurm_train.sbatch /path/to/prepared_run.yaml
+```
+
+This wrapper requests one GPU, four CPUs, 64 GiB RAM, and 12 hours. It stages
+the cache locally on every allocation, including after a requeue, and disables
+W&B; metrics remain in `history.jsonl` and the appended Slurm log. Thirty minutes
+before the deadline, Slurm signals the wrapper, which asks the trainer to finish
+its current update and any scheduled validation, save, and exit with code 75.
+Only this planned stop after forward progress triggers automatic requeue.
+Completion exits successfully; unexpected failures and starts without progress
+require inspection and manual resubmission. A signal during cache staging also
+stops without automatic requeue. Cluster-level preemption/requeue policy still
+applies independently.
+
+Continuation restores the optimizer, EMA target where applicable, learning-rate
+and EMA schedule position, random states, and next shuffled batch. Each pass
+uses its own seeded permutation and drops its incomplete final batch. Worker
+prefetch cannot move the saved consumed position. Checkpoints are atomically
+replaced at regular saves, every validation, milestones, and planned stops.
+The checkpoint records the durable history length; resume removes a later log
+tail and repairs applicable encoder exports before proceeding. Missing or short
+history is an error. A completed run repairs exports and exits without training.
+One trainer at a time may use a run directory. Older `latest.pt` files without
+complete continuation state cannot resume under this code; analysis loading is
+unchanged. CPU continuation is checked for exact equality; CUDA kernels remain
+unconstrained, so bitwise equality across GPU machines is not promised.
 
 ## Frozen-encoder analysis
 
@@ -344,3 +381,18 @@ its recorded validation minimum at step 8,000. Local evidence is retained under
 `outputs/lr_sweeps/active_matter/` and `outputs/lr_sweeps/shear_flow/`; RB evidence
 is under `outputs/lr_sweeps/rayleigh_benard_local/`. Full scientific training
 remains the next stage.
+
+Continuation verification passed all 30 tests, including exact uninterrupted
+versus resumed CPU training for all four objectives across shuffled-pass
+boundaries, worker-count changes, and cache relocation. The checks also cover
+history rollback, interrupted checkpoint writes, export recovery, completed
+runs, incompatible resumes, concurrent writers, and Slurm exit routing. All six
+workshop encoders still load. A native-resolution active-matter future-JEPA run
+used bf16, batch 64, four workers, and seven real trajectories: Slurm signalled
+it at step 8, requeued it once, and it resumed at step 9 from a different local
+cache path before completing step 32. Saved CPU/CUDA RNG restoration, optimizer
+counters, learning rates, validation baseline, history, and exports were checked.
+Both allocations used the same L40S node; this does not establish bitwise
+equivalence across GPU machines or full-budget convergence. The instrumented
+entrypoint, allocation logs, report, and training plot are retained under ignored
+`outputs/continuation_verification/`.

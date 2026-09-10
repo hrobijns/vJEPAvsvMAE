@@ -102,6 +102,31 @@ not double processed exposure. Dataset caches retain full trajectories and
 serve both tasks without a format change. Objective names bind resume identity
 to the target policy while keeping all encoder checkpoint shapes at eight frames.
 
+New runs shuffle complete passes with a permutation determined by the run seed
+and pass number. The next batch is derived from completed optimizer updates,
+not the loader's prefetched position. Separate loader generators keep worker
+creation from consuming the masking random stream. Continuation checkpoints
+retain Python, NumPy, Torch CPU/CUDA random states, model and optimizer state
+(including JEPA's EMA target), best validation values, and the first feature
+standard deviations used for collapse warnings. Schedules use the original
+total budget and the restored global update number; an allocation boundary
+does not restart warmup or EMA scheduling. This preserves the shuffled-pass
+sampling distribution, but new seeded permutations do not reproduce the older
+trainer's batch order.
+
+The continuation identity includes source code, data and sampling, objective,
+architecture, optimizer, seed, precision, and validation/image settings. It
+allows cache relocation and worker-count changes. Atomic latest checkpoints
+precede derived encoder exports and record the flushed history byte position.
+Resume discards uncheckpointed history and recreates applicable interrupted
+exports; incomplete legacy state is rejected. The Slurm wrapper requests a
+stop 30 minutes before its 12-hour allocation ends, finishes the current update
+and scheduled validation, and requeues only after a planned stop with progress.
+It restages local data for each allocation and keeps metrics locally with W&B
+disabled. Unexpected failures require inspection before manual resubmission.
+CPU comparisons test exact continuation; production CUDA kernels retain their
+existing nondeterministic behavior.
+
 The workshop regression configuration explicitly caps support at 101 frames.
 Both protocols use the following unchanged evaluation rules. An eight-frame
 context starting at `s` has its contemporary target at `s`; future targets
