@@ -41,14 +41,21 @@ and `<base>/datasets/<dataset>` layouts are accepted.
 
 ## Training
 
-Checked-in YAML files are the configuration source of truth. The completed RB
-sweep selected `5e-5` for JEPA, `1e-4` for MAE, `2e-4` for future JEPA, and `1e-4`
-for future MAE, using minimum recorded internal validation loss from 8,000-step
-seed-0 pilots. All twelve pilots completed and their diagnostics were reviewed.
+Checked-in YAML files are the configuration source of truth. The completed
+8,000-step seed-0 learning-rate sweeps selected these defaults:
 
-**Active matter and shear flow rates remain provisional.** Complete their
-four-objective learning-rate sweeps before full scientific training. The pilot
-recipe and subsequent analysis work are recorded under
+| System | JEPA | MAE | Future JEPA | Future MAE |
+| --- | --- | --- | --- | --- |
+| Rayleigh–Bénard | `5e-5` | `1e-4` | `2e-4` | `1e-4` |
+| Active matter | `2e-4` | `1e-4` | `2e-4` | `1e-4` |
+| Shear flow | `2e-4` | `1e-4` | `2e-4` | `1e-4` |
+
+Each rate minimizes the recorded internal validation loss within its completed
+pilot grid. All 36 pilots completed using full trajectories, and their
+diagnostics were reviewed. Active matter and shear flow selected the largest
+tested rates for every objective; rates above the grid were not tested. These
+pilots do not establish downstream representation quality or sufficient final
+training duration. The pilot recipe and subsequent analysis work are recorded under
 [Next experiment stages](#next-experiment-stages).
 
 ```bash
@@ -190,13 +197,13 @@ checkpoints cannot be substituted for models of another system.
 
 ## Next experiment stages
 
-1. **Run LR sweeps before full training** for each system; RB is complete, while
-   active matter and shear flow remain. Sweep all four objectives with seed 0,
-   8,000 steps, and the existing 5,000-step warmup. JEPA candidates are `5e-5, 1e-4, 2e-4`;
-   MAE candidates are `2.5e-5, 5e-5, 1e-4`, shared within each family. Select by
+1. **LR selection is complete for all three systems.** Each system's four
+   objectives were swept with seed 0, 8,000 steps, and a 5,000-step warmup.
+   JEPA candidates were `5e-5, 1e-4, 2e-4`; MAE candidates were
+   `2.5e-5, 5e-5, 1e-4`, shared within each family. Rates were selected by
    minimum recorded internal validation loss during each completed pilot,
-   inspect collapse diagnostics, and save candidate scores, selected rates,
-   and run locations. Do not select using test or probe performance.
+   with collapse diagnostics reviewed and candidate scores, selected rates,
+   and run locations retained. Test and probe performance were not used.
 2. **Train fresh seeds 1, 2, and 3** with selected rates and the initial
    100,000-step budget. Compare final endpoints and assess training sufficiency
    using validation and learning curves. Seed-0 pilots are not final results.
@@ -325,5 +332,15 @@ aggregation, and plotting on every system, producing 21 PDFs. Analysis used seed
 0, ten-step MLP fits, and noise levels 0/.1 with one corruption draw. Local
 verification evidence is under ignored
 `outputs/future_objectives_verification/`. These short jobs establish workflow
-operation, not convergence; the required LR sweeps and scientific runs remain
-the next stages.
+operation, not convergence.
+
+The subsequent full-trajectory LR sweeps completed all 36 GPU pilots across
+the three systems. The 24 active-matter and shear-flow pilots completed all
+96 scheduled validations with finite losses and feature diagnostics, and no
+automatic collapse flags. Full-data cache checks, checkpoint/configuration
+identities, optimizer counters, data exposure, and selected minima were checked;
+all eight loss/feature figures were inspected. Each of these 24 pilots reached
+its recorded validation minimum at step 8,000. Local evidence is retained under
+`outputs/lr_sweeps/active_matter/` and `outputs/lr_sweeps/shear_flow/`; RB evidence
+is under `outputs/lr_sweeps/rayleigh_benard_local/`. Full scientific training
+remains the next stage.

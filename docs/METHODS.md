@@ -176,19 +176,22 @@ there is no converter that treats old result JSON as current evidence.
 
 ## Required next experiment stages
 
-1. **Repeat LR selection before full scientific training.** Each system requires
-   sweeps for all four objectives using full trajectories. RB is complete;
-   complete the corresponding sweeps before full runs on each additional system.
-   Use seed 0 and 8,000 optimizer steps per candidate, with the
-   existing 5,000-step warmup and cosine schedule over the 8,000-step pilot budget.
-   Both JEPA variants use candidates `5e-5, 1e-4, 2e-4`; both MAE variants use
-   `2.5e-5, 5e-5, 1e-4`. This is 12 pilots per system, 36 across all three.
-   Select each dataset/objective's rate by its minimum recorded internal
-   pretraining validation loss across the completed pilot, never test or probe
-   performance. Inspect collapse diagnostics. Retain all candidate losses, selected
-   rates, and run locations. The reviewed RB sweep selected JEPA `5e-5`, MAE
-   `1e-4`, future JEPA `2e-4`, and future MAE `1e-4`; the RB YAML defaults now
-   match those selections. Active matter and shear flow rates remain provisional.
+1. **LR selection is complete for all three systems.** All four objectives were
+   swept using full trajectories, seed 0, and 8,000 optimizer steps per candidate,
+   with a 5,000-step warmup and cosine schedule over the 8,000-step pilot budget.
+   Both JEPA variants used candidates `5e-5, 1e-4, 2e-4`; both MAE variants used
+   `2.5e-5, 5e-5, 1e-4`: 12 completed pilots per system, 36 across all three.
+   Each dataset/objective's rate was selected by its minimum recorded internal
+   pretraining validation loss across the completed pilot. Test and probe
+   performance were not used. Collapse diagnostics were reviewed, and all
+   candidate losses, selected rates, and run locations were retained. RB selected
+   JEPA `5e-5`, MAE `1e-4`, future JEPA `2e-4`, and future MAE `1e-4`. Active matter
+   and shear flow both selected `2e-4` for both JEPA variants and `1e-4` for both
+   MAE variants. All training YAML defaults match these selections. Every
+   active-matter and shear-flow pilot reached its recorded minimum at step 8,000;
+   their selected rates are the largest tested. These results establish choices
+   within the agreed grids, with final training duration and downstream quality
+   still to be assessed.
 2. **Train fresh scientific seeds 1, 2, and 3** using the selected rates and the
    100,000-step starting budget. Seed-0 pilots are excluded from final results.
    Compare final endpoints; best-validation checkpoints remain diagnostics.
