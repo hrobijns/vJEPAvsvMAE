@@ -152,85 +152,85 @@ unconstrained, so bitwise equality across GPU machines is not promised.
 
 ## Frozen-encoder analysis
 
-Use a fresh output root. Every completed stage is immutable and records its
-inputs and code provenance. The same commands and result format serve all
-three systems.
+The workflow fits Ridge and MLP probes on official **training** data, selects
+all probe settings and one encoder checkpoint per run on **validation**, then
+scores the frozen choices on **test**. Inputs remain eight unmasked frames.
+Global targets average over the clip; local targets average within sampled
+2×16×16 patches. Target starts are explicit offsets **0, 8, 16, 40**, covering
+frames 0–7, 8–15, 16–23, and 40–47 relative to the input start.
+
+VRMSE is the default reported metric: RMSE divided by the target's population
+standard deviation across evaluated examples, separately for every quantity,
+horizon, and global/local setting. R² remains in result rows and can be plotted
+with `--metric r2`. This adapts Walrus's variance normalization to scalar
+physical quantities; it is not a direct comparison with its full-field scores.
+See [the methods contract](docs/METHODS.md) for formulas and selection weights.
+
+All 60 seed-1 encoder candidates are in
+[the checkpoint handoff](checkpoints/iclr2027/seed1/README.md). Preparing a sweep
+requires committed source changes. It creates a detached source checkout,
+freezes the candidate roster, and skips repeated fitting for verified identical
+encoder states with the same training configuration. It does not submit jobs.
 
 ```bash
-BASE=/path/to/data
-OUT=outputs/rb_full_trajectories
-
-for split in valid test; do
-  uv run --locked python -m src.evaluate prepare-cache \
-    --base "$BASE" --config configs/eval_rayleigh_benard.yaml \
-    --split "$split" --cache-root "$OUT/cache"
-done
-
-for objective in jepa mae jepa_future mae_future; do
-  for seed in 1 2 3; do
-    checkpoint="runs/full_trajectories/rayleigh_benard_${objective}_seed${seed}/encoder_100pct.pt"
-    uv run --locked python -m src.evaluate extract-features \
-      --checkpoint "$checkpoint" --cache-root "$OUT/cache" \
-      --feature-root "$OUT/features"
-    # Feature directory names include the checkpoint's content hash.
-    for feature in "$OUT/features/${objective}_seed${seed}_"*; do
-      uv run --locked python -m src.evaluate fit-probes \
-        --feature-dir "$feature" --cache-root "$OUT/cache" \
-        --output "$OUT/probes/${objective}_seed${seed}"
-      uv run --locked python -m src.evaluate evaluate-noise \
-        --feature-dir "$feature" --cache-root "$OUT/cache" \
-        --probe-dir "$OUT/probes/${objective}_seed${seed}" \
-        --output "$OUT/noise/${objective}_seed${seed}"
-    done
+STUDY=outputs/physical_probes/iclr2027_seed1
+uv run --locked python scripts/probe_sweep.py prepare \
+  --handoff checkpoints/iclr2027/seed1 --base /path/to/data --output "$STUDY"
+# Use this frozen source for every subsequent stage.
+PROBE_PYTHON="$STUDY/source/.venv/bin/python"
+PROBE_RUNNER="$STUDY/source/scripts/probe_sweep.py"
+for dataset in rayleigh_benard active_matter shear_flow; do
+  for split in train valid; do
+    "$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" --dataset "$dataset" --split "$split"
   done
 done
-
-for kind in probes noise; do
-  uv run --locked python -m src.evaluate aggregate "$OUT/$kind/"* \
-    --kind "$kind" --objectives jepa mae jepa_future mae_future --seeds 1 2 3 \
-    --output "$OUT/${kind}_aggregate"
-  uv run --locked python -m src.evaluate plot \
-    --aggregate-dir "$OUT/${kind}_aggregate" --output "$OUT/${kind}_plots"
+# The prepared seed-1 roster has 56 distinct candidates: indices 0 through 55.
+sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
+  --array=0-55%12 --output="$STUDY/logs/fit_%A_%a.log" \
+  scripts/slurm_probe.sbatch "$STUDY" run
+# After every candidate completes:
+"$PROBE_PYTHON" "$PROBE_RUNNER" collect --output "$STUDY"
+for dataset in rayleigh_benard active_matter shear_flow; do
+  "$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" --dataset "$dataset" --split test
 done
+sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
+  --array=0-11%12 --output="$STUDY/logs/test_%A_%a.log" \
+  scripts/slurm_probe.sbatch "$STUDY" test
+# After all twelve selected checkpoints finish test scoring:
+"$PROBE_PYTHON" "$PROBE_RUNNER" report --output "$STUDY"
 ```
 
-For workshop reproduction, use
-`configs/workshop/eval_rayleigh_benard.yaml`, a fresh output root such as
-`outputs/rb_workshop`, restrict the loop and aggregate `--objectives` to
-`jepa mae`, and replace the checkpoint assignment above with
-`checkpoint="checkpoints/neuripsworkshop/rayleigh_benard_${objective}_seed${seed}.pt"`.
-This uses the same analysis code with explicit frames 0–100. Full-trajectory
-analysis of those historical weights is a separate experiment: it does not make
-them models trained on full trajectories. New temporal protocols require new
-analysis artifacts; existing completed outputs are not overwritten or mixed.
+Cache preparation can run independently for different systems/splits. The
+launcher requests one GPU, four CPUs, 16 GiB RAM, and 12 hours per candidate.
+It does not automatically requeue; completed immutable stages can be reused
+when retrying an interrupted candidate. The expected aggregate MLP compute is
+about 50 GPU-hours at the full stopping cap. Allow approximately 6–10 hours
+with 8–12 L40S GPUs, excluding queueing and initial data preparation; this is
+an extrapolation from timing checks, not a completed scientific sweep.
 
-The existing probe targets remain frames 0–7, 16–23, and 40–47 for a context
-at 0–7. Adding the adjacent target at 8–15 is an explicit later analysis task.
-Future-model training validation already measures the adjacent prediction loss.
+The underlying commands remain available for other checkpoint rosters:
+`prepare-cache --split train|valid|test`, `extract-features --split ...`,
+`fit-probes`, `select-checkpoints`, `score-probes --selection ...`, `aggregate`,
+and `plot`. Feature directories contain separate immutable split artifacts;
+`fit-probes` needs no test data. `score-probes` rejects unselected probe fits.
+`extract-features --include-noise --split test` and `evaluate-noise` retain the
+clean-fit noise workflow for later use; the initial sweep does not run it.
 
-`fit-probes` produces the main selection, separate Ridge/MLP results, pooled
-depth curves, regime decoding, regime/time and position controls, the combined
-encoder-plus-control probe, and persistence baselines. `evaluate-noise`
-loads the actual fitted clean probes; it does not refit them.
+Outputs include separate Ridge/MLP and validation-selected results, global
+depth curves, governing-parameter probes, regime/time and position controls,
+combined encoder-plus-control Ridge probes, and future persistence baselines.
+Checkpoint selection excludes those controls and governing parameters.
+Aggregates average physical quantities inside each encoder seed before
+calculating between-seed statistics. A single encoder seed has no between-run
+standard deviation; MLP ensemble members are not extra encoder seeds.
+Undefined metrics remain JSON `null`, and plots retain scores outside 0–1.
 
-Aggregates retain individual checkpoint rows, per-target summaries, and
-within-checkpoint target means followed by between-checkpoint mean/SD.
-Single-seed smoke results are supported by specifying their actual roster
-(e.g. `--seeds 0`); their between-seed SD is undefined. Probe ensemble members,
-noise draws, targets, and deterministic controls are not counted as independent
-encoder seeds. Undefined metrics are JSON `null`, with an explanatory status.
-
-Plot outputs include comparison heatmaps, pooled Ridge/MLP depth curves, noise
-curves with individual checkpoints, and `summary.tsv` containing every metric,
-regime result, and control. Negative R² values remain visible; noise R² uses a
-symmetric-log scale. Heatmap color spans R² 0–1; cell annotations retain actual
-scores outside that range. No figure or result is copied into the paper.
-
-For the other systems, select `configs/eval_active_matter.yaml` or
-`configs/eval_shear_flow.yaml` and checkpoints trained on that dataset. Their
-initial physical target is enstrophy; their governing parameters are also
-probed. Richer target sets are deliberately deferred. The six retained RB
-checkpoints cannot be substituted for models of another system.
+The workshop configuration preserves its 101-frame support and original targets
+using offsets 0, 16, 40. The current probe-fitting protocol uses train/validation
+splits and differs from the historical five-fold procedure described in the
+submitted paper. Existing analysis artifacts must be rebuilt for the new
+schema; old gaps and results are never silently reinterpreted. Historical
+paper files and checkpoints are unchanged.
 
 ## Next experiment stages
 
@@ -241,16 +241,16 @@ checkpoints cannot be substituted for models of another system.
    minimum recorded internal validation loss during each completed pilot,
    with collapse diagnostics reviewed and candidate scores, selected rates,
    and run locations retained. Test and probe performance were not used.
-2. **Train fresh seeds 1, 2, and 3** with selected rates and the initial
-   100,000-step budget. Compare final endpoints and assess training sufficiency
-   using validation and learning curves. Seed-0 pilots are not final results.
-3. **Extend the analysis**, explicitly including physical-quantity probes for
-   the adjacent clip (8–15). Add attentive probes and richer physical targets
-   for the other systems as separate research changes.
+2. **Seed 1 training is complete:** all twelve system/objective combinations
+   reached 100,000 steps. Complete the validation-selected Ridge/MLP baseline
+   and clean test comparison using the retained checkpoint candidates.
+3. **Extend the analysis with collaborators:** attentive probing and noise
+   experiments follow the initial physical-target and checkpoint handoff.
+4. **Train seeds 2 and 3** to measure variation across independent training runs.
+   Seed-0 pilots remain excluded from scientific results.
 
-See [the methods contract](docs/METHODS.md#required-next-experiment-stages) for
-selection details. Short implementation checks do not replace the LR sweeps
-or establish scientific performance.
+The following commands reproduce the completed LR-sweep workflow; they do not
+need to be rerun for this probe study.
 
 After preparing the full training cache, create the twelve independent pilots
 and submit them as four GPU jobs. Each job runs one objective's three rates in
@@ -313,7 +313,7 @@ operators, sampling, selection, metrics, and remaining experiment work.
 - `src/physics`: system definitions and physical numerical operators.
 - `src/evaluation`, `src/evaluate.py`: cache, extraction, probes, reporting, CLI.
 - `configs`: explicit training and analysis configurations.
-- `checkpoints/neuripsworkshop`: six reference RB encoders and provenance.
+- `checkpoints`: historical workshop encoders and all ICLR seed-1 candidates.
 - `tests`: analytic, protocol, integrity, training, and small workflow checks.
 
 Historical code, results, plots, and the older checkpoint tier are recoverable

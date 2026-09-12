@@ -59,10 +59,14 @@ def paired_noise_batch(clips, sigma, corruption_seed, sample_indices):
     return output
 
 
-def extract_features(checkpoint, cache_root, feature_root, batch_size=4):
+def extract_features(
+    checkpoint, cache_root, feature_root, split, batch_size=4, include_noise=False
+):
     if batch_size < 1:
         raise ValueError("batch size must be positive")
-    caches = open_caches(cache_root)
+    if split not in ("train", "valid", "test") or (include_noise and split != "test"):
+        raise ValueError("noise extraction is available only for test")
+    caches = open_caches(cache_root, (split,))
     protocol = Protocol.from_dict(caches[0].manifest["protocol"])
     encoder, config, metadata = load_encoder(checkpoint)
     expected = dict(
@@ -84,11 +88,11 @@ def extract_features(checkpoint, cache_root, feature_root, batch_size=4):
         Path(feature_root)
         / f"{metadata['objective']}_seed{metadata['seed']}_{metadata['sha256'][:12]}"
     )
+    destination = destination / split
     with staged_directory(destination) as stage:
         for cache in caches:
             split = cache.manifest["split"]
-            output_dir = stage / split
-            output_dir.mkdir()
+            output_dir = stage
             for kind in ("pooled", "token"):
                 contexts = cache.array(f"{kind}/context.npy")
                 positions = (
@@ -123,7 +127,7 @@ def extract_features(checkpoint, cache_root, feature_root, batch_size=4):
                         pooled if kind == "pooled" else tokens
                     ).numpy()
                 output.flush()
-            if split == "test":
+            if include_noise:
                 contexts = cache.array("pooled/context.npy")
                 for sigma in protocol.noise_sigmas:
                     if sigma == 0:
@@ -166,5 +170,7 @@ def extract_features(checkpoint, cache_root, feature_root, batch_size=4):
                 cache.manifest["split"]: cache.manifest["sha256"] for cache in caches
             },
             batch_size=batch_size,
+            split=split,
+            include_noise=include_noise,
         )
-    return destination
+    return destination.parent

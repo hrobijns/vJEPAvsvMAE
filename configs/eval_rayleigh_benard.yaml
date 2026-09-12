@@ -1,10 +1,11 @@
 dataset: rayleigh_benard
 frame_limit: null
 n_frames: 8
-gaps:
+target_offsets:
 - 0
 - 8
-- 32
+- 16
+- 40
 patch:
 - 2
 - 16

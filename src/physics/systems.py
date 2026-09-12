@@ -18,7 +18,21 @@ class System:
 
     @property
     def targets(self):
-        return rb.PRIMARY_TARGETS if self.name == "rayleigh_benard" else ("enstrophy",)
+        if self.name == "rayleigh_benard":
+            return rb.PRIMARY_TARGETS
+        if self.name == "active_matter":
+            return (
+                "kinetic_energy",
+                "enstrophy",
+                "nematic_order",
+                "nematic_gradient_energy",
+            )
+        return (
+            "cross_stream_kinetic_energy",
+            "enstrophy",
+            "tracer_variance",
+            "tracer_gradient_energy",
+        )
 
     def regime_values(self, parameters):
         values = np.asarray(
@@ -30,7 +44,7 @@ class System:
             raise ValueError(f"invalid {self.name} regime: {parameters}")
         return np.log10(values) if self.log_parameters else values
 
-    def fields(self, raw, velocity_channels):
+    def fields(self, raw, velocity_channels, channels=None):
         if (
             raw.ndim != 5
             or raw.shape[1] != self.channels
@@ -43,7 +57,47 @@ class System:
         omega = periodic_derivative(v, -2, self.lengths[0]) - periodic_derivative(
             u, -1, self.lengths[1]
         )
-        return {"enstrophy": omega.square()}
+        fields = {"enstrophy": omega.square()}
+        if self.name == "active_matter":
+            names = channels or [
+                "concentration",
+                "velocity_x",
+                "velocity_y",
+                "D_xx",
+                "D_xy",
+                "D_yx",
+                "D_yy",
+            ]
+            c = raw[:, names.index("concentration")].double()
+            if torch.any(c <= 0):
+                raise ValueError("nematic order requires positive concentration")
+            q = torch.stack(
+                [
+                    raw[:, names.index("D_" + axis)].double() / c
+                    - (0.5 if axis in ("xx", "yy") else 0.0)
+                    for axis in ("xx", "xy", "yx", "yy")
+                ],
+                dim=1,
+            )
+            fields.update(
+                kinetic_energy=0.5 * (u.square() + v.square()),
+                nematic_order=(2 * q.square().sum(1)).sqrt(),
+                nematic_gradient_energy=self.gradient_squared(q).sum(1),
+            )
+        else:
+            tracer = raw[:, channels.index("tracer") if channels else 0].double()
+            fields.update(
+                cross_stream_kinetic_energy=0.5 * v.square(),
+                tracer_variance=(tracer - tracer.mean((-2, -1), keepdim=True)).square(),
+                tracer_gradient_energy=self.gradient_squared(tracer),
+            )
+        return fields
+
+    def gradient_squared(self, field):
+        return sum(
+            periodic_derivative(field, axis, length).square()
+            for axis, length in zip((-2, -1), self.lengths)
+        )
 
     def reduce(self, field, patch=None):
         if self.name == "rayleigh_benard":

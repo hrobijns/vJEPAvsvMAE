@@ -10,7 +10,7 @@ from pathlib import Path
 
 import numpy as np
 
-SCHEMA = "well-analysis-1"
+SCHEMA = "well-analysis-2"
 
 
 def canonical_hash(value):

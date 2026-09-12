@@ -7,7 +7,8 @@ import yaml
 
 from src.evaluation.cache import prepare_cache
 from src.evaluation.features import extract_features
-from src.evaluation.pipeline import evaluate_noise, fit_probes
+from src.evaluation.pipeline import evaluate_noise, fit_probes, score_probes
+from src.evaluation.selection import select_checkpoints
 from src.evaluation.protocol import Protocol
 from src.evaluation.reporting import aggregate, plot
 from src.models.checkpoints import load_encoder
@@ -26,18 +27,27 @@ def build_parser():
         required=True,
         help="evaluation YAML with dataset and explicit frame_limit",
     )
-    cache.add_argument("--split", choices=("valid", "test"), required=True)
+    cache.add_argument("--split", choices=("train", "valid", "test"), required=True)
     cache.add_argument("--cache-root", required=True)
     extract = sub.add_parser("extract-features")
     extract.add_argument("--checkpoint", required=True)
     extract.add_argument("--cache-root", required=True)
     extract.add_argument("--feature-root", required=True)
     extract.add_argument("--batch-size", type=int, default=4)
+    extract.add_argument("--split", choices=("train", "valid", "test"), required=True)
+    extract.add_argument("--include-noise", action="store_true")
     fit = sub.add_parser("fit-probes")
     fit.add_argument("--feature-dir", required=True)
     fit.add_argument("--cache-root", required=True)
     fit.add_argument("--output", required=True)
     fit.add_argument("--mlp-max-steps", type=int, default=2000)
+    fit.add_argument("--mlp-min-steps", type=int, default=150)
+    selection = sub.add_parser("select-checkpoints")
+    selection.add_argument("paths", nargs="+")
+    selection.add_argument("--output", required=True)
+    score = sub.add_parser("score-probes")
+    for name in ("feature-dir", "cache-root", "probe-dir", "selection", "output"):
+        score.add_argument("--" + name, required=True)
     noise = sub.add_parser("evaluate-noise")
     noise.add_argument("--feature-dir", required=True)
     noise.add_argument("--cache-root", required=True)
@@ -52,6 +62,7 @@ def build_parser():
     figures = sub.add_parser("plot")
     figures.add_argument("--aggregate-dir", required=True)
     figures.add_argument("--output", required=True)
+    figures.add_argument("--metric", choices=("vrmse", "r2"), default="vrmse")
     return parser
 
 
@@ -81,6 +92,8 @@ def main(argv=None):
         "prepare-cache": prepare_cache,
         "extract-features": extract_features,
         "fit-probes": fit_probes,
+        "select-checkpoints": select_checkpoints,
+        "score-probes": score_probes,
         "evaluate-noise": evaluate_noise,
         "aggregate": aggregate,
         "plot": plot,

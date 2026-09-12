@@ -52,8 +52,8 @@ weights. These are intentionally different operations on the RB grid.
 | System | Geometry | Physical targets | Governing parameters |
 |---|---|---|---|
 | Rayleigh–Bénard | Periodic x on [0,4), Chebyshev–Gauss y on [0,1] | Enstrophy; buoyancy-gradient energy; convective flux; pressure-gradient magnitude; buoyancy-Laplacian magnitude | log10 Rayleigh, log10 Prandtl |
-| Active matter | Periodic x/y, lengths 10 and 10 | Enstrophy | Alpha, zeta (unlogged) |
-| Shear flow | Periodic x/y, lengths 1 and 2 | Enstrophy | log10 Reynolds, log10 Schmidt |
+| Active matter | Periodic x/y, lengths 10 and 10 | Kinetic energy; enstrophy; nematic order; squared nematic gradient | Alpha, zeta (unlogged) |
+| Shear flow | Periodic x/y, lengths 1 and 2 | Cross-stream kinetic energy; enstrophy; tracer variance; squared tracer gradient | log10 Reynolds, log10 Schmidt |
 
 Enstrophy here means `ω²`, with `ω = ∂x u_y − ∂y u_x` (no factor of one half).
 RB's remaining fields are `|∇b|²`, `u_y b`, `|∇p|`, and `|∇²b|`. Compute the
@@ -64,8 +64,27 @@ RB uses Fourier differentiation in x, barycentric Chebyshev differentiation
 in y, and Fejér quadrature. The raw coordinate arrays in the workshop data
 misrepresent the grid; the explicit override preserves the geometry established
 from the conductive profile and physical velocity divergence. Other systems
-use Fourier derivatives on both uniform periodic axes. Their initial target
-set excludes the old unvalidated normalized-field formulas.
+use Fourier derivatives on both uniform periodic axes. Targets are always derived from raw fields, not normalized encoder inputs.
+
+Active-matter kinetic energy is `(u_x² + u_y²)/2`. Let `c` be concentration
+and `D` the symmetric second orientation moment, whose trace is `c`. Define
+`Q = D/c - I/2`; concentration must be positive. The pointwise nematic order
+is `sqrt(2 sum_ij Q_ij²)`. The spatial variation target is
+`sum_ijk (∂k Q_ij)²`, including changes in both strength and orientation. It
+is stored as `nematic_gradient_energy`, but does not include an elastic
+coefficient and is not claimed to be a complete physical elastic energy.
+These definitions follow the orientation-moment convention in
+[Maddu, Weady, and Shelley](https://arxiv.org/abs/2308.06675). Compute the
+pointwise order before spatial averaging, so differently oriented ordered
+regions do not cancel into an apparently disordered global target.
+
+Shear-flow cross-stream kinetic energy is `u_y²/2`. For tracer `s`, subtract
+the spatial mean independently at each frame to obtain the variance field
+`(s - mean_xy(s))²`. Its global reduction is the time average of spatial
+variance; its local reduction is a patch's contribution to that variance,
+not variance about the patch's own mean. The gradient target is `|∇s|²`;
+it is not multiplied by diffusivity. Both targets characterize tracer
+inhomogeneity and mixing without explicitly scaling by a regime parameter.
 
 Shear-flow exports label both axes from 0 to 1, including endpoints. Ingestion
 accepts these labels, while derivatives use physical lengths 1 and 2 and
@@ -127,49 +146,61 @@ disabled. Unexpected failures require inspection before manual resubmission.
 CPU comparisons test exact continuation; production CUDA kernels retain their
 existing nondeterministic behavior.
 
-The workshop regression configuration explicitly caps support at 101 frames.
-Both protocols use the following unchanged evaluation rules. An eight-frame
-context starting at `s` has its contemporary target at `s`; future targets
-start at `s + 8 + gap`. Gaps 8 and 32 count intervening frames, not physical
-time units or context-start offsets. Every requested target must fit inside
-the configured support.
+The workshop sampling configuration explicitly caps support at 101 frames.
+New configurations use `target_offsets = [0, 8, 16, 40]`: target-start minus
+context-start, measured in saved frames. For context 0–7 the targets are
+0–7, 8–15, 16–23, and 40–47. The workshop configuration uses [0, 16, 40],
+which preserves the original physical horizons formerly labeled gaps 0, 8,
+and 32. Legacy gap configurations are rejected rather than reinterpreted.
+Every requested target must fit inside the available trajectory support.
 
-Three pooled contexts are equally spaced across the eligible start interval.
-For a 200-frame trajectory these starts are 0, 76, 152. Token contexts cycle
-through five temporal quantiles according to stable trajectory order:
-0, 38, 76, 114, 152. The longest future target then ends at frame 199.
-With the workshop's 101-frame cap, pooled starts remain 0, 26, 53 and token
-starts remain 0, 13, 26, 40, 53; the longest target ends at frame 100.
-Each token context retains 64 deterministic, uniformly sampled positions.
-All compared checkpoints see identical samples, positions, and corruption draws.
-Active matter's 81 frames yield pooled starts 0, 16, 33; removing the former
-101-frame cap does not change its sampling. No padding or wrapping is used.
+Three global contexts are equally spaced across eligible starts. For 200
+frames these are 0, 76, 152; local contexts cycle through 0, 38, 76, 114, 152
+according to trajectory order. The workshop's starts remain 0, 26, 53 globally
+and 0, 13, 26, 40, 53 locally. Active matter's 81 frames give global starts
+0, 16, 33. Each local context retains 64 deterministic uniformly sampled
+positions. Checkpoints use identical samples and positions; no padding or
+wrapping is used. Encoders see only the full unmasked input clip, never the
+future target frames. Features include all 12 block outputs and the final norm.
 
-The official validation split supplies five trajectory-grouped folds. Replicate
-assignment rotates across regimes, reproducing RB's one-run-per-regime folds
-while balancing token sampling times. Fewer replicates do not imply five runs
-per regime: trajectories are assigned cyclically, and an empty fold causes an
-error. All clips/tokens of a trajectory stay together. This is not an evaluation
-of unseen physical regimes.
+Probes fit on official training trajectories. Official validation selects
+probe parameters, layers, families, and encoder checkpoints; official test
+is used only after those choices are recorded. This replaces the workshop's
+five-fold fitting inside the official validation split. It is not an
+assessment of unseen governing regimes. Training determines all fitted
+feature standardization and target normalization statistics.
 
-Ridge searches every block output and the final norm, with penalties
-`1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Fold training data determine feature
-standardization and target centering. The solve is
-`(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
+Ridge searches every encoder output and penalties
+`1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Targets are centered and the
+weights solve `(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
+MLPs independently search every output: 128 ReLU units, dropout 0.1,
+full-batch Adam, LR 0.01, weight decay 0.0001. Three fixed initializations
+(0, 1, 2) each select a stopping state between 150 and 2,000 updates,
+checking validation MSE every 20 updates with patience 100. Retain those
+states and average predictions in float64 on both validation and test;
+there is no post-selection refitting. Hyperparameters are fixed apart from
+stopping duration and layer; there is no additional MLP LR sweep.
 
-Physical MLP probes independently select their encoder layer. Each is a
-128-unit ReLU MLP with dropout 0.1, full-batch Adam, LR 0.01 and weight decay
-0.0001. Five seeded fits monitor distinct validation folds to select 150–2000
-training steps, checked every 20 steps with patience 100. Each chosen fit is
-then retrained on all validation data. Predictions from the five refits are
-averaged in float64. Pooled depth analysis refits every layer using its own
-validation-selected duration. The workshop's additional regime MLP check uses
-the Ridge-selected layer; it does not introduce a separate analysis pipeline.
+Each quantity/horizon/global-local cell selects Ridge or MLP by minimum
+validation VRMSE after each family's layer/settings search. Exact family
+ties prefer Ridge. Governing-parameter probes remain separate diagnostics.
+Both Ridge and MLP report test scores at every encoder output for global and
+local targets. Selected-family summaries retain the chosen score, family, and
+layer; full depth curves remain in the separate Ridge and MLP results.
 
-The physical comparison selects Ridge or MLP by validation CV R²; exact ties
-prefer Ridge. Test labels enter scoring after selection. Constant-target or
-otherwise undefined validation scores cannot select a winning probe. Fold
-averages use the finite fold scores; wholly undefined cells remain explicit.
+One encoder checkpoint is selected for each dataset/objective/training seed.
+Candidates are the 25k, 50k, 75k, and 100k milestones plus the minimum
+pretraining-validation-loss checkpoint. Verified identical encoder states
+with the same configuration are fit once. Average quantities and global/local
+settings equally within each horizon; assign 50% weight to the current
+horizon and 50% to the equal mean over the three future horizons. The lowest
+balanced validation VRMSE wins; exact checkpoint ties prefer earlier steps,
+then checkpoint hash. Controls and governing parameters do not enter this
+score. Missing task cells are errors, and undefined values are exposed rather
+than silently dropping quantities or changing weights. A candidate without a
+complete finite score is ineligible; if none are eligible, selection stops.
+The manifest freezes all choices before test scoring, which requires a
+matching selected probe-fit artifact.
 
 Noise evaluation reuses saved clean fits, layers, and statistics at sigmas
 0, .05, .1, .2, .5, 1, with three deterministic paired corruption draws. Targets
@@ -184,20 +215,35 @@ of token coordinates. A combined pooled Ridge probe appends nuisance variables
 to encoder features. Persistence predicts a future target by copying the
 current physical target. Controls are stored once per aggregate scientific cell.
 
-Report R², Pearson r, MSE, and log10 MSE in physical target units, with regime
-metrics on the specified parameter transforms. R² uses the test target mean in
-its denominator and may be arbitrarily negative. Undefined metrics are `null`;
-summary code does not silently reduce the seed count to omit them. Target means
-are computed inside each checkpoint before between-checkpoint statistics.
-These descriptive seed summaries do not claim formal statistical significance.
+Compute errors in the physical target units, with governing parameters using
+the specified transforms. The primary metric is VRMSE: `sqrt(mean((prediction-target)²) / var(target))`,
+with population variance (`ddof=0`) across all evaluated examples for that
+quantity, horizon, and representation. Global examples are clip averages;
+local examples are sampled patch averages. No dimensional epsilon is added;
+zero target variance is explicitly undefined. For nonconstant targets this
+is `sqrt(1-R²)`. Compute scores before averaging across quantities or encoder
+seeds; converting an averaged R² would produce a different result.
+
+This follows the variance-normalization principle of
+[Walrus, Appendix F.1.1](https://arxiv.org/abs/2511.15684), whose field metric
+uses spatial variance within each target field and a denominator epsilon.
+Our scalar-target results are not directly comparable with its published
+full-field scores. A direct comparison requires the same targets and sampling.
+R², Pearson correlation, MSE, and log MSE remain available internally.
+Undefined metrics are `null`; summary code does not silently reduce the seed
+count to omit them. A single encoder seed has no between-run standard
+deviation. Probe initializations and sampled positions are not independent
+encoder runs. These descriptive summaries do not claim statistical significance.
 
 Every completed cache, feature set, probe fit, result aggregate, and plot set
 has a manifest. Consumers verify the self-hash and the content hash of each
 file they actually read. Features bind to exact cache manifests; saved probes
 bind to their clean features; aggregates require matching protocols, cache
 identities, analysis code, checkpoint geometry/training protocol, and the
-explicit expected roster. New schema artifacts must be regenerated from data;
-there is no converter that treats old result JSON as current evidence.
+explicit expected roster. Selected checkpoint steps may differ only under the
+same recorded selection policy, while configured training budgets still match.
+Actual steps remain in the report provenance. New schema artifacts must be
+regenerated from data; there is no converter that treats old result JSON as current evidence.
 
 ## Required next experiment stages
 
@@ -217,18 +263,13 @@ there is no converter that treats old result JSON as current evidence.
    their selected rates are the largest tested. These results establish choices
    within the agreed grids, with final training duration and downstream quality
    still to be assessed.
-2. **Train fresh scientific seeds 1, 2, and 3** using the selected rates and the
-   100,000-step starting budget. Seed-0 pilots are excluded from final results.
-   Compare final endpoints; best-validation checkpoints remain diagnostics.
-   Assess training sufficiency through validation losses and intermediate
-   checkpoints before deciding whether the shared budget needs to increase.
-3. **Extend the analysis.** Add physical-quantity probes for the adjacent clip
-   (8–15 for context 0–7), alongside the existing current and more distant
-   targets (0–7, 16–23, 40–47). Existing `gap=0` denotes the current clip, so this
-   extension must represent the adjacent target explicitly without changing the
-   meaning of workshop results. Attentive probes and richer non-RB physical
-   quantities are separate research changes.
-
-The implementation checks and short GPU runs do not replace these stages or
-establish model convergence. Historical learning rates and workshop differences
-are not new ICLR results.
+2. **Complete the seed-1 physical probe comparison.** All twelve training runs
+   reached 100,000 steps. Use the retained candidates, full-trajectory sampling,
+   richer physical targets, and validation-selected Ridge/MLP protocol above.
+   Clean test scoring follows the recorded selections; smoke results are not
+   scientific performance measurements.
+3. **Extend the collaborator analysis** with attentive probing and noise
+   experiments. The full candidate handoff allows checkpoint selection to be
+   reassessed for a later, explicitly defined evaluation protocol.
+4. **Train scientific seeds 2 and 3** with the selected training rates to measure
+   between-run variation. The initial twelve encoders cover only seed 1.

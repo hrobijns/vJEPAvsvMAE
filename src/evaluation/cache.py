@@ -11,8 +11,8 @@ from src.physics.systems import SYSTEMS
 
 
 def prepare_cache(base, split, cache_root, protocol):
-    if split not in ("valid", "test"):
-        raise ValueError("analysis uses official valid and test splits")
+    if split not in ("train", "valid", "test"):
+        raise ValueError("analysis uses official train, valid and test splits")
     source = WellSource(base, protocol.dataset, split, protocol.n_frames)
     system = SYSTEMS[protocol.dataset]
     dimensions = (protocol.n_frames, *source.shape)
@@ -56,15 +56,15 @@ def prepare_cache(base, split, cache_root, protocol):
                 )
                 np.save(folder / "positions.npy", positions)
             targets = {
-                (gap, target): np.lib.format.open_memmap(
-                    folder / f"gap{gap}_{target}.npy",
+                (offset, target): np.lib.format.open_memmap(
+                    folder / f"offset{offset}_{target}.npy",
                     mode="w+",
                     dtype=np.float64,
                     shape=(len(rows),)
                     if kind == "pooled"
                     else (len(rows), protocol.token_samples),
                 )
-                for gap in protocol.gaps
+                for offset in protocol.target_offsets
                 for target in system.targets
             }
             for i, row in enumerate(rows):
@@ -72,21 +72,23 @@ def prepare_cache(base, split, cache_root, protocol):
                 contexts[i] = (
                     normalize(context, source.means, source.stds).half().numpy()
                 )
-                for gap in protocol.gaps:
+                for offset in protocol.target_offsets:
                     raw = (
                         context
-                        if gap == 0
+                        if offset == 0
                         else source.clip(
                             row["trajectory"],
-                            protocol.target_start(row["context_start"], gap),
+                            protocol.target_start(row["context_start"], offset),
                         )
                     )
-                    fields = system.fields(raw.unsqueeze(0), source.velocity_channels)
+                    fields = system.fields(
+                        raw.unsqueeze(0), source.velocity_channels, source.channels
+                    )
                     for target, field in fields.items():
                         values = system.reduce(
                             field, protocol.patch if kind == "token" else None
                         )[0].numpy()
-                        targets[gap, target][i] = (
+                        targets[offset, target][i] = (
                             values if positions is None else values[positions[i]]
                         )
                 if (i + 1) % 25 == 0 or i + 1 == len(rows):
@@ -107,16 +109,15 @@ def prepare_cache(base, split, cache_root, protocol):
     return destination
 
 
-def open_caches(root):
-    valid, test = (Artifact(Path(root) / split, "cache") for split in ("valid", "test"))
-    if valid.manifest["split"] != "valid" or test.manifest["split"] != "test":
-        raise ValueError("cache split identity mismatch")
-    if (
-        valid.manifest["protocol"] != test.manifest["protocol"]
-        or valid.manifest["grid"] != test.manifest["grid"]
-    ):
-        raise ValueError("valid/test cache protocols or token grids differ")
-    for key in ("channels", "shape", "normalization"):
-        if valid.manifest["source"][key] != test.manifest["source"][key]:
-            raise ValueError(f"valid/test {key} differ")
-    return valid, test
+def open_caches(root, splits=("train", "valid")):
+    caches = tuple(Artifact(Path(root) / split, "cache") for split in splits)
+    for split, cache in zip(splits, caches):
+        if cache.manifest["split"] != split:
+            raise ValueError("cache split identity mismatch")
+        for key in ("protocol", "grid"):
+            if cache.manifest[key] != caches[0].manifest[key]:
+                raise ValueError(f"cache {key} differs")
+        for key in ("channels", "shape", "normalization"):
+            if cache.manifest["source"][key] != caches[0].manifest["source"][key]:
+                raise ValueError(f"cache {key} differs")
+    return caches

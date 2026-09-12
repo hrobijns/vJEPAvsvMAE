@@ -98,6 +98,24 @@ def write_well(root, dataset, split, frames=6, trajectories=5, shape=None):
                                 * np.ones_like(Y)
                             )
                             a[trajectory, t] = np.stack((u, v), axis=-1)
+                        elif field == "concentration":
+                            a[trajectory, t] = 1 + 0.01 * np.cos(
+                                2 * np.pi * X / system.lengths[0]
+                            ) * np.ones_like(Y)
+                        elif field == "D":
+                            c = 1 + 0.01 * np.cos(2 * np.pi * X / system.lengths[0])
+                            strength = (
+                                0.1
+                                * amp
+                                * (1 + 0.2 * np.cos(2 * np.pi * Y / system.lengths[1]))
+                            )
+                            qxx = strength * np.cos(2 * np.pi * X / system.lengths[0])
+                            qxy = strength * np.sin(2 * np.pi * X / system.lengths[0])
+                            tensor = np.empty((nx, ny, 2, 2))
+                            tensor[..., 0, 0] = c * (0.5 + qxx)
+                            tensor[..., 1, 1] = c * (0.5 - qxx)
+                            tensor[..., 0, 1] = tensor[..., 1, 0] = c * qxy
+                            a[trajectory, t] = tensor
                         elif rank == 0:
                             a[trajectory, t] = (
                                 amp
@@ -108,18 +126,3 @@ def write_well(root, dataset, split, frames=6, trajectories=5, shape=None):
                         else:
                             a[trajectory, t] = np.zeros((nx, ny, 2, 2), dtype="float32")
     return path
-
-
-def sample_rows(n_regimes=5, replicates=5):
-    return [
-        dict(
-            trajectory=replicates * g + r,
-            trajectory_id=f"valid/{g}/{r}",
-            parameters={"Rayleigh": 10.0 ** (g + 6), "Prandtl": 1.0},
-            regime=[10.0 ** (g + 6), 1.0],
-            replicate=r,
-            age=r / 199.0,
-        )
-        for g in range(n_regimes)
-        for r in range(replicates)
-    ]

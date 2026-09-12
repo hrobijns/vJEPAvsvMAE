@@ -9,7 +9,7 @@ import numpy as np
 from src.evaluation.artifacts import Artifact, seal, staged_directory, write_json
 from src.objectives import OBJECTIVES
 
-METRICS = ("test_r2", "test_pearson_r", "test_mse", "test_log_mse")
+METRICS = ("test_vrmse", "test_r2", "test_pearson_r", "test_mse", "test_log_mse")
 
 
 def _summary(values, metric):
@@ -26,9 +26,7 @@ def _summary(values, metric):
     )
 
 
-def aggregate(
-    paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probes"
-):
+def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probes"):
     if (
         not objectives
         or not seeds
@@ -47,11 +45,31 @@ def aggregate(
             f"incomplete or duplicate run roster: expected {sorted(expected)}, got {observed}"
         )
     first = artifacts[0].manifest
+    policy = first.get("selection_policy")
+    if policy:
+        from src.evaluation.selection import SELECTION_POLICY
+
+        if policy != SELECTION_POLICY or not all(
+            a.manifest.get("selection") for a in artifacts
+        ):
+            raise ValueError("unrecognized checkpoint selection policy")
+        for artifact in artifacts:
+            checkpoint = artifact.manifest["checkpoint"]
+            budget = checkpoint["training_protocol"]["total_steps"]
+            if budget is None or not 0 < checkpoint["step"] <= budget:
+                raise ValueError(
+                    "selected checkpoint step exceeds configured training budget"
+                )
     for artifact in artifacts[1:]:
         for key in ("protocol", "caches", "probe_settings"):
             if artifact.manifest[key] != first[key]:
                 raise ValueError(f"incompatible aggregate {key}")
-        for key in ("spec", "encoder", "dataset", "training_protocol", "step"):
+        if artifact.manifest.get("selection_policy") != policy:
+            raise ValueError("incompatible checkpoint selection policy")
+        keys = ("spec", "encoder", "dataset", "training_protocol") + (
+            () if policy else ("step",)
+        )
+        for key in keys:
             if artifact.manifest["checkpoint"].get(key) != first["checkpoint"].get(key):
                 raise ValueError(f"incompatible checkpoint {key}")
         if (
@@ -73,6 +91,7 @@ def aggregate(
                 **item,
                 "objective": checkpoint["objective"],
                 "checkpoint_seed": checkpoint["seed"],
+                "checkpoint_step": checkpoint.get("step"),
             }
             for item in items
         )
@@ -93,7 +112,7 @@ def aggregate(
                 "family",
                 "representation",
                 "method",
-                "gap",
+                "target_offset",
                 "target",
                 "sigma",
                 "shared",
@@ -123,7 +142,9 @@ def aggregate(
                     "selected_method",
                     "selected_alpha",
                     "selected_steps",
-                    "valid_cv_r2",
+                    "valid_r2",
+                    "valid_vrmse",
+                    "checkpoint_step",
                     "status",
                     "metric_status",
                 )
@@ -171,7 +192,7 @@ def aggregate(
             row["family"],
             row["method"],
             row["representation"],
-            row["gap"],
+            row["target_offset"],
             row.get("sigma"),
         )
         averages[key].append(row)
@@ -185,7 +206,14 @@ def aggregate(
         target_means.append(
             dict(
                 zip(
-                    ("objective", "family", "method", "representation", "gap", "sigma"),
+                    (
+                        "objective",
+                        "family",
+                        "method",
+                        "representation",
+                        "target_offset",
+                        "sigma",
+                    ),
                     key,
                 )
             )
@@ -205,11 +233,16 @@ def aggregate(
             roster=[list(key) for key in sorted(expected)],
             source_results=[a.manifest["sha256"] for a in artifacts],
             scientific_unit="checkpoint_seed",
+            selection_policy=first.get("selection_policy"),
         )
     return Path(output)
 
 
-def plot(aggregate_dir, output):
+def plot(aggregate_dir, output, metric="vrmse"):
+    if metric not in ("vrmse", "r2"):
+        raise ValueError("plot metric must be vrmse or r2")
+    score_key = "test_" + metric
+    score_label = "VRMSE" if metric == "vrmse" else "R²"
     import matplotlib
 
     matplotlib.use("Agg")
@@ -226,14 +259,14 @@ def plot(aggregate_dir, output):
         objective: plt.get_cmap("tab10")(i) for i, objective in enumerate(objectives)
     }
     targets = artifact.manifest["protocol"]["targets"]
-    gaps = artifact.manifest["protocol"]["gaps"]
+    target_offsets = artifact.manifest["protocol"]["target_offsets"]
     with staged_directory(output) as stage:
         fields = (
             "objective",
             "family",
             "representation",
             "method",
-            "gap",
+            "target_offset",
             "target",
             "sigma",
             "metric",
@@ -246,14 +279,18 @@ def plot(aggregate_dir, output):
             writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t")
             writer.writeheader()
             for row in summaries:
-                for metric, score in row["metrics"].items():
+                for metric_name, score in row["metrics"].items():
                     writer.writerow(
                         {key: row.get(key) for key in fields[:7]}
-                        | {"metric": metric}
+                        | {"metric": metric_name}
                         | score
                     )
         write_json(stage / "target_means.json", target_means)
-        # Main comparison and separate readouts use identical cells and scales.
+        # Main comparison and separate probes use identical cells and scales.
+        scores = [r["metrics"][score_key]["mean"] for r in summaries]
+        finite = [v for v in scores if v is not None and np.isfinite(v)]
+        low = min([0.0, *finite])
+        high = max([1.0, *finite])
         if artifact.manifest["result_kind"] == "probes":
             for method in ("selected", "ridge", "mlp"):
                 fig, axes = plt.subplots(
@@ -270,15 +307,23 @@ def plot(aggregate_dir, output):
                         and r["method"] == method
                         and r["objective"] == objective
                     ]
-                    matrix = np.full((len(targets), 2 * len(gaps)), np.nan)
+                    matrix = np.full((len(targets), 2 * len(target_offsets)), np.nan)
                     for r in cells:
                         col = (
-                            0 if r["representation"] == "pooled" else len(gaps)
-                        ) + gaps.index(r["gap"])
-                        score = r["metrics"]["test_r2"]["mean"]
+                            0
+                            if r["representation"] == "pooled"
+                            else len(target_offsets)
+                        ) + target_offsets.index(r["target_offset"])
+                        score = r["metrics"][score_key]["mean"]
                         if score is not None:
                             matrix[targets.index(r["target"]), col] = score
-                    axis.imshow(matrix, vmin=0, vmax=1, cmap="viridis", aspect="auto")
+                    axis.imshow(
+                        matrix,
+                        vmin=low,
+                        vmax=high,
+                        cmap="viridis_r" if metric == "vrmse" else "viridis",
+                        aspect="auto",
+                    )
                     for i in range(matrix.shape[0]):
                         for j in range(matrix.shape[1]):
                             axis.text(
@@ -291,15 +336,20 @@ def plot(aggregate_dir, output):
                                 va="center",
                                 fontsize=8,
                                 color="white"
-                                if not np.isfinite(matrix[i, j]) or matrix[i, j] < 0.5
+                                if not np.isfinite(matrix[i, j])
+                                or (
+                                    matrix[i, j] > (low + high) / 2
+                                    if metric == "vrmse"
+                                    else matrix[i, j] < (low + high) / 2
+                                )
                                 else "black",
                             )
                     axis.set_xticks(
-                        range(2 * len(gaps)),
+                        range(2 * len(target_offsets)),
                         [
-                            f"{rep} +{gap}"
+                            f"{rep} +{target_offset}"
                             for rep in ("pooled", "token")
-                            for gap in gaps
+                            for target_offset in target_offsets
                         ],
                         rotation=40,
                         ha="right",
@@ -307,7 +357,7 @@ def plot(aggregate_dir, output):
                     axis.set_yticks(
                         range(len(targets)), [t.replace("_", " ") for t in targets]
                     )
-                    axis.set_title(f"{objective}: {method}, test R²")
+                    axis.set_title(f"{objective}: {method}, test {score_label}")
                 fig.tight_layout()
                 fig.savefig(stage / f"physics_{method}.pdf")
                 plt.close(fig)
@@ -315,12 +365,12 @@ def plot(aggregate_dir, output):
             for method in ("ridge", "mlp"):
                 fig, axes = plt.subplots(
                     len(targets),
-                    len(gaps),
-                    figsize=(4 * len(gaps), 2.5 * len(targets)),
+                    len(target_offsets),
+                    figsize=(4 * len(target_offsets), 2.5 * len(targets)),
                     squeeze=False,
                 )
                 for i, target in enumerate(targets):
-                    for j, gap in enumerate(gaps):
+                    for j, target_offset in enumerate(target_offsets):
                         axis = axes[i, j]
                         for row in raw:
                             if (
@@ -328,13 +378,13 @@ def plot(aggregate_dir, output):
                                 row["representation"],
                                 row["method"],
                                 row["target"],
-                                row["gap"],
-                            ) != ("physics", "pooled", method, target, gap):
+                                row["target_offset"],
+                            ) != ("physics", "pooled", method, target, target_offset):
                                 continue
                             curve = row.get("depth_curve", [])
                             axis.plot(
                                 [p["layer"] for p in curve],
-                                [p.get("test_r2") for p in curve],
+                                [p.get(score_key) for p in curve],
                                 color=colors[row["objective"]],
                                 alpha=0.2,
                                 lw=0.8,
@@ -345,25 +395,27 @@ def plot(aggregate_dir, output):
                                 row["representation"],
                                 row["method"],
                                 row["target"],
-                                row["gap"],
-                            ) != ("physics", "pooled", method, target, gap):
+                                row["target_offset"],
+                            ) != ("physics", "pooled", method, target, target_offset):
                                 continue
                             curve = row.get("depth_curve", [])
                             axis.plot(
                                 [p["layer"] for p in curve],
-                                [p["metrics"]["test_r2"]["mean"] for p in curve],
+                                [p["metrics"][score_key]["mean"] for p in curve],
                                 label=row["objective"],
                                 color=colors[row["objective"]],
                             )
-                        axis.set_title(f"{target.replace('_', ' ')} +{gap}", fontsize=9)
+                        axis.set_title(
+                            f"{target.replace('_', ' ')} +{target_offset}", fontsize=9
+                        )
                         axis.set_xlabel("Encoder output")
-                        axis.set_ylabel("Test R²")
+                        axis.set_ylabel(f"Test {score_label}")
                 axes[0, 0].legend()
                 fig.tight_layout()
                 fig.savefig(stage / f"depth_{method}.pdf")
                 plt.close(fig)
         else:
-            for metric in ("test_r2", "test_pearson_r"):
+            for metric in (score_key, "test_pearson_r"):
                 fig, axes = plt.subplots(
                     len(targets), 3, figsize=(12, 2.5 * len(targets)), squeeze=False
                 )
@@ -424,5 +476,5 @@ def plot(aggregate_dir, output):
                 fig.tight_layout()
                 fig.savefig(stage / f"noise_{metric}.pdf")
                 plt.close(fig)
-        seal(stage, "plots", aggregate=artifact.manifest["sha256"])
+        seal(stage, "plots", aggregate=artifact.manifest["sha256"], metric=score_key)
     return Path(output)

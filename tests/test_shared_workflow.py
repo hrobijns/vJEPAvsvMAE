@@ -20,7 +20,8 @@ from src.data.preprocess import preprocess
 from src.evaluation.artifacts import Artifact, seal, write_json
 from src.evaluation.cache import prepare_cache
 from src.evaluation.features import extract_features, paired_noise_batch
-from src.evaluation.pipeline import fit_probes, evaluate_noise, _score_fit
+from src.evaluation.pipeline import fit_probes, score_probes, evaluate_noise, _score_fit
+from src.evaluation.selection import select_checkpoints
 from src.evaluation.probes import (
     fit_ridge_many,
     fit_mlp,
@@ -30,7 +31,6 @@ from src.evaluation.probes import (
 )
 from src.evaluation.protocol import (
     Protocol,
-    trajectory_folds,
     token_indices,
     position_basis,
 )
@@ -41,7 +41,7 @@ from src.physics.systems import SYSTEMS
 from src.physics import rayleigh_benard as rb, rb_derivatives as R
 from src.physics.quadrature import quad_weights
 from src.train import training_identity, validate_resume
-from tests.fixtures import write_well, sample_rows
+from tests.fixtures import write_well
 
 
 class PhysicsTests(unittest.TestCase):
@@ -75,6 +75,9 @@ class PhysicsTests(unittest.TestCase):
             u = torch.cos(2 * torch.pi * y / system.lengths[1]).expand(nx, ny)
             v = torch.sin(4 * torch.pi * x / system.lengths[0]).expand(nx, ny)
             raw = torch.zeros(1, system.channels, 2, nx, ny, dtype=torch.float64)
+            if dataset == "active_matter":
+                raw[:, 0] = 1
+                raw[:, 3] = raw[:, 6] = 0.5
             raw[:, 1] = u
             raw[:, 2] = v
             expected = (
@@ -125,7 +128,7 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(
             [p.offsets(200, i)["token"][0] for i in range(5)], [0, 13, 26, 40, 53]
         )
-        self.assertEqual(p.target_start(53, 32) + 8, 101)
+        self.assertEqual(p.target_start(53, 40) + 8, 101)
         self.assertEqual(Protocol("active_matter").offsets(81, 4)["token"], [33])
         with self.assertRaises(ValueError):
             p.offsets(30, 0)
@@ -139,28 +142,13 @@ class ProtocolTests(unittest.TestCase):
                 [p.offsets(200, i)["token"][0] for i in range(5)],
                 [0, 38, 76, 114, 152],
             )
-            self.assertEqual(p.target_start(152, 32) + 8, 200)
+            self.assertEqual(p.target_start(152, 40) + 8, 200)
             # Full support follows the source length, including beyond 200.
-            self.assertEqual(p.target_start(p.offsets(240, 4)["token"][0], 32) + 8, 240)
+            self.assertEqual(p.target_start(p.offsets(240, 4)["token"][0], 40) + 8, 240)
             self.assertEqual(p.token_samples, 64)
         p = Protocol("active_matter")
         self.assertEqual(p.offsets(81, 0)["pooled"], [0, 16, 33])
-        self.assertEqual(p.target_start(33, 32) + 8, 81)
-
-    def test_folds_preserve_trajectories_and_rb_rotation(self):
-        rows = sample_rows()
-        expanded = [row for row in rows for _ in range(3)]
-        for f, fold in enumerate(trajectory_folds(expanded)):
-            fit = {expanded[i]["trajectory_id"] for i in fold["fit"]}
-            held = {expanded[i]["trajectory_id"] for i in fold["select"]}
-            self.assertFalse(fit & held)
-            self.assertEqual(held, {f"valid/{g}/{(f + g) % 5}" for g in range(5)})
-        self.assertTrue(
-            all(
-                len(f["select"]) == 1
-                for f in trajectory_folds(sample_rows(replicates=1))
-            )
-        )
+        self.assertEqual(p.target_start(33, 40) + 8, 81)
 
     def test_tokens_noise_and_position_coordinates(self):
         a = token_indices(3, 1024)
@@ -187,10 +175,11 @@ class ProbeTests(unittest.TestCase):
         self.x = self.rng.normal(size=(25, 2, 6)).astype("float32")
         self.xt = self.rng.normal(size=(25, 2, 6)).astype("float32")
         self.y = 2 * self.x[:, 1, 0].astype("float64") + 1
-        self.rows = sample_rows()
 
     def test_ridge_heldout_predictions_and_selection(self):
-        fits = fit_ridge_many(self.x, {"y": self.y}, self.rows)["y"]
+        fits = fit_ridge_many(
+            self.x, {"y": self.y}, self.xt, {"y": 2 * self.xt[:, 1, 0] + 1}
+        )["y"]
         self.assertEqual(fits["selected_layer"], 1)
         entry = fits["layers"][1]
         predicted = predict(entry["fit"], self.xt[:, 1])
@@ -199,14 +188,14 @@ class ProbeTests(unittest.TestCase):
         )
         # Test labels enter scoring only; selection APIs do not accept them.
         selected = selected_family(
-            {"valid_cv_r2": 0.8, "method": "ridge", "test_r2": -10},
-            {"valid_cv_r2": 0.7, "method": "mlp", "test_r2": 1},
+            {"valid_vrmse": 0.2, "method": "ridge", "test_r2": -10},
+            {"valid_vrmse": 0.3, "method": "mlp", "test_r2": 1},
         )
         self.assertEqual(selected["method"], "ridge")
         self.assertEqual(
             selected_family(
-                {"valid_cv_r2": 0.8, "method": "ridge"},
-                {"valid_cv_r2": 0.8, "method": "mlp"},
+                {"valid_vrmse": 0.2, "method": "ridge"},
+                {"valid_vrmse": 0.2, "method": "mlp"},
             )["method"],
             "ridge",
         )
@@ -214,7 +203,14 @@ class ProbeTests(unittest.TestCase):
     def test_saved_mlp_replay_for_low_variance_targets(self):
         for scale in (1.0, 1e-7, 1e-10):
             y = 1 + scale * self.y
-            fitted = fit_mlp(self.x, y, self.rows, max_steps=4, min_steps=2)
+            fitted = fit_mlp(
+                self.x,
+                y,
+                self.xt,
+                1 + scale * (2 * self.xt[:, 1, 0].astype("float64") + 1),
+                max_steps=4,
+                min_steps=2,
+            )
             entry = next(
                 r for r in fitted["layers"] if r["layer"] == fitted["selected_layer"]
             )
@@ -236,8 +232,10 @@ class ProbeTests(unittest.TestCase):
             )
 
     def test_constant_targets_are_explicitly_undefined(self):
-        fit = fit_ridge_many(self.x, {"constant": np.ones(25)}, self.rows)["constant"]
-        self.assertEqual(fit["status"], "undefined_validation_r2")
+        fit = fit_ridge_many(
+            self.x, {"constant": np.ones(25)}, self.xt, {"constant": np.ones(25)}
+        )["constant"]
+        self.assertEqual(fit["status"], "undefined_validation_vrmse")
         self.assertEqual(
             metrics(np.zeros(3), np.ones(3))["metric_status"], "constant_target"
         )
@@ -246,7 +244,8 @@ class ProbeTests(unittest.TestCase):
         fitted = fit_mlp(
             self.x,
             self.y,
-            self.rows,
+            self.xt,
+            2 * self.xt[:, 1, 0] + 1,
             max_steps=2,
             min_steps=2,
             include_depth=False,
@@ -311,12 +310,12 @@ class ArtifactTests(unittest.TestCase):
                         family="physics",
                         representation="token",
                         method="mlp",
-                        gap=0,
+                        target_offset=0,
                         target=target,
                         test_r2=score,
                         selected_layer=seed,
                         depth_curve=[],
-                        valid_cv_r2=score + 0.1,
+                        valid_r2=score + 0.1,
                     )
                     for target, score in zip(("a", "b"), scores)
                 ]
@@ -326,7 +325,7 @@ class ArtifactTests(unittest.TestCase):
                         family="physics",
                         representation="token",
                         method="position",
-                        gap=0,
+                        target_offset=0,
                         target="a",
                         test_r2=0.05,
                         shared=True,
@@ -385,7 +384,7 @@ class ArtifactTests(unittest.TestCase):
                             "family": "physics",
                             "representation": "pooled",
                             "method": "ridge",
-                            "gap": 0,
+                            "target_offset": 0,
                             "target": "x",
                             "test_r2": 0.5,
                         }
@@ -442,8 +441,12 @@ class WorkflowTests(unittest.TestCase):
                 )
             self.assertFalse(torch.equal(full_mm[93]["clip"], full_mm[192]["clip"]))
             for frames in (81, 200):
-                paired_hdf = WellClipDataset(tmp, "shear_flow", frame_limit=frames, future=True)
-                paired_mm = MemmapClipDataset(tmp, "shear_flow", "train", frame_limit=frames, future=True)
+                paired_hdf = WellClipDataset(
+                    tmp, "shear_flow", frame_limit=frames, future=True
+                )
+                paired_mm = MemmapClipDataset(
+                    tmp, "shear_flow", "train", frame_limit=frames, future=True
+                )
                 count = frames - 15
                 self.assertEqual(len(paired_hdf), 5 * count)
                 self.assertEqual(len(paired_mm), len(paired_hdf))
@@ -454,17 +457,26 @@ class WorkflowTests(unittest.TestCase):
                     trajectory, start = paired_hdf.window(index)
                     pair = paired_hdf[index]
                     for key, offset in (("clip", 0), ("target_clip", 8)):
-                        torch.testing.assert_close(pair[key], paired_mm[index][key], rtol=0, atol=0)
                         torch.testing.assert_close(
-                            pair[key], full_mm[trajectory * 193 + start + offset]["clip"],
-                            rtol=0, atol=0,
+                            pair[key], paired_mm[index][key], rtol=0, atol=0
+                        )
+                        torch.testing.assert_close(
+                            pair[key],
+                            full_mm[trajectory * 193 + start + offset]["clip"],
+                            rtol=0,
+                            atol=0,
                         )
                 with self.assertRaises(IndexError):
                     paired_hdf[len(paired_hdf)]
             for backend in (WellClipDataset, MemmapClipDataset):
                 with self.assertRaises(ValueError):
                     backend(tmp, "shear_flow", "train", frame_limit=15, future=True)
-                self.assertEqual(len(backend(tmp, "shear_flow", "train", frame_limit=16, future=True)), 5)
+                self.assertEqual(
+                    len(
+                        backend(tmp, "shear_flow", "train", frame_limit=16, future=True)
+                    ),
+                    5,
+                )
             fit, held = train_valid_trajectory_split(5)
             self.assertFalse(set(fit) & set(held))
             with self.assertRaises(IndexError):
@@ -515,20 +527,20 @@ class WorkflowTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()),
             ):
                 root = Path(tmp)
-                for split in ("valid", "test"):
+                for split in ("train", "valid"):
                     write_well(root, dataset, split)
                 patch_size = (1, 64, 32) if dataset == "rayleigh_benard" else (1, 8, 8)
                 protocol = Protocol(
                     dataset,
                     frame_limit=6,
                     n_frames=2,
-                    gaps=(0, 1),
+                    target_offsets=(0, 2, 3),
                     patch=patch_size,
                     token_samples=4,
                     noise_sigmas=(0.0, 0.1),
                     noise_seeds=(0,),
                 )
-                for split in ("valid", "test"):
+                for split in ("train", "valid"):
                     prepare_cache(root, split, root / "cache", protocol)
                 source = WellSource(root, dataset, "valid", n_frames=2)
                 spec = ClipSpec(len(source.channels), 2, *source.shape)
@@ -536,6 +548,7 @@ class WorkflowTests(unittest.TestCase):
                     data={"dataset_name": dataset},
                     objective_name="mae",
                     seed=0,
+                    optim={"total_steps": 2},
                     encoder=dict(
                         patch_t=1,
                         patch_h=patch_size[1],
@@ -556,15 +569,39 @@ class WorkflowTests(unittest.TestCase):
                     ),
                     checkpoint,
                 )
-                features = extract_features(
-                    checkpoint, root / "cache", root / "features", batch_size=5
-                )
+                for split in ("train", "valid"):
+                    features = extract_features(
+                        checkpoint,
+                        root / "cache",
+                        root / "features",
+                        split,
+                        batch_size=5,
+                    )
                 fit_probes(
                     features,
                     root / "cache",
-                    root / "probes",
+                    root / "fits",
                     mlp_max_steps=2,
                     mlp_min_steps=2,
+                )
+                self.assertFalse((root / "cache/test").exists())
+                select_checkpoints([root / "fits"], root / "selection")
+                write_well(root, dataset, "test")
+                prepare_cache(root, "test", root / "cache", protocol)
+                extract_features(
+                    checkpoint,
+                    root / "cache",
+                    root / "features",
+                    "test",
+                    batch_size=5,
+                    include_noise=True,
+                )
+                score_probes(
+                    features,
+                    root / "cache",
+                    root / "fits",
+                    root / "selection",
+                    root / "probes",
                 )
                 evaluate_noise(
                     features, root / "cache", root / "probes", root / "noise"
@@ -588,6 +625,17 @@ class WorkflowTests(unittest.TestCase):
                     self.assertTrue((root / "plots/summary.tsv").is_file())
                 self.assertTrue((root / "aggregate/target_means.json").is_file())
                 rows = Artifact(root / "probes", "probes").json("rows.json")
+                for row in rows:
+                    if row["method"] == "selected":
+                        self.assertNotIn("depth_curve", row)
+                    elif row["family"] == "physics" and row["method"] in (
+                        "ridge",
+                        "mlp",
+                    ):
+                        self.assertEqual(
+                            [p["layer"] for p in row["depth_curve"]],
+                            list(range(cfg["encoder"]["depth"] + 1)),
+                        )
                 self.assertEqual(
                     {r["target"] for r in rows if r["family"] == "physics"},
                     set(SYSTEMS[dataset].targets),

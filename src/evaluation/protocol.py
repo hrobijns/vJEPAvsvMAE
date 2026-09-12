@@ -1,4 +1,4 @@
-"""Explicit sampling, trajectory folds, and physical controls."""
+"""Explicit sampling offsets and physical controls."""
 
 from collections import defaultdict
 from dataclasses import asdict, dataclass
@@ -13,7 +13,7 @@ class Protocol:
     dataset: str
     frame_limit: int | None = None
     n_frames: int = 8
-    gaps: tuple[int, ...] = (0, 8, 32)
+    target_offsets: tuple[int, ...] = (0, 8, 16, 40)
     patch: tuple[int, int, int] = (2, 16, 16)
     token_samples: int = 64
     noise_sigmas: tuple[float, ...] = (0.0, 0.05, 0.1, 0.2, 0.5, 1.0)
@@ -34,12 +34,15 @@ class Protocol:
         ):
             raise ValueError("invalid token geometry")
         if (
-            not self.gaps
-            or min(self.gaps) < 0
-            or 0 not in self.gaps
-            or len(set(self.gaps)) != len(self.gaps)
+            not self.target_offsets
+            or min(self.target_offsets) < 0
+            or 0 not in self.target_offsets
+            or len(set(self.target_offsets)) != len(self.target_offsets)
+            or any(0 < offset < self.n_frames for offset in self.target_offsets)
         ):
-            raise ValueError("gaps must be distinct, nonnegative, and include zero")
+            raise ValueError(
+                "target offsets must include zero and nonoverlapping future clips"
+            )
         if (
             not self.noise_sigmas
             or self.noise_sigmas[0] != 0
@@ -53,28 +56,30 @@ class Protocol:
         return {
             **asdict(self),
             "targets": list(SYSTEMS[self.dataset].targets),
-            "target_version": 1,
-            "folds": "trajectory-cyclic-5",
-            "gap_definition": "intervening_frames",
+            "target_version": 2,
+            "offset_definition": "target_start_minus_context_start",
+            "probe_splits": {"fit": "train", "select": "valid", "score": "test"},
         }
 
     @classmethod
     def from_dict(cls, value):
+        if "gaps" in value:
+            raise ValueError(
+                "legacy gaps are ambiguous; migrate to target_offsets and rebuild caches"
+            )
         keys = cls.__dataclass_fields__
         kwargs = {k: v for k, v in value.items() if k in keys}
-        for k in ("gaps", "patch", "noise_sigmas", "noise_seeds"):
+        for k in ("target_offsets", "patch", "noise_sigmas", "noise_seeds"):
             if k in kwargs:
                 kwargs[k] = tuple(kwargs[k])
         return cls(**kwargs)
 
-    def target_start(self, start, gap):
-        return start if gap == 0 else start + self.n_frames + gap
+    def target_start(self, start, offset):
+        return start + offset
 
     def offsets(self, frames, trajectory):
         stop = frames if self.frame_limit is None else min(frames, self.frame_limit)
-        extent = max(
-            self.n_frames if gap == 0 else 2 * self.n_frames + gap for gap in self.gaps
-        )
+        extent = self.n_frames + max(self.target_offsets)
         last = stop - extent
         if last < 0:
             raise ValueError(f"{stop} frames cannot contain all requested horizons")
@@ -89,38 +94,6 @@ def token_indices(trajectory, n_tokens, n_select=64):
         raise ValueError("token sample count exceeds grid")
     rng = np.random.default_rng(np.random.SeedSequence([20260825, int(trajectory)]))
     return np.sort(rng.choice(n_tokens, size=n_select, replace=False))
-
-
-def trajectory_folds(samples, n_folds=5):
-    """Rotate held-out replicates by regime to balance sampled times.
-
-    With five runs per regime this reproduces the corrected RB folds exactly.
-    Smaller regimes are distributed across folds without inventing replicates.
-    All clips and tokens from one trajectory always remain together.
-    """
-    metadata = {}
-    by_regime = defaultdict(dict)
-    for row in samples:
-        trajectory = row["trajectory_id"]
-        value = (tuple(row["regime"]), int(row["replicate"]))
-        if metadata.setdefault(trajectory, value) != value:
-            raise ValueError("inconsistent trajectory metadata")
-        regime, replicate = value
-        previous = by_regime[regime].setdefault(replicate, trajectory)
-        if previous != trajectory:
-            raise ValueError("duplicate replicate within regime")
-    assignments = {}
-    for regime_index, regime in enumerate(sorted(by_regime)):
-        for replicate, trajectory in by_regime[regime].items():
-            assignments[trajectory] = (replicate - regime_index) % n_folds
-    ids = np.asarray([assignments[row["trajectory_id"]] for row in samples])
-    folds = [
-        {"fit": np.flatnonzero(ids != fold), "select": np.flatnonzero(ids == fold)}
-        for fold in range(n_folds)
-    ]
-    if any(len(f["fit"]) == 0 or len(f["select"]) == 0 for f in folds):
-        raise ValueError("insufficient trajectories for five nonempty grouped folds")
-    return folds
 
 
 def polynomial_basis(values):
