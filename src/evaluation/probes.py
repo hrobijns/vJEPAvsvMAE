@@ -7,7 +7,7 @@ from torch import nn
 from torch.nn import functional as F
 
 RIDGE_ALPHAS = (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0)
-MLP_SEEDS = (0, 1, 2)
+MLP_SEEDS = (0,)
 METRIC_NAMES = ("vrmse", "r2", "pearson_r", "mse", "log_mse")
 
 

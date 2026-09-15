@@ -246,7 +246,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                 mlp_lr=0.01,
                 mlp_weight_decay=1e-4,
                 probe_seeds=list(MLP_SEEDS),
-                mlp_predictions="ensemble_mean",
+                mlp_predictions="single_seed",
                 selection_metric="valid_vrmse",
             ),
         )

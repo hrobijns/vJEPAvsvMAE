@@ -174,11 +174,11 @@ Ridge searches every encoder output and penalties
 `1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Targets are centered and the
 weights solve `(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
 MLPs independently search every output: 128 ReLU units, dropout 0.1,
-full-batch Adam, LR 0.01, weight decay 0.0001. Three fixed initializations
-(0, 1, 2) each select a stopping state between 150 and 2,000 updates,
-checking validation MSE every 20 updates with patience 100. Retain those
-states and average predictions in float64 on both validation and test;
-there is no post-selection refitting. Hyperparameters are fixed apart from
+full-batch Adam, LR 0.01, weight decay 0.0001, and fixed initialization seed 0.
+Each selects a stopping state between 150 and 2,000 updates, checking validation
+MSE every 20 updates with patience 100. Retain that state for validation and
+test prediction in float64; there is no post-selection refitting.
+Hyperparameters are fixed apart from
 stopping duration and layer; there is no additional MLP LR sweep.
 
 Each quantity/horizon/global-local cell selects Ridge or MLP by minimum

@@ -232,7 +232,7 @@ combined encoder-plus-control Ridge probes, and future persistence baselines.
 Checkpoint selection excludes those controls and governing parameters.
 Aggregates average physical quantities inside each encoder seed before
 calculating between-seed statistics. A single encoder seed has no between-run
-standard deviation; MLP ensemble members are not extra encoder seeds.
+standard deviation; the fixed MLP initialization is not an encoder seed.
 Undefined metrics remain JSON `null`, and plots retain scores outside 0–1.
 
 The workshop configuration preserves its 101-frame support and original targets

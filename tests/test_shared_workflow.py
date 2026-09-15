@@ -23,6 +23,7 @@ from src.evaluation.features import extract_features, paired_noise_batch
 from src.evaluation.pipeline import fit_probes, score_probes, evaluate_noise, _score_fit
 from src.evaluation.selection import select_checkpoints
 from src.evaluation.probes import (
+    MLP_SEEDS,
     fit_ridge_many,
     fit_mlp,
     predict,
@@ -210,6 +211,14 @@ class ProbeTests(unittest.TestCase):
                 1 + scale * (2 * self.xt[:, 1, 0].astype("float64") + 1),
                 max_steps=4,
                 min_steps=2,
+            )
+            self.assertEqual(MLP_SEEDS, (0,))
+            self.assertTrue(
+                all(
+                    len(layer["fit"]["states"]) == 1
+                    and len(layer["selected_steps"]) == 1
+                    for layer in fitted["layers"]
+                )
             )
             entry = next(
                 r for r in fitted["layers"] if r["layer"] == fitted["selected_layer"]

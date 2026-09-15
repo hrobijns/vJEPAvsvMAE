@@ -76,7 +76,7 @@ Checkpoint selection uses the state-derived physical quantities listed under Sta
 For each task cell, search all 12 block outputs and the final encoder norm. Fit both:
 
 - Ridge, with the predefined regularization grid;
-- a one-hidden-layer MLP, with the predefined three initializations and validation-selected stopping state.
+- a one-hidden-layer MLP with fixed initialization seed 0 and a validation-selected stopping state.
 
 Select the layer, probe family, and probe settings for that task using validation VRMSE. Exact Ridge/MLP ties prefer Ridge.
 
