@@ -189,18 +189,20 @@ local targets. Selected-family summaries retain the chosen score, family, and
 layer; full depth curves remain in the separate Ridge and MLP results.
 
 One encoder checkpoint is selected for each dataset/objective/training seed.
-Candidates are the 25k, 50k, 75k, and 100k milestones plus the minimum
-pretraining-validation-loss checkpoint. Verified identical encoder states
-with the same configuration are fit once. Average quantities and global/local
-settings equally within each horizon; assign 50% weight to the current
-horizon and 50% to the equal mean over the three future horizons. The lowest
-balanced validation VRMSE wins; exact checkpoint ties prefer earlier steps,
-then checkpoint hash. Controls and governing parameters do not enter this
-score. Missing task cells are errors, and undefined values are exposed rather
-than silently dropping quantities or changing weights. A candidate without a
-complete finite score is ineligible; if none are eligible, selection stops.
-The manifest freezes all choices before test scoring, which requires a
-matching selected probe-fit artifact.
+Candidates are exactly the 25k, 50k, 75k, and 100k milestones; the minimum
+pretraining-validation-loss checkpoint is not a candidate, because its step is
+objective-dependent. The frozen study records this candidate policy, and every
+sweep command rejects a study or roster that does not match it. Verified
+identical encoder states with the same configuration are fit once. Average
+quantities and global/local settings equally within each horizon; assign 50%
+weight to the current horizon and 50% to the equal mean over the three future
+horizons. The lowest balanced validation VRMSE wins; exact checkpoint ties
+prefer earlier steps, then checkpoint hash. Controls and governing parameters
+do not enter this score. Missing task cells are errors, and undefined values
+are exposed rather than silently dropping quantities or changing weights. A
+candidate without a complete finite score is ineligible; if none are eligible,
+selection stops. The manifest freezes all choices before test scoring, which
+requires a matching selected probe-fit artifact.
 
 Noise evaluation reuses saved clean fits, layers, and statistics at sigmas
 0, .05, .1, .2, .5, 1, with three deterministic paired corruption draws. Targets

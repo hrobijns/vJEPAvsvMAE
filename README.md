@@ -166,47 +166,57 @@ with `--metric r2`. This adapts Walrus's variance normalization to scalar
 physical quantities; it is not a direct comparison with its full-field scores.
 See [the methods contract](docs/METHODS.md) for formulas and selection weights.
 
-All 60 seed-1 encoder candidates are in
-[the checkpoint handoff](checkpoints/iclr2027/seed1/README.md). Preparing a sweep
-requires committed source changes. It creates a detached source checkout,
-freezes the candidate roster, and skips repeated fitting for verified identical
-encoder states with the same training configuration. It does not submit jobs.
+The handoff at [checkpoints/iclr2027/seed1](checkpoints/iclr2027/seed1/README.md)
+retains 60 seed-1 encoder files. Stage-1 checkpoint selection uses only the
+four common training-fraction milestones (25%, 50%, 75%, and 100%) and ignores
+the objective-dependent `best_val` files. By default `probe_sweep.py prepare`
+freezes all 48 milestone candidates. Passing `--dataset` creates an independent
+single-system study with 16 candidates and four run groups, which permits one
+system to complete checkpoint selection and test scoring before the others.
+Preparation requires committed source changes. It validates the complete
+declared handoff first, then scopes the frozen candidates, creates a detached
+source checkout, and skips repeated fitting for verified identical encoder
+states with the same training configuration. Every later command re-checks
+the frozen policy and scoped roster.
 
 ```bash
-STUDY=outputs/physical_probes/iclr2027_seed1
+STUDY=outputs/physical_probes/rayleigh_benard_seed1
 uv run --locked python scripts/probe_sweep.py prepare \
-  --handoff checkpoints/iclr2027/seed1 --base /path/to/data --output "$STUDY"
+  --handoff checkpoints/iclr2027/seed1 --base /path/to/data --output "$STUDY" \
+  --dataset rayleigh_benard
 # Use this frozen source for every subsequent stage.
 PROBE_PYTHON="$STUDY/source/.venv/bin/python"
 PROBE_RUNNER="$STUDY/source/scripts/probe_sweep.py"
-for dataset in rayleigh_benard active_matter shear_flow; do
-  for split in train valid; do
-    "$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" --dataset "$dataset" --split "$split"
-  done
+for split in train valid; do
+  "$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" \
+    --dataset rayleigh_benard --split "$split"
 done
-# The prepared seed-1 roster has 56 distinct candidates: indices 0 through 55.
+# A scoped Rayleigh-Bénard study has 16 candidates: indices 0 through 15.
 sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
-  --array=0-55%12 --output="$STUDY/logs/fit_%A_%a.log" \
+  --array=0-15%12 --output="$STUDY/logs/fit_%A_%a.log" \
   scripts/slurm_probe.sbatch "$STUDY" run
-# After every candidate completes:
+# After all sixteen candidates complete:
 "$PROBE_PYTHON" "$PROBE_RUNNER" collect --output "$STUDY"
-for dataset in rayleigh_benard active_matter shear_flow; do
-  "$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" --dataset "$dataset" --split test
-done
+"$PROBE_PYTHON" "$PROBE_RUNNER" cache --output "$STUDY" \
+  --dataset rayleigh_benard --split test
 sbatch --account YOUR_ACCOUNT --partition YOUR_GPU_PARTITION \
-  --array=0-11%12 --output="$STUDY/logs/test_%A_%a.log" \
+  --array=0-3%4 --output="$STUDY/logs/test_%A_%a.log" \
   scripts/slurm_probe.sbatch "$STUDY" test
-# After all twelve selected checkpoints finish test scoring:
+# After all four selected checkpoints finish test scoring:
 "$PROBE_PYTHON" "$PROBE_RUNNER" report --output "$STUDY"
 ```
+
+Omit `--dataset` during preparation to freeze the complete three-system study;
+that form retains 48 candidate jobs and 12 selected-test jobs.
 
 Cache preparation can run independently for different systems/splits. The
 launcher requests one GPU, four CPUs, 16 GiB RAM, and 12 hours per candidate.
 It does not automatically requeue; completed immutable stages can be reused
-when retrying an interrupted candidate. The expected aggregate MLP compute is
-about 50 GPU-hours at the full stopping cap. Allow approximately 6–10 hours
-with 8–12 L40S GPUs, excluding queueing and initial data preparation; this is
-an extrapolation from timing checks, not a completed scientific sweep.
+when retrying an interrupted candidate. Scaling the earlier 56-candidate
+estimate, the expected aggregate MLP compute is about 45 GPU-hours at the full
+stopping cap. Allow approximately 5–9 hours with 8–12 L40S GPUs, excluding
+queueing and initial data preparation; this is an extrapolation from timing
+checks, not a completed scientific sweep.
 
 The underlying commands remain available for other checkpoint rosters:
 `prepare-cache --split train|valid|test`, `extract-features --split ...`,
