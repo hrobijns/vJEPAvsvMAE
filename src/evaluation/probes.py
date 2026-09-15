@@ -121,6 +121,19 @@ def _inputs(features, targets, valid_features, valid_targets):
     return x, y, xv, yv
 
 
+def _candidate_layers(n_layers, candidate_layers):
+    layers = (
+        tuple(range(n_layers))
+        if candidate_layers is None
+        else tuple(candidate_layers)
+    )
+    if not layers or len(set(layers)) != len(layers) or any(
+        not isinstance(layer, int) or not 0 <= layer < n_layers for layer in layers
+    ):
+        raise ValueError("candidate layers must be unique valid feature indices")
+    return layers
+
+
 def _result(layers, include_depth=True):
     valid = [row for row in layers if np.isfinite(row["valid_vrmse"])]
     return dict(
@@ -134,7 +147,12 @@ def _result(layers, include_depth=True):
 
 
 def fit_ridge_many(
-    features, targets, valid_features, valid_targets, alphas=RIDGE_ALPHAS
+    features,
+    targets,
+    valid_features,
+    valid_targets,
+    alphas=RIDGE_ALPHAS,
+    candidate_layers=None,
 ):
     """Share a training eigendecomposition across targets and penalties per layer."""
     x, y, xv, yv = _inputs(features, targets, valid_features, valid_targets)
@@ -144,8 +162,10 @@ def fit_ridge_many(
     yt = torch.tensor(np.column_stack(list(y.values())), dtype=torch.float64)
     ym = yt.mean(0)
     output = {name: [] for name in names}
-    for layer in range(x.shape[1]):
-        train, valid = (torch.tensor(f[:, layer], dtype=torch.float64) for f in (x, xv))
+    for layer in _candidate_layers(x.shape[1], candidate_layers):
+        train, valid = (
+            torch.tensor(f[:, layer], dtype=torch.float64) for f in (x, xv)
+        )
         mean, std = train.mean(0), train.std(0, unbiased=False)
         std = torch.where(std > 1e-12, std, torch.ones_like(std))
         train, valid = (train - mean) / std, (valid - mean) / std
@@ -197,12 +217,13 @@ def fit_mlp(
     x, y, xv, yv = _inputs(features, {"y": target}, valid_features, {"y": valid_target})
     if not 1 <= min_steps <= max_steps or not seeds or len(set(seeds)) != len(seeds):
         raise ValueError("invalid MLP stopping limits or seeds")
+    candidate_layers = _candidate_layers(x.shape[1], candidate_layers)
     if np.var(yv["y"]) == 0:
         return _result([], include_depth)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     y = torch.tensor(y["y"], dtype=torch.float64, device=device)
     layers = []
-    for layer in range(x.shape[1]) if candidate_layers is None else candidate_layers:
+    for layer in candidate_layers:
         train = torch.tensor(x[:, layer], device=device)
         train, yn, mean, std, ym, ys = _standardize_fit(train, y)
         valid = (torch.tensor(xv[:, layer], device=device) - mean) / std

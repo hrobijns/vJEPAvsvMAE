@@ -3,7 +3,6 @@ frame_limit: null
 n_frames: 8
 target_offsets:
 - 0
-- 8
 - 16
 - 40
 patch:

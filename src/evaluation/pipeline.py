@@ -24,6 +24,16 @@ from src.evaluation.protocol import (
 )
 from src.physics.systems import SYSTEMS
 
+PROBE_LAYERS = (2, 5, 8, 12)
+
+
+def _probe_layers(n_layers):
+    if n_layers < 1:
+        raise ValueError("feature artifact has no encoder outputs")
+    return tuple(layer for layer in PROBE_LAYERS[:-1] if layer < n_layers - 1) + (
+        n_layers - 1,
+    )
+
 
 def cell_id(row):
     keys = ("family", "representation", "target_offset", "target", "method", "sigma")
@@ -134,6 +144,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
     train_feature, valid_feature = features
     train, valid = caches
     protocol = Protocol.from_dict(train.manifest["protocol"])
+    probe_layers = _probe_layers(features[0].array("pooled.npy").shape[1])
     rows, fitted = [], {}
 
     def record(fit, base, method, shared=False):
@@ -148,7 +159,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
     for representation in ("pooled", "token"):
         x, b, y = _data(train_feature, train, representation)
         xv, bv, yv = _data(valid_feature, valid, representation)
-        ridge = fit_ridge_many(x, y, xv, yv)
+        ridge = fit_ridge_many(x, y, xv, yv, candidate_layers=probe_layers)
         controls = fit_ridge_many(b[:, None, :], y, bv[:, None, :], yv)
         combined = None
         if representation == "pooled":
@@ -161,6 +172,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                     [xv, np.repeat(bv[:, None, :], xv.shape[1], axis=1)], axis=2
                 ),
                 yv,
+                candidate_layers=probe_layers,
             )
         for offset in protocol.target_offsets:
             for target in SYSTEMS[protocol.dataset].targets:
@@ -179,6 +191,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                     yv[key],
                     max_steps=mlp_max_steps,
                     min_steps=mlp_min_steps,
+                    candidate_layers=probe_layers,
                 )
                 mr = record(mlp, base, "mlp")
                 chosen = selected_family(rr, mr)
@@ -209,7 +222,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                 print(f"fit {representation} offset {offset} {target}", flush=True)
     x, y = _regime_data(train_feature, train)
     xv, yv = _regime_data(valid_feature, valid)
-    ridge = fit_ridge_many(x, y, xv, yv)
+    ridge = fit_ridge_many(x, y, xv, yv, candidate_layers=probe_layers)
     for name in y:
         base = dict(
             family="regime", representation="pooled", target_offset=0, target=name
@@ -223,6 +236,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                 yv[name],
                 max_steps=mlp_max_steps,
                 min_steps=mlp_min_steps,
+                candidate_layers=probe_layers,
             ),
             base,
             "mlp",
@@ -247,6 +261,11 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                 mlp_weight_decay=1e-4,
                 probe_seeds=list(MLP_SEEDS),
                 mlp_predictions="single_seed",
+                probe_layers=list(probe_layers),
+                probe_outputs=[
+                    "final_norm" if layer == probe_layers[-1] else f"block_{layer + 1}"
+                    for layer in probe_layers
+                ],
                 selection_metric="valid_vrmse",
             ),
         )

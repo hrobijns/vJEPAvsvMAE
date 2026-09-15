@@ -71,9 +71,9 @@ Checkpoint selection uses the state-derived physical quantities listed under Sta
 
 - pooled representation;
 - local/token representation;
-- target offsets 0, 8, 16, and 40.
+- workshop-aligned target offsets 0, 16, and 40.
 
-For each task cell, search all 12 block outputs and the final encoder norm. Fit both:
+For each task cell, search block outputs 3, 6, and 9 plus the final encoder norm. Fit both:
 
 - Ridge, with the predefined regularization grid;
 - a one-hidden-layer MLP with fixed initialization seed 0 and a validation-selected stopping state.
@@ -90,10 +90,10 @@ Let `H_h` be the mean validation VRMSE at target offset `h`, averaged equally ov
 The checkpoint score is:
 
 ```text
-S = 0.5 H_0 + (H_8 + H_16 + H_40) / 6
+S = 0.5 H_0 + 0.25 (H_16 + H_40)
 ```
 
-This gives 50% total weight to the present target and 50% total weight to the three future targets. Lower is better.
+This gives 50% total weight to the present target and 50% total weight shared equally by the two future targets. Lower is better.
 
 A candidate must have a complete finite task roster. We will not silently omit a difficult or undefined quantity and average the remainder. If no candidate is eligible, selection stops for that run. Exact checkpoint-score ties prefer the earlier step and then the checkpoint SHA-256.
 
@@ -214,11 +214,12 @@ The local tracer-variance target does not subtract a separate mean inside each p
 For every selected encoder and every state-derived physical quantity, evaluate target-start offsets:
 
 - 0: the same eight-frame interval as the input context; this is paper `t+0`.
-- 8: the immediately adjacent eight-frame target; this is new and has no paper counterpart.
 - 16: the target beginning eight frames after the context ends; this is paper `t+8`.
 - 40: the target beginning 32 frames after the context ends; this is paper `t+32`.
 
-These are relative offsets, not one absolute timestep in the dataset.
+These are relative offsets, not one absolute timestep in the dataset. Offset 8,
+the immediately adjacent clip, is omitted from this reduced workshop-aligned
+study to lower probe cost.
 
 Current full-trajectory sampling uses:
 
@@ -237,7 +238,7 @@ For every selected encoder, report:
 - the validation-selected probe family and encoder layer;
 - validation and test VRMSE as the primary normalized error;
 - R², Pearson correlation, and MSE as supporting metrics;
-- performance across all 12 block outputs and the final norm for accessibility/depth analysis;
+- performance at block outputs 3, 6, and 9 plus the final norm for coarse depth analysis;
 - pooled and local/token results separately;
 - each target offset separately before any summary average.
 

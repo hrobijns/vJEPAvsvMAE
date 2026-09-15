@@ -156,8 +156,8 @@ The workflow fits Ridge and MLP probes on official **training** data, selects
 all probe settings and one encoder checkpoint per run on **validation**, then
 scores the frozen choices on **test**. Inputs remain eight unmasked frames.
 Global targets average over the clip; local targets average within sampled
-2×16×16 patches. Target starts are explicit offsets **0, 8, 16, 40**, covering
-frames 0–7, 8–15, 16–23, and 40–47 relative to the input start.
+2×16×16 patches. Target starts are explicit offsets **0, 16, 40**, covering
+frames 0–7, 16–23, and 40–47 relative to the input start.
 
 VRMSE is the default reported metric: RMSE divided by the target's population
 standard deviation across evaluated examples, separately for every quantity,

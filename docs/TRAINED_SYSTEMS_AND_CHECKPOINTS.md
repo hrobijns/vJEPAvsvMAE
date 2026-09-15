@@ -33,7 +33,7 @@ Primary dataset descriptions: [Rayleigh–Bénard](https://polymathic-ai.org/the
 | `jepa_future` | masked frames 0–7 | EMA target-encoder features at every position in the adjacent frames 8–15 | six-block future predictor |
 | `mae_future` | masked frames 0–7 | normalized pixels at every position in the adjacent frames 8–15 | four-block future decoder |
 
-This 2×2 design concerns the **pretraining target**: pixel versus latent space, and current versus adjacent-future clips. Downstream probe horizon is a separate evaluation axis applied to all four models (`target_offsets` 0, 8, 16, and 40). This lets us ask, for example, whether future-target pretraining specifically improves recovery of future physical quantities without conflating the two meanings of “future prediction.”
+This 2×2 design concerns the **pretraining target**: pixel versus latent space, and current versus adjacent-future clips. Downstream probe horizon is a separate evaluation axis applied to all four models. The reduced workshop-aligned study uses `target_offsets` 0, 16, and 40.
 
 All online encoders are matched: a 12-block ViT, width 384, six attention heads, 2×16×16 spacetime patches, and 90% tube masking. The heads have width 192 and six attention heads. The predictor/decoder depths intentionally remain family-specific, so this is not a claim of identical total parameter count or compute. The frozen **online encoder** is the representation used for probing; the objective-specific head is discarded.
 
@@ -130,8 +130,8 @@ For each `(system, objective, training seed)`:
 
 1. Use the common candidate grid: **25k, 50k, 75k, and 100k**. Do not include `best_val`: it gives objectives different candidate steps and JEPA's moving EMA target makes its loss minimum especially difficult to compare over training.
 2. Extract frozen online-encoder features from the same predefined official-train and official-validation clips for every candidate. Never use official test during selection.
-3. Fit Ridge and MLP probes on official training trajectories. Select probe family, hyperparameters, stopping state, and encoder layer separately for each physical task using official validation only and the same search space for every encoder.
-4. Give every physical quantity and the pooled/local settings equal weight within a horizon. Let `H_h` be that mean validation VRMSE at target offset `h`. Minimize `S = 0.5 H_0 + (H_8 + H_16 + H_40) / 6`: 50% present and 50% shared equally among the three future horizons.
+3. Fit Ridge and single-seed MLP probes on official training trajectories at block outputs 3, 6, and 9 plus the final norm. Select probe family, hyperparameters, stopping state, and encoder output separately for each physical task using official validation only and the same search space for every encoder.
+4. Give every physical quantity and the pooled/local settings equal weight within a horizon. Let `H_h` be that mean validation VRMSE at target offset `h`. Minimize `S = 0.5 H_0 + 0.25(H_16 + H_40)`: 50% present and 50% shared equally among the two future horizons.
 5. Governing-parameter diagnostics, nuisance controls, persistence baselines, pretraining loss, and test performance do not enter this checkpoint score.
 6. Require every planned task cell to have a finite score. If any are missing, the candidate is ineligible rather than benefiting from a smaller average.
 7. Break an exact checkpoint-score tie by earlier optimizer step, then checkpoint SHA-256; exact probe-family ties prefer Ridge.

@@ -20,7 +20,13 @@ from src.data.preprocess import preprocess
 from src.evaluation.artifacts import Artifact, seal, write_json
 from src.evaluation.cache import prepare_cache
 from src.evaluation.features import extract_features, paired_noise_batch
-from src.evaluation.pipeline import fit_probes, score_probes, evaluate_noise, _score_fit
+from src.evaluation.pipeline import (
+    PROBE_LAYERS,
+    fit_probes,
+    score_probes,
+    evaluate_noise,
+    _score_fit,
+)
 from src.evaluation.selection import select_checkpoints
 from src.evaluation.probes import (
     MLP_SEEDS,
@@ -239,6 +245,29 @@ class ProbeTests(unittest.TestCase):
                     )["test_r2"]
                 )
             )
+
+    def test_reduced_probe_grid_uses_workshop_horizons_and_four_outputs(self):
+        protocol = Protocol("rayleigh_benard")
+        self.assertEqual(protocol.target_offsets, (0, 16, 40))
+        self.assertEqual(PROBE_LAYERS, (2, 5, 8, 12))
+        self.assertEqual(
+            len(SYSTEMS["rayleigh_benard"].targets)
+            * len(protocol.target_offsets)
+            * 2
+            * len(PROBE_LAYERS)
+            * len(MLP_SEEDS)
+            * 16,
+            1920,
+        )
+        ridge = fit_ridge_many(
+            self.x,
+            {"y": self.y},
+            self.xt,
+            {"y": 2 * self.xt[:, 1, 0] + 1},
+            candidate_layers=(1,),
+        )["y"]
+        self.assertEqual([row["layer"] for row in ridge["layers"]], [1])
+
 
     def test_constant_targets_are_explicitly_undefined(self):
         fit = fit_ridge_many(
@@ -633,6 +662,9 @@ class WorkflowTests(unittest.TestCase):
                     plot(root / "noise_aggregate", root / "noise_plots")
                     self.assertTrue((root / "plots/summary.tsv").is_file())
                 self.assertTrue((root / "aggregate/target_means.json").is_file())
+                probe_layers = Artifact(root / "fits", "probe_fits").manifest[
+                    "probe_settings"
+                ]["probe_layers"]
                 rows = Artifact(root / "probes", "probes").json("rows.json")
                 for row in rows:
                     if row["method"] == "selected":
@@ -643,7 +675,7 @@ class WorkflowTests(unittest.TestCase):
                     ):
                         self.assertEqual(
                             [p["layer"] for p in row["depth_curve"]],
-                            list(range(cfg["encoder"]["depth"] + 1)),
+                            probe_layers,
                         )
                 self.assertEqual(
                     {r["target"] for r in rows if r["family"] == "physics"},

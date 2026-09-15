@@ -147,12 +147,13 @@ CPU comparisons test exact continuation; production CUDA kernels retain their
 existing nondeterministic behavior.
 
 The workshop sampling configuration explicitly caps support at 101 frames.
-New configurations use `target_offsets = [0, 8, 16, 40]`: target-start minus
-context-start, measured in saved frames. For context 0–7 the targets are
-0–7, 8–15, 16–23, and 40–47. The workshop configuration uses [0, 16, 40],
-which preserves the original physical horizons formerly labeled gaps 0, 8,
-and 32. Legacy gap configurations are rejected rather than reinterpreted.
-Every requested target must fit inside the available trajectory support.
+Current analysis configurations use `target_offsets = [0, 16, 40]`:
+target-start minus context-start, measured in saved frames. For context 0–7
+the targets are 0–7, 16–23, and 40–47. These preserve the workshop physical
+horizons formerly labeled gaps 0, 8, and 32. The immediately adjacent offset 8
+is omitted from this reduced comparison. Legacy gap configurations are rejected
+rather than reinterpreted. Every requested target must fit inside the available
+trajectory support.
 
 Three global contexts are equally spaced across eligible starts. For 200
 frames these are 0, 76, 152; local contexts cycle through 0, 38, 76, 114, 152
@@ -161,7 +162,7 @@ and 0, 13, 26, 40, 53 locally. Active matter's 81 frames give global starts
 0, 16, 33. Each local context retains 64 deterministic uniformly sampled
 positions. Checkpoints use identical samples and positions; no padding or
 wrapping is used. Encoders see only the full unmasked input clip, never the
-future target frames. Features include all 12 block outputs and the final norm.
+future target frames. Feature extraction retains all 12 block outputs and the final norm; probes use block outputs 3, 6, and 9 plus the final norm.
 
 Probes fit on official training trajectories. Official validation selects
 probe parameters, layers, families, and encoder checkpoints; official test
@@ -170,10 +171,10 @@ five-fold fitting inside the official validation split. It is not an
 assessment of unseen governing regimes. Training determines all fitted
 feature standardization and target normalization statistics.
 
-Ridge searches every encoder output and penalties
+Ridge searches block outputs 3, 6, and 9 plus the final encoder norm and penalties
 `1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Targets are centered and the
 weights solve `(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
-MLPs independently search every output: 128 ReLU units, dropout 0.1,
+MLPs independently search those same four outputs: 128 ReLU units, dropout 0.1,
 full-batch Adam, LR 0.01, weight decay 0.0001, and fixed initialization seed 0.
 Each selects a stopping state between 150 and 2,000 updates, checking validation
 MSE every 20 updates with patience 100. Retain that state for validation and
@@ -184,9 +185,9 @@ stopping duration and layer; there is no additional MLP LR sweep.
 Each quantity/horizon/global-local cell selects Ridge or MLP by minimum
 validation VRMSE after each family's layer/settings search. Exact family
 ties prefer Ridge. Governing-parameter probes remain separate diagnostics.
-Both Ridge and MLP report test scores at every encoder output for global and
-local targets. Selected-family summaries retain the chosen score, family, and
-layer; full depth curves remain in the separate Ridge and MLP results.
+Both Ridge and MLP report test scores at the four searched encoder outputs for
+global and local targets. Selected-family summaries retain the chosen score,
+family, and layer; four-point depth curves remain in the separate results.
 
 One encoder checkpoint is selected for each dataset/objective/training seed.
 Candidates are exactly the 25k, 50k, 75k, and 100k milestones; the minimum

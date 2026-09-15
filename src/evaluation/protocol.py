@@ -13,7 +13,7 @@ class Protocol:
     dataset: str
     frame_limit: int | None = None
     n_frames: int = 8
-    target_offsets: tuple[int, ...] = (0, 8, 16, 40)
+    target_offsets: tuple[int, ...] = (0, 16, 40)
     patch: tuple[int, int, int] = (2, 16, 16)
     token_samples: int = 64
     noise_sigmas: tuple[float, ...] = (0.0, 0.05, 0.1, 0.2, 0.5, 1.0)

@@ -143,7 +143,7 @@ class PhysicalSelectionTests(unittest.TestCase):
     def test_adjacent_and_legacy_horizon_definitions(self):
         p = Protocol("shear_flow")
         self.assertEqual(
-            [p.target_start(10, o) for o in p.target_offsets], [10, 18, 26, 50]
+            [p.target_start(10, o) for o in p.target_offsets], [10, 26, 50]
         )
         old = Protocol("rayleigh_benard", frame_limit=101, target_offsets=(0, 16, 40))
         self.assertEqual(old.offsets(200, 0)["pooled"], [0, 26, 53])
