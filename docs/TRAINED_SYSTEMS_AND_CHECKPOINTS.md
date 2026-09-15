@@ -130,7 +130,7 @@ For each `(system, objective, training seed)`:
 
 1. Use the common candidate grid: **25k, 50k, 75k, and 100k**. Do not include `best_val`: it gives objectives different candidate steps and JEPA's moving EMA target makes its loss minimum especially difficult to compare over training.
 2. Extract frozen online-encoder features from the same predefined official-train and official-validation clips for every candidate. Never use official test during selection.
-3. Fit Ridge and single-seed MLP probes on official training trajectories at block outputs 3, 6, and 9 plus the final norm. Select probe family, hyperparameters, stopping state, and encoder output separately for each physical task using official validation only and the same search space for every encoder.
+3. Fit Ridge and single-seed MLP probes on official training trajectories at transformer layer 4, chosen prospectively from the workshop paper's general layer-3–4 peak. Select probe family, hyperparameters, and stopping state separately for each physical task using official validation only and the same search space for every encoder.
 4. Give every physical quantity and the pooled/local settings equal weight within a horizon. Let `H_h` be that mean validation VRMSE at target offset `h`. Minimize `S = 0.5 H_0 + 0.25(H_16 + H_40)`: 50% present and 50% shared equally among the two future horizons.
 5. Governing-parameter diagnostics, nuisance controls, persistence baselines, pretraining loss, and test performance do not enter this checkpoint score.
 6. Require every planned task cell to have a finite score. If any are missing, the candidate is ineligible rather than benefiting from a smaller average.

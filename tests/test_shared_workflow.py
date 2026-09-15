@@ -249,7 +249,7 @@ class ProbeTests(unittest.TestCase):
     def test_reduced_probe_grid_uses_workshop_horizons_and_four_outputs(self):
         protocol = Protocol("rayleigh_benard")
         self.assertEqual(protocol.target_offsets, (0, 16, 40))
-        self.assertEqual(PROBE_LAYERS, (2, 5, 8, 12))
+        self.assertEqual(PROBE_LAYERS, (3,))
         self.assertEqual(
             len(SYSTEMS["rayleigh_benard"].targets)
             * len(protocol.target_offsets)
@@ -257,7 +257,7 @@ class ProbeTests(unittest.TestCase):
             * len(PROBE_LAYERS)
             * len(MLP_SEEDS)
             * 16,
-            1920,
+            480,
         )
         ridge = fit_ridge_many(
             self.x,

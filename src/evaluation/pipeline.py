@@ -24,15 +24,13 @@ from src.evaluation.protocol import (
 )
 from src.physics.systems import SYSTEMS
 
-PROBE_LAYERS = (2, 5, 8, 12)
+PROBE_LAYERS = (3,)
 
 
 def _probe_layers(n_layers):
     if n_layers < 1:
         raise ValueError("feature artifact has no encoder outputs")
-    return tuple(layer for layer in PROBE_LAYERS[:-1] if layer < n_layers - 1) + (
-        n_layers - 1,
-    )
+    return PROBE_LAYERS if max(PROBE_LAYERS) < n_layers else (n_layers - 1,)
 
 
 def cell_id(row):
@@ -144,7 +142,8 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
     train_feature, valid_feature = features
     train, valid = caches
     protocol = Protocol.from_dict(train.manifest["protocol"])
-    probe_layers = _probe_layers(features[0].array("pooled.npy").shape[1])
+    n_encoder_outputs = features[0].array("pooled.npy").shape[1]
+    probe_layers = _probe_layers(n_encoder_outputs)
     rows, fitted = [], {}
 
     def record(fit, base, method, shared=False):
@@ -263,7 +262,9 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
                 mlp_predictions="single_seed",
                 probe_layers=list(probe_layers),
                 probe_outputs=[
-                    "final_norm" if layer == probe_layers[-1] else f"block_{layer + 1}"
+                    "final_norm"
+                    if layer == n_encoder_outputs - 1
+                    else f"block_{layer + 1}"
                     for layer in probe_layers
                 ],
                 selection_metric="valid_vrmse",

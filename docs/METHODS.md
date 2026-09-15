@@ -162,7 +162,7 @@ and 0, 13, 26, 40, 53 locally. Active matter's 81 frames give global starts
 0, 16, 33. Each local context retains 64 deterministic uniformly sampled
 positions. Checkpoints use identical samples and positions; no padding or
 wrapping is used. Encoders see only the full unmasked input clip, never the
-future target frames. Feature extraction retains all 12 block outputs and the final norm; probes use block outputs 3, 6, and 9 plus the final norm.
+future target frames. Feature extraction retains all 12 block outputs and the final norm; probes use transformer layer 4.
 
 Probes fit on official training trajectories. Official validation selects
 probe parameters, layers, families, and encoder checkpoints; official test
@@ -171,23 +171,22 @@ five-fold fitting inside the official validation split. It is not an
 assessment of unseen governing regimes. Training determines all fitted
 feature standardization and target normalization statistics.
 
-Ridge searches block outputs 3, 6, and 9 plus the final encoder norm and penalties
+Ridge uses transformer layer 4 and searches penalties
 `1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Targets are centered and the
 weights solve `(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
-MLPs independently search those same four outputs: 128 ReLU units, dropout 0.1,
+MLPs use that same output: 128 ReLU units, dropout 0.1,
 full-batch Adam, LR 0.01, weight decay 0.0001, and fixed initialization seed 0.
 Each selects a stopping state between 150 and 2,000 updates, checking validation
 MSE every 20 updates with patience 100. Retain that state for validation and
 test prediction in float64; there is no post-selection refitting.
-Hyperparameters are fixed apart from
-stopping duration and layer; there is no additional MLP LR sweep.
+Only stopping duration is selected for the MLP; there is no layer or learning-rate sweep.
 
 Each quantity/horizon/global-local cell selects Ridge or MLP by minimum
-validation VRMSE after each family's layer/settings search. Exact family
+validation VRMSE after each family's fixed-layer settings search. Exact family
 ties prefer Ridge. Governing-parameter probes remain separate diagnostics.
-Both Ridge and MLP report test scores at the four searched encoder outputs for
-global and local targets. Selected-family summaries retain the chosen score,
-family, and layer; four-point depth curves remain in the separate results.
+Both Ridge and MLP report test scores at transformer layer 4 for global and
+local targets. Selected-family summaries retain the chosen score and family;
+there is no new depth analysis in this reduced comparison.
 
 One encoder checkpoint is selected for each dataset/objective/training seed.
 Candidates are exactly the 25k, 50k, 75k, and 100k milestones; the minimum

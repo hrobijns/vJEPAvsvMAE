@@ -73,7 +73,7 @@ Checkpoint selection uses the state-derived physical quantities listed under Sta
 - local/token representation;
 - workshop-aligned target offsets 0, 16, and 40.
 
-For each task cell, search block outputs 3, 6, and 9 plus the final encoder norm. Fit both:
+For each task cell, use transformer layer 4, fixed prospectively from the workshop paper's general layer-3–4 peak. Fit both:
 
 - Ridge, with the predefined regularization grid;
 - a one-hidden-layer MLP with fixed initialization seed 0 and a validation-selected stopping state.
@@ -238,7 +238,7 @@ For every selected encoder, report:
 - the validation-selected probe family and encoder layer;
 - validation and test VRMSE as the primary normalized error;
 - R², Pearson correlation, and MSE as supporting metrics;
-- performance at block outputs 3, 6, and 9 plus the final norm for coarse depth analysis;
+- performance at transformer layer 4;
 - pooled and local/token results separately;
 - each target offset separately before any summary average.
 
