@@ -1,17 +1,15 @@
 ## 1. Checkpoint selection
 
-We considered four training milestones for each objective:
+We considered five saved labels for each objective:
 
-$$
-25{,}000,\quad 50{,}000,\quad 75{,}000,\quad 100{,}000\text{ steps}.
-$$
+- 25%, 50%, 75%, and 100% of the 100,000-step training budget;
+- the checkpoint with minimum pretraining-validation loss (`best_val`).
 
-With four objectives, this produced **16 checkpoint candidates**:
-
-- JEPA
-- Future JEPA
-- MAE
-- Future MAE
+Across JEPA, Future JEPA, MAE, and Future MAE, this gave **20 candidate
+labels representing 17 unique encoder states**. The JEPA, MAE, and Future MAE
+`best_val` states were byte-identical at the tensor level to their corresponding
+100,000-step milestone states, so each was probed once and retained as an alias.
+Future JEPA's `best_val` checkpoint was a distinct state saved at step 98,000.
 
 The official data roles were fixed:
 
@@ -20,6 +18,18 @@ The official data roles were fixed:
 - **Test:** final score only, after selection was frozen
 
 The test split was not used to choose anything.
+
+### Code provenance
+
+The executed study used the repository's evaluation implementation frozen at
+commit `96bc7a92532250f0b0eedae64aed25091162e41a`. The reusable cache, target,
+probe, and checkpoint-selection workflow originated in Adil Soubki's commits
+`a3c1856` and `185bbe7`. It was not an unchanged copy of that original code:
+later commits `6316756`, `a43a8d3`, and `96bc7a9` restricted the MLP to one
+deterministic seed, reduced the task grid, fixed probing to transformer block 4,
+and corrected the reduced-probe implementation. Thus this analysis used
+Adil's repository implementation as its base, with the documented study-specific
+changes—not a separate reimplementation.
 
 ### Representation extraction
 
@@ -193,6 +203,18 @@ For each objective, we selected the checkpoint with minimum $S(c)$. Exact ties w
 | Future JEPA | 50,000 | 0.180774 | 0.364145 | 0.430322 | 0.090387 + 0.091036 + 0.107580 | 0.289004 |
 | MAE | 50,000 | 0.122356 | 0.344792 | 0.466224 | 0.061178 + 0.086198 + 0.116556 | 0.263932 |
 | Future MAE | 100,000 | 0.129222 | 0.348714 | 0.470506 | 0.064611 + 0.087178 + 0.117627 | 0.269416 |
+
+### Best-pretraining-validation candidates
+
+| Objective | Best-validation step | Relation to milestone | $H_0$ | $H_{16}$ | $H_{40}$ | $S(c)$ | Selection outcome |
+|---|---:|---|---:|---:|---:|---:|---|
+| JEPA | 100,000 | Same encoder state as 100% | 0.164039 | 0.359026 | 0.444087 | 0.282798 | 25,000 remained better |
+| Future JEPA | 98,000 | Distinct encoder state | 0.184215 | 0.367775 | 0.439731 | 0.293984 | 50,000 remained better |
+| MAE | 100,000 | Same encoder state as 100% | 0.129898 | 0.343820 | 0.465221 | 0.267209 | 50,000 remained better |
+| Future MAE | 100,000 | Same encoder state as 100% | 0.129222 | 0.348714 | 0.470506 | 0.269416 | Selected state unchanged |
+
+Adding the best-pretraining-validation candidates therefore changed **none**
+of the four selected encoder states or any Stage 2 test result.
 
 Regime-parameter probes were **not** included in this checkpoint score.
 

@@ -2,7 +2,7 @@
 
 ## Study
 
-The study evaluated the four seed-1 objectives (`jepa`, `jepa_future`, `mae`, and `mae_future`) on the official Rayleigh–Bénard train/validation/test splits. Transformer layer 4 was fixed prospectively for every probe (stored as zero-indexed layer `3`). Stage 1 selected one of four training milestones per objective using validation VRMSE. Stage 2 evaluated only those frozen selections on the test split.
+The study evaluated the four seed-1 objectives (`jepa`, `jepa_future`, `mae`, and `mae_future`) on the official Rayleigh–Bénard train/validation/test splits. Transformer layer 4 was fixed prospectively for every probe (stored as zero-indexed layer `3`). Stage 1 compared the 25%, 50%, 75%, and 100% training milestones plus each run's minimum-pretraining-validation-loss checkpoint, then selected one encoder state per objective using validation VRMSE. Stage 2 evaluated only those frozen selections on the test split.
 
 Physics probes covered pooled and token representations, offsets 0, 16, and 40, and five targets. Results below average the five target-specific scores within each representation/offset cell. Lower VRMSE and higher R² are better.
 
@@ -14,6 +14,8 @@ Physics probes covered pooled and token representations, offsets 0, 16, and 40, 
 | Future JEPA | 50,000 | 0.2890 |
 | MAE | 50,000 | 0.2639 |
 | Future MAE | 100,000 | 0.2694 |
+
+Adding the four `best_val` labels introduced only one new encoder state: Future JEPA at step 98,000. The JEPA, MAE, and Future MAE `best_val` states were tensor-identical to their 100,000-step milestone states. Future JEPA's 98,000-step state scored 0.2940 validation VRMSE versus 0.2890 for its selected 50,000-step state. Consequently, all four selections and all Stage 2 test results remained unchanged.
 
 ## Test physics results
 
