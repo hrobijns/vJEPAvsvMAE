@@ -4,17 +4,19 @@
   "aggregate": "1a7b038106c1cf79b88707f00b3ca73cdf9051814bd425a411bbcaa896c62c79",
   "metric": "test_vrmse",
   "provenance": {
-    "git_commit": "96bc7a92532250f0b0eedae64aed25091162e41a",
-    "code_sha256": "905f937c2cf8a6898780c5ebc487f21b1bacec43c23198f76cea68c76815f380"
+    "git_commit": "6043d2c6a878c78327c22135bd8404307e0a7828",
+    "code_sha256": "fa3592dd4aa6df58286c12d758326786de645920b610e54b8e3a4217534f506a"
   },
   "files": {
-    "depth_mlp.pdf": "ce025a11e07a796b44a78169fb03e85385e2b9473ed1e9120fbb58037e9c0f97",
-    "depth_ridge.pdf": "5f1ec808d448c547d000d7ce73ff3b7c32812118daa47d1d0b7ee58b27ddd7ec",
-    "physics_mlp.pdf": "679b09269803539c78d5c87e443e0294594869b121070095bbb3569ddc7b185b",
-    "physics_ridge.pdf": "2ae0257fc444be4863a23d3f0f33e3cf90d4fa46f269fee3f3e7c0ce80f4f8c3",
-    "physics_selected.pdf": "a25686e549c5941747ccb04edf126c5f70dc5ff50f6082384fda8e785141c16b",
+    "depth_mlp.pdf": "2f79939e29edd3994f1a4d1d195873ce33168f64c9a02bb76bc40aaf28f42afa",
+    "depth_ridge.pdf": "8bbf3c90da48bb068148c7fe80297bbef27cd287cb980274d0c3d77c9709c660",
+    "physics_mlp.pdf": "1ff8eca438040f8e3b3cca2ffdc9bc6a9df405ca38903fcf926980ed9c2738ed",
+    "physics_ridge.pdf": "3187f6b3030248271139f470de848335b5b1d68df9a3f1a41b8c1db8af4de9cd",
+    "physics_selected.pdf": "e157df735958ec3da1dd6b5dadb1e6774b486d6c4659366951f7bf8321ee691d",
     "summary.tsv": "bd595af6a59d84857795efe91701b68a4c822357abf6b13b62a2a2e2e223b95c",
-    "target_means.json": "167bab89b7544f5708647817f88cea56693e89dbb2c03066c7661dda1ac650bf"
+    "target_means.json": "167bab89b7544f5708647817f88cea56693e89dbb2c03066c7661dda1ac650bf",
+    "workshop_figure1_comparison.pdf": "22034b32c29e7d2edcb4879dfbb180e7fd3fdabb38c4452b46634839d495c0fc",
+    "workshop_figure1_comparison.png": "9cb9452eaa6f050d130fdba63a4de8635b1dfd100d72be27996b76c267cd570e"
   },
-  "sha256": "8885b13c898d5f4f830acba467e46fdc7ed43854ea47f50ba7fa52aaa664487a"
+  "sha256": "cc562d7088931af353f85e69886a34c0a9663d3eda91da886b43dd6d262567a2"
 }

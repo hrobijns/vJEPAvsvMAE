@@ -46,7 +46,7 @@ Physics probes covered pooled and token representations, offsets 0, 16, and 40, 
 
 The practical conclusion is not that JEPA or MAE wins universally. Use MAE for immediate-state and medium-horizon readout; Future JEPA is the best candidate when the downstream requirement is pooled long-horizon prediction. Token-level future prediction remains weak relative to pooled prediction for every objective.
 
-This is a single checkpoint seed and a single fixed transformer layer, so there is no between-seed uncertainty estimate and no post-hoc depth search. The older workshop numbers used different offsets and depth selection and therefore are not directly comparable. These results support a targeted follow-up with additional training seeds, especially for the pooled offset-40 Future JEPA advantage.
+This is a single checkpoint seed and a single fixed transformer layer, so there is no between-seed uncertainty estimate and no post-hoc depth search. The workshop labels `t+8` and `t+32` denote 8- and 32-frame gaps after an eight-frame context; they are the same physical target windows as this study's target-start offsets 16 and 40. Direct numerical comparison still requires care because the studies used different checkpoint, layer, probe-fitting, ensembling, and seed-selection protocols.
 
 ## Artifacts
 
@@ -54,3 +54,4 @@ This is a single checkpoint seed and a single fixed transformer layer, so there 
 - Aggregate results: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/aggregate/summary.json`
 - Flat table: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/summary.tsv`
 - Plots: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/*.pdf`
+- Workshop Figure 1-style comparison: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/workshop_figure1_comparison.pdf`

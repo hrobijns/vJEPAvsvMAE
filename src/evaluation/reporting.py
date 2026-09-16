@@ -362,6 +362,126 @@ def plot(aggregate_dir, output, metric="vrmse"):
                 fig.tight_layout()
                 fig.savefig(stage / f"physics_{method}.pdf")
                 plt.close(fig)
+            if (
+                artifact.manifest["protocol"]["dataset"] == "rayleigh_benard"
+                and {"jepa", "mae"} <= set(objectives)
+            ):
+                # Match the workshop paper's Figure 1: absolute R² values in each
+                # cell and JEPA-minus-MAE R² as the diverging background color.
+                comparison = {}
+                for row in summaries:
+                    if (
+                        row["family"] != "physics"
+                        or row["method"] != "selected"
+                        or row["objective"] not in ("jepa", "mae")
+                    ):
+                        continue
+                    methods = "".join(
+                        {"ridge": "R", "mlp": "M"}.get(
+                            selection.get("selected_method"), "?"
+                        )
+                        for selection in row["selections"]
+                    )
+                    comparison[
+                        (
+                            row["objective"],
+                            row["representation"],
+                            row["target_offset"],
+                            row["target"],
+                        )
+                    ] = (row["metrics"]["test_r2"]["mean"], methods)
+                shape = (len(targets), 2 * len(target_offsets))
+                jepa_scores = np.full(shape, np.nan)
+                mae_scores = np.full(shape, np.nan)
+                probe_labels = {}
+                for i, target in enumerate(targets):
+                    for j, (representation, offset) in enumerate(
+                        (rep, target_offset)
+                        for rep in ("pooled", "token")
+                        for target_offset in target_offsets
+                    ):
+                        for objective, matrix in (
+                            ("jepa", jepa_scores),
+                            ("mae", mae_scores),
+                        ):
+                            score, methods = comparison[
+                                (objective, representation, offset, target)
+                            ]
+                            matrix[i, j] = score
+                            probe_labels[objective, i, j] = methods
+                differences = jepa_scores - mae_scores
+                fig, axis = plt.subplots(figsize=(10, 5.5))
+                image = axis.imshow(
+                    differences,
+                    vmin=-0.2,
+                    vmax=0.2,
+                    cmap="RdBu",
+                    aspect="auto",
+                )
+                for i in range(shape[0]):
+                    for j in range(shape[1]):
+                        delta = differences[i, j]
+                        axis.text(
+                            j,
+                            i,
+                            (
+                                f"J {jepa_scores[i, j]:.3f} "
+                                f"[{probe_labels['jepa', i, j]}]\n"
+                                f"M {mae_scores[i, j]:.3f} "
+                                f"[{probe_labels['mae', i, j]}]"
+                            ),
+                            ha="center",
+                            va="center",
+                            fontsize=8,
+                            color="white" if abs(delta) >= 0.12 else "black",
+                        )
+                context_frames = artifact.manifest["protocol"]["n_frames"]
+                paper_horizons = [
+                    0 if offset == 0 else offset - context_frames
+                    for offset in target_offsets
+                ]
+                axis.set_xticks(
+                    range(shape[1]),
+                    [
+                        f"$t+{horizon}$"
+                        for _representation in ("pooled", "token")
+                        for horizon in paper_horizons
+                    ],
+                )
+                target_labels = {
+                    "enstrophy": r"$\omega^2$",
+                    "buoyancy_gradient_energy": r"$|\nabla b|^2$",
+                    "convective_flux": r"$u_y b$",
+                    "pressure_gradient_magnitude": r"$|\nabla p|$",
+                    "buoyancy_laplacian_magnitude": r"$|\nabla^2 b|$",
+                }
+                axis.set_yticks(
+                    range(len(targets)),
+                    [target_labels.get(target, target.replace("_", " ")) for target in targets],
+                )
+                axis.axvline(len(target_offsets) - 0.5, color="black", lw=1.5)
+                top = axis.secondary_xaxis("top")
+                top.set_xticks(
+                    [
+                        (len(target_offsets) - 1) / 2,
+                        len(target_offsets) + (len(target_offsets) - 1) / 2,
+                    ],
+                    ["Pooled representation", "Token representation"],
+                )
+                top.tick_params(length=0, pad=8)
+                axis.set_title(
+                    "Fixed block 4 · validation-selected checkpoints and probes\n"
+                    "cell text: test $R^2$ [probe]; color: JEPA − MAE",
+                    pad=28,
+                )
+                colorbar = fig.colorbar(image, ax=axis, pad=0.02)
+                colorbar.set_label(r"$\Delta R^2$ (JEPA − MAE)")
+                fig.tight_layout()
+                fig.savefig(stage / "workshop_figure1_comparison.pdf")
+                fig.savefig(
+                    stage / "workshop_figure1_comparison.png", dpi=200
+                )
+                plt.close(fig)
             # The paper's depth analysis is pooled, with one panel per target/horizon.
             for method in ("ridge", "mlp"):
                 fig, axes = plt.subplots(
