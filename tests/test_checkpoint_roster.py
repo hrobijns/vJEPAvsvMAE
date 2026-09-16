@@ -1,4 +1,4 @@
-"""Stage-1 candidate policy: the frozen four-milestone roster and its boundary."""
+"""Stage-1 candidate policy: four milestones plus best-validation checkpoints."""
 
 import contextlib
 import copy
@@ -61,7 +61,7 @@ def synthetic_index(objectives=OBJECTIVES, seeds=(1,)):
                     "best_val",
                     100,
                     seed=seed,
-                    state=f"{objective}_{seed}_100pct_state",
+                    state=f"{objective}_{seed}_best_val_state",
                 )
             )
     return dict(training_provenance={}, checkpoints=rows)
@@ -71,25 +71,21 @@ class CandidatePolicyTests(unittest.TestCase):
     def setUp(self):
         self.sweep = sweep()
 
-    def test_seed1_handoff_freezes_three_systems_by_four_objectives_by_four_steps(self):
+    def test_seed1_handoff_freezes_three_systems_by_four_objectives_by_five_labels(self):
         index = json.loads((HANDOFF / "index.json").read_text())
         candidates = self.sweep.frozen_candidates(HANDOFF, index)
         groups = self.sweep.roster_groups(candidates)
-        self.assertEqual((len(candidates), len(groups)), (48, 12))
-        self.assertEqual(
-            sorted({r["candidate"] for r in candidates}),
-            ["025pct", "050pct", "075pct", "100pct"],
-        )
-        self.assertEqual(
-            sorted({r["step"] for r in candidates}), [25000, 50000, 75000, 100000]
-        )
-        self.assertEqual(len({r["checkpoint_sha256"] for r in candidates}), 48)
+        self.assertEqual((len(candidates), len(groups)), (56, 12))
+        self.assertEqual(len({r["checkpoint_sha256"] for r in candidates}), 56)
         self.assertEqual(len({(r["dataset"], r["objective"]) for r in candidates}), 12)
-        for row in candidates:
-            self.assertEqual(row["aliases"], [])
-            self.assertNotIn("best_val", row["checkpoint"])
+        labels = {r["candidate"] for r in candidates}
+        labels.update(alias["candidate"] for r in candidates for alias in r["aliases"])
+        self.assertEqual(
+            labels, {"025pct", "050pct", "075pct", "100pct", "best_val"}
+        )
+        for group in groups.values():
             self.assertEqual(
-                row["step"] * 100, row["total_steps"] * int(row["candidate"][:3])
+                set(group), {"025pct", "050pct", "075pct", "100pct", "best_val"}
             )
 
     def test_dataset_scope_freezes_only_the_requested_complete_system(self):
@@ -98,14 +94,15 @@ class CandidatePolicyTests(unittest.TestCase):
             HANDOFF, index, dataset="rayleigh_benard"
         )
         groups = self.sweep.roster_groups(candidates)
-        self.assertEqual((len(candidates), len(groups)), (16, 4))
+        self.assertEqual((len(candidates), len(groups)), (17, 4))
         self.assertEqual({row["dataset"] for row in candidates}, {"rayleigh_benard"})
         self.assertEqual(
             {row["objective"] for row in candidates}, set(OBJECTIVES)
         )
+        labels = {row["candidate"] for row in candidates}
+        labels.update(alias["candidate"] for row in candidates for alias in row["aliases"])
         self.assertEqual(
-            sorted({row["candidate"] for row in candidates}),
-            ["025pct", "050pct", "075pct", "100pct"],
+            labels, {"025pct", "050pct", "075pct", "100pct", "best_val"}
         )
 
     def test_dataset_scope_rejects_a_dataset_absent_from_the_handoff(self):
@@ -114,15 +111,16 @@ class CandidatePolicyTests(unittest.TestCase):
                 "/handoff", synthetic_index(), dataset="rayleigh_benard"
             )
 
-    def test_excluded_best_val_never_enters_the_roster(self):
-        candidates = self.sweep.frozen_candidates("/handoff", synthetic_index())
-        self.assertEqual(len(candidates), 16)
-        labels = {r["candidate"] for r in candidates}
-        labels.update(a["candidate"] for r in candidates for a in r["aliases"])
-        self.assertEqual(labels, {"025pct", "050pct", "075pct", "100pct"})
-        self.assertEqual(
-            self.sweep.CANDIDATE_POLICY["excluded_candidates"], ["best_val"]
-        )
+    def test_best_val_enters_the_roster_and_may_alias_an_identical_milestone(self):
+        index = synthetic_index()
+        for row in index["checkpoints"]:
+            if row["objective"] == "jepa" and row["candidate"] == "best_val":
+                row["encoder_state_sha256"] = "jepa_1_100pct_state"
+        candidates = self.sweep.frozen_candidates("/handoff", index)
+        self.assertEqual(len(candidates), 19)
+        groups = self.sweep.roster_groups(candidates)
+        self.assertIs(groups[("shear_flow", "jepa", 1)]["best_val"],
+                      groups[("shear_flow", "jepa", 1)]["100pct"])
 
     def test_missing_duplicate_and_unexpected_candidates_are_rejected(self):
         index = synthetic_index()
@@ -130,7 +128,7 @@ class CandidatePolicyTests(unittest.TestCase):
         missing["checkpoints"] = [
             r for r in missing["checkpoints"] if r["candidate"] != "075pct"
         ]
-        with self.assertRaisesRegex(ValueError, "incomplete milestone roster"):
+        with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
             self.sweep.frozen_candidates("/handoff", missing)
 
         duplicate = copy.deepcopy(index)
@@ -146,7 +144,7 @@ class CandidatePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no checkpoints"):
             self.sweep.frozen_candidates("/handoff", dict(checkpoints=[]))
 
-    def test_a_run_group_holding_only_excluded_candidates_is_still_rejected(self):
+    def test_a_run_group_missing_milestones_is_rejected_even_with_best_val(self):
         index = synthetic_index()
         index["checkpoints"] = [
             r
@@ -154,7 +152,7 @@ class CandidatePolicyTests(unittest.TestCase):
             if r["objective"] != "mae" or r["candidate"] == "best_val"
         ]
         with self.assertRaisesRegex(
-            ValueError, r"incomplete milestone roster for \('shear_flow', 'mae', 1\)"
+            ValueError, r"incomplete candidate roster for \('shear_flow', 'mae', 1\)"
         ):
             self.sweep.frozen_candidates("/handoff", index)
 
@@ -171,7 +169,7 @@ class CandidatePolicyTests(unittest.TestCase):
         # A later seed is validated on its own; no seed is hard-coded.
         two_seeds = synthetic_index(seeds=(1, 2))
         self.assertEqual(
-            len(self.sweep.frozen_candidates("/handoff", two_seeds)), 32
+            len(self.sweep.frozen_candidates("/handoff", two_seeds)), 40
         )
         partial = synthetic_index(seeds=(1, 2))
         partial["checkpoints"] = [
@@ -203,7 +201,7 @@ class CandidatePolicyTests(unittest.TestCase):
         for row in aliased["checkpoints"]:
             if row["objective"] == "mae" and row["candidate"] == "best_val":
                 row["encoder_state_sha256"] = "mae_1_075pct_state"
-        with self.assertRaisesRegex(ValueError, "incomplete milestone roster"):
+        with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
             self.sweep.frozen_candidates("/handoff", aliased)
 
     def test_candidate_step_must_equal_its_declared_training_fraction(self):
@@ -227,6 +225,17 @@ class CandidatePolicyTests(unittest.TestCase):
             row["training_protocol"]["total_steps"] = None
         with self.assertRaisesRegex(ValueError, "missing training budget"):
             self.sweep.frozen_candidates("/handoff", absent)
+
+    def test_best_val_step_must_be_inside_the_training_budget(self):
+        for step in (0, 100001):
+            index = synthetic_index()
+            for row in index["checkpoints"]:
+                if row["objective"] == "jepa" and row["candidate"] == "best_val":
+                    row["step"] = step
+            with self.assertRaisesRegex(
+                ValueError, f"best_val candidate .* is at step {step}"
+            ):
+                self.sweep.frozen_candidates("/handoff", index)
 
     def test_inconsistent_run_metadata_is_rejected(self):
         for field, value in (
@@ -264,6 +273,22 @@ def frozen_study(sweep_module, objectives=OBJECTIVES, steps=MILESTONE_STEPS):
         for objective in objectives
         for step in steps
     ]
+    candidates.extend(
+        dict(
+            dataset="shear_flow",
+            objective=objective,
+            seed=1,
+            candidate="best_val",
+            step=16000,
+            total_steps=100000,
+            checkpoint=f"/handoff/shear_flow/{objective}/encoder_best_val.pt",
+            checkpoint_sha256=f"{objective}_best_val",
+            config_sha256="config",
+            id=f"shear_flow_{objective}_seed1_best_val",
+            aliases=[],
+        )
+        for objective in objectives
+    )
     return dict(
         provenance=provenance(),
         script_sha256=sha256_file(sweep_module.__file__),
@@ -336,25 +361,23 @@ class FrozenStudyTests(unittest.TestCase):
             output = Path(tmp)
             study = frozen_study(self.sweep)
             write_json(output / "study.json", study)
-            self.assertEqual(len(self.sweep.load(output)["candidates"]), 16)
+            self.assertEqual(len(self.sweep.load(output)["candidates"]), 20)
 
-            best_val = dict(
+            unexpected = dict(
                 study["candidates"][-1],
-                candidate="best_val",
-                step=16000,
-                checkpoint_sha256="mae_future_best_val",
-                id="shear_flow_mae_future_seed1_best_val",
+                candidate="latest",
+                step=99000,
+                checkpoint_sha256="mae_future_latest",
+                id="shear_flow_mae_future_seed1_latest",
             )
             old = copy.deepcopy(study)
-            old["candidate_policy"]["version"] = 0
-            old["candidate_policy"]["excluded_candidates"] = []
-            old["candidates"].append(best_val)
+            old["candidate_policy"]["version"] = 1
             self.rewrite(output, old)
             with self.assertRaisesRegex(ValueError, "candidate policy"):
                 self.sweep.load(output)
 
             mutated = copy.deepcopy(study)
-            mutated["candidates"].append(best_val)
+            mutated["candidates"].append(unexpected)
             self.rewrite(output, mutated)
             with self.assertRaisesRegex(ValueError, "outside the policy roster"):
                 self.sweep.load(output)
@@ -366,7 +389,7 @@ class FrozenStudyTests(unittest.TestCase):
                 if not (c["objective"] == "mae" and c["step"] == 75000)
             ]
             self.rewrite(output, short)
-            with self.assertRaisesRegex(ValueError, "incomplete milestone roster"):
+            with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
                 self.sweep.load(output)
 
             dropped = copy.deepcopy(study)
@@ -389,7 +412,7 @@ class FrozenStudyTests(unittest.TestCase):
 
     def test_task_indices_outside_the_frozen_roster_fail(self):
         study = frozen_study(self.sweep)
-        with self.assertRaisesRegex(ValueError, "outside the frozen roster of 16"):
+        with self.assertRaisesRegex(ValueError, "outside the frozen roster of 20"):
             self.sweep.candidate(study, 55)
         self.assertEqual(self.sweep.candidate(study, 3)["step"], 100000)
 
@@ -397,14 +420,20 @@ class FrozenStudyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             study = frozen_study(self.sweep)
-            scores = {25000: 0.5, 50000: 0.2, 75000: 0.4, 100000: 0.9}
+            scores = {
+                16000: 0.01,
+                25000: 0.5,
+                50000: 0.2,
+                75000: 0.4,
+                100000: 0.9,
+            }
             write_frozen_fits(output, study, scores)
-            # An unfrozen fit on disk would win on validation but is not a candidate.
+            # An unfrozen fit on disk would score even lower but is not a candidate.
             write_fit(
-                output / "fits/shear_flow_jepa_seed1_best_val",
-                "jepa_best_val",
-                16000,
-                0.01,
+                output / "fits/shear_flow_jepa_seed1_latest",
+                "jepa_latest",
+                99000,
+                0.001,
             )
             with contextlib.redirect_stdout(io.StringIO()):
                 self.sweep.collect(output, study)
@@ -413,9 +442,9 @@ class FrozenStudyTests(unittest.TestCase):
             rows = selection.json("rows.json")
             self.assertEqual(len(winners), 4)
             self.assertEqual({w["objective"] for w in winners}, set(OBJECTIVES))
-            self.assertEqual({w["step"] for w in winners}, {50000})
-            self.assertEqual(len(rows), 16)
-            self.assertEqual(len(selection.manifest["candidates"]), 16)
+            self.assertEqual({w["step"] for w in winners}, {16000})
+            self.assertEqual(len(rows), 20)
+            self.assertEqual(len(selection.manifest["candidates"]), 20)
             for row in rows:
                 self.assertNotIn("test_vrmse", row)
 
@@ -426,7 +455,7 @@ class FrozenStudyTests(unittest.TestCase):
             write_frozen_fits(
                 output,
                 study,
-                dict.fromkeys(MILESTONE_STEPS, 0.3),
+                {**dict.fromkeys(MILESTONE_STEPS, 0.3), 16000: 0.3},
                 skip={study["candidates"][-1]["id"]},
             )
             with self.assertRaisesRegex(ValueError, "no probe fit"):
@@ -455,8 +484,14 @@ class FrozenStudyTests(unittest.TestCase):
             self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_50000"})["step"],
             50000,
         )
+        self.assertEqual(
+            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_best_val"})[
+                "step"
+            ],
+            16000,
+        )
         with self.assertRaisesRegex(ValueError, "outside the frozen candidate roster"):
-            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_best_val"})
+            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_latest"})
 
 
 if __name__ == "__main__":

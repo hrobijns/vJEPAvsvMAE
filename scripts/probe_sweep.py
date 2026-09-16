@@ -26,22 +26,25 @@ from src.evaluation.reporting import aggregate, plot
 from src.evaluation.selection import select_checkpoints
 from src.objectives import OBJECTIVES
 
-# Stage 1 compares the common training-fraction milestones only. Objective-
-# dependent candidates such as best_val are excluded by this policy, which is
-# frozen into every study so a roster from another policy cannot be run.
+# Stage 1 compares common training-fraction milestones and each run's
+# minimum-pretraining-validation-loss encoder. Identical encoder states are
+# probed once and retain every candidate label as an alias.
 CANDIDATE_POLICY = dict(
-    version=1,
-    roster="training_fraction_milestones",
+    version=2,
+    roster="training_fraction_milestones_plus_best_validation",
     milestones=[
         dict(candidate=f"{percent:03d}pct", percent_of_total_steps=percent)
         for percent in (25, 50, 75, 100)
     ],
-    excluded_candidates=["best_val"],
+    additional_candidates=["best_val"],
 )
 MILESTONES = {
     m["candidate"]: m["percent_of_total_steps"] for m in CANDIDATE_POLICY["milestones"]
 }
 MILESTONE_ORDER = sorted(MILESTONES, key=MILESTONES.__getitem__)
+ADDITIONAL_CANDIDATES = tuple(CANDIDATE_POLICY["additional_candidates"])
+CANDIDATE_ORDER = (*MILESTONE_ORDER, *ADDITIONAL_CANDIDATES)
+CANDIDATE_LABELS = set(CANDIDATE_ORDER)
 RUN_IDENTITY = ("config_sha256", "training_identity", "spec", "training_protocol")
 
 
@@ -57,17 +60,13 @@ def check_objective_roster(keys):
             )
 
 
-def milestone_checkpoints(index):
-    """Validate the declared handoff roster before aliasing can hide a defect."""
+def candidate_checkpoints(index):
+    """Validate the complete declared handoff roster before deduplication."""
     found = defaultdict(dict)
     for row in index["checkpoints"]:
-        # Declare the run group first: an excluded label must never make a
-        # group, and therefore its missing milestones, disappear silently.
         group = found[(row["dataset"], row["objective"], row["seed"])]
         label = row["candidate"]
-        if label in CANDIDATE_POLICY["excluded_candidates"]:
-            continue
-        if label not in MILESTONES:
+        if label not in CANDIDATE_LABELS:
             raise ValueError(f"unexpected candidate label {label!r}: {row['path']}")
         if label in group:
             raise ValueError(
@@ -80,10 +79,10 @@ def milestone_checkpoints(index):
     check_objective_roster(found)
     rows = []
     for key, group in sorted(found.items()):
-        if set(group) != set(MILESTONES):
-            raise ValueError(f"incomplete milestone roster for {key}: {sorted(group)}")
+        if set(group) != CANDIDATE_LABELS:
+            raise ValueError(f"incomplete candidate roster for {key}: {sorted(group)}")
         reference = group[MILESTONE_ORDER[0]]
-        for label in MILESTONE_ORDER:
+        for label in CANDIDATE_ORDER:
             row = group[label]
             for field in RUN_IDENTITY:
                 if row[field] != reference[field]:
@@ -91,43 +90,58 @@ def milestone_checkpoints(index):
             total = row["training_protocol"]["total_steps"]
             if not isinstance(total, int) or total <= 0:
                 raise ValueError(f"missing training budget for {key}: {total}")
-            if row["step"] * 100 != MILESTONES[label] * total:
+            if label in MILESTONES:
+                if row["step"] * 100 != MILESTONES[label] * total:
+                    raise ValueError(
+                        f"{label} candidate for {key} is at step {row['step']}, "
+                        f"not {MILESTONES[label]}% of {total}"
+                    )
+            elif not 0 < row["step"] <= total:
                 raise ValueError(
                     f"{label} candidate for {key} is at step {row['step']}, "
-                    f"not {MILESTONES[label]}% of {total}"
+                    f"outside the training budget {total}"
                 )
             rows.append(row)
     return rows
 
 
 def roster_groups(candidates):
-    """Every run group holds exactly one probe candidate per policy milestone."""
+    """Every run group holds the complete checkpoint candidate policy."""
     groups = defaultdict(dict)
     for row in candidates:
         key = (row["dataset"], row["objective"], row["seed"])
         for entry in [row, *row["aliases"]]:
             label = entry["candidate"]
-            if label not in MILESTONES:
+            if label not in CANDIDATE_LABELS:
                 raise ValueError(f"candidate outside the policy roster: {label!r}")
             if label in groups[key]:
                 raise ValueError(f"duplicate {label} candidate for {key}")
-            if entry["step"] * 100 != MILESTONES[label] * row["total_steps"]:
+            if label in MILESTONES and (
+                entry["step"] * 100 != MILESTONES[label] * row["total_steps"]
+            ):
                 raise ValueError(
                     f"{label} candidate for {key} is at step {entry['step']}, "
                     f"not {MILESTONES[label]}% of {row['total_steps']}"
+                )
+            if label in ADDITIONAL_CANDIDATES and not (
+                0 < entry["step"] <= row["total_steps"]
+            ):
+                raise ValueError(
+                    f"{label} candidate for {key} is at step {entry['step']}, "
+                    f"outside the training budget {row['total_steps']}"
                 )
             groups[key][label] = row
     if not groups:
         raise ValueError("study declares no candidates")
     check_objective_roster(groups)
     for key, group in groups.items():
-        if set(group) != set(MILESTONES):
-            raise ValueError(f"incomplete milestone roster for {key}: {sorted(group)}")
+        if set(group) != CANDIDATE_LABELS:
+            raise ValueError(f"incomplete candidate roster for {key}: {sorted(group)}")
     return groups
 
 
 def frozen_candidates(handoff, index, dataset=None):
-    rows = milestone_checkpoints(index)
+    rows = candidate_checkpoints(index)
     if dataset is not None:
         available = {row["dataset"] for row in rows}
         if dataset not in available:
