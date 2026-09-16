@@ -35864,9 +35864,9 @@
         "valid_r2": 0.6659843960130624,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -35956,9 +35956,9 @@
         "valid_r2": 0.6178511366358062,
         "metric_status": "ok",
         "selected_alpha": 0.0001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36048,9 +36048,9 @@
         "valid_r2": 0.7067273985639306,
         "metric_status": "ok",
         "selected_alpha": 0.0001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36140,9 +36140,9 @@
         "valid_r2": 0.8456977541191375,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36232,9 +36232,9 @@
         "valid_r2": 0.782993833390585,
         "metric_status": "ok",
         "selected_alpha": 0.001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36322,9 +36322,9 @@
         "valid_vrmse": 0.6111467057173605,
         "valid_r2": 0.626499704090818,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36377,9 +36377,9 @@
         "valid_r2": 0.698061944579816,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36467,9 +36467,9 @@
         "valid_vrmse": 0.6154455217774023,
         "valid_r2": 0.621226809724141,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36522,9 +36522,9 @@
         "valid_r2": 0.714702153701693,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36612,9 +36612,9 @@
         "valid_vrmse": 0.5589023833629225,
         "valid_r2": 0.6876281258712449,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36667,9 +36667,9 @@
         "valid_r2": 0.821674051707598,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36757,9 +36757,9 @@
         "valid_vrmse": 0.18081389040798623,
         "valid_r2": 0.9673063370355287,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36812,9 +36812,9 @@
         "valid_r2": 0.8647842680573613,
         "metric_status": "ok",
         "selected_alpha": 0.0001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36902,9 +36902,9 @@
         "valid_vrmse": 0.16765790939366693,
         "valid_r2": 0.971890825417745,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -36957,9 +36957,9 @@
         "valid_r2": 0.78972726116501,
         "metric_status": "ok",
         "selected_alpha": 0.001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37047,9 +37047,9 @@
         "valid_vrmse": 1.0592645205615574,
         "valid_r2": -0.12204132452050587,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37102,9 +37102,9 @@
         "valid_r2": 0.7685605734234207,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37192,9 +37192,9 @@
         "valid_vrmse": 1.2308025259523434,
         "valid_r2": -0.5148748578906692,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37247,9 +37247,9 @@
         "valid_r2": 0.7624748777915563,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37337,9 +37337,9 @@
         "valid_vrmse": 0.7477237497921694,
         "valid_r2": 0.4409091939967372,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37392,9 +37392,9 @@
         "valid_r2": 0.635923120592224,
         "metric_status": "ok",
         "selected_alpha": 0.0001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37482,9 +37482,9 @@
         "valid_vrmse": 0.3481445318134254,
         "valid_r2": 0.8787953849684108,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37537,9 +37537,9 @@
         "valid_r2": 0.854635519655142,
         "metric_status": "ok",
         "selected_alpha": 0.0001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37627,9 +37627,9 @@
         "valid_vrmse": 0.3233264476662965,
         "valid_r2": 0.8954600082394937,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37682,9 +37682,9 @@
         "valid_r2": 0.8133606506282048,
         "metric_status": "ok",
         "selected_alpha": 0.001,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37774,9 +37774,9 @@
         "valid_r2": 0.22576627395219506,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37866,9 +37866,9 @@
         "valid_r2": 0.1330560418775576,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -37958,9 +37958,9 @@
         "valid_r2": 1.3619369690354155e-05,
         "metric_status": "ok",
         "selected_alpha": 1.0,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38050,9 +38050,9 @@
         "valid_r2": 0.07285144358343643,
         "metric_status": "ok",
         "selected_alpha": 0.01,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38142,9 +38142,9 @@
         "valid_r2": 0.013426451138488504,
         "metric_status": "ok",
         "selected_alpha": 0.1,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38232,9 +38232,9 @@
         "valid_vrmse": 0.520615260536112,
         "valid_r2": 0.7289597504969163,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38287,9 +38287,9 @@
         "valid_r2": 0.1746435971039041,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38377,9 +38377,9 @@
         "valid_vrmse": 0.6003650361330427,
         "valid_r2": 0.6395618233889704,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38432,9 +38432,9 @@
         "valid_r2": 0.13617939304012683,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38522,9 +38522,9 @@
         "valid_vrmse": 0.7186312366757746,
         "valid_r2": 0.4835691456738469,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38577,9 +38577,9 @@
         "valid_r2": 0.00025718791554762976,
         "metric_status": "ok",
         "selected_alpha": 0.1,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38667,9 +38667,9 @@
         "valid_vrmse": 0.7990247897600022,
         "valid_r2": 0.36155938534898413,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38722,9 +38722,9 @@
         "valid_r2": 0.07352625946914304,
         "metric_status": "ok",
         "selected_alpha": 0.01,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38812,9 +38812,9 @@
         "valid_vrmse": 0.8578447700898221,
         "valid_r2": 0.2641023504295402,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38867,9 +38867,9 @@
         "valid_r2": 0.017719542886184603,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -38957,9 +38957,9 @@
         "valid_vrmse": 0.48317238627021725,
         "valid_r2": 0.766544445145944,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39012,9 +39012,9 @@
         "valid_r2": 0.2106587713114091,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39102,9 +39102,9 @@
         "valid_vrmse": 0.6510619430467989,
         "valid_r2": 0.5761183463161268,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39157,9 +39157,9 @@
         "valid_r2": 0.15167844277046338,
         "metric_status": "ok",
         "selected_alpha": 1e-05,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39247,9 +39247,9 @@
         "valid_vrmse": 0.7764388176734024,
         "valid_r2": 0.3971427624099291,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39302,9 +39302,9 @@
         "valid_r2": 3.633319913498578e-05,
         "metric_status": "ok",
         "selected_alpha": 1.0,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39392,9 +39392,9 @@
         "valid_vrmse": 0.8589406611389114,
         "valid_r2": 0.26222094064224966,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39447,9 +39447,9 @@
         "valid_r2": 0.07860906851496452,
         "metric_status": "ok",
         "selected_alpha": 0.1,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39537,9 +39537,9 @@
         "valid_vrmse": 0.9011493254438097,
         "valid_r2": 0.1879298932521669,
         "metric_status": "ok",
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
@@ -39592,9 +39592,9 @@
         "valid_r2": 0.003325731224695483,
         "metric_status": "ok",
         "selected_alpha": 0.1,
-        "objective": "jepa",
+        "objective": "jepa_future",
         "checkpoint_seed": 1,
-        "checkpoint_step": 25000
+        "checkpoint_step": 50000
       }
     ],
     "metrics": {
