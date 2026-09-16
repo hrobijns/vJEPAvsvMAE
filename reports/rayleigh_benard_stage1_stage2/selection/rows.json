@@ -1,0 +1,274 @@
+[
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "b8536e6a7adf047ad2776df844e3ae8d4ae25f7e0608be946a07a4a267a98e96",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "a51ef90d876ef38bfe33b661db0b3942b318ecc76771818348e283ac9850f4c5",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_seed1_025pct_b8536e6a7adf",
+    "valid_vrmse": 0.2671280160558449,
+    "by_horizon": {
+      "0": 0.1382084527908341,
+      "16": 0.35557332756448606,
+      "40": 0.43652183107722536
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "c4db58f9d3f6753dbd3a49833d00e472d36cdbc600d05cd332691d64353a9917",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "ceaf1bedbbbcdf87904aa728f5529393dec95300162e5729b837db52665954e1",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_seed1_050pct_c4db58f9d3f6",
+    "valid_vrmse": 0.27864986028225247,
+    "by_horizon": {
+      "0": 0.1516527608576404,
+      "16": 0.3593957483463396,
+      "40": 0.4518981710673895
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 75000,
+    "checkpoint_sha256": "ff23986b6bbc8eee970b54d8b85fc4328b8e376375273c26091c98b6ed1f8cbd",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "4bdfdd07a85d37aab1f0c16c34f2201dcc4dd6edf7ee26b12bb43b0deee8285b",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_seed1_075pct_ff23986b6bbc",
+    "valid_vrmse": 0.2857940207730759,
+    "by_horizon": {
+      "0": 0.16047266686604572,
+      "16": 0.36157754019724,
+      "40": 0.46065320916297237
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "5bbd9df1ba2dbb5c6c234402f913213484c89f0b001c499464de4d341f08e348",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "c97a140b0d8fb40ef5e7fae5aa191ae9e8030c56b54101b3b3c13afbb7c921c6",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_seed1_100pct_5bbd9df1ba2d",
+    "valid_vrmse": 0.2827975362853243,
+    "by_horizon": {
+      "0": 0.1640389634803652,
+      "16": 0.35902552917349906,
+      "40": 0.4440866890070677
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "2e9f60ed4e1c6759d1c80f2e83ca206bdf4bb2ad63baa046d81b37d74f8d8126",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "5fdc3f23946d7f1a83018bdeca10ef2c130599b571bbb4faf93c1a223061abb8",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_future_seed1_025pct_2e9f60ed4e1c",
+    "valid_vrmse": 0.2938812107803334,
+    "by_horizon": {
+      "0": 0.19072805861948158,
+      "16": 0.37051902715421314,
+      "40": 0.4235496987281574
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "7617d382a98fd6a89a9e7cb949971661453b1c2dd05a08f402065ae02956c1a4",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "1357921090b5b9825b8c883f87be4977d81da7670fa47e973a5a58dec849904f",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_future_seed1_050pct_7617d382a98f",
+    "valid_vrmse": 0.2890037346028765,
+    "by_horizon": {
+      "0": 0.18077435346235846,
+      "16": 0.3641445431052258,
+      "40": 0.43032168838156315
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 75000,
+    "checkpoint_sha256": "42c35a48a9482e8941fbb7a4e9641edbccefe407c87da4da9dc2fa36a097161c",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "2303849a1f8865b53d2845020f54c2a094c6306db167be1e91d14c1380dd17da",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_future_seed1_075pct_42c35a48a948",
+    "valid_vrmse": 0.29284827551752024,
+    "by_horizon": {
+      "0": 0.1828127275947994,
+      "16": 0.36652516577800875,
+      "40": 0.43924248110247344
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "e7bce47860b2defb054db96cac9158ceecb6d3ae882e98cfc1624ceb9f447333",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "0c62bf7dae9750ac5bc16691f8f1c80a4ded784a1baab1a98c9acefd83d957aa",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_future_seed1_100pct_e7bce47860b2",
+    "valid_vrmse": 0.2963333458428491,
+    "by_horizon": {
+      "0": 0.1882180966985043,
+      "16": 0.3688199068094836,
+      "40": 0.440077283164904
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "95748c122504721dc12be3d21b10b6af0f06836def9109318b8a3313dd0162e9",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "3a6142eae948b36555add144b87f3349bfd253d83eda62853d8375f3b3109a6e",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_seed1_025pct_95748c122504",
+    "valid_vrmse": 0.2695147390091204,
+    "by_horizon": {
+      "0": 0.12903546964259577,
+      "16": 0.3498590794269164,
+      "40": 0.4701289373243734
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "41f04e39c666bddcde5de4018d39357a470f13d03d46427a26c0c01e01f9d494",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "11bee8b44c074eac40f320df679d2d2a4653c0dc2cc7e7ad1b89549052a6dc55",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_seed1_050pct_41f04e39c666",
+    "valid_vrmse": 0.26393212926383997,
+    "by_horizon": {
+      "0": 0.12235638109069938,
+      "16": 0.34479203338237285,
+      "40": 0.4662237214915882
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 75000,
+    "checkpoint_sha256": "83e9f29dd1ad92ac5a9dba63ef63d81d11484b30b89616bf5f05ffacb9e70d15",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "6b7dafe816c930120428c8ad2d089428c9d95140a8de1a57d7508249fe240ec3",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_seed1_075pct_83e9f29dd1ad",
+    "valid_vrmse": 0.26540920675152707,
+    "by_horizon": {
+      "0": 0.12678279937413584,
+      "16": 0.3419626747399841,
+      "40": 0.46610855351785246
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "3cd6726b135a91dd227ccc9d1b2f34d5531f8bfe244b9862c17de75f3c244b44",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "50f1735be531230a5284d147c7fdb8a275ef7c5f423441410e24a8c6ac6eab38",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_seed1_100pct_3cd6726b135a",
+    "valid_vrmse": 0.2672093207606605,
+    "by_horizon": {
+      "0": 0.12989812014513186,
+      "16": 0.343819627063665,
+      "40": 0.4652214156887132
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "85f2d1d4717df78844f525b26e5bc24801ded251a59111f4875c9e351572e5ac",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "3ab0ef8b117b7441a291b3599ea3fff81ec24ad243919642906e5282ead140a3",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_future_seed1_025pct_85f2d1d4717d",
+    "valid_vrmse": 0.2742330673862349,
+    "by_horizon": {
+      "0": 0.13835586033300354,
+      "16": 0.34943860423021234,
+      "40": 0.47078194464872014
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "fecfbcc8115e4696d42b2221a7f69f493f1cfd0d9db773593941e720f2901b47",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "b56d599e69cb96fbe735b2ed90c5903aa255cf07fb1a687d0f0c5a4114431659",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_future_seed1_050pct_fecfbcc8115e",
+    "valid_vrmse": 0.270148774198395,
+    "by_horizon": {
+      "0": 0.13111359012539286,
+      "16": 0.34831179043130134,
+      "40": 0.47005612611149294
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 75000,
+    "checkpoint_sha256": "e098c71fe4abe64b8c9704a7158e003ca502a80135c0a14e6f7f2e5b70ed76f1",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "2e5a37c745e0600b4e2693c6adb3b27d54d31e7deed402d9934757b06d68c3b8",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_future_seed1_075pct_e098c71fe4ab",
+    "valid_vrmse": 0.2699832258443542,
+    "by_horizon": {
+      "0": 0.13129468736038002,
+      "16": 0.34834185117987854,
+      "40": 0.46900167747677807
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "6b71645bdbaa23320d8f5d0d32499a7190ea2b54a27e50645f208d6fdc6f2145",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "370e14da403554be39dd08d727b1c60ca5b893c74bca8c85429f9895a4f5f5cc",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_future_seed1_100pct_6b71645bdbaa",
+    "valid_vrmse": 0.26941594929240664,
+    "by_horizon": {
+      "0": 0.12922187401821508,
+      "16": 0.3487137667788741,
+      "40": 0.47050628235432235
+    },
+    "status": "ok"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "schema": "well-analysis-2",
+  "kind": "plots",
+  "aggregate": "1a7b038106c1cf79b88707f00b3ca73cdf9051814bd425a411bbcaa896c62c79",
+  "metric": "test_vrmse",
+  "provenance": {
+    "git_commit": "96bc7a92532250f0b0eedae64aed25091162e41a",
+    "code_sha256": "905f937c2cf8a6898780c5ebc487f21b1bacec43c23198f76cea68c76815f380"
+  },
+  "files": {
+    "depth_mlp.pdf": "ce025a11e07a796b44a78169fb03e85385e2b9473ed1e9120fbb58037e9c0f97",
+    "depth_ridge.pdf": "5f1ec808d448c547d000d7ce73ff3b7c32812118daa47d1d0b7ee58b27ddd7ec",
+    "physics_mlp.pdf": "679b09269803539c78d5c87e443e0294594869b121070095bbb3569ddc7b185b",
+    "physics_ridge.pdf": "2ae0257fc444be4863a23d3f0f33e3cf90d4fa46f269fee3f3e7c0ce80f4f8c3",
+    "physics_selected.pdf": "a25686e549c5941747ccb04edf126c5f70dc5ff50f6082384fda8e785141c16b",
+    "summary.tsv": "bd595af6a59d84857795efe91701b68a4c822357abf6b13b62a2a2e2e223b95c",
+    "target_means.json": "167bab89b7544f5708647817f88cea56693e89dbb2c03066c7661dda1ac650bf"
+  },
+  "sha256": "8885b13c898d5f4f830acba467e46fdc7ed43854ea47f50ba7fa52aaa664487a"
+}

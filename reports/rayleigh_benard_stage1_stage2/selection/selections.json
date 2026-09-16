@@ -1,0 +1,70 @@
+[
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "b8536e6a7adf047ad2776df844e3ae8d4ae25f7e0608be946a07a4a267a98e96",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "a51ef90d876ef38bfe33b661db0b3942b318ecc76771818348e283ac9850f4c5",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_seed1_025pct_b8536e6a7adf",
+    "valid_vrmse": 0.2671280160558449,
+    "by_horizon": {
+      "0": 0.1382084527908341,
+      "16": 0.35557332756448606,
+      "40": 0.43652183107722536
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "7617d382a98fd6a89a9e7cb949971661453b1c2dd05a08f402065ae02956c1a4",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "1357921090b5b9825b8c883f87be4977d81da7670fa47e973a5a58dec849904f",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_jepa_future_seed1_050pct_7617d382a98f",
+    "valid_vrmse": 0.2890037346028765,
+    "by_horizon": {
+      "0": 0.18077435346235846,
+      "16": 0.3641445431052258,
+      "40": 0.43032168838156315
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "41f04e39c666bddcde5de4018d39357a470f13d03d46427a26c0c01e01f9d494",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "11bee8b44c074eac40f320df679d2d2a4653c0dc2cc7e7ad1b89549052a6dc55",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_seed1_050pct_41f04e39c666",
+    "valid_vrmse": 0.26393212926383997,
+    "by_horizon": {
+      "0": 0.12235638109069938,
+      "16": 0.34479203338237285,
+      "40": 0.4662237214915882
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "6b71645bdbaa23320d8f5d0d32499a7190ea2b54a27e50645f208d6fdc6f2145",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "370e14da403554be39dd08d727b1c60ca5b893c74bca8c85429f9895a4f5f5cc",
+    "fit_path": "/workspace/rb_stage1_stage2/fits/rayleigh_benard_mae_future_seed1_100pct_6b71645bdbaa",
+    "valid_vrmse": 0.26941594929240664,
+    "by_horizon": {
+      "0": 0.12922187401821508,
+      "16": 0.3487137667788741,
+      "40": 0.47050628235432235
+    },
+    "status": "ok"
+  }
+]

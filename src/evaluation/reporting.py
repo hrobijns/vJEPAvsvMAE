@@ -260,6 +260,7 @@ def plot(aggregate_dir, output, metric="vrmse"):
     }
     targets = artifact.manifest["protocol"]["targets"]
     target_offsets = artifact.manifest["protocol"]["target_offsets"]
+    probe_layers = artifact.manifest.get("probe_settings", {}).get("probe_layers", [])
     with staged_directory(output) as stage:
         fields = (
             "objective",
@@ -388,6 +389,8 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 color=colors[row["objective"]],
                                 alpha=0.2,
                                 lw=0.8,
+                                marker="o",
+                                markersize=2,
                             )
                         for row in summaries:
                             if (
@@ -404,11 +407,21 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 [p["metrics"][score_key]["mean"] for p in curve],
                                 label=row["objective"],
                                 color=colors[row["objective"]],
+                                marker="o",
+                                markersize=4,
                             )
                         axis.set_title(
                             f"{target.replace('_', ' ')} +{target_offset}", fontsize=9
                         )
-                        axis.set_xlabel("Encoder output")
+                        axis.set_xlabel("Encoder block")
+                        if probe_layers:
+                            axis.set_xticks(
+                                probe_layers, [str(layer + 1) for layer in probe_layers]
+                            )
+                            if len(probe_layers) == 1:
+                                axis.set_xlim(
+                                    probe_layers[0] - 0.5, probe_layers[0] + 0.5
+                                )
                         axis.set_ylabel(f"Test {score_label}")
                 axes[0, 0].legend()
                 fig.tight_layout()
