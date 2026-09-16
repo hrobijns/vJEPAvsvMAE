@@ -187,12 +187,12 @@ For each objective, we selected the checkpoint with minimum $S(c)$. Exact ties w
 
 ### Winners
 
-| Objective | Selected step | Validation score $S(c)$ |
-|---|---:|---:|
-| JEPA | 25,000 | 0.2671 |
-| Future JEPA | 50,000 | 0.2890 |
-| MAE | 50,000 | 0.2639 |
-| Future MAE | 100,000 | 0.2694 |
+| Objective | Selected step | $H_0$ | $H_{16}$ | $H_{40}$ | Weighted contributions: $0.5H_0 + 0.25H_{16} + 0.25H_{40}$ | $S(c)$ |
+|---|---:|---:|---:|---:|---:|---:|
+| JEPA | 25,000 | 0.138208 | 0.355573 | 0.436522 | 0.069104 + 0.088893 + 0.109130 | 0.267128 |
+| Future JEPA | 50,000 | 0.180774 | 0.364145 | 0.430322 | 0.090387 + 0.091036 + 0.107580 | 0.289004 |
+| MAE | 50,000 | 0.122356 | 0.344792 | 0.466224 | 0.061178 + 0.086198 + 0.116556 | 0.263932 |
+| Future MAE | 100,000 | 0.129222 | 0.348714 | 0.470506 | 0.064611 + 0.087178 + 0.117627 | 0.269416 |
 
 Regime-parameter probes were **not** included in this checkpoint score.
 
