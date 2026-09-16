@@ -1,0 +1,229 @@
+## 1. Checkpoint selection
+
+We considered four training milestones for each objective:
+
+\[
+25{,}000,\quad 50{,}000,\quad 75{,}000,\quad 100{,}000\text{ steps}.
+\]
+
+With four objectives, this produced **16 checkpoint candidates**:
+
+- JEPA
+- Future JEPA
+- MAE
+- Future MAE
+
+The official data roles were fixed:
+
+- **Train:** fit probes
+- **Validation:** choose probe settings and checkpoint
+- **Test:** final score only, after selection was frozen
+
+The test split was not used to choose anything.
+
+### Representation extraction
+
+For every checkpoint, the encoder was frozen and given complete, unmasked eight-frame clips. We retained only the output of **transformer block 4**—internally zero-indexed layer `3`.
+
+Two representations were extracted:
+
+1. **Pooled:** mean of all encoder tokens
+   \[
+   z_{\mathrm{pool}}=\frac{1}{N}\sum_{i=1}^{N}z_i.
+   \]
+
+2. **Token:** representations at 64 deterministic token positions per trajectory.
+
+### Physics targets
+
+Each representation was probed for five quantities:
+
+\[
+\omega^2,\qquad
+|\nabla b|^2,\qquad
+u_yb,\qquad
+|\nabla p|,\qquad
+|\nabla^2b|,
+\]
+
+where
+
+\[
+\omega=\partial_xu_y-\partial_yu_x.
+\]
+
+These correspond to:
+
+- enstrophy,
+- buoyancy-gradient energy,
+- convective flux,
+- pressure-gradient magnitude,
+- buoyancy-Laplacian magnitude.
+
+Pooled targets were spatiotemporal averages. Token targets were averages over the corresponding \(2\times16\times16\) spacetime patch.
+
+We used target offsets
+
+\[
+\Delta t\in\{0,16,40\},
+\]
+
+defined as target-start frame minus context-start frame. Thus each checkpoint had
+
+\[
+2\text{ representations}\times3\text{ offsets}\times5\text{ targets}
+=30
+\]
+
+physics-probing cells.
+
+---
+
+## 2. Probe selection inside each cell
+
+Each cell received both a Ridge probe and a one-hidden-layer MLP. Features were standardized using **training-set statistics only**.
+
+### Ridge
+
+For standardized feature matrix \(X\), centered target \(y-\bar y\), and \(n\) training examples:
+
+\[
+\hat w_\alpha=
+\left(X^\top X+\alpha nI\right)^{-1}X^\top(y-\bar y).
+\]
+
+We searched
+
+\[
+\alpha\in
+\{10^{-5},10^{-4},10^{-3},10^{-2},10^{-1},1,10,100\}.
+\]
+
+The \(\alpha\) with the lowest validation VRMSE was retained independently for each target.
+
+### MLP
+
+The nonlinear probe was
+
+\[
+\hat y=
+W_2\,\mathrm{Dropout}
+\left(\mathrm{ReLU}(W_1z+b_1)\right)+b_2,
+\]
+
+with:
+
+- 128 hidden units,
+- dropout \(0.1\),
+- Adam,
+- learning rate \(10^{-2}\),
+- weight decay \(10^{-4}\),
+- full-batch training,
+- deterministic probe seed 0.
+
+Validation loss was checked every 20 steps. Training ran for at least 150 and at most 2,000 steps, with patience 100. The best validation step was retained.
+
+For each physics cell, we then selected whichever family—Ridge or MLP—had lower validation VRMSE.
+
+### Selection metric
+
+For predictions \(\hat y_i\) and targets \(y_i\),
+
+\[
+\mathrm{MSE}
+=
+\frac1N\sum_i(\hat y_i-y_i)^2,
+\]
+
+\[
+\mathrm{VRMSE}
+=
+\sqrt{
+\frac{\mathrm{MSE}}
+{\frac1N\sum_i(y_i-\bar y)^2}
+}.
+\]
+
+This is related to \(R^2\) by
+
+\[
+R^2=1-\mathrm{VRMSE}^2.
+\]
+
+Lower VRMSE is better.
+
+---
+
+## 3. Combining cells into one checkpoint score
+
+For checkpoint \(c\), we first averaged validation VRMSE over the five targets and two representations at each horizon:
+
+\[
+H_\delta(c)
+=
+\frac1{10}
+\sum_{\substack{r\in\{\mathrm{pooled,token}\}\\q\in\text{five targets}}}
+\mathrm{VRMSE}_{c,r,\delta,q}.
+\]
+
+The final checkpoint score gave equal weight to present and future performance:
+
+\[
+S(c)
+=
+\frac12H_0(c)
++
+\frac12\left(\frac{H_{16}(c)+H_{40}(c)}2\right).
+\]
+
+Equivalently,
+
+\[
+S(c)=0.5H_0(c)+0.25H_{16}(c)+0.25H_{40}(c).
+\]
+
+For each objective, we selected the checkpoint with minimum \(S(c)\). Exact ties would prefer the earlier checkpoint.
+
+### Winners
+
+| Objective | Selected step | Validation score \(S(c)\) |
+|---|---:|---:|
+| JEPA | 25,000 | 0.2671 |
+| Future JEPA | 50,000 | 0.2890 |
+| MAE | 50,000 | 0.2639 |
+| Future MAE | 100,000 | 0.2694 |
+
+Regime-parameter probes were **not** included in this checkpoint score.
+
+---
+
+## 4. Final probing after selection
+
+Once these four checkpoints were frozen:
+
+1. We extracted their layer-4 features on the official test split.
+2. We reused the exact train-fitted probe, feature normalization, Ridge penalty or MLP stopping point selected on validation.
+3. We did **not** refit using validation or test data.
+4. Each frozen probe was applied once to the test set.
+
+For each physics cell we reported:
+
+\[
+\mathrm{VRMSE},\quad R^2,\quad
+r_{\mathrm{Pearson}},\quad
+\mathrm{MSE},\quad
+\log_{10}(\mathrm{MSE}).
+\]
+
+We also evaluated:
+
+- Ridge and MLP separately,
+- the validation-selected Ridge/MLP result,
+- persistence baselines for future targets,
+- regime/time and position controls,
+- Ridge augmented with the relevant controls,
+- recovery of \(\log_{10}\mathrm{Rayleigh}\) and \(\log_{10}\mathrm{Prandtl}\).
+
+The regime probes used Ridge and MLP but did not influence checkpoint selection. No noise-corruption sweep was included in this Stage 2 result.
+
+**In one sentence:** we selected checkpoints using balanced validation performance over all 30 layer-4 physics tasks, froze every choice, and then scored those same fitted probes exactly once on the official test split.
