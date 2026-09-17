@@ -162,7 +162,7 @@ and 0, 13, 26, 40, 53 locally. Active matter's 81 frames give global starts
 0, 16, 33. Each local context retains 64 deterministic uniformly sampled
 positions. Checkpoints use identical samples and positions; no padding or
 wrapping is used. Encoders see only the full unmasked input clip, never the
-future target frames. Feature extraction retains all 12 block outputs and the final norm; probes use transformer layer 4.
+future target frames. Feature extraction retains all 12 block outputs and the final norm.
 
 Probes fit on official training trajectories. Official validation selects
 probe parameters, layers, families, and encoder checkpoints; official test
@@ -171,38 +171,40 @@ five-fold fitting inside the official validation split. It is not an
 assessment of unseen governing regimes. Training determines all fitted
 feature standardization and target normalization statistics.
 
-Ridge uses transformer layer 4 and searches penalties
-`1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`. Targets are centered and the
-weights solve `(XᵀX + α n I) w = Xᵀ(y − mean(y))`.
-MLPs use that same output: 128 ReLU units, dropout 0.1,
-full-batch Adam, LR 0.01, weight decay 0.0001, and fixed initialization seed 0.
-Each selects a stopping state between 150 and 2,000 updates, checking validation
-MSE every 20 updates with patience 100. Retain that state for validation and
-test prediction in float64; there is no post-selection refitting.
-Only stopping duration is selected for the MLP; there is no layer or learning-rate sweep.
+Ridge searches every encoder output—the 12 transformer blocks and final
+normalization—and penalties `1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100`.
+Targets are centered and the weights solve
+`(XᵀX + α n I) w = Xᵀ(y − mean(y))`. MLPs search the same 13 outputs:
+128 ReLU units, dropout 0.1, full-batch Adam, LR 0.01, weight decay 0.0001,
+and fixed initialization seed 0. Each output selects a stopping state between
+150 and 2,000 updates, checking validation MSE every 20 updates with patience
+100. Retain the best output and state for validation and test prediction in
+float64; there is no post-selection refitting.
 
-Each quantity/horizon/global-local cell selects Ridge or MLP by minimum
-validation VRMSE after each family's fixed-layer settings search. Exact family
-ties prefer Ridge. Governing-parameter probes remain separate diagnostics.
-Both Ridge and MLP report test scores at transformer layer 4 for global and
-local targets. Selected-family summaries retain the chosen score and family;
-there is no new depth analysis in this reduced comparison.
+Each quantity/horizon/global-local cell first selects the best output for Ridge
+and MLP independently by minimum validation VRMSE, then selects between those
+two family candidates by the same validation metric. Exact family ties prefer
+Ridge. Governing-parameter probes remain separate diagnostics. The main physics
+tables report the validation-selected family and output; family-specific tables
+report each family's independently selected output. Depth figures report test
+VRMSE at all 13 outputs and never use test scores for selection.
 
-One encoder checkpoint is selected for each dataset/objective/training seed.
-Candidates are exactly the 25k, 50k, 75k, and 100k milestones; the minimum
-pretraining-validation-loss checkpoint is not a candidate, because its step is
-objective-dependent. The frozen study records this candidate policy, and every
-sweep command rejects a study or roster that does not match it. Verified
-identical encoder states with the same configuration are fit once. Average
-quantities and global/local settings equally within each horizon; assign 50%
-weight to the current horizon and 50% to the equal mean over the three future
-horizons. The lowest balanced validation VRMSE wins; exact checkpoint ties
-prefer earlier steps, then checkpoint hash. Controls and governing parameters
-do not enter this score. Missing task cells are errors, and undefined values
-are exposed rather than silently dropping quantities or changing weights. A
-candidate without a complete finite score is ineligible; if none are eligible,
-selection stops. The manifest freezes all choices before test scoring, which
-requires a matching selected probe-fit artifact.
+Checkpoint selection preceded the full-depth analysis. It compared the 25k,
+50k, 75k, and 100k milestones plus each run's minimum-pretraining-validation-
+loss label: 20 labels representing 17 unique encoder states. To keep checkpoint
+selection prospective and computationally bounded, every candidate was scored
+at transformer block 4. Verified identical encoder states with the same
+configuration were fit once. Average quantities and global/local settings
+equally within each horizon; assign 50% weight to the current horizon and 50%
+to the equal mean over the two future horizons. The lowest balanced validation
+VRMSE wins; exact checkpoint ties prefer earlier steps, then checkpoint hash.
+Controls and governing parameters do not enter this score. Missing task cells
+are errors, and undefined values are exposed rather than silently dropping
+quantities or changing weights. A candidate without a complete finite score is
+ineligible; if none are eligible, selection stops. After freezing one encoder
+state per objective, fit the final 13-output probes only for those four states.
+The selection manifests bind every frozen choice before test scoring, which
+requires matching probe-fit artifacts.
 
 Noise evaluation reuses saved clean fits, layers, and statistics at sigmas
 0, .05, .1, .2, .5, 1, with three deterministic paired corruption draws. Targets

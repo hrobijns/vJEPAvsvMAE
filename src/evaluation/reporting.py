@@ -548,7 +548,7 @@ def plot(aggregate_dir, output, metric="vrmse"):
                 )
                 top.tick_params(length=0, pad=8)
                 axis.set_title(
-                    "Fixed block 4 · validation-selected checkpoints and probes\n"
+                    "Validation-selected checkpoints, probe families, and encoder outputs\n"
                     "cell text: test $R^2$ [probe]; color: JEPA − MAE",
                     pad=28,
                 )
