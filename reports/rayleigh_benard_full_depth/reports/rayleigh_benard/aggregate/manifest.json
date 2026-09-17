@@ -1,0 +1,151 @@
+{
+  "schema": "well-analysis-2",
+  "kind": "aggregate",
+  "result_kind": "probes",
+  "protocol": {
+    "dataset": "rayleigh_benard",
+    "frame_limit": null,
+    "n_frames": 8,
+    "target_offsets": [
+      0,
+      16,
+      40
+    ],
+    "patch": [
+      2,
+      16,
+      16
+    ],
+    "token_samples": 64,
+    "noise_sigmas": [
+      0.0,
+      0.05,
+      0.1,
+      0.2,
+      0.5,
+      1.0
+    ],
+    "noise_seeds": [
+      0,
+      1,
+      2
+    ],
+    "targets": [
+      "enstrophy",
+      "buoyancy_gradient_energy",
+      "convective_flux",
+      "pressure_gradient_magnitude",
+      "buoyancy_laplacian_magnitude"
+    ],
+    "target_version": 2,
+    "offset_definition": "target_start_minus_context_start",
+    "probe_splits": {
+      "fit": "train",
+      "select": "valid",
+      "score": "test"
+    }
+  },
+  "caches": {
+    "train": "49014d375fc5b6ad56c261292b5be6c2cee745751623521edc138838d735eea8",
+    "valid": "874d15b6b0e4cfa5c50163b87c04e2804e4d74c7216f7faff7106a774705b46c",
+    "test": "f6675f055dded4f0750c0a13cde2914330b6b165b964362ad57aa6cb68d5fb3b"
+  },
+  "probe_settings": {
+    "ridge_alphas": [
+      1e-05,
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "mlp_max_steps": 2000,
+    "mlp_min_steps": 150,
+    "mlp_hidden": 128,
+    "mlp_dropout": 0.1,
+    "mlp_lr": 0.01,
+    "mlp_weight_decay": 0.0001,
+    "probe_seeds": [
+      0
+    ],
+    "mlp_predictions": "single_seed",
+    "probe_layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "probe_outputs": [
+      "block_1",
+      "block_2",
+      "block_3",
+      "block_4",
+      "block_5",
+      "block_6",
+      "block_7",
+      "block_8",
+      "block_9",
+      "block_10",
+      "block_11",
+      "block_12",
+      "final_norm"
+    ],
+    "selection_metric": "valid_vrmse"
+  },
+  "roster": [
+    [
+      "jepa",
+      1
+    ],
+    [
+      "jepa_future",
+      1
+    ],
+    [
+      "mae",
+      1
+    ],
+    [
+      "mae_future",
+      1
+    ]
+  ],
+  "source_results": [
+    "d60c5ad8f12c367b04df685ec746c400ee2786da67e70e27271dcd5488a6b55e",
+    "b278fd61c9ff2cc6b9ed3ed97f80a354c526dacbd0833c76ce5bda8da998ec89",
+    "fc3cab9756a3bdb79fb4f6d271627c795b3877e3080fca28b59850de0e890f61",
+    "1e4c3b5116e9bcea5ff52e7c94af4aa96704a7eaf23b11330ba43a2cde462ced"
+  ],
+  "scientific_unit": "checkpoint_seed",
+  "selection_policy": {
+    "version": 1,
+    "metric": "valid_vrmse",
+    "direction": "minimize",
+    "present_weight": 0.5,
+    "future_weight": 0.5,
+    "within_group": "equal_quantities_equal_global_local",
+    "future_horizons": "equal",
+    "checkpoint_tie": "earlier_step_then_sha256"
+  },
+  "provenance": {
+    "git_commit": "688bb289891e460dcc35b42f5657d184278edff3",
+    "code_sha256": "8055d2e921e6dec69bd0474e253a1e2f890ac4307ffd798264dc0e35adcfe34c"
+  },
+  "files": {
+    "rows.json": "e9ca8e70e384417e231c77ca04c8437262c346b4c13888f6e6ca87c570b578e5",
+    "summary.json": "205cc4204af724d78d950225c3778285d9c483e5ff858619aa71c5840382cf22",
+    "target_means.json": "903bf224713d61766758a71a065cbd6e076e7d280311faaa2978b8385db06373"
+  },
+  "sha256": "54b18db948c0c70ec06c00217d59a977cb143f9a5c472dc0e7420a11194b8a14"
+}

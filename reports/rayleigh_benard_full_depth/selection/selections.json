@@ -1,0 +1,70 @@
+[
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa",
+    "seed": 1,
+    "step": 25000,
+    "checkpoint_sha256": "b8536e6a7adf047ad2776df844e3ae8d4ae25f7e0608be946a07a4a267a98e96",
+    "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+    "fit_sha256": "67feb28de378aa587710b1f0557763fcf140d97ad2743508f4960c517a358a12",
+    "fit_path": "/workspace/rb_full_depth/fits/jepa",
+    "valid_vrmse": 0.2524726820575671,
+    "by_horizon": {
+      "0": 0.1267678427093048,
+      "16": 0.3405998038448931,
+      "40": 0.4157552389667658
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "jepa_future",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "7617d382a98fd6a89a9e7cb949971661453b1c2dd05a08f402065ae02956c1a4",
+    "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+    "fit_sha256": "f55c94ccd777350ff2485cc4823ad5d379b8c20618cd513e8e8cb8eed6df2a2c",
+    "fit_path": "/workspace/rb_full_depth/fits/jepa_future",
+    "valid_vrmse": 0.22765501428590093,
+    "by_horizon": {
+      "0": 0.1222746452127444,
+      "16": 0.31099169524760334,
+      "40": 0.3550790714705116
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae",
+    "seed": 1,
+    "step": 50000,
+    "checkpoint_sha256": "41f04e39c666bddcde5de4018d39357a470f13d03d46427a26c0c01e01f9d494",
+    "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+    "fit_sha256": "cf1d50178a8b6b8e50b5892949b63549d84e451288894a91276372cb6a2ebe50",
+    "fit_path": "/workspace/rb_full_depth/fits/mae",
+    "valid_vrmse": 0.26005335978137517,
+    "by_horizon": {
+      "0": 0.11870038931954308,
+      "16": 0.3400440060850073,
+      "40": 0.4627686544014072
+    },
+    "status": "ok"
+  },
+  {
+    "dataset": "rayleigh_benard",
+    "objective": "mae_future",
+    "seed": 1,
+    "step": 100000,
+    "checkpoint_sha256": "6b71645bdbaa23320d8f5d0d32499a7190ea2b54a27e50645f208d6fdc6f2145",
+    "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+    "fit_sha256": "65179e7b09759b9f01918fb7d294b6f6ae4e6b76bb8e914990f879004bcbf349",
+    "fit_path": "/workspace/rb_full_depth/fits/mae_future",
+    "valid_vrmse": 0.25802689882427016,
+    "by_horizon": {
+      "0": 0.11556523909718242,
+      "16": 0.33667937329489217,
+      "40": 0.4642977438078237
+    },
+    "status": "ok"
+  }
+]

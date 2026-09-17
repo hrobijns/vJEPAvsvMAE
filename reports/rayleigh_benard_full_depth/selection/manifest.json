@@ -1,0 +1,74 @@
+{
+  "schema": "well-analysis-2",
+  "kind": "checkpoint_selection",
+  "policy": {
+    "version": 1,
+    "metric": "valid_vrmse",
+    "direction": "minimize",
+    "present_weight": 0.5,
+    "future_weight": 0.5,
+    "within_group": "equal_quantities_equal_global_local",
+    "future_horizons": "equal",
+    "checkpoint_tie": "earlier_step_then_sha256"
+  },
+  "protocols": {
+    "rayleigh_benard": {
+      "dataset": "rayleigh_benard",
+      "frame_limit": null,
+      "n_frames": 8,
+      "target_offsets": [
+        0,
+        16,
+        40
+      ],
+      "patch": [
+        2,
+        16,
+        16
+      ],
+      "token_samples": 64,
+      "noise_sigmas": [
+        0.0,
+        0.05,
+        0.1,
+        0.2,
+        0.5,
+        1.0
+      ],
+      "noise_seeds": [
+        0,
+        1,
+        2
+      ],
+      "targets": [
+        "enstrophy",
+        "buoyancy_gradient_energy",
+        "convective_flux",
+        "pressure_gradient_magnitude",
+        "buoyancy_laplacian_magnitude"
+      ],
+      "target_version": 2,
+      "offset_definition": "target_start_minus_context_start",
+      "probe_splits": {
+        "fit": "train",
+        "select": "valid",
+        "score": "test"
+      }
+    }
+  },
+  "candidates": [
+    "67feb28de378aa587710b1f0557763fcf140d97ad2743508f4960c517a358a12",
+    "f55c94ccd777350ff2485cc4823ad5d379b8c20618cd513e8e8cb8eed6df2a2c",
+    "cf1d50178a8b6b8e50b5892949b63549d84e451288894a91276372cb6a2ebe50",
+    "65179e7b09759b9f01918fb7d294b6f6ae4e6b76bb8e914990f879004bcbf349"
+  ],
+  "provenance": {
+    "git_commit": "e40c6c32dc73eaeb85f20bfe7d1ede08360863b0",
+    "code_sha256": "5fab1b7bbd588e8cc8068e072360136e8d5ebb4dbab587928e939fdc2b1b270a"
+  },
+  "files": {
+    "rows.json": "820579db69f250f65d54eed28f650df9db7b189c36ec9ed491a8e0412d591b8c",
+    "selections.json": "820579db69f250f65d54eed28f650df9db7b189c36ec9ed491a8e0412d591b8c"
+  },
+  "sha256": "01fb507525f131b0c9a2eb7fcd23749c704172e9719e50d23387b138862308f9"
+}

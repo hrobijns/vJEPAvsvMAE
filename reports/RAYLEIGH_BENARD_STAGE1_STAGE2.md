@@ -19,45 +19,88 @@ within each representation/offset cell. Lower VRMSE and higher R² are better.
 
 ## Frozen checkpoint selections
 
-| Objective | Selected step | Validation VRMSE |
+| Objective | Selected step | Block-4 checkpoint-selection VRMSE |
 |---|---:|---:|
 | JEPA | 25,000 | 0.2671 |
 | Future JEPA | 50,000 | 0.2890 |
 | MAE | 50,000 | 0.2639 |
 | Future MAE | 100,000 | 0.2694 |
 
+These scores are from the prospective block-4 candidate comparison. The
+full-depth selection artifact binds the four already-frozen winners to their
+new probe fits; its all-output validation scores are not a second checkpoint
+search.
+
 Adding the four `best_val` labels introduced only one new encoder state: Future JEPA at step 98,000. The JEPA, MAE, and Future MAE `best_val` states were tensor-identical to their 100,000-step milestone states. Future JEPA's 98,000-step state scored 0.2940 validation VRMSE versus 0.2890 for its selected 50,000-step state. Consequently, all four selections and all Stage 2 test results remained unchanged.
 
 ## Test physics results
 
+Each entry averages the five target-specific test scores. The encoder output
+and probe family were selected independently in each target cell using
+validation only.
+
 | Representation | Offset | JEPA VRMSE / R² | Future JEPA | MAE | Future MAE |
 |---|---:|---:|---:|---:|---:|
-| Pooled | 0 | 0.1078 / 0.9875 | 0.1514 / 0.9753 | **0.0855 / 0.9915** | 0.0924 / 0.9898 |
-| Pooled | 16 | 0.1617 / 0.9719 | 0.1764 / 0.9664 | **0.1493 / 0.9755** | 0.1501 / 0.9752 |
-| Pooled | 40 | 0.3214 / 0.8763 | **0.2780 / 0.9129** | 0.3972 / 0.7959 | 0.3970 / 0.7963 |
-| Token | 0 | 0.1974 / 0.9505 | 0.2417 / 0.9256 | **0.1840 / 0.9600** | 0.2122 / 0.9471 |
-| Token | 16 | 0.5542 / 0.6716 | 0.5613 / 0.6632 | **0.5460 / 0.6840** | 0.5463 / 0.6815 |
-| Token | 40 | 0.5562 / 0.6550 | 0.5800 / 0.6303 | 0.5533 / 0.6563 | **0.5518 / 0.6585** |
+| Pooled | 0 | 0.0966 / 0.9898 | 0.0857 / 0.9912 | **0.0840 / 0.9917** | 0.0907 / 0.9898 |
+| Pooled | 16 | 0.1519 / 0.9748 | **0.1179 / 0.9838** | 0.1484 / 0.9757 | 0.1434 / 0.9776 |
+| Pooled | 40 | 0.2908 / 0.9002 | **0.1887 / 0.9599** | 0.3961 / 0.7966 | 0.3939 / 0.7983 |
+| Token | 0 | **0.1852 / 0.9579** | 0.1900 / 0.9566 | 0.1853 / 0.9594 | 0.1867 / 0.9584 |
+| Token | 16 | 0.5462 / 0.6773 | **0.5079 / 0.7145** | 0.5402 / 0.6902 | 0.5402 / 0.6876 |
+| Token | 40 | 0.5475 / 0.6645 | **0.5400 / 0.6688** | 0.5521 / 0.6569 | 0.5512 / 0.6603 |
 
 ## Findings
 
-1. **MAE is strongest at short and medium horizons.** It has the lowest mean VRMSE in four of the six representation/offset cells: pooled 0 and 16, and token 0 and 16. Against JEPA, its VRMSE is 20.7% lower for pooled offset 0, 7.7% lower for pooled offset 16, and 6.8% lower for token offset 0.
+1. **Future JEPA is strongest after validation selects encoder depth.** It has
+the lowest mean VRMSE in four of six representation/horizon cells and 18 of 30
+target-level cells. Its equal-cell mean is 0.2717, 10.3% below JEPA (0.3030)
+and 14.5% below both MAE variants (0.3177).
 
-2. **Future JEPA is the clear pooled long-horizon winner.** At offset 40 its pooled VRMSE is 0.2780, 13.5% below JEPA and 30.0% below MAE; its mean R² rises to 0.9129 versus 0.8763 for JEPA and 0.7959 for MAE. This is the main positive result for future-conditioned latent prediction.
+2. **The gain is largest for pooled future prediction.** Future JEPA reaches
+0.1179 at offset 16 and 0.1887 at offset 40. Its offset-40 error is 35.1% below
+JEPA and 52.4% below MAE, with mean target-specific R² of 0.9599. It wins all
+five pooled offset-40 targets.
 
-3. **The future objective does not improve token prediction.** Future JEPA trails JEPA at all three token offsets. Future MAE is nearly tied with MAE at offsets 16 and 40, but is worse at offset 0. The long-horizon benefit is specific to Future JEPA's pooled representation in this run.
+3. **Full-depth analysis changes the token conclusion.** Future JEPA now has
+the lowest token mean at offsets 16 and 40. The offset-16 improvement over JEPA
+is 7.0%; the offset-40 improvement is smaller at 1.4%. Immediate token
+performance is effectively tied between JEPA (0.1852) and MAE (0.1853).
 
-4. **No objective dominates every target.** Across the 30 target/representation/offset cells, the lowest VRMSE belongs to MAE in 12, Future MAE in 9, Future JEPA in 6, and JEPA in 3. An equal-cell average gives JEPA the lowest overall VRMSE (0.3165), narrowly ahead of MAE (0.3192), but that scalar hides the much more useful horizon-specific pattern above.
+4. **Future JEPA's useful information is concentrated late.** Validation
+selected block 12 or final normalization for 22 of its 30 cells. By contrast,
+JEPA most often selected blocks 4–6, MAE favored early-to-middle outputs, and
+Future MAE selected block 1 for four of five immediate token targets. Relative
+to fixed block 4, output selection lowers equal-cell test VRMSE by 18.2% for
+Future JEPA, 4.2% for JEPA, 2.2% for Future MAE, and 0.5% for MAE.
 
-5. **Nonlinearity matters.** Validation selected the MLP in 118 of 120 objective/cell combinations; Ridge was selected only twice. Report encoder quality using the selected-probe results rather than Ridge alone.
+5. **Every selected cell uses the nonlinear probe.** Validation selected MLP
+in all 120 objective/cell combinations after each family independently searched
+depth. Ridge remains reported as a controlled linear diagnostic, not the main
+encoder ranking.
 
-6. **Long-horizon pooled results are control-sensitive.** Adding regime/time controls to Ridge lowers offset-40 pooled mean VRMSE to 0.218–0.237 for every objective, below the encoder-only selected probes (0.278–0.397). The encoder comparison remains valid under the frozen protocol, but this gap shows that known regime/time metadata carries substantial complementary long-horizon information.
+6. **Every encoder beats persistence on average at both future horizons.**
+Persistence VRMSE is 0.4874 and 0.8121 for pooled offsets 16 and 40, versus
+0.1179 and 0.1887 for the best encoder. Token persistence is 0.7528 and 0.7884,
+versus Future JEPA's 0.5079 and 0.5400. Offset 0 is intentionally N/A because
+copying the current target would be the identity.
 
-7. **All representations encode the simulation regime strongly.** For `log10_Prandtl` and `log10_Rayleigh`, every objective/probe combination has test R² above 0.9939. MAE variants produce the lowest regime VRMSEs; the best individual result is MAE Ridge on `log10_Rayleigh` (VRMSE 0.0234, R² 0.99945).
+7. **Regime/time metadata remains an important pooled long-horizon control.**
+Ridge plus controls gives offset-40 pooled VRMSE 0.1832–0.2224. This is far
+below encoder-only selected probes for JEPA and both MAE variants, but only
+slightly below Future JEPA's 0.1887. Future JEPA therefore nearly closes the
+metadata-control gap at the long pooled horizon.
+
+8. **All representations encode the simulation regime strongly.** Across both
+regime targets and both probe families, every objective has test R² above
+0.9967.
 
 ## Interpretation and limits
 
-The practical conclusion is not that JEPA or MAE wins universally. Use MAE for immediate-state and medium-horizon readout; Future JEPA is the best candidate when the downstream requirement is pooled long-horizon prediction. Token-level future prediction remains weak relative to pooled prediction for every objective.
+The practical result is a depth-dependent advantage for future-conditioned
+latent prediction: use Future JEPA for future readout, especially pooled
+long-horizon prediction. Current pooled readout still slightly favors MAE, while
+current token readout is effectively tied. The depth result is substantive,
+not cosmetic: fixed block 4 obscured most of Future JEPA's advantage because
+its validation-selected outputs are usually block 12 or final normalization.
 
 This is a single checkpoint seed and single probe initialization, so there is
 no between-seed uncertainty estimate. The workshop labels `t+8` and `t+32`

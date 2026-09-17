@@ -673,8 +673,17 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 linewidth=1,
                                 label="persistence",
                             )
-                axes[0, min(1, len(target_offsets) - 1)].legend()
-                fig.tight_layout()
+                legend_axis = axes[0, min(1, len(target_offsets) - 1)]
+                handles, labels = legend_axis.get_legend_handles_labels()
+                fig.legend(
+                    handles,
+                    labels,
+                    loc="upper center",
+                    ncol=len(labels),
+                    frameon=False,
+                    bbox_to_anchor=(0.5, 1.0),
+                )
+                fig.tight_layout(rect=(0, 0, 1, 0.97))
                 fig.savefig(stage / f"depth_{method}.pdf")
                 plt.close(fig)
         else:

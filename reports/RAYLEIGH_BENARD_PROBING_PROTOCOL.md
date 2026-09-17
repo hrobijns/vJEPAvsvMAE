@@ -264,11 +264,14 @@ $$
 
 We also evaluated:
 
-- Ridge and MLP separately,
-- the validation-selected Ridge/MLP result,
-- persistence baselines for future targets,
-- regime/time and position controls,
-- Ridge augmented with the relevant controls,
+- Ridge and MLP separately, each at its own validation-selected output;
+- the main validation-selected result, chosen between those two family candidates;
+- persistence for future targets by copying the corresponding current target
+  (`t+0` persistence is N/A because it is the identity);
+- test depth curves for Ridge and MLP at every output, with persistence shown
+  as a dashed reference in future pooled panels;
+- regime/time and position controls;
+- Ridge augmented with the relevant controls;
 - recovery of $\log_{10}\mathrm{Rayleigh}$ and $\log_{10}\mathrm{Prandtl}$.
 
 The regime probes used Ridge and MLP but did not influence checkpoint selection. No noise-corruption sweep was included in this Stage 2 result.
