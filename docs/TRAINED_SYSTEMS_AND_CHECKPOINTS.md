@@ -118,7 +118,7 @@ MAE's pixel target is fixed, so MAE validation loss at two checkpoints measures 
 
 Early in training the target encoder is still close to its initialization, and its layer-normalized features may be relatively easy for the predictor to match. The target can later encode richer structure and become harder to predict, allowing validation loss to rise even while the online representation improves. This is particularly relevant for shear-flow `jepa` and `jepa_future`: their recorded minima are at 4k, still inside the 5k learning-rate warm-up. Conversely, active-matter `mae_future` reaches its minimum at 18k after 1,152,000 processed pairs—about 114 passes over its small fit support—so ordinary overfitting is a separate plausible concern there. Rayleigh–Bénard `jepa`, `mae`, and `mae_future` have `best_val` at 100k, so those files duplicate their 100% encoder states.
 
-JEPA loss can also improve if features partly collapse and become easy to predict. This is why `src/train.py` tracks target, context, and predictor feature standard deviations and warns when they fall below 10% of their first validation value. Before treating the early 4k, 16k, or 20k JEPA minima as serious candidates, inspect the original `history.jsonl` collapse diagnostics; those histories are not included in the encoder-only handoff. The minimum stays in the handoff so it is available for a later, explicitly defined protocol, but it is outside the Stage-1 candidate policy and receives no privileged status.
+JEPA loss can also improve if features partly collapse and become easy to predict. This is why `src/train.py` tracks target, context, and predictor feature standard deviations and warns when they fall below 10% of their first validation value. Before treating the early 4k, 16k, or 20k JEPA minima as serious candidates, inspect the original `history.jsonl` collapse diagnostics; those histories are not included in the encoder-only handoff. The completed Rayleigh–Bénard protocol included each `best_val` label as an ordinary downstream-validation candidate, never as a privileged choice; none displaced the milestone winner.
 
 ## Recommended checkpoint-selection protocol
 
@@ -128,18 +128,30 @@ JEPA loss can also improve if features partly collapse and become easy to predic
 
 For each `(system, objective, training seed)`:
 
-1. Use the common candidate grid: **25k, 50k, 75k, and 100k**. Do not include `best_val`: it gives objectives different candidate steps and JEPA's moving EMA target makes its loss minimum especially difficult to compare over training.
+1. Use the common 25k, 50k, 75k, and 100k milestone grid and also evaluate
+   each run's `best_val` label. Tensor-identical labels represent one encoder
+   state and are fit once. In Rayleigh–Bénard this produced 20 labels but 17
+   unique states; only Future JEPA's 98k `best_val` added a non-milestone state.
 2. Extract frozen online-encoder features from the same predefined official-train and official-validation clips for every candidate. Never use official test during selection.
-3. Fit Ridge and single-seed MLP probes on official training trajectories at transformer layer 4, chosen prospectively from the workshop paper's general layer-3–4 peak. Select probe family, hyperparameters, and stopping state separately for each physical task using official validation only and the same search space for every encoder.
+3. Fit Ridge and single-seed MLP probes on official training trajectories at transformer block 4, chosen prospectively from the workshop paper's general layer-3–4 peak. Select probe family, hyperparameters, and stopping state separately for each physical task using official validation only and the same search space for every encoder.
 4. Give every physical quantity and the pooled/local settings equal weight within a horizon. Let `H_h` be that mean validation VRMSE at target offset `h`. Minimize `S = 0.5 H_0 + 0.25(H_16 + H_40)`: 50% present and 50% shared equally among the two future horizons.
 5. Governing-parameter diagnostics, nuisance controls, persistence baselines, pretraining loss, and test performance do not enter this checkpoint score.
 6. Require every planned task cell to have a finite score. If any are missing, the candidate is ineligible rather than benefiting from a smaller average.
 7. Break an exact checkpoint-score tie by earlier optimizer step, then checkpoint SHA-256; exact probe-family ties prefer Ridge.
 8. Freeze one selected checkpoint per system/objective/seed in a manifest before extracting or scoring official-test features.
+9. For the final frozen checkpoints, fit probes at all 12 block outputs and the final normalization output. Validation selects each family's output and then the family; official test only scores the frozen choices and supplies the depth curves.
 
-`scripts/probe_sweep.py prepare` implements this candidate policy directly: it freezes only the 25k/50k/75k/100k milestones, requires every dataset/seed in the handoff to supply all four objectives, refuses a run group whose four milestones are missing, duplicated, mislabelled, at the wrong fraction of the configured budget, or inconsistent in run metadata, and records the candidate policy in `study.json` so `load`, `run`, `collect`, `test`, and `report` reject a study prepared under any other roster. `best_val` files stay in the handoff but never enter the sweep, and a run group that declares only excluded files is reported as an incomplete milestone roster rather than silently dropped. For a different roster, call `src.evaluate select-checkpoints` with the intended probe-fit paths and pass the resulting selection artifact to `score-probes`. Scaled from the earlier 56-candidate estimate, the 48-candidate sweep is roughly 45 GPU-hours of MLP fitting, or about 5–9 hours on 8–12 L40S GPUs, excluding queueing and initial data preparation; caches and extracted features are reusable.
+The original `scripts/probe_sweep.py prepare` milestone roster covered only
+25k/50k/75k/100k. The completed Rayleigh–Bénard study extended that roster with
+`best_val` through `src.evaluate select-checkpoints`, while preserving the same
+validation-only scoring, completeness, and tie rules. Adding `best_val` changed
+none of the four selected encoder states. Candidate identities and steps are
+grounded in `checkpoints/iclr2027/seed1/index.json` and `manifest.json`.
+`src/train.py::export_encoders` confirms that the exported representation is the
+online encoder, `src/objectives/jepa.py::post_step` contains the EMA update, and
+`src/evaluation/selection.py` implements the balanced score and failure/tie
+rules.
 
-Candidate identities and steps are grounded in `checkpoints/iclr2027/seed1/index.json` and `manifest.json`. `src/train.py::export_encoders` confirms that the exported representation is the online encoder, `src/objectives/jepa.py::post_step` contains the EMA update, and `src/evaluation/selection.py` implements the balanced score and failure/tie rules.
 
 ### Why selected steps may differ
 

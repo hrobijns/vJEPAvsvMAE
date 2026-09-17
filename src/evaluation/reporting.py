@@ -301,7 +301,12 @@ def plot(aggregate_dir, output, metric="vrmse"):
                     )
         write_json(stage / "target_means.json", target_means)
         # Main comparison and separate probes use identical cells and scales.
-        scores = [r["metrics"][score_key]["mean"] for r in summaries]
+        scores = [
+            r["metrics"][score_key]["mean"]
+            for r in summaries
+            if r.get("family") == "physics"
+            and r.get("method") in ("selected", "ridge", "mlp", "persistence")
+        ]
         finite = [v for v in scores if v is not None and np.isfinite(v)]
         low = min([0.0, *finite])
         high = max([1.0, *finite])

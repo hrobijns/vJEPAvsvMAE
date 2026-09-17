@@ -73,12 +73,17 @@ Checkpoint selection uses the state-derived physical quantities listed under Sta
 - local/token representation;
 - workshop-aligned target offsets 0, 16, and 40.
 
-For each task cell, use transformer layer 4, fixed prospectively from the workshop paper's general layer-3–4 peak. Fit both:
+Checkpoint selection uses transformer block 4, fixed prospectively from the
+workshop paper's general layer-3–4 peak. Fit both:
 
 - Ridge, with the predefined regularization grid;
 - a one-hidden-layer MLP with fixed initialization seed 0 and a validation-selected stopping state.
 
-Select the layer, probe family, and probe settings for that task using validation VRMSE. Exact Ridge/MLP ties prefer Ridge.
+Select the probe family and its settings for each checkpoint-selection task
+using validation VRMSE. Exact Ridge/MLP ties prefer Ridge. After one checkpoint
+per objective is frozen, refit Ridge and MLP at all 12 block outputs and the
+final normalization output. Validation independently selects the output within
+each family, then the family for the main summary; test data makes no choice.
 
 ## Checkpoint score
 
@@ -238,7 +243,7 @@ For every selected encoder, report:
 - the validation-selected probe family and encoder layer;
 - validation and test VRMSE as the primary normalized error;
 - R², Pearson correlation, and MSE as supporting metrics;
-- performance at transformer layer 4;
+- depth curves across all 12 transformer blocks and the final normalization output;
 - pooled and local/token results separately;
 - each target offset separately before any summary average.
 

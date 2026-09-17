@@ -2,9 +2,20 @@
 
 ## Study
 
-The study evaluated the four seed-1 objectives (`jepa`, `jepa_future`, `mae`, and `mae_future`) on the official Rayleigh–Bénard train/validation/test splits. Transformer layer 4 was fixed prospectively for every probe (stored as zero-indexed layer `3`). Stage 1 compared the 25%, 50%, 75%, and 100% training milestones plus each run's minimum-pretraining-validation-loss checkpoint, then selected one encoder state per objective using validation VRMSE. Stage 2 evaluated only those frozen selections on the test split.
+The study evaluated the four seed-1 objectives (`jepa`, `jepa_future`, `mae`,
+and `mae_future`) on the official Rayleigh–Bénard train/validation/test splits.
+Stage 1 compared the 25%, 50%, 75%, and 100% training milestones plus each
+run's minimum-pretraining-validation-loss checkpoint at prospectively fixed
+transformer block 4, then selected one encoder state per objective using
+validation VRMSE. After freezing those four checkpoints, the final analysis fit
+Ridge and MLP probes at all 12 transformer blocks and the final normalization
+output. Validation independently selected each family's output and
+hyperparameters in every cell, then selected the family for the main summary.
+Only those frozen choices were evaluated on test.
 
-Physics probes covered pooled and token representations, offsets 0, 16, and 40, and five targets. Results below average the five target-specific scores within each representation/offset cell. Lower VRMSE and higher R² are better.
+Physics probes covered pooled and token representations, offsets 0, 16, and
+40, and five targets. Results below average the five target-specific scores
+within each representation/offset cell. Lower VRMSE and higher R² are better.
 
 ## Frozen checkpoint selections
 
@@ -48,12 +59,18 @@ Adding the four `best_val` labels introduced only one new encoder state: Future 
 
 The practical conclusion is not that JEPA or MAE wins universally. Use MAE for immediate-state and medium-horizon readout; Future JEPA is the best candidate when the downstream requirement is pooled long-horizon prediction. Token-level future prediction remains weak relative to pooled prediction for every objective.
 
-This is a single checkpoint seed and a single fixed transformer layer, so there is no between-seed uncertainty estimate and no post-hoc depth search. The workshop labels `t+8` and `t+32` denote 8- and 32-frame gaps after an eight-frame context; they are the same physical target windows as this study's target-start offsets 16 and 40. Direct numerical comparison still requires care because the studies used different checkpoint, layer, probe-fitting, ensembling, and seed-selection protocols.
+This is a single checkpoint seed and single probe initialization, so there is
+no between-seed uncertainty estimate. The workshop labels `t+8` and `t+32`
+denote 8- and 32-frame gaps after an eight-frame context; they are the same
+physical target windows as this study's target-start offsets 16 and 40. Direct
+numerical comparison still requires care because the studies used different
+checkpoint, probe-fitting, ensembling, and seed-selection protocols.
 
 ## Artifacts
 
-- Frozen selections: `reports/rayleigh_benard_stage1_stage2/selection/selections.json`
-- Aggregate results: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/aggregate/summary.json`
-- Flat table: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/summary.tsv`
-- Plots: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/*.pdf`
-- Workshop Figure 1-style comparison: `reports/rayleigh_benard_stage1_stage2/reports/rayleigh_benard/plots/workshop_figure1_comparison.pdf`
+- Checkpoint-selection study: `reports/rayleigh_benard_stage1_stage2/selection/selections.json`
+- Full-depth frozen selections: `reports/rayleigh_benard_full_depth/selection/selections.json`
+- Full-depth aggregate: `reports/rayleigh_benard_full_depth/reports/rayleigh_benard/aggregate/summary.json`
+- Flat table: `reports/rayleigh_benard_full_depth/reports/rayleigh_benard/plots/summary.tsv`
+- Physics, persistence, and depth plots: `reports/rayleigh_benard_full_depth/reports/rayleigh_benard/plots/*.pdf`
+- Workshop Figure 1-style comparison: `reports/rayleigh_benard_full_depth/reports/rayleigh_benard/plots/workshop_figure1_comparison.pdf`
