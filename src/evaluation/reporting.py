@@ -268,6 +268,12 @@ def plot(aggregate_dir, output, metric="vrmse"):
     probe_outputs = artifact.manifest.get("probe_settings", {}).get(
         "probe_outputs", []
     )
+    def encoder_output_label(layer):
+        if layer not in probe_layers or len(probe_outputs) != len(probe_layers):
+            return "?"
+        output = probe_outputs[probe_layers.index(layer)]
+        return "N" if output == "final_norm" else output.removeprefix("block_")
+
     with staged_directory(output) as stage:
         fields = (
             "objective",
@@ -316,6 +322,9 @@ def plot(aggregate_dir, output, metric="vrmse"):
                         and r["objective"] == objective
                     ]
                     matrix = np.full((len(targets), 2 * len(target_offsets)), np.nan)
+                    selected_outputs = np.full(
+                        (len(targets), 2 * len(target_offsets)), "", dtype=object
+                    )
                     for r in cells:
                         col = (
                             0
@@ -325,6 +334,16 @@ def plot(aggregate_dir, output, metric="vrmse"):
                         score = r["metrics"][score_key]["mean"]
                         if score is not None:
                             matrix[targets.index(r["target"]), col] = score
+                        layers = [
+                            selection.get("selected_layer")
+                            for selection in r["selections"]
+                        ]
+                        labels = [encoder_output_label(layer) for layer in layers]
+                        selected_outputs[targets.index(r["target"]), col] = (
+                            labels[0]
+                            if labels and all(label == labels[0] for label in labels)
+                            else "/".join(labels)
+                        )
                     axis.imshow(
                         matrix,
                         vmin=low,
@@ -337,7 +356,10 @@ def plot(aggregate_dir, output, metric="vrmse"):
                             axis.text(
                                 j,
                                 i,
-                                f"{matrix[i, j]:.3f}"
+                                (
+                                    f"{matrix[i, j]:.3f}\nout "
+                                    f"{selected_outputs[i, j]}"
+                                )
                                 if np.isfinite(matrix[i, j])
                                 else "undefined",
                                 ha="center",
@@ -366,6 +388,7 @@ def plot(aggregate_dir, output, metric="vrmse"):
                         range(len(targets)), [t.replace("_", " ") for t in targets]
                     )
                     axis.set_title(f"{objective}: {method}, test {score_label}")
+                    axis.set_xlabel("cell text: test score and validation-selected output")
                 fig.tight_layout()
                 fig.savefig(stage / f"physics_{method}.pdf")
                 plt.close(fig)
