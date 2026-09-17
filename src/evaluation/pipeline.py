@@ -250,6 +250,7 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
             checkpoint=train_feature.manifest["checkpoint"],
             caches={c.manifest["split"]: c.manifest["sha256"] for c in caches},
             features={f.manifest["split"]: f.manifest["sha256"] for f in features},
+            feature_provenance=train_feature.manifest["provenance"],
             probe_settings=dict(
                 ridge_alphas=list(RIDGE_ALPHAS),
                 mlp_max_steps=mlp_max_steps,
@@ -286,14 +287,17 @@ def score_probes(feature_dir, cache_root, probe_dir, selection, output):
     features, caches = _features_and_caches(
         feature_dir, cache_root, ("train", "valid", "test")
     )
+    feature_provenance = fits.manifest.get(
+        "feature_provenance", features[0].manifest["provenance"]
+    )
     for feature, cache in zip(features, caches):
         split = cache.manifest["split"]
         if (
             feature.manifest["checkpoint"] != fits.manifest["checkpoint"]
-            or feature.manifest["provenance"] != fits.manifest["provenance"]
+            or feature.manifest["provenance"] != feature_provenance
         ):
             raise ValueError(
-                "test checkpoint or analysis code differs from fitted probes"
+                "test checkpoint or feature-extraction code differs from fitted probes"
             )
         if split != "test" and (
             fits.manifest["caches"][split] != cache.manifest["sha256"]
