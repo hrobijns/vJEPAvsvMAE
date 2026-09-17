@@ -24,13 +24,13 @@ from src.evaluation.protocol import (
 )
 from src.physics.systems import SYSTEMS
 
-PROBE_LAYERS = (3,)
+PROBE_LAYERS = None
 
 
 def _probe_layers(n_layers):
     if n_layers < 1:
         raise ValueError("feature artifact has no encoder outputs")
-    return PROBE_LAYERS if max(PROBE_LAYERS) < n_layers else (n_layers - 1,)
+    return tuple(range(n_layers))
 
 
 def cell_id(row):

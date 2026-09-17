@@ -246,18 +246,19 @@ class ProbeTests(unittest.TestCase):
                 )
             )
 
-    def test_reduced_probe_grid_uses_workshop_horizons_and_four_outputs(self):
+    def test_full_probe_grid_uses_workshop_horizons_and_all_outputs(self):
         protocol = Protocol("rayleigh_benard")
         self.assertEqual(protocol.target_offsets, (0, 16, 40))
-        self.assertEqual(PROBE_LAYERS, (3,))
+        self.assertIsNone(PROBE_LAYERS)
+        encoder_outputs = 13
         self.assertEqual(
             len(SYSTEMS["rayleigh_benard"].targets)
             * len(protocol.target_offsets)
             * 2
-            * len(PROBE_LAYERS)
+            * encoder_outputs
             * len(MLP_SEEDS)
             * 16,
-            480,
+            6240,
         )
         ridge = fit_ridge_many(
             self.x,
@@ -660,6 +661,9 @@ class WorkflowTests(unittest.TestCase):
                 if dataset == "shear_flow":
                     plot(root / "aggregate", root / "plots")
                     plot(root / "noise_aggregate", root / "noise_plots")
+                    self.assertTrue(
+                        (root / "plots/physics_persistence.pdf").is_file()
+                    )
                     self.assertTrue((root / "plots/summary.tsv").is_file())
                 self.assertTrue((root / "aggregate/target_means.json").is_file())
                 probe_layers = Artifact(root / "fits", "probe_fits").manifest[

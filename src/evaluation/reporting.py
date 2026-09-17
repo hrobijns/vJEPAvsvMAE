@@ -260,7 +260,14 @@ def plot(aggregate_dir, output, metric="vrmse"):
     }
     targets = artifact.manifest["protocol"]["targets"]
     target_offsets = artifact.manifest["protocol"]["target_offsets"]
+    context_frames = artifact.manifest["protocol"]["n_frames"]
+    display_horizons = [
+        0 if offset == 0 else offset - context_frames for offset in target_offsets
+    ]
     probe_layers = artifact.manifest.get("probe_settings", {}).get("probe_layers", [])
+    probe_outputs = artifact.manifest.get("probe_settings", {}).get(
+        "probe_outputs", []
+    )
     with staged_directory(output) as stage:
         fields = (
             "objective",
@@ -348,9 +355,9 @@ def plot(aggregate_dir, output, metric="vrmse"):
                     axis.set_xticks(
                         range(2 * len(target_offsets)),
                         [
-                            f"{rep} +{target_offset}"
+                            f"{rep} $t+{horizon}$"
                             for rep in ("pooled", "token")
-                            for target_offset in target_offsets
+                            for horizon in display_horizons
                         ],
                         rotation=40,
                         ha="right",
@@ -362,6 +369,77 @@ def plot(aggregate_dir, output, metric="vrmse"):
                 fig.tight_layout()
                 fig.savefig(stage / f"physics_{method}.pdf")
                 plt.close(fig)
+            persistence = [
+                row
+                for row in summaries
+                if row["family"] == "physics" and row["method"] == "persistence"
+            ]
+            persistence_matrix = np.full(
+                (len(targets), 2 * len(target_offsets)), np.nan
+            )
+            for row in persistence:
+                column = (
+                    0
+                    if row["representation"] == "pooled"
+                    else len(target_offsets)
+                ) + target_offsets.index(row["target_offset"])
+                score = row["metrics"][score_key]["mean"]
+                if score is not None:
+                    persistence_matrix[targets.index(row["target"]), column] = score
+            persistence_cmap = plt.get_cmap(
+                "viridis_r" if metric == "vrmse" else "viridis"
+            ).with_extremes(bad="#eeeeee")
+            fig, axis = plt.subplots(
+                figsize=(8, max(3, len(targets) * 0.65))
+            )
+            image = axis.imshow(
+                persistence_matrix,
+                vmin=low,
+                vmax=high,
+                cmap=persistence_cmap,
+                aspect="auto",
+            )
+            for i in range(persistence_matrix.shape[0]):
+                for j in range(persistence_matrix.shape[1]):
+                    value = persistence_matrix[i, j]
+                    axis.text(
+                        j,
+                        i,
+                        f"{value:.3f}" if np.isfinite(value) else "N/A",
+                        ha="center",
+                        va="center",
+                        fontsize=8,
+                        color="white"
+                        if np.isfinite(value)
+                        and (
+                            value > (low + high) / 2
+                            if metric == "vrmse"
+                            else value < (low + high) / 2
+                        )
+                        else "black",
+                    )
+            axis.set_xticks(
+                range(2 * len(target_offsets)),
+                [
+                    f"{representation} $t+{horizon}$"
+                    for representation in ("pooled", "token")
+                    for horizon in display_horizons
+                ],
+                rotation=40,
+                ha="right",
+            )
+            axis.set_yticks(
+                range(len(targets)), [target.replace("_", " ") for target in targets]
+            )
+            axis.set_title(
+                f"Persistence baseline, test {score_label}\n"
+                "future prediction copies the corresponding current target"
+            )
+            colorbar = fig.colorbar(image, ax=axis, pad=0.02)
+            colorbar.set_label(f"Test {score_label}")
+            fig.tight_layout()
+            fig.savefig(stage / "physics_persistence.pdf")
+            plt.close(fig)
             if (
                 artifact.manifest["protocol"]["dataset"] == "rayleigh_benard"
                 and {"jepa", "mae"} <= set(objectives)
@@ -531,19 +609,43 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 markersize=4,
                             )
                         axis.set_title(
-                            f"{target.replace('_', ' ')} +{target_offset}", fontsize=9
+                            f"{target.replace('_', ' ')} "
+                            f"$t+{display_horizons[j]}$",
+                            fontsize=9,
                         )
-                        axis.set_xlabel("Encoder block")
+                        axis.set_xlabel("Encoder output")
                         if probe_layers:
-                            axis.set_xticks(
-                                probe_layers, [str(layer + 1) for layer in probe_layers]
-                            )
+                            output_labels = [
+                                "N"
+                                if output == "final_norm"
+                                else output.removeprefix("block_")
+                                for output in probe_outputs
+                            ]
+                            axis.set_xticks(probe_layers, output_labels)
                             if len(probe_layers) == 1:
                                 axis.set_xlim(
                                     probe_layers[0] - 0.5, probe_layers[0] + 0.5
                                 )
                         axis.set_ylabel(f"Test {score_label}")
-                axes[0, 0].legend()
+                        baseline = next(
+                            (
+                                row["metrics"][score_key]["mean"]
+                                for row in persistence
+                                if row["representation"] == "pooled"
+                                and row["target"] == target
+                                and row["target_offset"] == target_offset
+                            ),
+                            None,
+                        )
+                        if baseline is not None:
+                            axis.axhline(
+                                baseline,
+                                color="black",
+                                linestyle="--",
+                                linewidth=1,
+                                label="persistence",
+                            )
+                axes[0, min(1, len(target_offsets) - 1)].legend()
                 fig.tight_layout()
                 fig.savefig(stage / f"depth_{method}.pdf")
                 plt.close(fig)
