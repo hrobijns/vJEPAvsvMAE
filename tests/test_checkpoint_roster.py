@@ -1,4 +1,4 @@
-"""Stage-1 candidate policy: four milestones plus best-validation checkpoints."""
+"""The frozen roster is one best-validation encoder per training run."""
 
 import contextlib
 import copy
@@ -9,13 +9,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from src.evaluation.artifacts import Artifact, provenance, seal, sha256_file, write_json
+from src.evaluation.artifacts import provenance, seal, sha256_file, write_json
 from src.evaluation.protocol import Protocol
 from src.objectives import OBJECTIVES
-from src.physics.systems import SYSTEMS
 
 REPO = Path(__file__).resolve().parents[1]
 HANDOFF = REPO / "checkpoints/iclr2027/seed1"
+# Rayleigh-Bénard best-validation steps recorded in the seed-1 handoff index.
+RAYLEIGH_BENARD_STEPS = {
+    "jepa": 100000,
+    "mae": 100000,
+    "jepa_future": 98000,
+    "mae_future": 100000,
+}
 
 
 def sweep():
@@ -27,134 +33,112 @@ def sweep():
     return module
 
 
-def index_row(objective, label, percent, seed=1, total=100000, state=None, **overrides):
+def index_row(objective, label, step, seed=1, total=100000, **overrides):
     return dict(
-        path=f"shear_flow/{objective}/seed{seed}/encoder_{label}.pt",
+        path=f"shear_flow/{objective}/encoder_{label}.pt",
         dataset="shear_flow",
         objective=objective,
         seed=seed,
-        step=percent * total // 100,
+        step=step,
         candidate=label,
         bytes=1,
         sha256=f"{objective}_{seed}_{label}_checkpoint",
-        encoder_state_sha256=state or f"{objective}_{seed}_{label}_state",
+        encoder_state_sha256=f"{objective}_{seed}_{label}_state",
         config_sha256=f"{objective}_config",
         spec={"n_channels": 4, "n_frames": 8, "height": 256, "width": 512},
         training_protocol={"total_steps": total, "batch_size": 64},
         training_identity=f"{objective}_{seed}_identity",
-        data_exposure={"clips_processed": percent * 1000},
-        **overrides,
-    )
+        data_exposure={"clips_processed": step},
+    ) | overrides
 
 
-def synthetic_index(objectives=OBJECTIVES, seeds=(1,)):
+def synthetic_index(objectives=OBJECTIVES, seeds=(1,), milestones=True):
+    """A handoff may still retain milestone files; only best_val is probed."""
     rows = []
     for seed in seeds:
         for objective in objectives:
-            for percent in (25, 50, 75, 100):
-                rows.append(
-                    index_row(objective, f"{percent:03d}pct", percent, seed=seed)
-                )
-            rows.append(
-                index_row(
-                    objective,
-                    "best_val",
-                    100,
-                    seed=seed,
-                    state=f"{objective}_{seed}_best_val_state",
-                )
-            )
+            if milestones:
+                for percent in (25, 50, 75, 100):
+                    rows.append(
+                        index_row(
+                            objective, f"{percent:03d}pct", percent * 1000, seed=seed
+                        )
+                    )
+            rows.append(index_row(objective, "best_val", 64000, seed=seed))
     return dict(training_provenance={}, checkpoints=rows)
 
 
-class CandidatePolicyTests(unittest.TestCase):
+class BestValidationRosterTests(unittest.TestCase):
     def setUp(self):
         self.sweep = sweep()
 
-    def test_seed1_handoff_freezes_three_systems_by_four_objectives_by_five_labels(self):
+    def test_seed1_handoff_freezes_one_best_validation_encoder_per_run(self):
         index = json.loads((HANDOFF / "index.json").read_text())
-        candidates = self.sweep.frozen_candidates(HANDOFF, index)
-        groups = self.sweep.roster_groups(candidates)
-        self.assertEqual((len(candidates), len(groups)), (56, 12))
-        self.assertEqual(len({r["checkpoint_sha256"] for r in candidates}), 56)
-        self.assertEqual(len({(r["dataset"], r["objective"]) for r in candidates}), 12)
-        labels = {r["candidate"] for r in candidates}
-        labels.update(alias["candidate"] for r in candidates for alias in r["aliases"])
+        encoders = self.sweep.frozen_encoders(HANDOFF, index)
+        groups = self.sweep.roster_groups(encoders)
+        self.assertEqual((len(encoders), len(groups)), (12, 12))
+        self.assertEqual({r["candidate"] for r in encoders}, {"best_val"})
+        self.assertEqual(len({r["checkpoint_sha256"] for r in encoders}), 12)
         self.assertEqual(
-            labels, {"025pct", "050pct", "075pct", "100pct", "best_val"}
+            {r["dataset"] for r in encoders},
+            {"rayleigh_benard", "active_matter", "shear_flow"},
         )
-        for group in groups.values():
-            self.assertEqual(
-                set(group), {"025pct", "050pct", "075pct", "100pct", "best_val"}
-            )
+        self.assertEqual({r["seed"] for r in encoders}, {1})
+        for row in encoders:
+            self.assertTrue(row["checkpoint"].endswith("/encoder_best_val.pt"))
+            self.assertTrue(0 < row["step"] <= row["total_steps"])
+
+    def test_milestone_rows_are_ignored_when_present_or_absent(self):
+        self.assertEqual(
+            len(self.sweep.frozen_encoders("/handoff", synthetic_index())), 4
+        )
+        without = synthetic_index(milestones=False)
+        self.assertEqual(len(self.sweep.frozen_encoders("/handoff", without)), 4)
 
     def test_dataset_scope_freezes_only_the_requested_complete_system(self):
         index = json.loads((HANDOFF / "index.json").read_text())
-        candidates = self.sweep.frozen_candidates(
+        encoders = self.sweep.frozen_encoders(
             HANDOFF, index, dataset="rayleigh_benard"
         )
-        groups = self.sweep.roster_groups(candidates)
-        self.assertEqual((len(candidates), len(groups)), (17, 4))
-        self.assertEqual({row["dataset"] for row in candidates}, {"rayleigh_benard"})
+        self.assertEqual(len(self.sweep.roster_groups(encoders)), 4)
+        self.assertEqual({row["dataset"] for row in encoders}, {"rayleigh_benard"})
+        self.assertEqual({row["objective"] for row in encoders}, set(OBJECTIVES))
         self.assertEqual(
-            {row["objective"] for row in candidates}, set(OBJECTIVES)
+            {row["objective"]: row["step"] for row in encoders},
+            RAYLEIGH_BENARD_STEPS,
         )
-        labels = {row["candidate"] for row in candidates}
-        labels.update(alias["candidate"] for row in candidates for alias in row["aliases"])
-        self.assertEqual(
-            labels, {"025pct", "050pct", "075pct", "100pct", "best_val"}
-        )
+        for row in encoders:
+            self.assertTrue(
+                row["checkpoint"].endswith(
+                    f"rayleigh_benard/{row['objective']}/encoder_best_val.pt"
+                )
+            )
 
     def test_dataset_scope_rejects_a_dataset_absent_from_the_handoff(self):
         with self.assertRaisesRegex(ValueError, "is absent from the handoff"):
-            self.sweep.frozen_candidates(
+            self.sweep.frozen_encoders(
                 "/handoff", synthetic_index(), dataset="rayleigh_benard"
             )
 
-    def test_best_val_enters_the_roster_and_may_alias_an_identical_milestone(self):
-        index = synthetic_index()
-        for row in index["checkpoints"]:
-            if row["objective"] == "jepa" and row["candidate"] == "best_val":
-                row["encoder_state_sha256"] = "jepa_1_100pct_state"
-        candidates = self.sweep.frozen_candidates("/handoff", index)
-        self.assertEqual(len(candidates), 19)
-        groups = self.sweep.roster_groups(candidates)
-        self.assertIs(groups[("shear_flow", "jepa", 1)]["best_val"],
-                      groups[("shear_flow", "jepa", 1)]["100pct"])
-
-    def test_missing_duplicate_and_unexpected_candidates_are_rejected(self):
-        index = synthetic_index()
-        missing = copy.deepcopy(index)
+    def test_a_run_must_declare_exactly_one_best_validation_encoder(self):
+        missing = synthetic_index()
         missing["checkpoints"] = [
-            r for r in missing["checkpoints"] if r["candidate"] != "075pct"
+            r
+            for r in missing["checkpoints"]
+            if not (r["objective"] == "mae" and r["candidate"] == "best_val")
         ]
-        with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
-            self.sweep.frozen_candidates("/handoff", missing)
+        with self.assertRaisesRegex(ValueError, "declares 0 best_val encoders"):
+            self.sweep.frozen_encoders("/handoff", missing)
 
-        duplicate = copy.deepcopy(index)
-        duplicate["checkpoints"].append(index_row("jepa", "050pct", 50))
-        with self.assertRaisesRegex(ValueError, "duplicate 050pct"):
-            self.sweep.frozen_candidates("/handoff", duplicate)
-
-        unexpected = copy.deepcopy(index)
-        unexpected["checkpoints"].append(index_row("jepa", "090pct", 90))
-        with self.assertRaisesRegex(ValueError, "unexpected candidate label"):
-            self.sweep.frozen_candidates("/handoff", unexpected)
+        duplicate = synthetic_index()
+        duplicate["checkpoints"].append(
+            index_row("mae", "best_val", 64000, sha256="second_best_val")
+        )
+        with self.assertRaisesRegex(ValueError, "declares 2 best_val encoders"):
+            self.sweep.frozen_encoders("/handoff", duplicate)
 
         with self.assertRaisesRegex(ValueError, "no checkpoints"):
-            self.sweep.frozen_candidates("/handoff", dict(checkpoints=[]))
-
-    def test_a_run_group_missing_milestones_is_rejected_even_with_best_val(self):
-        index = synthetic_index()
-        index["checkpoints"] = [
-            r
-            for r in index["checkpoints"]
-            if r["objective"] != "mae" or r["candidate"] == "best_val"
-        ]
-        with self.assertRaisesRegex(
-            ValueError, r"incomplete candidate roster for \('shear_flow', 'mae', 1\)"
-        ):
-            self.sweep.frozen_candidates("/handoff", index)
+            self.sweep.frozen_encoders("/handoff", dict(checkpoints=[]))
 
     def test_every_observed_dataset_and_seed_needs_all_four_objectives(self):
         index = synthetic_index()
@@ -164,12 +148,12 @@ class CandidatePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(
             ValueError, r"incomplete objective roster for \('shear_flow', 1\)"
         ):
-            self.sweep.frozen_candidates("/handoff", index)
+            self.sweep.frozen_encoders("/handoff", index)
 
         # A later seed is validated on its own; no seed is hard-coded.
-        two_seeds = synthetic_index(seeds=(1, 2))
         self.assertEqual(
-            len(self.sweep.frozen_candidates("/handoff", two_seeds)), 40
+            len(self.sweep.frozen_encoders("/handoff", synthetic_index(seeds=(1, 2)))),
+            8,
         )
         partial = synthetic_index(seeds=(1, 2))
         partial["checkpoints"] = [
@@ -180,64 +164,26 @@ class CandidatePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(
             ValueError, r"incomplete objective roster for \('shear_flow', 2\)"
         ):
-            self.sweep.frozen_candidates("/handoff", partial)
+            self.sweep.frozen_encoders("/handoff", partial)
 
-    def test_aliasing_cannot_hide_a_repeated_or_absent_milestone(self):
-        index = synthetic_index()
-        # Byte-identical duplicates would collapse into one job; the declared
-        # roster must still be rejected before deduplication.
-        index["checkpoints"].append(
-            index_row("jepa", "050pct", 50, state="jepa_1_050pct_state")
-        )
-        with self.assertRaisesRegex(ValueError, "duplicate 050pct"):
-            self.sweep.frozen_candidates("/handoff", index)
-
-        aliased = synthetic_index()
-        aliased["checkpoints"] = [
-            r
-            for r in aliased["checkpoints"]
-            if not (r["objective"] == "mae" and r["candidate"] == "100pct")
-        ]
-        for row in aliased["checkpoints"]:
-            if row["objective"] == "mae" and row["candidate"] == "best_val":
-                row["encoder_state_sha256"] = "mae_1_075pct_state"
-        with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
-            self.sweep.frozen_candidates("/handoff", aliased)
-
-    def test_candidate_step_must_equal_its_declared_training_fraction(self):
-        for label, step in (("050pct", 40000), ("100pct", 99000)):
-            index = synthetic_index()
-            for row in index["checkpoints"]:
-                if row["objective"] == "jepa" and row["candidate"] == label:
-                    row["step"] = step
-            with self.assertRaisesRegex(ValueError, f"{label} candidate .* is at step"):
-                self.sweep.frozen_candidates("/handoff", index)
-
-        rescaled = synthetic_index()
-        for row in rescaled["checkpoints"]:
-            if row["objective"] == "jepa":
-                row["training_protocol"]["total_steps"] = 200000
-        with self.assertRaisesRegex(ValueError, "is at step"):
-            self.sweep.frozen_candidates("/handoff", rescaled)
-
-        absent = synthetic_index()
-        for row in absent["checkpoints"]:
-            row["training_protocol"]["total_steps"] = None
-        with self.assertRaisesRegex(ValueError, "missing training budget"):
-            self.sweep.frozen_candidates("/handoff", absent)
-
-    def test_best_val_step_must_be_inside_the_training_budget(self):
+    def test_best_validation_step_must_be_inside_the_training_budget(self):
         for step in (0, 100001):
             index = synthetic_index()
             for row in index["checkpoints"]:
                 if row["objective"] == "jepa" and row["candidate"] == "best_val":
                     row["step"] = step
             with self.assertRaisesRegex(
-                ValueError, f"best_val candidate .* is at step {step}"
+                ValueError, f"best_val encoder .* is at step {step}"
             ):
-                self.sweep.frozen_candidates("/handoff", index)
+                self.sweep.frozen_encoders("/handoff", index)
 
-    def test_inconsistent_run_metadata_is_rejected(self):
+        absent = synthetic_index()
+        for row in absent["checkpoints"]:
+            row["training_protocol"]["total_steps"] = None
+        with self.assertRaisesRegex(ValueError, "missing training budget"):
+            self.sweep.frozen_encoders("/handoff", absent)
+
+    def test_inconsistent_run_metadata_in_the_handoff_is_rejected(self):
         for field, value in (
             ("config_sha256", "other_config"),
             ("training_identity", "other_identity"),
@@ -248,162 +194,242 @@ class CandidatePolicyTests(unittest.TestCase):
             for row in index["checkpoints"]:
                 if row["objective"] == "jepa" and row["candidate"] == "100pct":
                     row[field] = value
-            with self.assertRaisesRegex(ValueError, f"candidate {field} differs"):
-                self.sweep.frozen_candidates("/handoff", index)
+            with self.assertRaisesRegex(ValueError, f"handoff {field} differs"):
+                self.sweep.frozen_encoders("/handoff", index)
 
-
-MILESTONE_STEPS = (25000, 50000, 75000, 100000)
-
-
-def frozen_study(sweep_module, objectives=OBJECTIVES, steps=MILESTONE_STEPS):
-    candidates = [
-        dict(
-            dataset="shear_flow",
-            objective=objective,
-            seed=1,
-            candidate=f"{step // 1000:03d}pct",
-            step=step,
-            total_steps=100000,
-            checkpoint=f"/handoff/shear_flow/{objective}/encoder_{step}.pt",
-            checkpoint_sha256=f"{objective}_{step}",
-            config_sha256="config",
-            id=f"shear_flow_{objective}_seed1_{step}",
-            aliases=[],
+    def test_frozen_encoders_keep_size_exposure_and_run_identity(self):
+        index = json.loads((HANDOFF / "index.json").read_text())
+        row = next(
+            r
+            for r in self.sweep.frozen_encoders(HANDOFF, index, dataset="rayleigh_benard")
+            if r["objective"] == "jepa"
         )
-        for objective in objectives
-        for step in steps
-    ]
-    candidates.extend(
+        source = next(
+            r
+            for r in index["checkpoints"]
+            if r["dataset"] == "rayleigh_benard"
+            and r["objective"] == "jepa"
+            and r["candidate"] == "best_val"
+        )
+        for field in ("bytes", "spec", "training_identity", "data_exposure"):
+            self.assertEqual(row[field], source[field])
+        self.assertEqual(row["training_protocol"], source["training_protocol"])
+        self.assertEqual(row["total_steps"], source["training_protocol"]["total_steps"])
+
+    def test_frozen_protocol_comes_from_the_committed_evaluation_config(self):
+        protocol = self.sweep.frozen_protocol(REPO, "rayleigh_benard")
+        self.assertEqual(protocol.target_offsets, (0, 16, 24, 40))
+        self.assertEqual((protocol.n_frames, protocol.patch), (8, (2, 16, 16)))
+        self.assertIsNone(protocol.frame_limit)
+        self.assertEqual(protocol.token_samples, 64)
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            (repo / "configs").mkdir()
+            (repo / "configs/eval_shear_flow.yaml").write_text(
+                "dataset: shear_flow\nn_frames: 8\n"
+            )
+            with self.assertRaisesRegex(ValueError, "explicit frame_limit"):
+                self.sweep.frozen_protocol(repo, "shear_flow")
+            (repo / "configs/eval_active_matter.yaml").write_text(
+                "dataset: active_matter\nframe_limit: null\nbatch_size: 4\n"
+            )
+            with self.assertRaisesRegex(ValueError, "only supported protocol fields"):
+                self.sweep.frozen_protocol(repo, "active_matter")
+
+    def test_encoder_temporal_support_must_match_the_frozen_protocol(self):
+        protocol = self.sweep.frozen_protocol(REPO, "rayleigh_benard")
+        self.sweep.check_input_geometry(protocol, [dict(id="x", spec={"n_frames": 8})])
+        with self.assertRaisesRegex(ValueError, "takes 4-frame clips"):
+            self.sweep.check_input_geometry(
+                protocol, [dict(id="x", spec={"n_frames": 4})]
+            )
+
+    def test_payload_verification_rejects_missing_short_and_altered_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "encoder_best_val.pt"
+            row = dict(checkpoint=str(path), bytes=4, checkpoint_sha256="0" * 64)
+            with self.assertRaisesRegex(ValueError, "frozen encoder is missing"):
+                self.sweep.verify_payloads([row])
+            path.write_bytes(b"lfs")
+            with self.assertRaisesRegex(ValueError, "not the declared 4 bytes"):
+                self.sweep.verify_payloads([row])
+            path.unlink()
+            path.write_bytes(b"real")
+            with self.assertRaisesRegex(ValueError, "content differs"):
+                self.sweep.verify_payloads([row])
+            self.sweep.verify_payloads(
+                [dict(row, checkpoint_sha256=sha256_file(path))]
+            )
+
+
+def frozen_study(module, dataset="rayleigh_benard", objectives=OBJECTIVES, seeds=(1,)):
+    encoders = [
         dict(
-            dataset="shear_flow",
+            dataset=dataset,
             objective=objective,
-            seed=1,
+            seed=seed,
             candidate="best_val",
-            step=16000,
+            step=RAYLEIGH_BENARD_STEPS[objective],
             total_steps=100000,
-            checkpoint=f"/handoff/shear_flow/{objective}/encoder_best_val.pt",
-            checkpoint_sha256=f"{objective}_best_val",
-            config_sha256="config",
-            id=f"shear_flow_{objective}_seed1_best_val",
-            aliases=[],
+            checkpoint=f"/handoff/{dataset}/{objective}/encoder_best_val.pt",
+            checkpoint_sha256=f"{objective}_{seed}_best_val",
+            bytes=88377111,
+            encoder_state_sha256=f"{objective}_{seed}_state",
+            config_sha256=f"{objective}_config",
+            training_identity=f"{objective}_{seed}_identity",
+            training_protocol={"total_steps": 100000, "batch_size": 64},
+            spec={"n_channels": 4, "n_frames": 8, "height": 512, "width": 128},
+            data_exposure={"clips_processed": 6400000},
+            id=f"{dataset}_{objective}_seed{seed}_best_val",
         )
+        for seed in seeds
         for objective in objectives
-    )
+    ]
     return dict(
         provenance=provenance(),
-        script_sha256=sha256_file(sweep_module.__file__),
+        script_sha256=sha256_file(module.__file__),
         base="/data",
         handoff_sha256="handoff",
-        candidate_policy=copy.deepcopy(sweep_module.CANDIDATE_POLICY),
-        protocols={"shear_flow": Protocol("shear_flow").to_dict()},
-        candidates=candidates,
+        encoder_policy=copy.deepcopy(module.ENCODER_POLICY),
+        probe_settings=copy.deepcopy(module.PROBE_SETTINGS),
+        protocols={dataset: module.frozen_protocol(REPO, dataset).to_dict()},
+        encoders=encoders,
     )
 
 
-def write_fit(path, sha256, step, valid_vrmse, objective="jepa"):
-    protocol = Protocol("shear_flow")
-    path.mkdir(parents=True)
+def real_checkpoints(output, study):
+    """Stage verifiable checkpoint bytes so hash and size checks run for real."""
+    for row in study["encoders"]:
+        path = output / "handoff" / f"{row['objective']}.pt"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(row["objective"].encode())
+        row["checkpoint"] = str(path)
+        row["checkpoint_sha256"] = sha256_file(path)
+        row["bytes"] = path.stat().st_size
+    return study
+
+
+def seal_stub(path, kind):
+    """Stand in for a stage artifact the orchestration only has to recognize."""
+    write_json(Path(path) / "manifest_input.json", {})
+    seal(Path(path), kind)
+    return Path(path)
+
+
+def write_rows(path):
     write_json(
         path / "rows.json",
         [
             dict(
                 family="physics",
-                method="selected",
-                representation=rep,
-                target_offset=offset,
-                target=target,
-                valid_vrmse=valid_vrmse,
+                representation="pooled",
+                target_offset=0,
+                target="convective_flux",
+                method=method,
+                valid_vrmse=0.3,
             )
-            for rep in ("pooled", "token")
-            for offset in protocol.target_offsets
-            for target in SYSTEMS["shear_flow"].targets
+            for method in ("ridge", "attentive")
         ],
     )
+
+
+def checkpoint_block(row):
+    return dict(
+        dataset=row["dataset"],
+        objective=row["objective"],
+        seed=row["seed"],
+        step=row["step"],
+        sha256=row["checkpoint_sha256"],
+        config_sha256=row["config_sha256"],
+        spec={},
+        encoder={},
+        training_protocol={"total_steps": row["total_steps"]},
+    )
+
+
+def write_fit(output, study, row, sha256=None):
+    path = Path(output) / "fits" / row["id"]
+    write_rows(path)
     seal(
         path,
         "probe_fits",
-        protocol=protocol.to_dict(),
+        protocol=study["protocols"][row["dataset"]],
         caches={"train": "train", "valid": "valid"},
         probe_settings={},
-        checkpoint=dict(
-            dataset="shear_flow",
-            objective=objective,
-            seed=1,
-            step=step,
-            sha256=sha256,
-            config_sha256="config",
-            spec={},
-            encoder={},
-            training_protocol={"total_steps": 100000},
-        ),
+        checkpoint=checkpoint_block(row) | ({"sha256": sha256} if sha256 else {}),
     )
+    return path
 
 
-def write_frozen_fits(output, study, scores, skip=()):
-    for row in study["candidates"]:
-        if row["id"] in skip:
-            continue
-        write_fit(
-            output / "fits" / row["id"],
-            row["checkpoint_sha256"],
-            row["step"],
-            scores[row["step"]],
-            objective=row["objective"],
-        )
+def write_scores(output, study, row):
+    path = Path(output) / "test" / row["id"]
+    write_rows(path)
+    seal(
+        path,
+        "probes",
+        protocol=study["protocols"][row["dataset"]],
+        caches={"test": "test"},
+        probe_settings={},
+        checkpoint=checkpoint_block(row),
+    )
+    return path
 
 
 class FrozenStudyTests(unittest.TestCase):
     def setUp(self):
         self.sweep = sweep()
+        self.study = frozen_study(self.sweep)
 
-    def test_load_binds_every_command_to_the_frozen_candidate_policy(self):
+    def test_load_binds_every_command_to_the_best_validation_policy(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
-            study = frozen_study(self.sweep)
-            write_json(output / "study.json", study)
-            self.assertEqual(len(self.sweep.load(output)["candidates"]), 20)
+            write_json(output / "study.json", self.study)
+            self.assertEqual(len(self.sweep.load(output)["encoders"]), 4)
 
-            unexpected = dict(
-                study["candidates"][-1],
-                candidate="latest",
-                step=99000,
-                checkpoint_sha256="mae_future_latest",
-                id="shear_flow_mae_future_seed1_latest",
-            )
-            old = copy.deepcopy(study)
-            old["candidate_policy"]["version"] = 1
+            old = copy.deepcopy(self.study)
+            old["encoder_policy"]["version"] = 2
             self.rewrite(output, old)
-            with self.assertRaisesRegex(ValueError, "candidate policy"):
+            with self.assertRaisesRegex(ValueError, "encoder policy"):
                 self.sweep.load(output)
 
-            mutated = copy.deepcopy(study)
-            mutated["candidates"].append(unexpected)
-            self.rewrite(output, mutated)
-            with self.assertRaisesRegex(ValueError, "outside the policy roster"):
+            retuned = copy.deepcopy(self.study)
+            retuned["probe_settings"]["attentive_epochs"] = 5
+            self.rewrite(output, retuned)
+            with self.assertRaisesRegex(ValueError, "probe settings"):
                 self.sweep.load(output)
 
-            short = copy.deepcopy(study)
-            short["candidates"] = [
-                c
-                for c in short["candidates"]
-                if not (c["objective"] == "mae" and c["step"] == 75000)
+            milestone = copy.deepcopy(self.study)
+            milestone["encoders"][0]["candidate"] = "100pct"
+            self.rewrite(output, milestone)
+            with self.assertRaisesRegex(ValueError, "outside the frozen roster"):
+                self.sweep.load(output)
+
+            repeated = copy.deepcopy(self.study)
+            repeated["encoders"].append(copy.deepcopy(repeated["encoders"][0]))
+            self.rewrite(output, repeated)
+            with self.assertRaisesRegex(ValueError, "duplicate best_val encoder"):
+                self.sweep.load(output)
+
+            shared = copy.deepcopy(self.study)
+            shared["encoders"][1]["checkpoint_sha256"] = shared["encoders"][0][
+                "checkpoint_sha256"
             ]
-            self.rewrite(output, short)
-            with self.assertRaisesRegex(ValueError, "incomplete candidate roster"):
+            self.rewrite(output, shared)
+            with self.assertRaisesRegex(ValueError, "duplicate encoder checkpoint"):
                 self.sweep.load(output)
 
-            dropped = copy.deepcopy(study)
-            dropped["candidates"] = [
-                c for c in dropped["candidates"] if c["objective"] != "jepa_future"
+            dropped = copy.deepcopy(self.study)
+            dropped["encoders"] = [
+                r for r in dropped["encoders"] if r["objective"] != "jepa_future"
             ]
             self.rewrite(output, dropped)
             with self.assertRaisesRegex(ValueError, "incomplete objective roster"):
                 self.sweep.load(output)
 
-            slipped = copy.deepcopy(study)
-            slipped["candidates"][1]["step"] = 60000
+            slipped = copy.deepcopy(self.study)
+            slipped["encoders"][0]["step"] = 100001
             self.rewrite(output, slipped)
-            with self.assertRaisesRegex(ValueError, "is at step 60000"):
+            with self.assertRaisesRegex(ValueError, "outside the training budget"):
                 self.sweep.load(output)
 
     def rewrite(self, output, study):
@@ -411,87 +437,175 @@ class FrozenStudyTests(unittest.TestCase):
         write_json(output / "study.json", study)
 
     def test_task_indices_outside_the_frozen_roster_fail(self):
-        study = frozen_study(self.sweep)
-        with self.assertRaisesRegex(ValueError, "outside the frozen roster of 20"):
-            self.sweep.candidate(study, 55)
-        self.assertEqual(self.sweep.candidate(study, 3)["step"], 100000)
+        with self.assertRaisesRegex(ValueError, "outside the frozen roster of 4"):
+            self.sweep.encoder(self.study, 4)
+        self.assertEqual(self.sweep.encoder(self.study, 0)["objective"], "jepa")
 
-    def test_collect_scores_only_frozen_fits_and_picks_one_winner_per_group(self):
+    def test_test_scoring_and_test_caching_need_every_validation_fit(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
-            study = frozen_study(self.sweep)
-            scores = {
-                16000: 0.01,
-                25000: 0.5,
-                50000: 0.2,
-                75000: 0.4,
-                100000: 0.9,
-            }
-            write_frozen_fits(output, study, scores)
-            # An unfrozen fit on disk would score even lower but is not a candidate.
-            write_fit(
-                output / "fits/shear_flow_jepa_seed1_latest",
-                "jepa_latest",
-                99000,
-                0.001,
-            )
-            with contextlib.redirect_stdout(io.StringIO()):
-                self.sweep.collect(output, study)
-            selection = Artifact(output / "selection", "checkpoint_selection")
-            winners = selection.json("selections.json")
-            rows = selection.json("rows.json")
-            self.assertEqual(len(winners), 4)
-            self.assertEqual({w["objective"] for w in winners}, set(OBJECTIVES))
-            self.assertEqual({w["step"] for w in winners}, {16000})
-            self.assertEqual(len(rows), 20)
-            self.assertEqual(len(selection.manifest["candidates"]), 20)
-            for row in rows:
-                self.assertNotIn("test_vrmse", row)
-
-    def test_collect_requires_a_fit_for_every_frozen_candidate(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            output = Path(tmp)
-            study = frozen_study(self.sweep)
-            write_frozen_fits(
-                output,
-                study,
-                {**dict.fromkeys(MILESTONE_STEPS, 0.3), 16000: 0.3},
-                skip={study["candidates"][-1]["id"]},
-            )
+            calls = []
+            self.sweep.prepare_cache = lambda *a, **k: calls.append(a)
+            self.sweep.extract_features = lambda *a, **k: calls.append(a)
+            self.sweep.score_probes = lambda *a, **k: calls.append(a)
+            for row in self.study["encoders"][:3]:
+                write_fit(output, self.study, row)
             with self.assertRaisesRegex(ValueError, "no probe fit"):
-                self.sweep.collect(output, study)
+                self.sweep.test(output, self.study, 3)
+            with self.assertRaisesRegex(ValueError, "no probe fit"):
+                self.sweep.cache(output, self.study, "rayleigh_benard", "test")
+            self.assertEqual(calls, [])
+            # Train and validation data stay available before any fit exists.
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.sweep.cache(output, self.study, "rayleigh_benard", "valid")
+            self.assertEqual(len(calls), 1)
 
-    def test_collect_rejects_a_fit_from_another_checkpoint(self):
+    def test_a_fit_from_another_checkpoint_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
-            study = frozen_study(self.sweep)
-            for row in study["candidates"]:
-                write_fit(
-                    output / "fits" / row["id"],
-                    "jepa_best_val"
-                    if row["id"] == study["candidates"][0]["id"]
-                    else row["checkpoint_sha256"],
-                    row["step"],
-                    0.3,
-                    objective=row["objective"],
-                )
-            with self.assertRaisesRegex(ValueError, "does not match prepared"):
-                self.sweep.collect(output, study)
+            for row in self.study["encoders"]:
+                write_fit(output, self.study, row, sha256="some_other_encoder")
+            with self.assertRaisesRegex(ValueError, "does not match the frozen"):
+                self.sweep.completed_fits(output, self.study)
 
-    def test_selected_row_must_come_from_the_frozen_roster(self):
-        study = frozen_study(self.sweep)
-        self.assertEqual(
-            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_50000"})["step"],
-            50000,
-        )
-        self.assertEqual(
-            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_best_val"})[
-                "step"
-            ],
-            16000,
-        )
-        with self.assertRaisesRegex(ValueError, "outside the frozen candidate roster"):
-            self.sweep.selected_row(study, {"checkpoint_sha256": "jepa_latest"})
+    def test_test_scoring_follows_the_fits_without_a_selection_artifact(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            study = real_checkpoints(output, self.study)
+            fits = [write_fit(output, study, row) for row in study["encoders"]]
+            row = study["encoders"][2]
+            cache_root, _, feature, fit = self.sweep.encoder_paths(output, row)
+            extracted, scored = [], []
+
+            def fake_extract(checkpoint, cache, feature_root, split):
+                extracted.append((checkpoint, cache, feature_root, split))
+                seal_stub(feature / split, "features")
+
+            def fake_score(features, cache, probes, destination):
+                scored.append((features, cache, probes, destination))
+                seal_stub(destination, "probes")
+
+            self.sweep.extract_features = fake_extract
+            self.sweep.score_probes = fake_score
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.sweep.test(output, study, 2)
+            self.assertEqual(fit, fits[2])
+            self.assertEqual(
+                extracted,
+                [
+                    (row["checkpoint"], cache_root, feature.parent, split)
+                    for split in ("train", "valid", "test")
+                ],
+            )
+            self.assertEqual(
+                scored, [(feature, cache_root, fit, output / "test" / row["id"])]
+            )
+            self.assertFalse((output / "selection").exists())
+
+    def test_fitting_uses_the_probe_settings_frozen_in_the_study(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            study = real_checkpoints(output, self.study)
+            row = study["encoders"][0]
+            _, _, feature, _ = self.sweep.encoder_paths(output, row)
+            calls = []
+
+            def fake_extract(checkpoint, cache, feature_root, split):
+                calls.append(split)
+                seal_stub(feature / split, "features")
+
+            def fake_fit(features, cache, destination, **settings):
+                calls.append(settings)
+                write_fit(output, study, row)
+
+            self.sweep.extract_features = fake_extract
+            self.sweep.fit_probes = fake_fit
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.sweep.run(output, study, 0)
+            self.assertEqual(
+                calls,
+                [
+                    "train",
+                    "valid",
+                    dict(
+                        mlp_max_steps=2000,
+                        mlp_min_steps=150,
+                        attentive_epochs=100,
+                        attentive_batch_size=32,
+                    ),
+                ],
+            )
+
+    def test_a_stage_that_seals_nothing_is_a_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            study = real_checkpoints(output, self.study)
+            self.sweep.extract_features = lambda *a: None
+            self.sweep.fit_probes = lambda *a, **k: None
+            with self.assertRaisesRegex(ValueError, "sealed no train features"):
+                self.sweep.run(output, study, 0)
+
+    def test_a_sealed_fit_is_never_recomputed_on_resume(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            write_fit(output, self.study, self.study["encoders"][0])
+            calls = []
+            self.sweep.extract_features = lambda *a: calls.append(a)
+            self.sweep.fit_probes = lambda *a, **k: calls.append(a)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.sweep.run(output, self.study, 0)
+            self.assertEqual(calls, [])
+
+    def test_report_aggregates_the_four_objective_results(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            aggregated, plotted = [], []
+            self.sweep.aggregate = lambda *a, **k: aggregated.append((a, k))
+            self.sweep.plot = lambda *a: plotted.append(a)
+            scores = [write_scores(output, self.study, r) for r in self.study["encoders"][:3]]
+            with self.assertRaisesRegex(ValueError, "without test scores"):
+                self.sweep.report(output, self.study)
+            scores.append(write_scores(output, self.study, self.study["encoders"][3]))
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.sweep.report(output, self.study)
+            folder = output / "reports/rayleigh_benard"
+            self.assertEqual(
+                aggregated,
+                [((scores, folder / "aggregate"), dict(objectives=OBJECTIVES, seeds=[1]))],
+            )
+            self.assertEqual(plotted, [(folder / "aggregate", folder / "plots")])
+
+    def test_status_reports_pending_work_for_a_resumable_study(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            stream = io.StringIO()
+            with contextlib.redirect_stdout(stream):
+                self.sweep.status(output, self.study)
+            state = json.loads(stream.getvalue())
+            self.assertEqual(state["pending_fits"], [0, 1, 2, 3])
+            self.assertEqual(state["pending_tests"], [0, 1, 2, 3])
+            self.assertEqual(
+                state["caches"]["rayleigh_benard"],
+                {"train": False, "valid": False, "test": False},
+            )
+            self.assertEqual(state["reports"], {"rayleigh_benard": False})
+
+            for row in self.study["encoders"][:2]:
+                write_fit(output, self.study, row)
+            write_scores(output, self.study, self.study["encoders"][0])
+            stream = io.StringIO()
+            with contextlib.redirect_stdout(stream):
+                self.sweep.status(output, self.study)
+            state = json.loads(stream.getvalue())
+            self.assertEqual(state["pending_fits"], [2, 3])
+            self.assertEqual(state["pending_tests"], [1, 2, 3])
+            self.assertEqual(
+                [r["feature_dir"] for r in state["encoders"]],
+                [
+                    str(self.sweep.encoder_paths(output, row)[2])
+                    for row in self.study["encoders"]
+                ],
+            )
 
 
 if __name__ == "__main__":

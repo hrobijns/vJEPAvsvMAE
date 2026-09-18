@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy retained encoders byte-for-byte and index their training provenance."""
+"""Copy each run's best-validation encoder and index its training provenance."""
 
 import argparse
 import hashlib
@@ -22,73 +22,73 @@ from src.models.checkpoints import load_encoder
 
 def prepare(training_manifest, output):
     manifest = json.loads(Path(training_manifest).read_text())
-    rows = []
+    rows, seen = [], set()
     with staged_directory(output) as stage:
         for run in manifest["runs"]:
-            source = Path(run["run_dir"])
             if run["seed"] != 1:
                 continue
-            candidates = [
-                source / f"encoder_{p:03d}pct.pt" for p in (25, 50, 75, 100)
-            ] + [source / "encoder_best_val.pt"]
-            for path in candidates:
-                encoder, config, meta = load_encoder(path)
-                if (meta["dataset"], meta["objective"], meta["seed"]) != (
-                    run["dataset"],
-                    run["objective"],
-                    run["seed"],
-                ):
-                    raise ValueError(f"checkpoint/run identity differs: {path}")
-                if not 0 < meta["step"] <= meta["training_protocol"]["total_steps"]:
-                    raise ValueError(f"invalid checkpoint step: {path}")
-                tensors = {}
-                for name, value in encoder.state_dict().items():
-                    if not torch.isfinite(value).all():
-                        raise ValueError(f"nonfinite encoder tensor: {path} {name}")
-                    tensors[name] = dict(
-                        shape=list(value.shape),
-                        dtype=str(value.dtype),
-                        sha256=hashlib.sha256(
-                            value.cpu().numpy().tobytes()
-                        ).hexdigest(),
-                    )
-                relative = Path(run["dataset"]) / run["objective"] / path.name
-                destination = stage / relative
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(path, destination)
-                if sha256_file(destination) != meta["sha256"]:
-                    raise ValueError(f"copied checkpoint differs: {path}")
-                rows.append(
-                    dict(
-                        path=str(relative),
-                        dataset=meta["dataset"],
-                        objective=meta["objective"],
-                        seed=meta["seed"],
-                        step=meta["step"],
-                        candidate=path.stem.removeprefix("encoder_"),
-                        bytes=destination.stat().st_size,
-                        sha256=meta["sha256"],
-                        encoder_state_sha256=canonical_hash(tensors),
-                        config_sha256=meta["config_sha256"],
-                        spec=meta["spec"],
-                        training_protocol=meta["training_protocol"],
-                        training_identity=meta["training_identity"],
-                        data_exposure=meta["data_exposure"],
-                    )
+            identity = (run["dataset"], run["objective"], run["seed"])
+            if identity in seen:
+                raise ValueError(f"training manifest declares {identity} twice")
+            seen.add(identity)
+            # The analysis probes one encoder per run: the state at minimum
+            # internal pretraining-validation loss.
+            path = Path(run["run_dir"]) / "encoder_best_val.pt"
+            encoder, config, meta = load_encoder(path)
+            if (meta["dataset"], meta["objective"], meta["seed"]) != (
+                run["dataset"],
+                run["objective"],
+                run["seed"],
+            ):
+                raise ValueError(f"checkpoint/run identity differs: {path}")
+            if not 0 < meta["step"] <= meta["training_protocol"]["total_steps"]:
+                raise ValueError(f"invalid checkpoint step: {path}")
+            tensors = {}
+            for name, value in encoder.state_dict().items():
+                if not torch.isfinite(value).all():
+                    raise ValueError(f"nonfinite encoder tensor: {path} {name}")
+                tensors[name] = dict(
+                    shape=list(value.shape),
+                    dtype=str(value.dtype),
+                    sha256=hashlib.sha256(value.cpu().numpy().tobytes()).hexdigest(),
                 )
-                print(f"verified {relative}: step {meta['step']}", flush=True)
+            relative = Path(run["dataset"]) / run["objective"] / path.name
+            destination = stage / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, destination)
+            if sha256_file(destination) != meta["sha256"]:
+                raise ValueError(f"copied checkpoint differs: {path}")
+            rows.append(
+                dict(
+                    path=str(relative),
+                    dataset=meta["dataset"],
+                    objective=meta["objective"],
+                    seed=meta["seed"],
+                    step=meta["step"],
+                    candidate=path.stem.removeprefix("encoder_"),
+                    bytes=destination.stat().st_size,
+                    sha256=meta["sha256"],
+                    encoder_state_sha256=canonical_hash(tensors),
+                    config_sha256=meta["config_sha256"],
+                    spec=meta["spec"],
+                    training_protocol=meta["training_protocol"],
+                    training_identity=meta["training_identity"],
+                    data_exposure=meta["data_exposure"],
+                )
+            )
+            print(f"verified {relative}: step {meta['step']}", flush=True)
         write_json(
             stage / "index.json",
             dict(training_provenance=manifest["provenance"], checkpoints=rows),
         )
-        (stage / "README.md").write_text("""# ICLR study: seed-1 encoder candidates
+        (stage / "README.md").write_text("""# ICLR study: seed-1 best-validation encoders
 
-All retained encoders from the twelve 100,000-step training runs: three
-systems and four objectives. Each run supplies the 25%, 50%, 75%, and 100%
-milestones plus its minimum-pretraining-validation-loss encoder. These are
-candidates, not downstream-selected final models. `index.json` records actual
-steps, checksums, input geometry, exposure, and training provenance. Identical
-encoder-state and configuration hashes identify equivalent candidates.
+One encoder per training run from the twelve 100,000-step runs: three systems
+and four objectives. Each file is that run's state at minimum internal
+pretraining-validation loss, which is the encoder the downstream analysis
+probes. There is no downstream checkpoint comparison and no training-fraction
+milestone in this handoff. `index.json` records actual steps, checksums, input
+geometry, exposure, and training provenance.
 
 Files preserve the original float32 checkpoint payloads byte-for-byte and are
 tracked by the repository's existing `checkpoints/**/*.pt` Git LFS rule.
@@ -106,7 +106,7 @@ Load an encoder through the repository's normal loader:
 ```python
 from src.models.checkpoints import load_encoder
 encoder, config, metadata = load_encoder(
-    "checkpoints/iclr2027/seed1/shear_flow/jepa/encoder_100pct.pt"
+    "checkpoints/iclr2027/seed1/shear_flow/jepa/encoder_best_val.pt"
 )
 ```
 
@@ -115,10 +115,10 @@ normalization and channel ordering from `WellSource` and `normalize` in
 `src.data.source`; use the matching dataset and native resolution. Global
 features average tokens; local features retain the sampled token positions.
 The evaluation commands and exact target definitions are in the main README
-and methods documentation. All checkpoint and probe choices use validation
-data before test scoring.
+and methods documentation. Probe hyperparameters, stopping state, and encoder
+output are chosen on validation data before test scoring.
 
-The payloads total approximately 5 GiB. Lossless compression saved only 7–8%
+The payloads total approximately 1 GiB. Lossless compression saved only 7–8%
 in representative checks and is not used. Confirm the repository owner's
 remaining LFS storage and download allowance before uploading. Nothing in
 this preparation script pushes files or changes GitHub billing settings.

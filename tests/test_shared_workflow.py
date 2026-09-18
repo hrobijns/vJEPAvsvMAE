@@ -20,27 +20,8 @@ from src.data.preprocess import preprocess
 from src.evaluation.artifacts import Artifact, seal, write_json
 from src.evaluation.cache import prepare_cache
 from src.evaluation.features import extract_features, paired_noise_batch
-from src.evaluation.pipeline import (
-    PROBE_LAYERS,
-    fit_probes,
-    score_probes,
-    evaluate_noise,
-    _score_fit,
-)
-from src.evaluation.selection import select_checkpoints
-from src.evaluation.probes import (
-    MLP_SEEDS,
-    fit_ridge_many,
-    fit_mlp,
-    predict,
-    metrics,
-    selected_family,
-)
-from src.evaluation.protocol import (
-    Protocol,
-    token_indices,
-    position_basis,
-)
+from src.evaluation.pipeline import fit_probes, score_probes, evaluate_noise
+from src.evaluation.protocol import Protocol, token_indices, token_coordinates
 from src.evaluation.reporting import aggregate, plot
 from src.models.vit import build_encoder
 from src.objectives import OBJECTIVES
@@ -171,228 +152,14 @@ class ProtocolTests(unittest.TestCase):
         )
         torch.testing.assert_close(full, batches, atol=0, rtol=0)
         np.testing.assert_array_equal(
-            position_basis(np.array([0, 1023]), (4, 32, 8))[:, 1:4],
-            [[-1, -1, -1], [1, 1, 1]],
+            token_coordinates(np.array([0, 1023]), (4, 32, 8)),
+            [[0, 0, 0], [1, 1, 1]],
         )
 
 
-class ProbeTests(unittest.TestCase):
-    def setUp(self):
-        self.rng = np.random.default_rng(71)
-        self.x = self.rng.normal(size=(25, 2, 6)).astype("float32")
-        self.xt = self.rng.normal(size=(25, 2, 6)).astype("float32")
-        self.y = 2 * self.x[:, 1, 0].astype("float64") + 1
-
-    def test_ridge_heldout_predictions_and_selection(self):
-        fits = fit_ridge_many(
-            self.x, {"y": self.y}, self.xt, {"y": 2 * self.xt[:, 1, 0] + 1}
-        )["y"]
-        self.assertEqual(fits["selected_layer"], 1)
-        entry = fits["layers"][1]
-        predicted = predict(entry["fit"], self.xt[:, 1])
-        self.assertGreater(
-            metrics(predicted, 2 * self.xt[:, 1, 0] + 1)["test_r2"], 0.999
-        )
-        # Test labels enter scoring only; selection APIs do not accept them.
-        selected = selected_family(
-            {"valid_vrmse": 0.2, "method": "ridge", "test_r2": -10},
-            {"valid_vrmse": 0.3, "method": "mlp", "test_r2": 1},
-        )
-        self.assertEqual(selected["method"], "ridge")
-        self.assertEqual(
-            selected_family(
-                {"valid_vrmse": 0.2, "method": "ridge"},
-                {"valid_vrmse": 0.2, "method": "mlp"},
-            )["method"],
-            "ridge",
-        )
-
-    def test_saved_mlp_replay_for_low_variance_targets(self):
-        for scale in (1.0, 1e-7, 1e-10):
-            y = 1 + scale * self.y
-            fitted = fit_mlp(
-                self.x,
-                y,
-                self.xt,
-                1 + scale * (2 * self.xt[:, 1, 0].astype("float64") + 1),
-                max_steps=4,
-                min_steps=2,
-            )
-            self.assertEqual(MLP_SEEDS, (0,))
-            self.assertTrue(
-                all(
-                    len(layer["fit"]["states"]) == 1
-                    and len(layer["selected_steps"]) == 1
-                    for layer in fitted["layers"]
-                )
-            )
-            entry = next(
-                r for r in fitted["layers"] if r["layer"] == fitted["selected_layer"]
-            )
-            expected = predict(entry["fit"], self.xt[:, entry["layer"]])
-            with tempfile.TemporaryDirectory() as tmp:
-                path = Path(tmp) / "probe.pt"
-                torch.save(entry["fit"], path)
-                loaded = torch.load(path, weights_only=False)
-                np.testing.assert_array_equal(
-                    predict(loaded, self.xt[:, entry["layer"]]), expected
-                )
-            self.assertTrue(
-                np.isfinite(
-                    metrics(
-                        expected,
-                        1 + scale * (2 * self.xt[:, 1, 0].astype("float64") + 1),
-                    )["test_r2"]
-                )
-            )
-
-    def test_full_probe_grid_uses_workshop_horizons_and_all_outputs(self):
-        protocol = Protocol("rayleigh_benard")
-        self.assertEqual(protocol.target_offsets, (0, 16, 40))
-        self.assertIsNone(PROBE_LAYERS)
-        encoder_outputs = 13
-        self.assertEqual(
-            len(SYSTEMS["rayleigh_benard"].targets)
-            * len(protocol.target_offsets)
-            * 2
-            * encoder_outputs
-            * len(MLP_SEEDS)
-            * 16,
-            6240,
-        )
-        ridge = fit_ridge_many(
-            self.x,
-            {"y": self.y},
-            self.xt,
-            {"y": 2 * self.xt[:, 1, 0] + 1},
-            candidate_layers=(1,),
-        )["y"]
-        self.assertEqual([row["layer"] for row in ridge["layers"]], [1])
-
-
-    def test_constant_targets_are_explicitly_undefined(self):
-        fit = fit_ridge_many(
-            self.x, {"constant": np.ones(25)}, self.xt, {"constant": np.ones(25)}
-        )["constant"]
-        self.assertEqual(fit["status"], "undefined_validation_vrmse")
-        self.assertEqual(
-            metrics(np.zeros(3), np.ones(3))["metric_status"], "constant_target"
-        )
-
-    def test_selected_only_mlp_does_not_claim_a_depth_curve(self):
-        fitted = fit_mlp(
-            self.x,
-            self.y,
-            self.xt,
-            2 * self.xt[:, 1, 0] + 1,
-            max_steps=2,
-            min_steps=2,
-            include_depth=False,
-            candidate_layers=(1,),
-        )
-        row, state = _score_fit(fitted, self.xt, self.y, {}, "mlp")
-        self.assertEqual(row["selected_layer"], 1)
-        self.assertEqual(row["depth_curve"], [])
-        self.assertIsNotNone(state)
 
 
 class ArtifactTests(unittest.TestCase):
-    def test_aggregation_requires_matching_checkpoint_steps(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            paths = []
-            for name, seed, step in (
-                ("a", 1, 25000),
-                ("b", 2, 25000),
-                ("c", 2, 100000),
-            ):
-                path = root / name
-                path.mkdir()
-                write_json(
-                    path / "rows.json",
-                    [dict(cell_id="x", family="regime", target="x", test_r2=0.5)],
-                )
-                seal(
-                    path,
-                    "probes",
-                    checkpoint=dict(
-                        objective="jepa",
-                        seed=seed,
-                        step=step,
-                        training_protocol={"total_steps": 100000},
-                    ),
-                    protocol={},
-                    caches={},
-                    probe_settings={},
-                )
-                paths.append(path)
-            # Matching intermediate checkpoints are valid despite a longer plan.
-            aggregate(paths[:2], root / "matched", objectives=("jepa",), seeds=(1, 2))
-            with self.assertRaisesRegex(ValueError, "incompatible checkpoint step"):
-                aggregate(
-                    [paths[0], paths[2]],
-                    root / "mixed",
-                    objectives=("jepa",),
-                    seeds=(1, 2),
-                )
-
-    def test_seed_summaries_preserve_selection_and_scientific_units(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            paths = []
-            for seed, scores in ((1, (0.1, 0.3)), (2, (0.5, 0.7))):
-                path = root / f"run{seed}"
-                path.mkdir()
-                rows = [
-                    dict(
-                        cell_id=target,
-                        family="physics",
-                        representation="token",
-                        method="mlp",
-                        target_offset=0,
-                        target=target,
-                        test_r2=score,
-                        selected_layer=seed,
-                        depth_curve=[],
-                        valid_r2=score + 0.1,
-                    )
-                    for target, score in zip(("a", "b"), scores)
-                ]
-                rows.append(
-                    dict(
-                        cell_id="control",
-                        family="physics",
-                        representation="token",
-                        method="position",
-                        target_offset=0,
-                        target="a",
-                        test_r2=0.05,
-                        shared=True,
-                    )
-                )
-                write_json(path / "rows.json", rows)
-                seal(
-                    path,
-                    "probes",
-                    checkpoint={"objective": "jepa", "seed": seed},
-                    protocol={},
-                    caches={},
-                    probe_settings={},
-                )
-                paths.append(path)
-            out = root / "out"
-            aggregate(paths, out, objectives=("jepa",), seeds=(1, 2))
-            result = Artifact(out, "aggregate")
-            summaries = {r["cell_id"]: r for r in result.json("summary.json")}
-            self.assertNotIn("selected_layer", summaries["a"])
-            self.assertEqual(
-                [v["selected_layer"] for v in summaries["a"]["selections"]], [1, 2]
-            )
-            self.assertEqual(summaries["control"]["metrics"]["test_r2"]["n"], 1)
-            avg = result.json("target_means.json")[0]["metrics"]["test_r2"]
-            self.assertAlmostEqual(avg["mean"], 0.4)
-            self.assertAlmostEqual(avg["std"], np.std([0.2, 0.6], ddof=1))
-            self.assertEqual(avg["n"], 2)
 
     def test_array_and_manifest_integrity(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -622,9 +389,10 @@ class WorkflowTests(unittest.TestCase):
                     root / "fits",
                     mlp_max_steps=2,
                     mlp_min_steps=2,
+                    attentive_epochs=1,
+                    attentive_batch_size=5,
                 )
                 self.assertFalse((root / "cache/test").exists())
-                select_checkpoints([root / "fits"], root / "selection")
                 write_well(root, dataset, "test")
                 prepare_cache(root, "test", root / "cache", protocol)
                 extract_features(
@@ -639,7 +407,6 @@ class WorkflowTests(unittest.TestCase):
                     features,
                     root / "cache",
                     root / "fits",
-                    root / "selection",
                     root / "probes",
                 )
                 evaluate_noise(
@@ -671,11 +438,9 @@ class WorkflowTests(unittest.TestCase):
                 ]["probe_layers"]
                 rows = Artifact(root / "probes", "probes").json("rows.json")
                 for row in rows:
-                    if row["method"] == "selected":
-                        self.assertNotIn("depth_curve", row)
-                    elif row["family"] == "physics" and row["method"] in (
+                    if row["family"] == "physics" and row["method"] in (
                         "ridge",
-                        "mlp",
+                        "attentive",
                     ):
                         self.assertEqual(
                             [p["layer"] for p in row["depth_curve"]],

@@ -1,5 +1,6 @@
-"""Explicit sampling offsets and physical controls."""
+"""Explicit sampling offsets, metadata-only inputs, and governing labels."""
 
+import math
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 
@@ -13,7 +14,7 @@ class Protocol:
     dataset: str
     frame_limit: int | None = None
     n_frames: int = 8
-    target_offsets: tuple[int, ...] = (0, 16, 40)
+    target_offsets: tuple[int, ...] = (0, 16, 24, 40)
     patch: tuple[int, int, int] = (2, 16, 16)
     token_samples: int = 64
     noise_sigmas: tuple[float, ...] = (0.0, 0.05, 0.1, 0.2, 0.5, 1.0)
@@ -56,6 +57,7 @@ class Protocol:
         return {
             **asdict(self),
             "targets": list(SYSTEMS[self.dataset].targets),
+            "governing_targets": list(governing_names(self.dataset)),
             "target_version": 2,
             "offset_definition": "target_start_minus_context_start",
             "probe_splits": {"fit": "train", "select": "valid", "score": "test"},
@@ -77,6 +79,10 @@ class Protocol:
     def target_start(self, start, offset):
         return start + offset
 
+    def horizon(self, offset):
+        """Displayed forecast horizon: a target clip starts after the context."""
+        return 0 if offset == 0 else offset - self.n_frames
+
     def offsets(self, frames, trajectory):
         stop = frames if self.frame_limit is None else min(frames, self.frame_limit)
         extent = self.n_frames + max(self.target_offsets)
@@ -96,43 +102,76 @@ def token_indices(trajectory, n_tokens, n_select=64):
     return np.sort(rng.choice(n_tokens, size=n_select, replace=False))
 
 
-def polynomial_basis(values):
-    values = np.asarray(values, dtype=np.float64)
-    columns = [np.ones(len(values)), *values.T, *(values**2).T]
-    columns.extend(
-        values[:, i] * values[:, j]
-        for i in range(values.shape[1])
-        for j in range(i + 1, values.shape[1])
-    )
-    return np.column_stack(columns)
+def regime_metadata(samples, dataset):
+    """The three encoder-independent pooled inputs: both regime values and age.
 
-
-def nuisance_basis(samples, dataset):
+    These are the only inputs of the pooled metadata baseline. No encoder
+    feature, target value, or horizon enters the array; a separate fit per
+    target and horizon holds the horizon fixed.
+    """
     system = SYSTEMS[dataset]
-    return polynomial_basis(
-        [[*system.regime_values(row["parameters"]), row["age"]] for row in samples]
+    return np.array(
+        [[*system.regime_values(row["parameters"]), row["age"]] for row in samples],
+        dtype=np.float64,
     )
 
 
-def position_basis(positions, grid):
+def token_coordinates(positions, grid):
+    """Normalized token time, y and x of every requested output location."""
     flat = np.asarray(positions).reshape(-1)
+    if flat.size and (flat.min() < 0 or flat.max() >= int(np.prod(grid))):
+        raise ValueError("token position falls outside the encoder grid")
     axes = np.unravel_index(flat, grid)
-    scaled = np.column_stack(
-        [2 * axis / max(n - 1, 1) - 1 for axis, n in zip(axes, grid)]
+    return np.column_stack(
+        [axis / max(n - 1, 1) for axis, n in zip(axes, grid)]
+    ).astype(np.float64)
+
+
+def position_metadata(samples, positions, grid, dataset):
+    """The pooled metadata repeated per token plus its normalized coordinate."""
+    positions = np.asarray(positions)
+    if positions.ndim != 2 or len(positions) != len(samples):
+        raise ValueError("token positions must be one row per local sample")
+    pooled = np.repeat(regime_metadata(samples, dataset), positions.shape[1], axis=0)
+    return np.column_stack([pooled, token_coordinates(positions, grid)])
+
+
+def governing_names(dataset):
+    """Paper-matched governing labels: log the forcing parameter, keep the ratio."""
+    system = SYSTEMS[dataset]
+    return tuple(
+        f"log10_{name}" if index == 0 and system.log_parameters else name
+        for index, name in enumerate(system.parameters)
     )
-    return polynomial_basis(scaled)
 
 
-def trajectory_average(features, samples):
+def governing_values(dataset, parameters):
+    system = SYSTEMS[dataset]
+    system.regime_values(parameters)  # shared finiteness and positivity checks
+    values = [
+        math.log10(float(parameters[name]))
+        if index == 0 and system.log_parameters
+        else float(parameters[name])
+        for index, name in enumerate(system.parameters)
+    ]
+    return dict(zip(governing_names(dataset), values))
+
+
+def trajectory_groups(samples):
+    """Sample indices of each trajectory, ordered by trajectory identity."""
     grouped = defaultdict(list)
     for i, row in enumerate(samples):
         grouped[row["trajectory"]].append(i)
+    order = sorted(grouped)
     return (
-        np.stack(
-            [
-                np.asarray(features[ids]).mean(axis=0)
-                for _, ids in sorted(grouped.items())
-            ]
-        ),
-        [samples[ids[0]] for _, ids in sorted(grouped.items())],
+        [np.asarray(grouped[key], dtype=np.int64) for key in order],
+        [samples[grouped[key][0]] for key in order],
+    )
+
+
+def trajectory_average(features, samples):
+    groups, rows = trajectory_groups(samples)
+    return (
+        np.stack([np.asarray(features[ids]).mean(axis=0) for ids in groups]),
+        rows,
     )

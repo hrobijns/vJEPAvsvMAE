@@ -1,30 +1,64 @@
-"""Fit on training data, freeze validation choices, then score held-out data."""
+"""Fit on training data, freeze validation choices, then score held-out data.
 
+Both stages iterate encoder outputs in the outer loop so that exactly one
+float16 token shard per representation is staged on the compute device at a
+time. Probe inputs are built only from cached eight-frame input contexts and
+their metadata; target arrays are read as labels and never as features.
+"""
+
+import json
+import os
+import shutil
+from collections import defaultdict
 from pathlib import Path
+
 import numpy as np
 import torch
 
-from src.evaluation.artifacts import Artifact, seal, staged_directory, write_json
+from src.evaluation.artifacts import (
+    Artifact,
+    canonical_hash,
+    finite_json,
+    provenance,
+    seal,
+    staged_directory,
+    write_json,
+)
 from src.evaluation.cache import open_caches
+from src.evaluation.features import shard_name
 from src.evaluation.probes import (
-    RIDGE_ALPHAS,
-    MLP_SEEDS,
+    ATTENTIVE,
     METRIC_NAMES,
-    fit_mlp,
-    fit_ridge_many,
+    MLP_DROPOUT,
+    MLP_HIDDEN,
+    MLP_SEEDS,
+    RIDGE_ALPHAS,
+    attentive_predictions,
+    device,
+    fit_attentive_layer,
+    fit_mlp_layer,
+    fit_ridge_layer,
     metrics,
     predict,
-    selected_family,
+    scored,
+    select_layers,
 )
 from src.evaluation.protocol import (
     Protocol,
-    nuisance_basis,
-    position_basis,
-    trajectory_average,
+    governing_names,
+    governing_values,
+    position_metadata,
+    regime_metadata,
+    trajectory_groups,
 )
 from src.physics.systems import SYSTEMS
 
-PROBE_LAYERS = None
+REPRESENTATIONS = ("pooled", "token")
+GOVERNING = "governing"
+METADATA_METHODS = {
+    "pooled": "regime_time_mlp",
+    "token": "regime_time_position_mlp",
+}
 
 
 def _probe_layers(n_layers):
@@ -54,192 +88,500 @@ def _features_and_caches(feature_dir, cache_root, splits):
     return features, caches
 
 
-def _data(feature, cache, representation):
-    protocol = Protocol.from_dict(cache.manifest["protocol"])
-    samples = cache.json(f"{representation}/samples.json")
-    x = np.asarray(feature.array(f"{representation}.npy"))
-    if len(x) != len(samples):
-        raise ValueError("feature/sample identity mismatch")
-    if representation == "token":
-        if x.ndim != 4 or x.shape[1] != protocol.token_samples:
-            raise ValueError("invalid token features")
-        basis = position_basis(
-            cache.array("token/positions.npy"), cache.manifest["grid"]
-        )
-        x = x.reshape(-1, *x.shape[-2:])
-    else:
-        basis = nuisance_basis(samples, protocol.dataset)
-    targets = {
-        f"{offset}:{target}": np.asarray(
-            cache.array(f"{representation}/offset{offset}_{target}.npy")
-        ).reshape(-1)
-        for offset in protocol.target_offsets
-        for target in SYSTEMS[protocol.dataset].targets
+def _stage_layer(array, dev, chunk=64):
+    """Copy exactly one encoder output onto the compute device."""
+    tensor = torch.empty(array.shape, dtype=torch.float16, device=dev)
+    for start in range(0, len(array), chunk):
+        stop = min(start + chunk, len(array))
+        tensor[start:stop] = torch.from_numpy(np.array(array[start:stop])).to(dev)
+    return tensor
+
+
+def _sampled_tokens(context, positions):
+    """The requested frozen tokens, flattened exactly like the local targets."""
+    index = torch.as_tensor(
+        np.asarray(positions), dtype=torch.long, device=context.device
+    )
+    gathered = torch.gather(
+        context, 1, index.unsqueeze(-1).expand(-1, -1, context.shape[-1])
+    )
+    return gathered.reshape(-1, context.shape[-1]).float().cpu().numpy()
+
+
+def _governing_window_labels(samples, dataset):
+    """Each sampled window carries its own trajectory's governing labels."""
+    values = [governing_values(dataset, row["parameters"]) for row in samples]
+    return {
+        name: np.array([value[name] for value in values])
+        for name in governing_names(dataset)
     }
-    return x, basis, targets
 
 
-def _validation_row(fitted, base, method):
+class Split:
+    """One split's labels, metadata and lazily staged encoder outputs."""
+
+    def __init__(self, feature, cache, protocol):
+        self.feature, self.cache, self.protocol = feature, cache, protocol
+        self.grid = tuple(cache.manifest["grid"])
+        system = SYSTEMS[protocol.dataset]
+        self.samples = {r: cache.json(f"{r}/samples.json") for r in REPRESENTATIONS}
+        self.positions = np.array(cache.array("token/positions.npy"), dtype=np.int64)
+        self.targets = {
+            representation: {
+                (offset, target): np.asarray(
+                    cache.array(f"{representation}/offset{offset}_{target}.npy")
+                )
+                for offset in protocol.target_offsets
+                for target in system.targets
+            }
+            for representation in REPRESENTATIONS
+        }
+        self.metadata = {
+            "pooled": regime_metadata(self.samples["pooled"], protocol.dataset),
+            "token": position_metadata(
+                self.samples["token"], self.positions, self.grid, protocol.dataset
+            ),
+        }
+        self.groups, trajectories = trajectory_groups(self.samples["pooled"])
+        # Per trajectory for reporting, per sampled window for attentive fits.
+        self.governing = _governing_window_labels(trajectories, protocol.dataset)
+        self.governing_windows = _governing_window_labels(
+            self.samples["pooled"], protocol.dataset
+        )
+        shards = feature.manifest["shards"]
+        self.n_layers = shards["layers"]
+        if (
+            shards["dtype"] != "float16"
+            or list(feature.manifest["grid"]) != list(self.grid)
+            or any(
+                shards[representation][0] != len(self.samples[representation])
+                or shards[representation][1] != int(np.prod(self.grid))
+                for representation in REPRESENTATIONS
+            )
+            or self.positions.shape
+            != (len(self.samples["token"]), protocol.token_samples)
+        ):
+            raise ValueError("feature shard geometry disagrees with the cache")
+
+    def pooled(self, layer):
+        features = self.feature.array("pooled/pooled.npy")
+        if len(features) != len(self.samples["pooled"]) or features.shape[1] != self.n_layers:
+            raise ValueError("feature/sample identity mismatch")
+        return np.asarray(features[:, layer], dtype=np.float32)
+
+    def regime_features(self, layer):
+        features = self.pooled(layer)
+        return np.stack([features[ids].mean(axis=0) for ids in self.groups])
+
+    def shard(self, representation, layer, dev):
+        return _stage_layer(
+            self.feature.array(f"{representation}/{shard_name(layer)}"), dev
+        )
+
+    def flat_targets(self, representation):
+        return {
+            f"{offset}:{target}": values.reshape(-1)
+            for (offset, target), values in self.targets[representation].items()
+        }
+
+
+def _entry_row(entry, output=None):
+    """A validation-curve row: never the fitted state, one output at a time."""
+    row = {k: v for k, v in entry.items() if k not in ("fit", "outputs")}
+    if output is not None:
+        row.update(entry["outputs"][output])
+    return row
+
+
+def _validation_row(result, base, method, fit_key, output=None):
     row = {
         **base,
         "method": method,
-        "status": fitted["status"],
-        "selected_layer": fitted["selected_layer"],
+        "status": result["status"],
+        "selected_layer": result["selected_layer"],
+        "fit_key": fit_key,
     }
-    curve = [
-        {k: v for k, v in entry.items() if k != "fit"} for entry in fitted["layers"]
-    ]
+    curve = [_entry_row(entry, output) for entry in result["layers"]]
     row["validation_curve"] = curve
-    if fitted["selected_layer"] is None:
+    if result["selected_layer"] is None:
         row.update(
             valid_vrmse=float("nan"),
             valid_r2=float("nan"),
             metric_status="undefined_validation_vrmse",
         )
     else:
-        entry = next(r for r in curve if r["layer"] == fitted["selected_layer"])
+        entry = next(r for r in curve if r["layer"] == result["selected_layer"])
         row.update({k: v for k, v in entry.items() if k != "layer"})
         if "alpha" in entry:
             row["selected_alpha"] = entry["alpha"]
     return row
 
 
-def _score_fit(fitted, test_features, target, base, method):
-    row = _validation_row(fitted, base, method)
-    if fitted["selected_layer"] is None:
-        row.update({f"test_{m}": float("nan") for m in METRIC_NAMES})
-        row["depth_curve"] = []
-        return row, None
-    depth, selected_fit = [], None
-    for entry in fitted["layers"]:
-        if (
-            not fitted.get("include_depth", True)
-            and entry["layer"] != fitted["selected_layer"]
-        ):
-            continue
-        score = {k: v for k, v in entry.items() if k != "fit"} | metrics(
-            predict(entry["fit"], test_features[:, entry["layer"]]), target
-        )
-        depth.append(score)
-        if entry["layer"] == fitted["selected_layer"]:
-            selected_fit = entry["fit"]
-            row.update({k: v for k, v in score.items() if k != "layer"})
-    row["depth_curve"] = depth if fitted.get("include_depth", True) else []
-    return row, selected_fit
-
-
-def _regime_data(feature, cache):
-    samples = cache.json("pooled/samples.json")
-    x, samples = trajectory_average(feature.array("pooled.npy"), samples)
-    system = SYSTEMS[cache.manifest["protocol"]["dataset"]]
-    y = np.stack([system.regime_values(r["parameters"]) for r in samples])
-    names = [("log10_" if system.log_parameters else "") + p for p in system.parameters]
-    return x, {name: y[:, i] for i, name in enumerate(names)}
-
-
-def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_steps=150):
-    features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
-    train_feature, valid_feature = features
-    train, valid = caches
-    protocol = Protocol.from_dict(train.manifest["protocol"])
-    n_encoder_outputs = features[0].array("pooled.npy").shape[1]
-    probe_layers = _probe_layers(n_encoder_outputs)
-    rows, fitted = [], {}
-
-    def record(fit, base, method, shared=False):
-        row = _validation_row(fit, base, method)
-        row["cell_id"] = cell_id(row)
-        if shared:
+def _rows(result, plan, fit_key, scores=None):
+    """One row per reported output, with test metrics when scores are supplied."""
+    rows = []
+    for output in plan["outputs"] or [None]:
+        base = plan["base"] if output is None else {**plan["base"], "target": output}
+        row = _validation_row(result, base, plan["method"], fit_key, output)
+        if scores is not None:
+            depth = []
+            for entry in result["layers"]:
+                if entry["layer"] not in scores:
+                    continue
+                block = scores[entry["layer"]]
+                depth.append(
+                    _entry_row(entry, output)
+                    | (block if output is None else block["outputs"][output])
+                )
+            if result["selected_layer"] is None:
+                row.update({f"test_{name}": float("nan") for name in METRIC_NAMES})
+            else:
+                selected = next(
+                    d for d in depth if d["layer"] == result["selected_layer"]
+                )
+                row.update({k: v for k, v in selected.items() if k != "layer"})
+            row["depth_curve"] = depth if result["include_depth"] else []
+        if plan["shared"]:
             row["shared"] = True
+        row["cell_id"] = cell_id(row)
         rows.append(row)
-        fitted[row["cell_id"]] = fit
-        return row
+    return rows
 
-    for representation in ("pooled", "token"):
-        x, b, y = _data(train_feature, train, representation)
-        xv, bv, yv = _data(valid_feature, valid, representation)
-        ridge = fit_ridge_many(x, y, xv, yv, candidate_layers=probe_layers)
-        controls = fit_ridge_many(b[:, None, :], y, bv[:, None, :], yv)
-        combined = None
-        if representation == "pooled":
-            combined = fit_ridge_many(
-                np.concatenate(
-                    [x, np.repeat(b[:, None, :], x.shape[1], axis=1)], axis=2
-                ),
-                y,
-                np.concatenate(
-                    [xv, np.repeat(bv[:, None, :], xv.shape[1], axis=1)], axis=2
-                ),
-                yv,
-                candidate_layers=probe_layers,
-            )
+
+def _persistence_rows(split, protocol, dataset, test=False):
+    rows = []
+    for representation in REPRESENTATIONS:
         for offset in protocol.target_offsets:
-            for target in SYSTEMS[protocol.dataset].targets:
-                key = f"{offset}:{target}"
-                base = dict(
+            if not offset:
+                continue
+            for target in SYSTEMS[dataset].targets:
+                row = dict(
                     family="physics",
                     representation=representation,
                     target_offset=offset,
                     target=target,
-                )
-                rr = record(ridge[key], base, "ridge")
-                mlp = fit_mlp(
-                    x,
-                    y[key],
-                    xv,
-                    yv[key],
-                    max_steps=mlp_max_steps,
-                    min_steps=mlp_min_steps,
-                    candidate_layers=probe_layers,
-                )
-                mr = record(mlp, base, "mlp")
-                chosen = selected_family(rr, mr)
-                selected = {
-                    **(chosen or rr),
-                    "method": "selected",
-                    "selected_method": chosen["method"] if chosen else None,
-                }
-                selected["cell_id"] = cell_id(selected)
-                rows.append(selected)
-                record(
-                    controls[key],
-                    base,
-                    "regime_time" if representation == "pooled" else "position",
+                    method="persistence",
                     shared=True,
+                    status="ok",
+                    selected_layer=None,
+                    fit_key=None,
+                    **metrics(
+                        split.targets[representation][0, target].reshape(-1),
+                        split.targets[representation][offset, target].reshape(-1),
+                        "test" if test else "valid",
+                    ),
                 )
-                if combined is not None:
-                    record(combined[key], base, "ridge_plus_control")
-                if offset:
-                    row = {
-                        **base,
-                        "method": "persistence",
-                        "shared": True,
-                        "status": "ok",
-                        **metrics(yv[f"0:{target}"], yv[key], "valid"),
-                    }
-                    rows.append(row | {"cell_id": cell_id(row)})
-                print(f"fit {representation} offset {offset} {target}", flush=True)
-    x, y = _regime_data(train_feature, train)
-    xv, yv = _regime_data(valid_feature, valid)
-    ridge = fit_ridge_many(x, y, xv, yv, candidate_layers=probe_layers)
-    for name in y:
-        base = dict(
-            family="regime", representation="pooled", target_offset=0, target=name
+                row["cell_id"] = cell_id(row)
+                rows.append(row)
+    return rows
+
+
+def _probe_settings(protocol, probe_layers, n_layers, metadata_widths, tuning):
+    return dict(
+        ridge_alphas=list(RIDGE_ALPHAS),
+        mlp_max_steps=tuning["mlp_max_steps"],
+        mlp_min_steps=tuning["mlp_min_steps"],
+        mlp_hidden=MLP_HIDDEN,
+        mlp_dropout=MLP_DROPOUT,
+        mlp_lr=0.01,
+        mlp_weight_decay=1e-4,
+        probe_seeds=list(MLP_SEEDS),
+        mlp_predictions="single_seed",
+        metadata_methods=dict(METADATA_METHODS),
+        metadata_inputs_pooled=metadata_widths["pooled"],
+        metadata_inputs_token=metadata_widths["token"],
+        attentive_epochs=tuning["attentive_epochs"],
+        attentive_batch_size=tuning["attentive_batch_size"],
+        attentive_blocks=ATTENTIVE["blocks"],
+        attentive_heads=ATTENTIVE["heads"],
+        attentive_ffn_hidden=ATTENTIVE["ffn_hidden"],
+        attentive_dropout=ATTENTIVE["dropout"],
+        attentive_lr=ATTENTIVE["lr"],
+        attentive_weight_decay=ATTENTIVE["weight_decay"],
+        attentive_warmup_epochs=ATTENTIVE["warmup_epochs"],
+        attentive_seed=ATTENTIVE["seed"],
+        attentive_context="all_input_context_tokens",
+        attentive_queries=dict(
+            pooled="learned_global",
+            token="normalized_frozen_token_plus_coordinate",
+        ),
+        attentive_local_queries=protocol.token_samples,
+        governing_targets=list(governing_names(protocol.dataset)),
+        governing_fit="joint_two_output",
+        governing_standardization="train_only",
+        governing_selection_metric="valid_normalized_mse",
+        regime_samples=dict(
+            ridge="trajectory_averaged_pooled_features",
+            attentive="per_window_context_then_averaged_predictions",
+        ),
+        probe_layers=list(probe_layers),
+        probe_outputs=[
+            "final_norm" if layer == n_layers - 1 else f"block_{layer + 1}"
+            for layer in probe_layers
+        ],
+        selection_metric="valid_vrmse",
+    )
+
+
+def _replace(write, path):
+    """Publish partial work only once it is completely on disk."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    staging = path.with_name(f"{path.name}.writing")
+    write(staging)
+    os.replace(staging, path)
+
+
+class PartialFits:
+    """Per-encoder-output probe fits kept beside the unfinished output.
+
+    A full depth sweep of attentive probes is far too long to restart from
+    zero, so each completed encoder output and the metadata-only stage are
+    published atomically. Resuming is allowed only against byte-identical
+    inputs: the checkpoint, every cache and feature hash, the feature
+    extraction provenance, the probe settings, and this module's own
+    provenance all bind the saved state. Nothing here ever masks a failed
+    scientific cell; a cell that raises simply leaves its output unpublished.
+    """
+
+    def __init__(self, output, identity):
+        self.root = Path(output).with_name(f".{Path(output).name}.partial-fits")
+        self.identity = identity
+        self.digest = canonical_hash(identity)
+        recorded = self.root / "identity.json"
+        if recorded.is_file():
+            saved = json.loads(recorded.read_text())
+            if saved.get("sha256") != self.digest:
+                raise ValueError(
+                    f"partial probe fits at {self.root} were produced from "
+                    "different inputs, settings or code; remove them to refit"
+                )
+        else:
+            _replace(
+                lambda path: path.write_text(
+                    json.dumps(
+                        {**finite_json(identity), "sha256": self.digest},
+                        indent=2,
+                        sort_keys=True,
+                    )
+                ),
+                recorded,
+            )
+
+    def _path(self, stage):
+        return self.root / f"{stage}.pt"
+
+    def completed(self, stage):
+        return self._path(stage).is_file()
+
+    def load(self, stage):
+        return torch.load(self._path(stage), map_location="cpu", weights_only=False)
+
+    def publish(self, stage, payload):
+        _replace(lambda path: torch.save(payload, path), self._path(stage))
+
+    def discard(self):
+        shutil.rmtree(self.root, ignore_errors=True)
+
+
+def fit_probes(
+    feature_dir,
+    cache_root,
+    output,
+    mlp_max_steps=2000,
+    mlp_min_steps=150,
+    attentive_epochs=100,
+    attentive_batch_size=32,
+):
+    features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
+    protocol = Protocol.from_dict(caches[0].manifest["protocol"])
+    train, valid = (Split(f, c, protocol) for f, c in zip(features, caches))
+    probe_layers = _probe_layers(train.n_layers)
+    system = SYSTEMS[protocol.dataset]
+    governing = list(governing_names(protocol.dataset))
+    dev = device()
+    settings = _probe_settings(
+        protocol,
+        probe_layers,
+        train.n_layers,
+        {r: int(train.metadata[r].shape[1]) for r in REPRESENTATIONS},
+        dict(
+            mlp_max_steps=mlp_max_steps,
+            mlp_min_steps=mlp_min_steps,
+            attentive_epochs=attentive_epochs,
+            attentive_batch_size=attentive_batch_size,
+        ),
+    )
+    caches_by_split = {c.manifest["split"]: c.manifest["sha256"] for c in caches}
+    features_by_split = {f.manifest["split"]: f.manifest["sha256"] for f in features}
+    partial = PartialFits(
+        output,
+        dict(
+            protocol=protocol.to_dict(),
+            checkpoint=train.feature.manifest["checkpoint"],
+            caches=caches_by_split,
+            features=features_by_split,
+            feature_provenance=train.feature.manifest["provenance"],
+            probe_settings=settings,
+            provenance=provenance(),
+        ),
+    )
+    entries, plans = defaultdict(dict), {}
+
+    def plan(base, method, criterion="valid_vrmse", include_depth=True, shared=False, outputs=None):
+        key = cell_id({**base, "method": method})
+        plans[key] = dict(
+            base=dict(base),
+            method=method,
+            criterion=criterion,
+            include_depth=include_depth,
+            shared=shared,
+            outputs=outputs,
         )
-        record(ridge[name], base, "ridge")
-        record(
-            fit_mlp(
+        return key
+
+    def restore(stage):
+        resumed = partial.load(stage)
+        plans.update(resumed["plans"])
+        for key, entry in resumed["entries"].items():
+            entries[key][entry["layer"]] = entry
+        print(f"resumed {stage} from {partial.root}", flush=True)
+
+    for layer in probe_layers:
+        stage = f"layer{layer}"
+        if partial.completed(stage):
+            restore(stage)
+            continue
+        done = {}
+        for representation in REPRESENTATIONS:
+            local = representation == "token"
+            context = train.shard(representation, layer, dev)
+            valid_context = valid.shard(representation, layer, dev)
+            if local:
+                x = _sampled_tokens(context, train.positions)
+                xv = _sampled_tokens(valid_context, valid.positions)
+            else:
+                x, xv = train.pooled(layer), valid.pooled(layer)
+            ridge = fit_ridge_layer(
+                layer,
                 x,
-                y[name],
+                train.flat_targets(representation),
                 xv,
-                yv[name],
-                max_steps=mlp_max_steps,
-                min_steps=mlp_min_steps,
-                candidate_layers=probe_layers,
-            ),
-            base,
-            "mlp",
-        )
+                valid.flat_targets(representation),
+            )
+            del x, xv
+            for offset in protocol.target_offsets:
+                for target in system.targets:
+                    base = dict(
+                        family="physics",
+                        representation=representation,
+                        target_offset=offset,
+                        target=target,
+                    )
+                    done[plan(base, "ridge")] = ridge[f"{offset}:{target}"]
+                    done[plan(base, "attentive")] = fit_attentive_layer(
+                        layer,
+                        context,
+                        {target: train.targets[representation][offset, target]},
+                        valid_context,
+                        {target: valid.targets[representation][offset, target]},
+                        positions=train.positions if local else None,
+                        valid_positions=valid.positions if local else None,
+                        grid=train.grid if local else None,
+                        epochs=attentive_epochs,
+                        batch_size=attentive_batch_size,
+                    )
+                    print(
+                        f"fit output {layer} {representation} offset {offset} {target}",
+                        flush=True,
+                    )
+            if not local:
+                base = dict(
+                    family="regime",
+                    representation="pooled",
+                    target_offset=0,
+                    target=GOVERNING,
+                )
+                key = plan(
+                    base,
+                    "ridge",
+                    criterion="valid_normalized_mse",
+                    outputs=governing,
+                )
+                done[key] = fit_ridge_layer(
+                    layer,
+                    train.regime_features(layer),
+                    train.governing,
+                    valid.regime_features(layer),
+                    valid.governing,
+                    joint=True,
+                )
+                key = plan(
+                    base,
+                    "attentive",
+                    criterion="valid_normalized_mse",
+                    outputs=governing,
+                )
+                # Every real sampled window is its own training example; the
+                # trajectory's two labels are repeated across its windows and
+                # the window predictions are averaged before scoring.
+                done[key] = fit_attentive_layer(
+                    layer,
+                    context,
+                    train.governing_windows,
+                    valid_context,
+                    valid.governing,
+                    valid_groups=valid.groups,
+                    epochs=attentive_epochs,
+                    batch_size=attentive_batch_size,
+                    joint=True,
+                )
+                print(f"fit output {layer} governing parameters", flush=True)
+            del context, valid_context
+        partial.publish(stage, dict(entries=done, plans=dict(plans)))
+        for key, entry in done.items():
+            entries[key][layer] = entry
+
+    if partial.completed("metadata"):
+        restore("metadata")
+    else:
+        done = {}
+        for representation in REPRESENTATIONS:
+            method = METADATA_METHODS[representation]
+            for offset in protocol.target_offsets:
+                for target in system.targets:
+                    base = dict(
+                        family="physics",
+                        representation=representation,
+                        target_offset=offset,
+                        target=target,
+                    )
+                    key = plan(base, method, include_depth=False, shared=True)
+                    done[key] = fit_mlp_layer(
+                        0,
+                        train.metadata[representation],
+                        train.targets[representation][offset, target].reshape(-1),
+                        valid.metadata[representation],
+                        valid.targets[representation][offset, target].reshape(-1),
+                        max_steps=mlp_max_steps,
+                        min_steps=mlp_min_steps,
+                    )
+            print(f"fit {method}", flush=True)
+        partial.publish("metadata", dict(entries=done, plans=dict(plans)))
+        for key, entry in done.items():
+            entries[key][0] = entry
+
+    rows, fitted = [], {}
+    for key, by_layer in entries.items():
+        spec = plans[key]
+        result = select_layers(
+            [by_layer[layer] for layer in sorted(by_layer)],
+            spec["include_depth"],
+            spec["criterion"],
+        ) | {"plan": spec}
+        fitted[key] = result
+        rows.extend(_rows(result, spec, key))
+    rows.extend(_persistence_rows(valid, protocol, protocol.dataset))
     with staged_directory(output) as stage:
         write_json(stage / "rows.json", rows)
         torch.save(fitted, stage / "fits.pt")
@@ -247,49 +589,29 @@ def fit_probes(feature_dir, cache_root, output, mlp_max_steps=2000, mlp_min_step
             stage,
             "probe_fits",
             protocol=protocol.to_dict(),
-            checkpoint=train_feature.manifest["checkpoint"],
-            caches={c.manifest["split"]: c.manifest["sha256"] for c in caches},
-            features={f.manifest["split"]: f.manifest["sha256"] for f in features},
-            feature_provenance=train_feature.manifest["provenance"],
-            probe_settings=dict(
-                ridge_alphas=list(RIDGE_ALPHAS),
-                mlp_max_steps=mlp_max_steps,
-                mlp_min_steps=mlp_min_steps,
-                mlp_hidden=128,
-                mlp_dropout=0.1,
-                mlp_lr=0.01,
-                mlp_weight_decay=1e-4,
-                probe_seeds=list(MLP_SEEDS),
-                mlp_predictions="single_seed",
-                probe_layers=list(probe_layers),
-                probe_outputs=[
-                    "final_norm"
-                    if layer == n_encoder_outputs - 1
-                    else f"block_{layer + 1}"
-                    for layer in probe_layers
-                ],
-                selection_metric="valid_vrmse",
-            ),
+            checkpoint=train.feature.manifest["checkpoint"],
+            caches=caches_by_split,
+            features=features_by_split,
+            feature_provenance=train.feature.manifest["provenance"],
+            probe_settings=settings,
         )
+    partial.discard()
     return Path(output)
 
 
-def score_probes(feature_dir, cache_root, probe_dir, selection, output):
+def _scores_wanted(result, layer):
+    if result["selected_layer"] is None:
+        return False
+    return result["include_depth"] or result["selected_layer"] == layer
+
+
+def score_probes(feature_dir, cache_root, probe_dir, output):
+    """Open test exactly once, replaying each frozen validation-selected fit."""
     fits = Artifact(probe_dir, "probe_fits")
-    choice = Artifact(selection, "checkpoint_selection")
-    winners = choice.json("selections.json")
-    if not any(
-        r["fit_sha256"] == fits.manifest["sha256"]
-        and r["checkpoint_sha256"] == fits.manifest["checkpoint"]["sha256"]
-        for r in winners
-    ):
-        raise ValueError("probe fits were not selected for test evaluation")
     features, caches = _features_and_caches(
         feature_dir, cache_root, ("train", "valid", "test")
     )
-    feature_provenance = fits.manifest.get(
-        "feature_provenance", features[0].manifest["provenance"]
-    )
+    feature_provenance = fits.manifest["feature_provenance"]
     for feature, cache in zip(features, caches):
         split = cache.manifest["split"]
         if (
@@ -304,65 +626,158 @@ def score_probes(feature_dir, cache_root, probe_dir, selection, output):
             or fits.manifest["features"][split] != feature.manifest["sha256"]
         ):
             raise ValueError("fitting inputs changed before test scoring")
-    feature, cache = features[-1], caches[-1]
+    protocol = Protocol.from_dict(fits.manifest["protocol"])
+    test = Split(features[-1], caches[-1], protocol)
     fitted = torch.load(fits.file("fits.pt"), map_location="cpu", weights_only=False)
     validation = fits.json("rows.json")
-    data = {rep: _data(feature, cache, rep) for rep in ("pooled", "token")}
-    regime_x, regime_y = _regime_data(feature, cache)
-    rows, saved = [], {}
-    for original in validation:
-        method = original["method"]
-        if method == "selected":
-            continue
-        base = {
-            k: original[k]
-            for k in ("family", "representation", "target_offset", "target")
-        }
-        if base["family"] == "regime":
-            x, y = regime_x, regime_y[base["target"]]
-        else:
-            x, b, targets = data[base["representation"]]
-            y = targets[f"{base['target_offset']}:{base['target']}"]
-            if method == "persistence":
-                row = {**original, **metrics(targets[f"0:{base['target']}"], y)}
-                rows.append(row)
+    if not fitted or not validation:
+        raise ValueError("probe fits record no validation-selected cells")
+    if any(result["selected_layer"] is None for result in fitted.values()) and not any(
+        result["selected_layer"] is not None for result in fitted.values()
+    ):
+        raise ValueError("no cell reached a usable validation selection")
+    probe_layers = fits.manifest["probe_settings"]["probe_layers"]
+    grouped = defaultdict(list)
+    for key, result in fitted.items():
+        base, method = result["plan"]["base"], result["plan"]["method"]
+        kind = (
+            "regime"
+            if base["family"] == "regime"
+            else "metadata"
+            if method in METADATA_METHODS.values()
+            else method
+        )
+        grouped[kind, base["representation"]].append((key, result))
+    dev = device()
+    scores = defaultdict(dict)
+    for layer in probe_layers:
+        for representation in REPRESENTATIONS:
+            ridge_cells = [
+                (k, r)
+                for k, r in grouped["ridge", representation]
+                if _scores_wanted(r, layer)
+            ]
+            attentive_cells = [
+                (k, r)
+                for k, r in grouped["attentive", representation]
+                if _scores_wanted(r, layer)
+            ]
+            regime_cells = [
+                (k, r)
+                for k, r in grouped["regime", representation]
+                if _scores_wanted(r, layer)
+            ]
+            if not (ridge_cells or attentive_cells or regime_cells):
                 continue
-            if method in ("regime_time", "position"):
-                x = b[:, None, :]
-            elif method == "ridge_plus_control":
-                x = np.concatenate(
-                    [x, np.repeat(b[:, None, :], x.shape[1], axis=1)], axis=2
+            local = representation == "token"
+            context = test.shard(representation, layer, dev)
+            targets = test.flat_targets(representation)
+            if ridge_cells:
+                x = (
+                    _sampled_tokens(context, test.positions)
+                    if local
+                    else test.pooled(layer)
                 )
-        row, state = _score_fit(fitted[original["cell_id"]], x, y, base, method)
-        if original.get("shared"):
-            row["shared"] = True
-        row["cell_id"] = cell_id(row)
-        rows.append(row)
-        if (
-            base["family"] == "physics"
-            and base["representation"] == "pooled"
-            and base["target_offset"] == 0
-            and method in ("ridge", "mlp")
-            and state is not None
-        ):
-            saved[row["cell_id"]] = dict(
-                fit=state,
-                layer=row["selected_layer"],
-                target=base["target"],
-                method=method,
+                for key, result in ridge_cells:
+                    base = result["plan"]["base"]
+                    name = f"{base['target_offset']}:{base['target']}"
+                    entry = next(
+                        e for e in result["layers"] if e["layer"] == layer
+                    )
+                    scores[key][layer] = scored(
+                        {base["target"]: predict(entry["fit"], x)},
+                        {base["target"]: targets[name]},
+                        {base["target"]: float(entry["fit"]["target_std"][0])},
+                        split="test",
+                    )
+                del x
+            for key, result in attentive_cells:
+                base = result["plan"]["base"]
+                name = f"{base['target_offset']}:{base['target']}"
+                entry = next(e for e in result["layers"] if e["layer"] == layer)
+                fit = entry["fit"]
+                scores[key][layer] = scored(
+                    attentive_predictions(
+                        fit, context, test.positions if local else None
+                    ),
+                    {base["target"]: targets[name]},
+                    {base["target"]: float(fit["target_std"][0])},
+                    split="test",
+                )
+            if regime_cells:
+                regime_x = test.regime_features(layer)
+                for key, result in regime_cells:
+                    entry = next(e for e in result["layers"] if e["layer"] == layer)
+                    fit = entry["fit"]
+                    names = result["plan"]["outputs"]
+                    stds = {
+                        name: float(fit["target_std"][i])
+                        for i, name in enumerate(names)
+                    }
+                    if fit["kind"] == "ridge":
+                        values = np.asarray(predict(fit, regime_x)).reshape(
+                            len(regime_x), len(names)
+                        )
+                        predictions = {
+                            name: values[:, i] for i, name in enumerate(names)
+                        }
+                    else:
+                        # Predict every real window, then average per trajectory.
+                        predictions = attentive_predictions(
+                            fit, context, groups=test.groups
+                        )
+                    scores[key][layer] = scored(
+                        predictions,
+                        test.governing,
+                        stds,
+                        split="test",
+                        joint=True,
+                    )
+                del regime_x
+            del context
+        for key, result in grouped["metadata", "pooled"] + grouped[
+            "metadata", "token"
+        ]:
+            if layer != 0 or not _scores_wanted(result, 0):
+                continue
+            base = result["plan"]["base"]
+            representation = base["representation"]
+            entry = next(e for e in result["layers"] if e["layer"] == 0)
+            scores[key][0] = scored(
+                {base["target"]: predict(entry["fit"], test.metadata[representation])},
+                {
+                    base["target"]: test.targets[representation][
+                        base["target_offset"], base["target"]
+                    ].reshape(-1)
+                },
+                {base["target"]: float(entry["fit"]["target_std"])},
+                split="test",
             )
-    lookup = {r["cell_id"]: r for r in rows}
-    for original in validation:
-        if original["method"] == "selected":
-            key = cell_id(original | {"method": original["selected_method"] or "ridge"})
-            rows.append(
-                {k: v for k, v in lookup[key].items() if k != "depth_curve"}
-                | {
-                    "method": "selected",
-                    "selected_method": original["selected_method"],
-                    "cell_id": original["cell_id"],
-                }
-            )
+    rows, saved = [], {}
+    for key, result in fitted.items():
+        plan = result["plan"]
+        for row in _rows(result, plan, key, scores[key]):
+            rows.append(row)
+            base = plan["base"]
+            if (
+                base["family"] == "physics"
+                and base["representation"] == "pooled"
+                and base["target_offset"] == 0
+                and plan["method"] == "ridge"
+                and result["selected_layer"] is not None
+            ):
+                entry = next(
+                    e
+                    for e in result["layers"]
+                    if e["layer"] == result["selected_layer"]
+                )
+                saved[row["cell_id"]] = dict(
+                    fit=entry["fit"],
+                    layer=result["selected_layer"],
+                    target=base["target"],
+                    method="ridge",
+                )
+    rows.extend(_persistence_rows(test, protocol, protocol.dataset, test=True))
     with staged_directory(output) as stage:
         write_json(stage / "rows.json", rows)
         torch.save(saved, stage / "probes.pt")
@@ -372,16 +787,20 @@ def score_probes(feature_dir, cache_root, probe_dir, selection, output):
             protocol=fits.manifest["protocol"],
             checkpoint=fits.manifest["checkpoint"],
             caches={c.manifest["split"]: c.manifest["sha256"] for c in caches},
-            features=feature.manifest["sha256"],
+            features=features[-1].manifest["sha256"],
             probe_settings=fits.manifest["probe_settings"],
             fits=fits.manifest["sha256"],
-            selection=choice.manifest["sha256"],
-            selection_policy=choice.manifest["policy"],
         )
     return Path(output)
 
 
 def evaluate_noise(feature_dir, cache_root, probe_dir, output):
+    """Paired input corruption for the pooled linear probes.
+
+    Noise features are mean-pooled by construction, so only the pooled Ridge
+    probes can be replayed on them; an attentive head needs the full token
+    sequence of the corrupted clip, which is not cached.
+    """
     features, caches = _features_and_caches(feature_dir, cache_root, ("test",))
     feature, cache = features[0], caches[0]
     probes = Artifact(probe_dir, "probes")
@@ -393,8 +812,7 @@ def evaluate_noise(feature_dir, cache_root, probe_dir, output):
     states = torch.load(
         probes.file("probes.pt"), map_location="cpu", weights_only=False
     )
-    clean_rows = probes.json("rows.json")
-    originals = {r["cell_id"]: r for r in clean_rows}
+    originals = {r["cell_id"]: r for r in probes.json("rows.json")}
     protocol = Protocol.from_dict(feature.manifest["protocol"])
     rows = []
     for identity, state in states.items():
@@ -405,9 +823,9 @@ def evaluate_noise(feature_dir, cache_root, probe_dir, output):
                     predict(
                         state["fit"],
                         feature.array(
-                            "pooled.npy"
+                            "pooled/pooled.npy"
                             if sigma == 0
-                            else f"noise_{sigma:g}_{seed}.npy"
+                            else f"pooled/noise_{sigma:g}_{seed}.npy"
                         )[:, state["layer"]],
                     ),
                     target,
@@ -441,26 +859,6 @@ def evaluate_noise(feature_dir, cache_root, probe_dir, output):
                             f"zero-noise replay differs: {identity} {metric}"
                         )
             rows.append(row)
-    for clean in clean_rows:
-        if (
-            clean["family"] == "physics"
-            and clean["representation"] == "pooled"
-            and clean["target_offset"] == 0
-            and clean["method"] == "selected"
-            and clean.get("selected_method")
-        ):
-            rows.extend(
-                [
-                    r
-                    | {
-                        "method": "selected",
-                        "selected_method": clean["selected_method"],
-                    }
-                    for r in rows
-                    if r["target"] == clean["target"]
-                    and r["method"] == clean["selected_method"]
-                ]
-            )
     for row in rows:
         row["cell_id"] = cell_id(row)
     with staged_directory(output) as stage:
@@ -472,8 +870,7 @@ def evaluate_noise(feature_dir, cache_root, probe_dir, output):
             checkpoint=feature.manifest["checkpoint"],
             caches=probes.manifest["caches"],
             features=feature.manifest["sha256"],
-            selection=probes.manifest["selection"],
-            selection_policy=probes.manifest["selection_policy"],
             probe_settings=probes.manifest["probe_settings"],
+            noise_methods=["ridge"],
         )
     return Path(output)

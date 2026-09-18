@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare and run independent checkpoint probes, then score selected encoders."""
+"""Probe each run's frozen best-validation encoder, then score held-out data."""
 
 import argparse
 from collections import defaultdict
@@ -9,6 +9,8 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.evaluation.artifacts import (
@@ -23,29 +25,30 @@ from src.evaluation.features import extract_features
 from src.evaluation.pipeline import fit_probes, score_probes
 from src.evaluation.protocol import Protocol
 from src.evaluation.reporting import aggregate, plot
-from src.evaluation.selection import select_checkpoints
 from src.objectives import OBJECTIVES
 
-# Stage 1 compares common training-fraction milestones and each run's
-# minimum-pretraining-validation-loss encoder. Identical encoder states are
-# probed once and retain every candidate label as an alias.
-CANDIDATE_POLICY = dict(
-    version=2,
-    roster="training_fraction_milestones_plus_best_validation",
-    milestones=[
-        dict(candidate=f"{percent:03d}pct", percent_of_total_steps=percent)
-        for percent in (25, 50, 75, 100)
-    ],
-    additional_candidates=["best_val"],
+# The analysis probes one encoder per training run: the state at minimum
+# pretraining-validation loss. No downstream checkpoint comparison takes
+# place. Validation data still selects probe hyperparameters, probe stopping
+# state, and the encoder output inside every fit.
+ENCODER_POLICY = dict(
+    version=3,
+    roster="minimum_pretraining_validation_loss",
+    candidate="best_val",
+    downstream_checkpoint_selection=False,
 )
-MILESTONES = {
-    m["candidate"]: m["percent_of_total_steps"] for m in CANDIDATE_POLICY["milestones"]
-}
-MILESTONE_ORDER = sorted(MILESTONES, key=MILESTONES.__getitem__)
-ADDITIONAL_CANDIDATES = tuple(CANDIDATE_POLICY["additional_candidates"])
-CANDIDATE_ORDER = (*MILESTONE_ORDER, *ADDITIONAL_CANDIDATES)
-CANDIDATE_LABELS = set(CANDIDATE_ORDER)
+CANDIDATE = ENCODER_POLICY["candidate"]
 RUN_IDENTITY = ("config_sha256", "training_identity", "spec", "training_protocol")
+DATASETS = ("rayleigh_benard", "active_matter", "shear_flow")
+SPLITS = ("train", "valid", "test")
+# Probe fitting budget, frozen with the study so every encoder is fitted and
+# validation-selected under identical settings.
+PROBE_SETTINGS = dict(
+    mlp_max_steps=2000,
+    mlp_min_steps=150,
+    attentive_epochs=100,
+    attentive_batch_size=32,
+)
 
 
 def check_objective_roster(keys):
@@ -60,88 +63,70 @@ def check_objective_roster(keys):
             )
 
 
-def candidate_checkpoints(index):
-    """Validate the complete declared handoff roster before deduplication."""
-    found = defaultdict(dict)
+def best_val_checkpoints(index):
+    """Retain each run's best-validation encoder and verify its provenance."""
+    runs = defaultdict(list)
     for row in index["checkpoints"]:
-        group = found[(row["dataset"], row["objective"], row["seed"])]
-        label = row["candidate"]
-        if label not in CANDIDATE_LABELS:
-            raise ValueError(f"unexpected candidate label {label!r}: {row['path']}")
-        if label in group:
-            raise ValueError(
-                f"duplicate {label} candidate for "
-                f"{(row['dataset'], row['objective'], row['seed'])}"
-            )
-        group[label] = row
-    if not found:
+        runs[(row["dataset"], row["objective"], row["seed"])].append(row)
+    if not runs:
         raise ValueError("handoff declares no checkpoints")
-    check_objective_roster(found)
+    check_objective_roster(runs)
     rows = []
-    for key, group in sorted(found.items()):
-        if set(group) != CANDIDATE_LABELS:
-            raise ValueError(f"incomplete candidate roster for {key}: {sorted(group)}")
-        reference = group[MILESTONE_ORDER[0]]
-        for label in CANDIDATE_ORDER:
-            row = group[label]
+    for key, group in sorted(runs.items()):
+        chosen = [row for row in group if row["candidate"] == CANDIDATE]
+        if len(chosen) != 1:
+            raise ValueError(
+                f"{key} declares {len(chosen)} {CANDIDATE} encoders; "
+                "exactly one is required"
+            )
+        row = chosen[0]
+        # Other retained labels are never probed, but a label from a different
+        # training run would mean the handoff index itself is unreliable.
+        for other in group:
             for field in RUN_IDENTITY:
-                if row[field] != reference[field]:
-                    raise ValueError(f"candidate {field} differs within {key}")
-            total = row["training_protocol"]["total_steps"]
-            if not isinstance(total, int) or total <= 0:
-                raise ValueError(f"missing training budget for {key}: {total}")
-            if label in MILESTONES:
-                if row["step"] * 100 != MILESTONES[label] * total:
-                    raise ValueError(
-                        f"{label} candidate for {key} is at step {row['step']}, "
-                        f"not {MILESTONES[label]}% of {total}"
-                    )
-            elif not 0 < row["step"] <= total:
-                raise ValueError(
-                    f"{label} candidate for {key} is at step {row['step']}, "
-                    f"outside the training budget {total}"
-                )
-            rows.append(row)
+                if other[field] != row[field]:
+                    raise ValueError(f"handoff {field} differs within {key}")
+        total = row["training_protocol"]["total_steps"]
+        if not isinstance(total, int) or total <= 0:
+            raise ValueError(f"missing training budget for {key}: {total}")
+        if not 0 < row["step"] <= total:
+            raise ValueError(
+                f"{CANDIDATE} encoder for {key} is at step {row['step']}, "
+                f"outside the training budget {total}"
+            )
+        rows.append(row)
     return rows
 
 
-def roster_groups(candidates):
-    """Every run group holds the complete checkpoint candidate policy."""
-    groups = defaultdict(dict)
-    for row in candidates:
+def roster_groups(encoders):
+    """The frozen roster holds exactly one best-validation encoder per run."""
+    groups = {}
+    for row in encoders:
+        if row["candidate"] != CANDIDATE:
+            raise ValueError(
+                f"encoder outside the frozen roster: {row['candidate']!r}"
+            )
         key = (row["dataset"], row["objective"], row["seed"])
-        for entry in [row, *row["aliases"]]:
-            label = entry["candidate"]
-            if label not in CANDIDATE_LABELS:
-                raise ValueError(f"candidate outside the policy roster: {label!r}")
-            if label in groups[key]:
-                raise ValueError(f"duplicate {label} candidate for {key}")
-            if label in MILESTONES and (
-                entry["step"] * 100 != MILESTONES[label] * row["total_steps"]
-            ):
-                raise ValueError(
-                    f"{label} candidate for {key} is at step {entry['step']}, "
-                    f"not {MILESTONES[label]}% of {row['total_steps']}"
-                )
-            if label in ADDITIONAL_CANDIDATES and not (
-                0 < entry["step"] <= row["total_steps"]
-            ):
-                raise ValueError(
-                    f"{label} candidate for {key} is at step {entry['step']}, "
-                    f"outside the training budget {row['total_steps']}"
-                )
-            groups[key][label] = row
+        if key in groups:
+            raise ValueError(f"duplicate {CANDIDATE} encoder for {key}")
+        if row["total_steps"] != row["training_protocol"]["total_steps"]:
+            raise ValueError(f"inconsistent training budget for {key}")
+        if not 0 < row["step"] <= row["total_steps"]:
+            raise ValueError(
+                f"{CANDIDATE} encoder for {key} is at step {row['step']}, "
+                f"outside the training budget {row['total_steps']}"
+            )
+        groups[key] = row
     if not groups:
-        raise ValueError("study declares no candidates")
+        raise ValueError("study declares no encoders")
+    if len({row["checkpoint_sha256"] for row in encoders}) != len(encoders):
+        raise ValueError("duplicate encoder checkpoint in the frozen roster")
     check_objective_roster(groups)
-    for key, group in groups.items():
-        if set(group) != CANDIDATE_LABELS:
-            raise ValueError(f"incomplete candidate roster for {key}: {sorted(group)}")
     return groups
 
 
-def frozen_candidates(handoff, index, dataset=None):
-    rows = candidate_checkpoints(index)
+def frozen_encoders(handoff, index, dataset=None):
+    rows = best_val_checkpoints(index)
     if dataset is not None:
         available = {row["dataset"] for row in rows}
         if dataset not in available:
@@ -150,58 +135,117 @@ def frozen_candidates(handoff, index, dataset=None):
                 f"available datasets: {sorted(available)}"
             )
         rows = [row for row in rows if row["dataset"] == dataset]
-    identical, candidates = {}, []
-    for row in rows:
-        key = (
-            row["dataset"],
-            row["objective"],
-            row["seed"],
-            row["encoder_state_sha256"],
-            row["config_sha256"],
+    return [
+        dict(
+            dataset=row["dataset"],
+            objective=row["objective"],
+            seed=row["seed"],
+            candidate=row["candidate"],
+            step=row["step"],
+            total_steps=row["training_protocol"]["total_steps"],
+            checkpoint=str((Path(handoff) / row["path"]).resolve()),
+            checkpoint_sha256=row["sha256"],
+            bytes=row["bytes"],
+            encoder_state_sha256=row["encoder_state_sha256"],
+            config_sha256=row["config_sha256"],
+            training_identity=row["training_identity"],
+            training_protocol=row["training_protocol"],
+            spec=row["spec"],
+            data_exposure=row["data_exposure"],
+            id=f"{row['dataset']}_{row['objective']}_seed{row['seed']}"
+            f"_{CANDIDATE}_{row['sha256'][:12]}",
         )
-        entry = dict(candidate=row["candidate"], step=row["step"], path=row["path"])
-        if key in identical:
-            candidates[identical[key]]["aliases"].append(entry)
-            continue
-        identical[key] = len(candidates)
-        candidates.append(
-            dict(
-                dataset=row["dataset"],
-                objective=row["objective"],
-                seed=row["seed"],
-                candidate=row["candidate"],
-                step=row["step"],
-                total_steps=row["training_protocol"]["total_steps"],
-                checkpoint=str((Path(handoff) / row["path"]).resolve()),
-                checkpoint_sha256=row["sha256"],
-                config_sha256=row["config_sha256"],
-                id=f"{row['dataset']}_{row['objective']}_seed{row['seed']}"
-                f"_{row['candidate']}_{row['sha256'][:12]}",
-                aliases=[],
+        for row in rows
+    ]
+
+
+def frozen_protocol(repo, dataset):
+    """Freeze the committed evaluation configuration, never library defaults."""
+    config = yaml.safe_load(
+        (Path(repo) / f"configs/eval_{dataset}.yaml").read_text()
+    )
+    if (
+        not isinstance(config, dict)
+        or config.get("dataset") != dataset
+        or "frame_limit" not in config
+        or set(config) - set(Protocol.__dataclass_fields__)
+    ):
+        raise ValueError(
+            f"configs/eval_{dataset}.yaml must declare dataset {dataset!r}, an "
+            "explicit frame_limit, and only supported protocol fields"
+        )
+    return Protocol.from_dict(config)
+
+
+def check_input_geometry(protocol, encoders):
+    """A frozen encoder only accepts the temporal support it was trained on."""
+    for row in encoders:
+        if row["spec"]["n_frames"] != protocol.n_frames:
+            raise ValueError(
+                f"{row['id']} takes {row['spec']['n_frames']}-frame clips but "
+                f"configs/eval_{protocol.dataset}.yaml asks for {protocol.n_frames}"
             )
-        )
-    return candidates
 
 
-def prepare(handoff, base, output, dataset=None):
-    repo = Path(__file__).resolve().parents[1]
+def verify_payloads(encoders):
+    """Frozen payloads must be present and unmodified before any other work."""
+    for row in encoders:
+        path = Path(row["checkpoint"])
+        if not path.is_file():
+            raise ValueError(f"frozen encoder is missing: {path}")
+        size = path.stat().st_size
+        if size != row["bytes"]:
+            raise ValueError(
+                f"{path} holds {size} bytes, not the declared {row['bytes']} "
+                "bytes; fetch the Git LFS payload before preparing a study"
+            )
+        if sha256_file(path) != row["checkpoint_sha256"]:
+            raise ValueError(f"frozen encoder content differs: {path}")
+
+
+def check_clean_source(repo):
+    """Freeze committed source only: no modified, staged, or untracked files."""
     subprocess.run(
         ["git", "ls-files", "--error-unmatch", "scripts/probe_sweep.py"],
         cwd=repo,
         check=True,
         stdout=subprocess.DEVNULL,
     )
-    subprocess.run(
-        ["git", "diff", "--exit-code", "HEAD", "--", "src", "scripts", "configs"],
+    dirty = subprocess.run(
+        [
+            "git",
+            "status",
+            "--porcelain",
+            "--untracked-files=all",
+            "--",
+            "src",
+            "scripts",
+            "configs",
+        ],
         cwd=repo,
         check=True,
-        stdout=subprocess.DEVNULL,
-    )
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if dirty:
+        raise ValueError(
+            "commit or remove uncommitted source before preparing a study:\n"
+            + dirty
+        )
+
+
+def prepare(handoff, base, output, dataset=None):
+    repo = Path(__file__).resolve().parents[1]
+    check_clean_source(repo)
     bundle = Artifact(handoff, "encoder_handoff")
-    candidates = frozen_candidates(
-        handoff, bundle.json("index.json"), dataset=dataset
-    )
-    groups = roster_groups(candidates)
+    encoders = frozen_encoders(handoff, bundle.json("index.json"), dataset=dataset)
+    groups = roster_groups(encoders)
+    protocols = {}
+    for name in sorted({r["dataset"] for r in encoders}):
+        protocol = frozen_protocol(repo, name)
+        check_input_geometry(protocol, [r for r in encoders if r["dataset"] == name])
+        protocols[name] = protocol.to_dict()
+    verify_payloads(encoders)
     with staged_directory(output) as stage:
         (stage / "logs").mkdir()
         write_json(
@@ -211,15 +255,15 @@ def prepare(handoff, base, output, dataset=None):
                 script_sha256=sha256_file(__file__),
                 base=str(Path(base).resolve()),
                 handoff_sha256=bundle.manifest["sha256"],
-                candidate_policy=CANDIDATE_POLICY,
-                protocols={
-                    d: Protocol(d).to_dict()
-                    for d in sorted({r["dataset"] for r in candidates})
-                },
-                candidates=candidates,
+                encoder_policy=ENCODER_POLICY,
+                probe_settings=PROBE_SETTINGS,
+                protocols=protocols,
+                encoders=encoders,
             ),
         )
     output = Path(output).resolve()
+    # Studies are disposable; stale worktree registrations must never block one.
+    subprocess.run(["git", "worktree", "prune"], cwd=repo, check=True)
     subprocess.run(
         [
             "git",
@@ -233,14 +277,13 @@ def prepare(handoff, base, output, dataset=None):
         check=True,
         env=os.environ | {"GIT_LFS_SKIP_SMUDGE": "1"},
     )
-    (output / "source/.venv").symlink_to(repo / ".venv", target_is_directory=True)
     print(
         json.dumps(
             dict(
                 study=str(output),
-                candidate_jobs=len(candidates),
+                encoder_jobs=len(encoders),
                 run_groups=len(groups),
-                max_concurrency=12,
+                datasets=sorted({r["dataset"] for r in encoders}),
             )
         ),
         flush=True,
@@ -253,15 +296,19 @@ def load(output):
         __file__
     ):
         raise ValueError("run the frozen study source; code changed after preparation")
-    if study.get("candidate_policy") != CANDIDATE_POLICY:
+    if study.get("encoder_policy") != ENCODER_POLICY:
         raise ValueError(
-            "study candidate policy differs from this source's candidate policy"
+            "study encoder policy differs from this source's encoder policy"
         )
-    roster_groups(study["candidates"])
+    if study.get("probe_settings") != PROBE_SETTINGS:
+        raise ValueError(
+            "study probe settings differ from this source's probe settings"
+        )
+    roster_groups(study["encoders"])
     return study
 
 
-def candidate_paths(output, row):
+def encoder_paths(output, row):
     cache = output / "cache" / row["dataset"]
     feature_root = output / "features" / row["dataset"]
     feature = (
@@ -271,104 +318,179 @@ def candidate_paths(output, row):
     return cache, feature_root, feature, output / "fits" / row["id"]
 
 
-def candidate(study, task):
-    rows = study["candidates"]
+def encoder(study, task):
+    rows = study["encoders"]
     if not 0 <= task < len(rows):
-        raise ValueError(
-            f"candidate task {task} outside the frozen roster of {len(rows)}"
-        )
+        raise ValueError(f"task {task} outside the frozen roster of {len(rows)}")
     return rows[task]
 
 
-def run(output, study, task):
-    row = candidate(study, task)
+def verified_checkpoint(row):
     if sha256_file(row["checkpoint"]) != row["checkpoint_sha256"]:
         raise ValueError("checkpoint changed after sweep preparation")
-    cache, feature_root, feature, fit = candidate_paths(output, row)
+    return row["checkpoint"]
+
+
+def sealed(path, kind):
+    """A finished stage is a verified artifact, never merely a directory."""
+    path = Path(path)
+    if not (path / "manifest.json").exists():
+        return False
+    Artifact(path, kind)
+    return True
+
+
+def fitted(output, row):
+    fit = encoder_paths(output, row)[3]
+    if not sealed(fit, "probe_fits"):
+        return False
+    if (
+        Artifact(fit, "probe_fits").manifest["checkpoint"]["sha256"]
+        != row["checkpoint_sha256"]
+    ):
+        raise ValueError(f"probe fit does not match the frozen encoder: {row['id']}")
+    return True
+
+
+def completed_fits(output, study):
+    """Test data stays sealed until every frozen encoder has a probe fit."""
+    for row in study["encoders"]:
+        if not fitted(output, row):
+            raise ValueError(f"frozen encoder has no probe fit: {row['id']}")
+    return [encoder_paths(output, row)[3] for row in study["encoders"]]
+
+
+def cache(output, study, dataset, split):
+    if dataset not in study["protocols"]:
+        raise ValueError(
+            f"dataset {dataset!r} is outside this frozen study; "
+            f"choose one of {sorted(study['protocols'])}"
+        )
+    if split == "test":
+        completed_fits(output, study)
+    destination = output / "cache" / dataset / split
+    if not sealed(destination, "cache"):
+        prepare_cache(
+            study["base"],
+            split,
+            output / "cache" / dataset,
+            Protocol.from_dict(study["protocols"][dataset]),
+        )
+    print(destination, flush=True)
+
+
+def extracted_features(checkpoint, cache_root, feature_root, feature, splits):
+    for split in splits:
+        if sealed(feature / split, "features"):
+            continue
+        extract_features(checkpoint, cache_root, feature_root, split)
+        if not sealed(feature / split, "features"):
+            raise ValueError(f"extraction sealed no {split} features: {feature}")
+
+
+def run(output, study, task):
+    row = encoder(study, task)
+    cache_root, feature_root, feature, fit = encoder_paths(output, row)
     start = time.monotonic()
-    for split in ("train", "valid"):
-        if not (feature / split / "manifest.json").exists():
-            extract_features(row["checkpoint"], cache, feature_root, split)
-    if (fit / "manifest.json").exists():
-        Artifact(fit, "probe_fits")
-    else:
-        fit_probes(feature, cache, fit)
+    if not fitted(output, row):
+        checkpoint = verified_checkpoint(row)
+        extracted_features(
+            checkpoint, cache_root, feature_root, feature, ("train", "valid")
+        )
+        fit_probes(feature, cache_root, fit, **study["probe_settings"])
+        if not fitted(output, row):
+            raise ValueError(f"fitting sealed no usable probe fit: {fit}")
     print(
         json.dumps(
-            dict(candidate=row["id"], seconds=time.monotonic() - start, fit=str(fit))
+            dict(encoder=row["id"], seconds=time.monotonic() - start, fit=str(fit))
         ),
         flush=True,
     )
 
 
-def collect(output, study):
-    groups = roster_groups(study["candidates"])
-    paths = [candidate_paths(output, r)[3] for r in study["candidates"]]
-    for row, path in zip(study["candidates"], paths):
-        if not (path / "manifest.json").exists():
-            raise ValueError(f"frozen candidate has no probe fit: {row['id']}")
-        if (
-            Artifact(path, "probe_fits").manifest["checkpoint"]["sha256"]
-            != row["checkpoint_sha256"]
-        ):
-            raise ValueError("fit does not match prepared candidate roster")
-    select_checkpoints(paths, output / "selection")
-    winners = Artifact(output / "selection", "checkpoint_selection").json(
-        "selections.json"
-    )
-    frozen = {r["checkpoint_sha256"] for r in study["candidates"]}
-    chosen = [(w["dataset"], w["objective"], w["seed"]) for w in winners]
-    if sorted(chosen) != sorted(groups) or not frozen.issuperset(
-        w["checkpoint_sha256"] for w in winners
-    ):
-        raise ValueError(
-            "selection must yield exactly one frozen candidate per run group"
-        )
-    print(output / "selection")
-
-
-def selected_row(study, chosen):
-    row = next(
-        (
-            r
-            for r in study["candidates"]
-            if r["checkpoint_sha256"] == chosen["checkpoint_sha256"]
-        ),
-        None,
-    )
-    if row is None:
-        raise ValueError("selected checkpoint is outside the frozen candidate roster")
-    return row
-
-
 def test(output, study, task):
-    choices = Artifact(output / "selection", "checkpoint_selection").json(
-        "selections.json"
-    )
-    if not 0 <= task < len(choices):
-        raise ValueError(f"test task {task} outside the {len(choices)} selected runs")
-    row = selected_row(study, choices[task])
-    cache, feature_root, feature, fit = candidate_paths(output, row)
-    if not (feature / "test/manifest.json").exists():
-        extract_features(row["checkpoint"], cache, feature_root, "test")
-    score_probes(feature, cache, fit, output / "selection", output / "test" / row["id"])
+    completed_fits(output, study)
+    row = encoder(study, task)
+    scores = output / "test" / row["id"]
+    if not sealed(scores, "probes"):
+        checkpoint = verified_checkpoint(row)
+        cache_root, feature_root, feature, fit = encoder_paths(output, row)
+        extracted_features(checkpoint, cache_root, feature_root, feature, SPLITS)
+        score_probes(feature, cache_root, fit, scores)
+        if not sealed(scores, "probes"):
+            raise ValueError(f"scoring sealed no test artifact: {scores}")
+    print(scores, flush=True)
 
 
 def report(output, study):
-    choices = Artifact(output / "selection", "checkpoint_selection").json(
-        "selections.json"
-    )
-    selected = [selected_row(study, choice) for choice in choices]
-    for dataset in study["protocols"]:
-        rows = [r for r in selected if r["dataset"] == dataset]
-        folder = output / "reports" / dataset
-        aggregate(
-            [output / "test" / r["id"] for r in rows],
-            folder / "aggregate",
-            objectives=OBJECTIVES,
-            seeds=sorted({r["seed"] for r in rows}),
+    for dataset in sorted(study["protocols"]):
+        rows = [r for r in study["encoders"] if r["dataset"] == dataset]
+        scores = [output / "test" / r["id"] for r in rows]
+        missing = sorted(
+            r["id"] for r, p in zip(rows, scores) if not sealed(p, "probes")
         )
-        plot(folder / "aggregate", folder / "plots")
+        if missing:
+            raise ValueError(f"frozen encoders without test scores: {missing}")
+        folder = output / "reports" / dataset
+        if not sealed(folder / "aggregate", "aggregate"):
+            aggregate(
+                scores,
+                folder / "aggregate",
+                objectives=OBJECTIVES,
+                seeds=sorted({r["seed"] for r in rows}),
+            )
+        if not sealed(folder / "plots", "plots"):
+            plot(folder / "aggregate", folder / "plots")
+        print(folder / "plots", flush=True)
+
+
+def status(output, study):
+    """Report finished work so an interrupted study resumes without rework."""
+    rows = []
+    for task, row in enumerate(study["encoders"]):
+        feature = encoder_paths(output, row)[2]
+        rows.append(
+            dict(
+                task=task,
+                id=row["id"],
+                dataset=row["dataset"],
+                objective=row["objective"],
+                seed=row["seed"],
+                step=row["step"],
+                feature_dir=str(feature),
+                features={
+                    split: sealed(feature / split, "features") for split in SPLITS
+                },
+                fit=fitted(output, row),
+                test=sealed(output / "test" / row["id"], "probes"),
+            )
+        )
+    datasets = sorted(study["protocols"])
+    print(
+        json.dumps(
+            dict(
+                study=str(output),
+                caches={
+                    dataset: {
+                        split: sealed(output / "cache" / dataset / split, "cache")
+                        for split in SPLITS
+                    }
+                    for dataset in datasets
+                },
+                pending_fits=[r["task"] for r in rows if not r["fit"]],
+                pending_tests=[r["task"] for r in rows if not r["test"]],
+                reports={
+                    dataset: sealed(
+                        output / "reports" / dataset / "plots", "plots"
+                    )
+                    for dataset in datasets
+                },
+                encoders=rows,
+            ),
+            indent=2,
+        ),
+        flush=True,
+    )
 
 
 def main():
@@ -379,20 +501,16 @@ def main():
         p.add_argument("--" + name, required=True)
     p.add_argument(
         "--dataset",
-        choices=("rayleigh_benard", "active_matter", "shear_flow"),
+        choices=DATASETS,
         help="freeze only one system; omit to retain the complete handoff",
     )
     p = commands.add_parser("cache")
-    p.add_argument(
-        "--dataset",
-        required=True,
-        choices=("rayleigh_benard", "active_matter", "shear_flow"),
-    )
-    p.add_argument("--split", required=True, choices=("train", "valid", "test"))
+    p.add_argument("--dataset", required=True, choices=DATASETS)
+    p.add_argument("--split", required=True, choices=SPLITS)
     for name in ("run", "test"):
         p = commands.add_parser(name)
         p.add_argument("--task", required=True, type=int)
-    for name in ("collect", "report"):
+    for name in ("report", "status"):
         commands.add_parser(name)
     for name, p in commands.choices.items():
         if name != "prepare":
@@ -404,23 +522,11 @@ def main():
     output = Path(args.output).resolve()
     study = load(output)
     if args.command == "cache":
-        if args.split == "test":
-            Artifact(output / "selection", "checkpoint_selection")
-        if args.dataset not in study["protocols"]:
-            raise ValueError(
-                f"dataset {args.dataset!r} is outside this frozen study; "
-                f"choose one of {sorted(study['protocols'])}"
-            )
-        prepare_cache(
-            study["base"],
-            args.split,
-            output / "cache" / args.dataset,
-            Protocol.from_dict(study["protocols"][args.dataset]),
-        )
+        cache(output, study, args.dataset, args.split)
     elif args.command in ("run", "test"):
         (run if args.command == "run" else test)(output, study, args.task)
     else:
-        (collect if args.command == "collect" else report)(output, study)
+        (report if args.command == "report" else status)(output, study)
 
 
 if __name__ == "__main__":

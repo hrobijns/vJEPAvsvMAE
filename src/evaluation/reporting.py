@@ -10,6 +10,27 @@ from src.evaluation.artifacts import Artifact, seal, staged_directory, write_jso
 from src.objectives import OBJECTIVES
 
 METRICS = ("test_vrmse", "test_r2", "test_pearson_r", "test_mse", "test_log_mse")
+# Only the governing-parameter probes define an error in train-standardized units.
+NORMALIZED_MSE = "test_normalized_mse"
+# Probes that read frozen encoder features; everything else is a baseline.
+ENCODER_METHODS = ("ridge", "attentive")
+# The metadata MLP never sees the encoder: pooled gets regime and time, tokens
+# additionally get their own spatiotemporal position.
+METADATA_METHODS = (
+    ("pooled", "regime_time_mlp"),
+    ("token", "regime_time_position_mlp"),
+)
+PHYSICS_METHODS = (
+    *ENCODER_METHODS,
+    *(method for _, method in METADATA_METHODS),
+    "persistence",
+)
+GOVERNING_LABELS = {
+    "Prandtl": r"$\mathrm{Pr}$",
+    "log10_Rayleigh": r"$\log_{10}\mathrm{Ra}$",
+}
+# Paper order first, then anything else a different system contributes.
+GOVERNING_ORDER = ("Prandtl", "log10_Rayleigh")
 
 
 def _summary(values, metric):
@@ -24,6 +45,12 @@ def _summary(values, metric):
         n=len(finite),
         status="ok",
     )
+
+
+def _metric_names(values):
+    """Governing rows carry one extra metric; every other cell carries METRICS."""
+    extra = (NORMALIZED_MSE,) if any(NORMALIZED_MSE in v for v in values) else ()
+    return METRICS + extra
 
 
 def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probes"):
@@ -45,31 +72,19 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
             f"incomplete or duplicate run roster: expected {sorted(expected)}, got {observed}"
         )
     first = artifacts[0].manifest
-    policy = first.get("selection_policy")
-    if policy:
-        from src.evaluation.selection import SELECTION_POLICY
-
-        if policy != SELECTION_POLICY or not all(
-            a.manifest.get("selection") for a in artifacts
-        ):
-            raise ValueError("unrecognized checkpoint selection policy")
-        for artifact in artifacts:
-            checkpoint = artifact.manifest["checkpoint"]
-            budget = checkpoint["training_protocol"]["total_steps"]
-            if budget is None or not 0 < checkpoint["step"] <= budget:
-                raise ValueError(
-                    "selected checkpoint step exceeds configured training budget"
-                )
+    for artifact in artifacts:
+        checkpoint = artifact.manifest["checkpoint"]
+        budget = checkpoint.get("training_protocol", {}).get("total_steps")
+        step = checkpoint.get("step")
+        # Each run freezes its own best-validation step, so steps differ across
+        # runs, but none of them may sit outside the configured training plan.
+        if step is not None and budget is not None and not 0 < step <= budget:
+            raise ValueError("checkpoint step exceeds configured training budget")
     for artifact in artifacts[1:]:
         for key in ("protocol", "caches", "probe_settings"):
             if artifact.manifest[key] != first[key]:
                 raise ValueError(f"incompatible aggregate {key}")
-        if artifact.manifest.get("selection_policy") != policy:
-            raise ValueError("incompatible checkpoint selection policy")
-        keys = ("spec", "encoder", "dataset", "training_protocol") + (
-            () if policy else ("step",)
-        )
-        for key in keys:
+        for key in ("spec", "encoder", "dataset", "training_protocol"):
             if artifact.manifest["checkpoint"].get(key) != first["checkpoint"].get(key):
                 raise ValueError(f"incompatible checkpoint {key}")
         if (
@@ -119,8 +134,9 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
             )
         }
         summary.update(objective=objective, cell_id=identity)
+        metric_names = _metric_names(values)
         if objective == "shared":
-            for metric in METRICS:
+            for metric in metric_names:
                 numbers = [v.get(metric) for v in values]
                 if any(v is None for v in numbers):
                     if not all(v is None for v in numbers):
@@ -139,11 +155,11 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
                     "checkpoint_seed",
                     "objective",
                     "selected_layer",
-                    "selected_method",
                     "selected_alpha",
                     "selected_steps",
                     "valid_r2",
                     "valid_vrmse",
+                    "valid_normalized_mse",
                     "checkpoint_step",
                     "status",
                     "metric_status",
@@ -151,7 +167,9 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
             }
             for value in values
         ]
-        summary["metrics"] = {metric: _summary(values, metric) for metric in METRICS}
+        summary["metrics"] = {
+            metric: _summary(values, metric) for metric in metric_names
+        }
         if any("depth_curve" in v for v in values):
             layers = [
                 {point["layer"] for point in v.get("depth_curve", [])} for v in values
@@ -162,21 +180,24 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
                 dict(
                     layer=layer,
                     metrics={
-                        metric: _summary(
-                            [
-                                next(
-                                    point
-                                    for point in v["depth_curve"]
-                                    if point["layer"] == layer
-                                )
-                                for v in values
-                            ],
-                            metric,
-                        )
-                        for metric in METRICS
+                        metric: _summary(points, metric)
+                        for metric in _metric_names(points)
                     },
                 )
-                for layer in sorted(layers[0])
+                for layer, points in (
+                    (
+                        layer,
+                        [
+                            next(
+                                point
+                                for point in v["depth_curve"]
+                                if point["layer"] == layer
+                            )
+                            for v in values
+                        ],
+                    )
+                    for layer in sorted(layers[0])
+                )
             ]
         summaries.append(summary)
     # Average targets inside each checkpoint before calculating between-seed SD.
@@ -233,9 +254,158 @@ def aggregate(paths, output, objectives=OBJECTIVES, seeds=(1, 2, 3), kind="probe
             roster=[list(key) for key in sorted(expected)],
             source_results=[a.manifest["sha256"] for a in artifacts],
             scientific_unit="checkpoint_seed",
-            selection_policy=first.get("selection_policy"),
         )
     return Path(output)
+
+
+def _column(representation, offset, target_offsets):
+    return (
+        0 if representation == "pooled" else len(target_offsets)
+    ) + target_offsets.index(offset)
+
+
+def _cells(summaries, targets, target_offsets, score_key, note=None):
+    """Score and annotation grids over targets by representation and horizon."""
+    shape = (len(targets), 2 * len(target_offsets))
+    matrix = np.full(shape, np.nan)
+    notes = np.full(shape, "", dtype=object)
+    seen = set()
+    for row in summaries:
+        i, j = (
+            targets.index(row["target"]),
+            _column(row["representation"], row["target_offset"], target_offsets),
+        )
+        # One figure cell is one result; never let a later row hide an earlier one.
+        if (i, j) in seen:
+            raise ValueError(
+                "duplicate result cell for "
+                f"{row['method']} {row['representation']} "
+                f"offset {row['target_offset']} {row['target']}"
+            )
+        seen.add((i, j))
+        score = row["metrics"].get(score_key, {}).get("mean")
+        if score is not None:
+            matrix[i, j] = score
+        if note is not None:
+            notes[i, j] = note(row)
+    return matrix, notes
+
+
+def _heatmap(
+    plt,
+    axis,
+    matrix,
+    notes,
+    targets,
+    target_offsets,
+    horizons,
+    low,
+    high,
+    metric,
+    missing="undefined",
+):
+    cmap = plt.get_cmap("viridis_r" if metric == "vrmse" else "viridis").with_extremes(
+        bad="#eeeeee"
+    )
+    image = axis.imshow(matrix, vmin=low, vmax=high, cmap=cmap, aspect="auto")
+    middle = (low + high) / 2
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            value = matrix[i, j]
+            if np.isfinite(value):
+                text = f"{value:.3f}"
+                if notes[i, j]:
+                    text += f"\nout {notes[i, j]}"
+                dark = value > middle if metric == "vrmse" else value < middle
+            else:
+                text, dark = missing, False
+            axis.text(
+                j,
+                i,
+                text,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="white" if dark else "black",
+            )
+    axis.set_xticks(
+        range(2 * len(target_offsets)),
+        [
+            f"{representation} $t+{horizon}$"
+            for representation in ("pooled", "token")
+            for horizon in horizons
+        ],
+        rotation=40,
+        ha="right",
+    )
+    axis.set_yticks(range(len(targets)), [t.replace("_", " ") for t in targets])
+    return image
+
+
+def _interval(entry):
+    """One seed reports no interval rather than a fabricated zero."""
+    if entry is None or entry.get("mean") is None:
+        return "undefined"
+    mean = entry["mean"]
+    std = entry.get("std")
+    return f"{mean:.3f}" if std is None else f"{mean:.3f} $\\pm$ {std:.3f}"
+
+
+def _is_governing(row):
+    return row["family"] == "regime" and row["representation"] == "pooled"
+
+
+def _governing_targets(summaries):
+    present = {r["target"] for r in summaries if _is_governing(r)}
+    ordered = [t for t in GOVERNING_ORDER if t in present]
+    return ordered + sorted(present - set(ordered))
+
+
+def averaged_normalized_mse(raw, objective, method, targets):
+    """Average the parameters inside a seed, then vary only over seeds.
+
+    The paper's governing-parameter score is one number per fit, so the two
+    standardized parameter errors are combined before the between-seed SD.
+    """
+    per_seed = defaultdict(dict)
+    for row in raw:
+        if (
+            _is_governing(row)
+            and row["method"] == method
+            and row["objective"] == objective
+            and row["target"] in targets
+        ):
+            seed, target = row["checkpoint_seed"], row["target"]
+            if target in per_seed[seed]:
+                raise ValueError(
+                    f"duplicate governing row: {objective} {method} {target} seed {seed}"
+                )
+            per_seed[seed][target] = row.get(NORMALIZED_MSE)
+    means = []
+    for seed in sorted(per_seed):
+        values = per_seed[seed]
+        missing = [target for target in targets if target not in values]
+        if missing:
+            raise ValueError(
+                f"governing parameters {missing} missing for "
+                f"{objective} {method} seed {seed}"
+            )
+        numbers = [values[target] for target in targets]
+        means.append(
+            {
+                "value": float(np.mean(numbers))
+                if all(v is not None and np.isfinite(v) for v in numbers)
+                else None
+            }
+        )
+    return _summary(means, "value") if means else None
+
+
+def display_horizons(target_offsets, context_frames):
+    """t+0 reads the last context frame; later offsets count frames beyond it."""
+    return [
+        0 if offset == 0 else offset - context_frames for offset in target_offsets
+    ]
 
 
 def plot(aggregate_dir, output, metric="vrmse"):
@@ -261,18 +431,31 @@ def plot(aggregate_dir, output, metric="vrmse"):
     targets = artifact.manifest["protocol"]["targets"]
     target_offsets = artifact.manifest["protocol"]["target_offsets"]
     context_frames = artifact.manifest["protocol"]["n_frames"]
-    display_horizons = [
-        0 if offset == 0 else offset - context_frames for offset in target_offsets
-    ]
+    horizons = display_horizons(target_offsets, context_frames)
     probe_layers = artifact.manifest.get("probe_settings", {}).get("probe_layers", [])
-    probe_outputs = artifact.manifest.get("probe_settings", {}).get(
-        "probe_outputs", []
-    )
+    probe_outputs = artifact.manifest.get("probe_settings", {}).get("probe_outputs", [])
+    # Depth axes and cell annotations both name encoder outputs by layer index.
+    if len(probe_outputs) != len(probe_layers):
+        raise ValueError(
+            f"probe_settings names {len(probe_outputs)} encoder outputs for "
+            f"{len(probe_layers)} probe layers"
+        )
+
     def encoder_output_label(layer):
-        if layer not in probe_layers or len(probe_outputs) != len(probe_layers):
+        if layer not in probe_layers:
             return "?"
         output = probe_outputs[probe_layers.index(layer)]
         return "N" if output == "final_norm" else output.removeprefix("block_")
+
+    def selected_output(row):
+        labels = [
+            encoder_output_label(selection.get("selected_layer"))
+            for selection in row["selections"]
+        ]
+        if not labels:
+            return ""
+        first = labels[0]
+        return first if all(label == first for label in labels) else "/".join(labels)
 
     with staged_directory(output) as stage:
         fields = (
@@ -300,296 +483,143 @@ def plot(aggregate_dir, output, metric="vrmse"):
                         | score
                     )
         write_json(stage / "target_means.json", target_means)
-        # Main comparison and separate probes use identical cells and scales.
+        # Encoder probes, metadata baselines and persistence share one scale so
+        # the separate figures can be read against each other.
         scores = [
-            r["metrics"][score_key]["mean"]
+            r["metrics"].get(score_key, {}).get("mean")
             for r in summaries
-            if r.get("family") == "physics"
-            and r.get("method") in ("selected", "ridge", "mlp", "persistence")
+            if r.get("family") == "physics" and r.get("method") in PHYSICS_METHODS
         ]
         finite = [v for v in scores if v is not None and np.isfinite(v)]
         low = min([0.0, *finite])
         high = max([1.0, *finite])
         if artifact.manifest["result_kind"] == "probes":
-            for method in ("selected", "ridge", "mlp"):
-                fig, axes = plt.subplots(
-                    1,
-                    len(objectives),
-                    figsize=(6 * len(objectives), max(3, len(targets) * 0.65)),
-                    squeeze=False,
+            methods = [
+                method
+                for method in ENCODER_METHODS
+                if any(
+                    r["family"] == "physics" and r["method"] == method
+                    for r in summaries
                 )
-                for axis, objective in zip(axes[0], objectives):
-                    cells = [
-                        r
-                        for r in summaries
-                        if r["family"] == "physics"
-                        and r["method"] == method
-                        and r["objective"] == objective
-                    ]
-                    matrix = np.full((len(targets), 2 * len(target_offsets)), np.nan)
-                    selected_outputs = np.full(
-                        (len(targets), 2 * len(target_offsets)), "", dtype=object
-                    )
-                    for r in cells:
-                        col = (
-                            0
-                            if r["representation"] == "pooled"
-                            else len(target_offsets)
-                        ) + target_offsets.index(r["target_offset"])
-                        score = r["metrics"][score_key]["mean"]
-                        if score is not None:
-                            matrix[targets.index(r["target"]), col] = score
-                        layers = [
-                            selection.get("selected_layer")
-                            for selection in r["selections"]
-                        ]
-                        labels = [encoder_output_label(layer) for layer in layers]
-                        selected_outputs[targets.index(r["target"]), col] = (
-                            labels[0]
-                            if labels and all(label == labels[0] for label in labels)
-                            else "/".join(labels)
-                        )
-                    axis.imshow(
-                        matrix,
-                        vmin=low,
-                        vmax=high,
-                        cmap="viridis_r" if metric == "vrmse" else "viridis",
-                        aspect="auto",
-                    )
-                    for i in range(matrix.shape[0]):
-                        for j in range(matrix.shape[1]):
-                            axis.text(
-                                j,
-                                i,
-                                (
-                                    f"{matrix[i, j]:.3f}\nout "
-                                    f"{selected_outputs[i, j]}"
-                                )
-                                if np.isfinite(matrix[i, j])
-                                else "undefined",
-                                ha="center",
-                                va="center",
-                                fontsize=8,
-                                color="white"
-                                if not np.isfinite(matrix[i, j])
-                                or (
-                                    matrix[i, j] > (low + high) / 2
-                                    if metric == "vrmse"
-                                    else matrix[i, j] < (low + high) / 2
-                                )
-                                else "black",
-                            )
-                    axis.set_xticks(
-                        range(2 * len(target_offsets)),
+            ]
+            fig, axes = plt.subplots(
+                max(1, len(methods)),
+                len(objectives),
+                figsize=(
+                    6 * len(objectives),
+                    max(3, len(targets) * 0.65) * max(1, len(methods)),
+                ),
+                squeeze=False,
+                layout="constrained",
+            )
+            image = None
+            for row_axes, method in zip(axes, methods):
+                for axis, objective in zip(row_axes, objectives):
+                    matrix, notes = _cells(
                         [
-                            f"{rep} $t+{horizon}$"
-                            for rep in ("pooled", "token")
-                            for horizon in display_horizons
+                            r
+                            for r in summaries
+                            if r["family"] == "physics"
+                            and r["method"] == method
+                            and r["objective"] == objective
                         ],
-                        rotation=40,
-                        ha="right",
+                        targets,
+                        target_offsets,
+                        score_key,
+                        note=selected_output,
                     )
-                    axis.set_yticks(
-                        range(len(targets)), [t.replace("_", " ") for t in targets]
+                    image = _heatmap(
+                        plt,
+                        axis,
+                        matrix,
+                        notes,
+                        targets,
+                        target_offsets,
+                        horizons,
+                        low,
+                        high,
+                        metric,
                     )
                     axis.set_title(f"{objective}: {method}, test {score_label}")
-                    axis.set_xlabel("cell text: test score and validation-selected output")
-                fig.tight_layout()
-                fig.savefig(stage / f"physics_{method}.pdf")
-                plt.close(fig)
+            if image is not None:
+                fig.colorbar(image, ax=axes.ravel().tolist(), pad=0.02).set_label(
+                    f"Test {score_label}"
+                )
+            fig.suptitle(
+                "Frozen best-validation encoders: Ridge and attentive probes\n"
+                "cell text: test score and validation-selected encoder output"
+            )
+            fig.savefig(stage / "physics.pdf")
+            plt.close(fig)
+
+            # The metadata MLP sees no encoder features, so every objective
+            # shares one baseline and it is drawn exactly once.
+            metadata_cells = [
+                r
+                for r in summaries
+                if r["family"] == "physics"
+                and (r["representation"], r["method"]) in METADATA_METHODS
+            ]
+            fig, axis = plt.subplots(
+                figsize=(8, max(3, len(targets) * 0.65)), layout="constrained"
+            )
+            matrix, notes = _cells(
+                metadata_cells, targets, target_offsets, score_key
+            )
+            image = _heatmap(
+                plt,
+                axis,
+                matrix,
+                notes,
+                targets,
+                target_offsets,
+                horizons,
+                low,
+                high,
+                metric,
+                missing="N/A",
+            )
+            axis.set_title(
+                f"Metadata MLP baseline, test {score_label}\n"
+                "pooled: regime parameters and time; "
+                "token: also normalized token position"
+            )
+            fig.colorbar(image, ax=axis, pad=0.02).set_label(f"Test {score_label}")
+            fig.savefig(stage / "physics_metadata_mlp.pdf")
+            plt.close(fig)
+
             persistence = [
                 row
                 for row in summaries
                 if row["family"] == "physics" and row["method"] == "persistence"
             ]
-            persistence_matrix = np.full(
-                (len(targets), 2 * len(target_offsets)), np.nan
-            )
-            for row in persistence:
-                column = (
-                    0
-                    if row["representation"] == "pooled"
-                    else len(target_offsets)
-                ) + target_offsets.index(row["target_offset"])
-                score = row["metrics"][score_key]["mean"]
-                if score is not None:
-                    persistence_matrix[targets.index(row["target"]), column] = score
-            persistence_cmap = plt.get_cmap(
-                "viridis_r" if metric == "vrmse" else "viridis"
-            ).with_extremes(bad="#eeeeee")
             fig, axis = plt.subplots(
-                figsize=(8, max(3, len(targets) * 0.65))
+                figsize=(8, max(3, len(targets) * 0.65)), layout="constrained"
             )
-            image = axis.imshow(
-                persistence_matrix,
-                vmin=low,
-                vmax=high,
-                cmap=persistence_cmap,
-                aspect="auto",
-            )
-            for i in range(persistence_matrix.shape[0]):
-                for j in range(persistence_matrix.shape[1]):
-                    value = persistence_matrix[i, j]
-                    axis.text(
-                        j,
-                        i,
-                        f"{value:.3f}" if np.isfinite(value) else "N/A",
-                        ha="center",
-                        va="center",
-                        fontsize=8,
-                        color="white"
-                        if np.isfinite(value)
-                        and (
-                            value > (low + high) / 2
-                            if metric == "vrmse"
-                            else value < (low + high) / 2
-                        )
-                        else "black",
-                    )
-            axis.set_xticks(
-                range(2 * len(target_offsets)),
-                [
-                    f"{representation} $t+{horizon}$"
-                    for representation in ("pooled", "token")
-                    for horizon in display_horizons
-                ],
-                rotation=40,
-                ha="right",
-            )
-            axis.set_yticks(
-                range(len(targets)), [target.replace("_", " ") for target in targets]
+            matrix, notes = _cells(persistence, targets, target_offsets, score_key)
+            image = _heatmap(
+                plt,
+                axis,
+                matrix,
+                notes,
+                targets,
+                target_offsets,
+                horizons,
+                low,
+                high,
+                metric,
+                missing="N/A",
             )
             axis.set_title(
                 f"Persistence baseline, test {score_label}\n"
                 "future prediction copies the corresponding current target"
             )
-            colorbar = fig.colorbar(image, ax=axis, pad=0.02)
-            colorbar.set_label(f"Test {score_label}")
-            fig.tight_layout()
+            fig.colorbar(image, ax=axis, pad=0.02).set_label(f"Test {score_label}")
             fig.savefig(stage / "physics_persistence.pdf")
             plt.close(fig)
-            if (
-                artifact.manifest["protocol"]["dataset"] == "rayleigh_benard"
-                and {"jepa", "mae"} <= set(objectives)
-            ):
-                # Match the workshop paper's Figure 1: absolute R² values in each
-                # cell and JEPA-minus-MAE R² as the diverging background color.
-                comparison = {}
-                for row in summaries:
-                    if (
-                        row["family"] != "physics"
-                        or row["method"] != "selected"
-                        or row["objective"] not in ("jepa", "mae")
-                    ):
-                        continue
-                    methods = "".join(
-                        {"ridge": "R", "mlp": "M"}.get(
-                            selection.get("selected_method"), "?"
-                        )
-                        for selection in row["selections"]
-                    )
-                    comparison[
-                        (
-                            row["objective"],
-                            row["representation"],
-                            row["target_offset"],
-                            row["target"],
-                        )
-                    ] = (row["metrics"]["test_r2"]["mean"], methods)
-                shape = (len(targets), 2 * len(target_offsets))
-                jepa_scores = np.full(shape, np.nan)
-                mae_scores = np.full(shape, np.nan)
-                probe_labels = {}
-                for i, target in enumerate(targets):
-                    for j, (representation, offset) in enumerate(
-                        (rep, target_offset)
-                        for rep in ("pooled", "token")
-                        for target_offset in target_offsets
-                    ):
-                        for objective, matrix in (
-                            ("jepa", jepa_scores),
-                            ("mae", mae_scores),
-                        ):
-                            score, methods = comparison[
-                                (objective, representation, offset, target)
-                            ]
-                            matrix[i, j] = score
-                            probe_labels[objective, i, j] = methods
-                differences = jepa_scores - mae_scores
-                fig, axis = plt.subplots(figsize=(10, 5.5))
-                image = axis.imshow(
-                    differences,
-                    vmin=-0.2,
-                    vmax=0.2,
-                    cmap="RdBu",
-                    aspect="auto",
-                )
-                for i in range(shape[0]):
-                    for j in range(shape[1]):
-                        delta = differences[i, j]
-                        axis.text(
-                            j,
-                            i,
-                            (
-                                f"J {jepa_scores[i, j]:.3f} "
-                                f"[{probe_labels['jepa', i, j]}]\n"
-                                f"M {mae_scores[i, j]:.3f} "
-                                f"[{probe_labels['mae', i, j]}]"
-                            ),
-                            ha="center",
-                            va="center",
-                            fontsize=8,
-                            color="white" if abs(delta) >= 0.12 else "black",
-                        )
-                context_frames = artifact.manifest["protocol"]["n_frames"]
-                paper_horizons = [
-                    0 if offset == 0 else offset - context_frames
-                    for offset in target_offsets
-                ]
-                axis.set_xticks(
-                    range(shape[1]),
-                    [
-                        f"$t+{horizon}$"
-                        for _representation in ("pooled", "token")
-                        for horizon in paper_horizons
-                    ],
-                )
-                target_labels = {
-                    "enstrophy": r"$\omega^2$",
-                    "buoyancy_gradient_energy": r"$|\nabla b|^2$",
-                    "convective_flux": r"$u_y b$",
-                    "pressure_gradient_magnitude": r"$|\nabla p|$",
-                    "buoyancy_laplacian_magnitude": r"$|\nabla^2 b|$",
-                }
-                axis.set_yticks(
-                    range(len(targets)),
-                    [target_labels.get(target, target.replace("_", " ")) for target in targets],
-                )
-                axis.axvline(len(target_offsets) - 0.5, color="black", lw=1.5)
-                top = axis.secondary_xaxis("top")
-                top.set_xticks(
-                    [
-                        (len(target_offsets) - 1) / 2,
-                        len(target_offsets) + (len(target_offsets) - 1) / 2,
-                    ],
-                    ["Pooled representation", "Token representation"],
-                )
-                top.tick_params(length=0, pad=8)
-                axis.set_title(
-                    "Validation-selected checkpoints, probe families, and encoder outputs\n"
-                    "cell text: test $R^2$ [probe]; color: JEPA − MAE",
-                    pad=28,
-                )
-                colorbar = fig.colorbar(image, ax=axis, pad=0.02)
-                colorbar.set_label(r"$\Delta R^2$ (JEPA − MAE)")
-                fig.tight_layout()
-                fig.savefig(stage / "workshop_figure1_comparison.pdf")
-                fig.savefig(
-                    stage / "workshop_figure1_comparison.png", dpi=200
-                )
-                plt.close(fig)
+
             # The paper's depth analysis is pooled, with one panel per target/horizon.
-            for method in ("ridge", "mlp"):
+            for method in methods:
                 fig, axes = plt.subplots(
                     len(targets),
                     len(target_offsets),
@@ -637,8 +667,7 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 markersize=4,
                             )
                         axis.set_title(
-                            f"{target.replace('_', ' ')} "
-                            f"$t+{display_horizons[j]}$",
+                            f"{target.replace('_', ' ')} $t+{horizons[j]}$",
                             fontsize=9,
                         )
                         axis.set_xlabel("Encoder output")
@@ -655,51 +684,187 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                     probe_layers[0] - 0.5, probe_layers[0] + 0.5
                                 )
                         axis.set_ylabel(f"Test {score_label}")
-                        baseline = next(
+                        for rows, color, label in (
+                            (persistence, "black", "persistence"),
                             (
-                                row["metrics"][score_key]["mean"]
-                                for row in persistence
-                                if row["representation"] == "pooled"
-                                and row["target"] == target
-                                and row["target_offset"] == target_offset
+                                [
+                                    r
+                                    for r in summaries
+                                    if r["family"] == "physics"
+                                    and r["method"] == "regime_time_mlp"
+                                ],
+                                "tab:gray",
+                                "regime+time MLP",
                             ),
-                            None,
-                        )
-                        if baseline is not None:
-                            axis.axhline(
-                                baseline,
-                                color="black",
-                                linestyle="--",
-                                linewidth=1,
-                                label="persistence",
+                        ):
+                            baseline = next(
+                                (
+                                    r["metrics"][score_key]["mean"]
+                                    for r in rows
+                                    if r["representation"] == "pooled"
+                                    and r["target"] == target
+                                    and r["target_offset"] == target_offset
+                                ),
+                                None,
                             )
-                legend_axis = axes[0, min(1, len(target_offsets) - 1)]
-                handles, labels = legend_axis.get_legend_handles_labels()
+                            if baseline is not None:
+                                axis.axhline(
+                                    baseline,
+                                    color=color,
+                                    linestyle="--",
+                                    linewidth=1,
+                                    label=label,
+                                )
+                handles, labels = [], []
+                for axis in axes.ravel():
+                    for handle, label in zip(*axis.get_legend_handles_labels()):
+                        if label not in labels:
+                            handles.append(handle)
+                            labels.append(label)
                 fig.legend(
                     handles,
                     labels,
                     loc="upper center",
-                    ncol=len(labels),
+                    ncol=max(1, len(labels)),
                     frameon=False,
                     bbox_to_anchor=(0.5, 1.0),
                 )
-                fig.tight_layout(rect=(0, 0, 1, 0.97))
+                # Reserve a fixed strip so the legend never covers panel titles.
+                fig.tight_layout(rect=(0, 0, 1, 1 - 0.5 / fig.get_figheight()))
                 fig.savefig(stage / f"depth_{method}.pdf")
                 plt.close(fig)
+
+            governing_targets = _governing_targets(summaries)
+            if governing_targets:
+                header = ["Objective", "Probe", "Encoder output"]
+                for target in governing_targets:
+                    label = GOVERNING_LABELS.get(target, target.replace("_", " "))
+                    header += [f"{label} $R^2$", f"{label} nMSE"]
+                header.append("Mean nMSE")
+                body = []
+                for objective in objectives:
+                    for method in methods:
+                        cells = {}
+                        for row in summaries:
+                            if (
+                                not _is_governing(row)
+                                or row["method"] != method
+                                or row["objective"] != objective
+                            ):
+                                continue
+                            if row["target"] in cells:
+                                raise ValueError(
+                                    "duplicate governing summary: "
+                                    f"{objective} {method} {row['target']}"
+                                )
+                            cells[row["target"]] = row
+                        if not cells:
+                            continue
+                        missing = [t for t in governing_targets if t not in cells]
+                        if missing:
+                            raise ValueError(
+                                f"governing parameters {missing} missing for "
+                                f"{objective} {method}"
+                            )
+                        outputs = {selected_output(cell) for cell in cells.values()}
+                        line = [
+                            objective,
+                            method,
+                            "/".join(sorted(outputs)),
+                        ]
+                        for target in governing_targets:
+                            entry = cells[target]["metrics"]
+                            line += [
+                                _interval(entry.get("test_r2")),
+                                _interval(entry.get(NORMALIZED_MSE)),
+                            ]
+                        line.append(
+                            _interval(
+                                averaged_normalized_mse(
+                                    raw, objective, method, governing_targets
+                                )
+                            )
+                        )
+                        body.append(line)
+                fig, axis = plt.subplots(
+                    figsize=(2.0 + 1.55 * len(header), 1.4 + 0.42 * len(body)),
+                    layout="constrained",
+                )
+                axis.axis("off")
+                table = axis.table(
+                    cellText=body or [["no governing probe rows"] + [""] * (len(header) - 1)],
+                    colLabels=header,
+                    cellLoc="center",
+                    loc="center",
+                )
+                table.auto_set_font_size(False)
+                table.set_fontsize(9)
+                table.scale(1, 1.6)
+                for (row_index, _), cell in table.get_celld().items():
+                    cell.set_edgecolor("#bbbbbb")
+                    if row_index == 0:
+                        cell.set_facecolor("#e8e8e8")
+                        cell.set_text_props(fontweight="bold")
+                    elif row_index % 2 == 0:
+                        cell.set_facecolor("#f7f7f7")
+                seed_counts = sorted(
+                    {
+                        r["metrics"][NORMALIZED_MSE]["n"]
+                        for r in summaries
+                        if _is_governing(r) and NORMALIZED_MSE in r["metrics"]
+                    }
+                )
+                axis.set_title(
+                    "Governing-parameter probes on frozen best-validation encoders\n"
+                    "joint two-output head; targets standardized with training statistics; "
+                    "nMSE in standardized units",
+                    fontsize=11,
+                )
+                axis.text(
+                    0.5,
+                    0.0,
+                    "Mean nMSE averages both parameters inside a seed before the "
+                    "between-seed SD.\n"
+                    + (
+                        f"Intervals are SD over {'/'.join(str(n) for n in seed_counts)} "
+                        "checkpoint seeds; a value without an interval comes from a "
+                        "single seed."
+                        if seed_counts
+                        else "No seed statistics available."
+                    ),
+                    transform=axis.transAxes,
+                    ha="center",
+                    va="top",
+                    fontsize=8,
+                )
+                fig.savefig(stage / "governing_parameters.pdf")
+                plt.close(fig)
         else:
-            for metric in (score_key, "test_pearson_r"):
+            def is_noise(row):
+                return row["family"] == "noise" and row["representation"] == "pooled"
+
+            noise_methods = [
+                method
+                for method in ENCODER_METHODS
+                if any(is_noise(r) and r["method"] == method for r in raw)
+            ]
+            for metric_name in (score_key, "test_pearson_r"):
                 fig, axes = plt.subplots(
-                    len(targets), 3, figsize=(12, 2.5 * len(targets)), squeeze=False
+                    len(targets),
+                    max(1, len(noise_methods)),
+                    figsize=(4 * max(1, len(noise_methods)), 2.5 * len(targets)),
+                    squeeze=False,
                 )
                 for i, target in enumerate(targets):
-                    for j, method in enumerate(("selected", "ridge", "mlp")):
+                    for j, method in enumerate(noise_methods):
                         axis = axes[i, j]
                         for objective in objectives:
                             points = sorted(
                                 [
                                     r
                                     for r in summaries
-                                    if r["target"] == target
+                                    if is_noise(r)
+                                    and r["target"] == target
                                     and r["method"] == method
                                     and r["objective"] == objective
                                 ],
@@ -709,14 +874,15 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 {
                                     r["checkpoint_seed"]
                                     for r in raw
-                                    if r["objective"] == objective
+                                    if is_noise(r) and r["objective"] == objective
                                 }
                             ):
                                 values = sorted(
                                     [
                                         r
                                         for r in raw
-                                        if r["target"] == target
+                                        if is_noise(r)
+                                        and r["target"] == target
                                         and r["method"] == method
                                         and r["objective"] == objective
                                         and r["checkpoint_seed"] == seed
@@ -725,28 +891,28 @@ def plot(aggregate_dir, output, metric="vrmse"):
                                 )
                                 axis.plot(
                                     [r["sigma"] for r in values],
-                                    [r.get(metric) for r in values],
+                                    [r.get(metric_name) for r in values],
                                     color=colors[objective],
                                     alpha=0.2,
                                     lw=0.8,
                                 )
                             axis.plot(
                                 [r["sigma"] for r in points],
-                                [r["metrics"][metric]["mean"] for r in points],
+                                [r["metrics"][metric_name]["mean"] for r in points],
                                 color=colors[objective],
                                 label=objective,
                                 marker="o",
                             )
-                        if metric == "test_r2":
+                        if metric_name == "test_r2":
                             axis.set_yscale("symlog", linthresh=1.0)
                         axis.set_title(
                             f"{target.replace('_', ' ')}: {method}", fontsize=9
                         )
                         axis.set_xlabel("Noise sigma")
-                        axis.set_ylabel(metric.removeprefix("test_"))
+                        axis.set_ylabel(metric_name.removeprefix("test_"))
                 axes[0, 0].legend()
                 fig.tight_layout()
-                fig.savefig(stage / f"noise_{metric}.pdf")
+                fig.savefig(stage / f"noise_{metric_name}.pdf")
                 plt.close(fig)
         seal(stage, "plots", aggregate=artifact.manifest["sha256"], metric=score_key)
     return Path(output)

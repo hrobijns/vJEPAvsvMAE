@@ -4,6 +4,7 @@ n_frames: 8
 target_offsets:
 - 0
 - 16
+- 24
 - 40
 patch:
 - 2
