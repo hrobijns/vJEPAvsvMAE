@@ -448,7 +448,7 @@ class WorkflowTests(unittest.TestCase):
                 for row in rows:
                     if row["family"] == "physics" and row["method"] in (
                         "ridge",
-                        "attentive",
+                        "mlp",
                     ):
                         self.assertEqual(
                             [p["layer"] for p in row["depth_curve"]],
@@ -459,6 +459,12 @@ class WorkflowTests(unittest.TestCase):
                     {SYSTEMS[dataset].targets[0]},
                 )
                 self.assertTrue(any(r["method"] == "persistence" for r in rows))
+                self.assertTrue(
+                    any(
+                        r["family"] == "regime" and r["method"] == "mlp"
+                        for r in rows
+                    )
+                )
 
 
 if __name__ == "__main__":

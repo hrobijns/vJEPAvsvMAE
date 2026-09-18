@@ -13,7 +13,7 @@ METRICS = ("test_vrmse", "test_r2", "test_pearson_r", "test_mse", "test_log_mse"
 # Only the governing-parameter probes define an error in train-standardized units.
 NORMALIZED_MSE = "test_normalized_mse"
 # Probes that read frozen encoder features; everything else is a baseline.
-ENCODER_METHODS = ("ridge", "mlp")
+ENCODER_METHODS = ("ridge", "mlp", "attentive")
 # The metadata MLP never sees the encoder: pooled gets regime and time, tokens
 # additionally get their own spatiotemporal position.
 METADATA_METHODS = (
