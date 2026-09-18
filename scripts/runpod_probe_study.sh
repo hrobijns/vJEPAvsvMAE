@@ -95,6 +95,7 @@ import importlib, sys
 import torch
 if not torch.cuda.is_available():
     sys.exit('no CUDA device visible to ' + sys.executable)
+torch.ones(1, device='cuda').item()
 for name in '$modules'.split():
     importlib.import_module(name)
 print(f'{sys.executable}: torch {torch.__version__} on {torch.cuda.get_device_name(0)}')
