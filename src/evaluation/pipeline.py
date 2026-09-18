@@ -67,6 +67,17 @@ def _probe_layers(n_layers):
     return tuple(range(n_layers))
 
 
+def _selected_targets(system, requested=None):
+    """Validate and preserve the requested physical-target order."""
+    targets = list(system.targets if requested is None else requested)
+    unknown = [target for target in targets if target not in system.targets]
+    if not targets or unknown or len(set(targets)) != len(targets):
+        raise ValueError(
+            f"physical targets must be a non-empty unique subset of "
+            f"{list(system.targets)}; got {targets}"
+        )
+    return targets
+
 def cell_id(row):
     keys = ("family", "representation", "target_offset", "target", "method", "sigma")
     return "|".join(f"{k}={row[k]}" for k in keys if k in row)
@@ -178,10 +189,16 @@ class Split:
             self.feature.array(f"{representation}/{shard_name(layer)}"), dev
         )
 
-    def flat_targets(self, representation):
+    def flat_targets(self, representation, targets=None):
+        wanted = (
+            {target for _, target in self.targets[representation]}
+            if targets is None
+            else set(targets)
+        )
         return {
             f"{offset}:{target}": values.reshape(-1)
             for (offset, target), values in self.targets[representation].items()
+            if target in wanted
         }
 
 
@@ -248,13 +265,13 @@ def _rows(result, plan, fit_key, scores=None):
     return rows
 
 
-def _persistence_rows(split, protocol, dataset, test=False):
+def _persistence_rows(split, protocol, dataset, targets, test=False):
     rows = []
     for representation in REPRESENTATIONS:
         for offset in protocol.target_offsets:
             if not offset:
                 continue
-            for target in SYSTEMS[dataset].targets:
+            for target in targets:
                 row = dict(
                     family="physics",
                     representation=representation,
@@ -276,7 +293,9 @@ def _persistence_rows(split, protocol, dataset, test=False):
     return rows
 
 
-def _probe_settings(protocol, probe_layers, n_layers, metadata_widths, tuning):
+def _probe_settings(
+    protocol, probe_layers, n_layers, metadata_widths, tuning, physical_targets
+):
     return dict(
         ridge_alphas=list(RIDGE_ALPHAS),
         mlp_max_steps=tuning["mlp_max_steps"],
@@ -288,6 +307,7 @@ def _probe_settings(protocol, probe_layers, n_layers, metadata_widths, tuning):
         probe_seeds=list(MLP_SEEDS),
         mlp_predictions="single_seed",
         metadata_methods=dict(METADATA_METHODS),
+        physical_targets=list(physical_targets),
         metadata_inputs_pooled=metadata_widths["pooled"],
         metadata_inputs_token=metadata_widths["token"],
         attentive_epochs=tuning["attentive_epochs"],
@@ -392,12 +412,14 @@ def fit_probes(
     mlp_min_steps=150,
     attentive_epochs=100,
     attentive_batch_size=32,
+    physical_targets=None,
 ):
     features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
     protocol = Protocol.from_dict(caches[0].manifest["protocol"])
     train, valid = (Split(f, c, protocol) for f, c in zip(features, caches))
     probe_layers = _probe_layers(train.n_layers)
     system = SYSTEMS[protocol.dataset]
+    physical_targets = _selected_targets(system, physical_targets)
     governing = list(governing_names(protocol.dataset))
     dev = device()
     settings = _probe_settings(
@@ -411,6 +433,7 @@ def fit_probes(
             attentive_epochs=attentive_epochs,
             attentive_batch_size=attentive_batch_size,
         ),
+        physical_targets,
     )
     caches_by_split = {c.manifest["split"]: c.manifest["sha256"] for c in caches}
     features_by_split = {f.manifest["split"]: f.manifest["sha256"] for f in features}
@@ -465,13 +488,13 @@ def fit_probes(
             ridge = fit_ridge_layer(
                 layer,
                 x,
-                train.flat_targets(representation),
+                train.flat_targets(representation, physical_targets),
                 xv,
-                valid.flat_targets(representation),
+                valid.flat_targets(representation, physical_targets),
             )
             del x, xv
             for offset in protocol.target_offsets:
-                for target in system.targets:
+                for target in physical_targets:
                     base = dict(
                         family="physics",
                         representation=representation,
@@ -549,7 +572,7 @@ def fit_probes(
         for representation in REPRESENTATIONS:
             method = METADATA_METHODS[representation]
             for offset in protocol.target_offsets:
-                for target in system.targets:
+                for target in physical_targets:
                     base = dict(
                         family="physics",
                         representation=representation,
@@ -581,7 +604,9 @@ def fit_probes(
         ) | {"plan": spec}
         fitted[key] = result
         rows.extend(_rows(result, spec, key))
-    rows.extend(_persistence_rows(valid, protocol, protocol.dataset))
+    rows.extend(
+        _persistence_rows(valid, protocol, protocol.dataset, physical_targets)
+    )
     with staged_directory(output) as stage:
         write_json(stage / "rows.json", rows)
         torch.save(fitted, stage / "fits.pt")
@@ -628,6 +653,10 @@ def score_probes(feature_dir, cache_root, probe_dir, output):
             raise ValueError("fitting inputs changed before test scoring")
     protocol = Protocol.from_dict(fits.manifest["protocol"])
     test = Split(features[-1], caches[-1], protocol)
+    physical_targets = _selected_targets(
+        SYSTEMS[protocol.dataset],
+        fits.manifest["probe_settings"].get("physical_targets"),
+    )
     fitted = torch.load(fits.file("fits.pt"), map_location="cpu", weights_only=False)
     validation = fits.json("rows.json")
     if not fitted or not validation:
@@ -777,7 +806,11 @@ def score_probes(feature_dir, cache_root, probe_dir, output):
                     target=base["target"],
                     method="ridge",
                 )
-    rows.extend(_persistence_rows(test, protocol, protocol.dataset, test=True))
+    rows.extend(
+        _persistence_rows(
+            test, protocol, protocol.dataset, physical_targets, test=True
+        )
+    )
     with staged_directory(output) as stage:
         write_json(stage / "rows.json", rows)
         torch.save(saved, stage / "probes.pt")

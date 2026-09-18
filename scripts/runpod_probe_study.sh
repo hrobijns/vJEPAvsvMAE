@@ -37,6 +37,7 @@ BASE="${BASE:-/workspace/well}"
 STUDY="${STUDY:-/workspace/rb_best_val}"
 HANDOFF="${HANDOFF:-$REPO/checkpoints/iclr2027/seed1}"
 DATASET="${DATASET:-rayleigh_benard}"
+TARGETS="${TARGETS:-}"
 MIN_FREE_GIB="${MIN_FREE_GIB:-80}"
 REPORT_MIN_FREE_GIB="${REPORT_MIN_FREE_GIB:-1}"
 PRUNE_FEATURES="${PRUNE_FEATURES:-0}"
@@ -141,6 +142,11 @@ case "$stage" in
   *) check_imports "h5py the_well" ;;
 esac
 
+target_args=()
+if [ -n "$TARGETS" ]; then
+  read -r -a target_args <<<"$TARGETS"
+  target_args=(--targets "${target_args[@]}")
+fi
 if [ "$stage" = prepare ] || [ "$stage" = all ]; then
   preflight prepare
   if prepared; then
@@ -152,7 +158,8 @@ if [ "$stage" = prepare ] || [ "$stage" = all ]; then
     exit 1
   else
     ( cd "$REPO" && "$PYTHON" scripts/probe_sweep.py prepare \
-        --handoff "$HANDOFF" --base "$BASE" --output "$STUDY" --dataset "$DATASET" )
+        --handoff "$HANDOFF" --base "$BASE" --output "$STUDY" \
+        --dataset "$DATASET" "${target_args[@]}" )
     prepared || { echo "preparation produced no usable study at $STUDY" >&2; exit 1; }
   fi
 fi

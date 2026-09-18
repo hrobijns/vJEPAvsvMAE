@@ -391,6 +391,7 @@ class WorkflowTests(unittest.TestCase):
                     mlp_min_steps=2,
                     attentive_epochs=1,
                     attentive_batch_size=5,
+                    physical_targets=(SYSTEMS[dataset].targets[0],),
                 )
                 self.assertFalse((root / "cache/test").exists())
                 write_well(root, dataset, "test")
@@ -448,7 +449,7 @@ class WorkflowTests(unittest.TestCase):
                         )
                 self.assertEqual(
                     {r["target"] for r in rows if r["family"] == "physics"},
-                    set(SYSTEMS[dataset].targets),
+                    {SYSTEMS[dataset].targets[0]},
                 )
                 self.assertTrue(any(r["method"] == "persistence" for r in rows))
 

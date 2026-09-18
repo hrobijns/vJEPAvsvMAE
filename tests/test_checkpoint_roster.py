@@ -293,6 +293,7 @@ def frozen_study(module, dataset="rayleigh_benard", objectives=OBJECTIVES, seeds
         encoder_policy=copy.deepcopy(module.ENCODER_POLICY),
         probe_settings=copy.deepcopy(module.PROBE_SETTINGS),
         protocols={dataset: module.frozen_protocol(REPO, dataset).to_dict()},
+        physical_targets={dataset: module.selected_physical_targets(dataset)},
         encoders=encoders,
     )
 
@@ -396,6 +397,23 @@ class FrozenStudyTests(unittest.TestCase):
             retuned["probe_settings"]["attentive_epochs"] = 5
             self.rewrite(output, retuned)
             with self.assertRaisesRegex(ValueError, "probe settings"):
+                self.sweep.load(output)
+
+            subset = copy.deepcopy(self.study)
+            subset["physical_targets"]["rayleigh_benard"] = [
+                "enstrophy",
+                "convective_flux",
+            ]
+            self.rewrite(output, subset)
+            self.assertEqual(
+                self.sweep.load(output)["physical_targets"]["rayleigh_benard"],
+                ["enstrophy", "convective_flux"],
+            )
+
+            invalid_targets = copy.deepcopy(self.study)
+            invalid_targets["physical_targets"]["rayleigh_benard"] = ["not_a_target"]
+            self.rewrite(output, invalid_targets)
+            with self.assertRaisesRegex(ValueError, "physical targets"):
                 self.sweep.load(output)
 
             milestone = copy.deepcopy(self.study)
@@ -532,6 +550,9 @@ class FrozenStudyTests(unittest.TestCase):
                         mlp_min_steps=150,
                         attentive_epochs=100,
                         attentive_batch_size=32,
+                        physical_targets=self.study["physical_targets"][
+                            "rayleigh_benard"
+                        ],
                     ),
                 ],
             )

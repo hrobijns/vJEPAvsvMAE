@@ -26,6 +26,7 @@ from src.evaluation.pipeline import fit_probes, score_probes
 from src.evaluation.protocol import Protocol
 from src.evaluation.reporting import aggregate, plot
 from src.objectives import OBJECTIVES
+from src.physics.systems import SYSTEMS
 
 # The analysis probes one encoder per training run: the state at minimum
 # pretraining-validation loss. No downstream checkpoint comparison takes
@@ -49,6 +50,21 @@ PROBE_SETTINGS = dict(
     attentive_epochs=100,
     attentive_batch_size=32,
 )
+
+def selected_physical_targets(dataset, requested=None):
+    """Validate a study's ordered physical-target subset."""
+    available = list(SYSTEMS[dataset].targets)
+    targets = list(available if requested is None else requested)
+    if (
+        not targets
+        or len(set(targets)) != len(targets)
+        or any(target not in available for target in targets)
+    ):
+        raise ValueError(
+            f"physical targets for {dataset} must be a non-empty unique subset "
+            f"of {available}; got {targets}"
+        )
+    return targets
 
 
 def check_objective_roster(keys):
@@ -234,7 +250,7 @@ def check_clean_source(repo):
         )
 
 
-def prepare(handoff, base, output, dataset=None):
+def prepare(handoff, base, output, dataset=None, targets=None):
     repo = Path(__file__).resolve().parents[1]
     check_clean_source(repo)
     bundle = Artifact(handoff, "encoder_handoff")
@@ -245,6 +261,14 @@ def prepare(handoff, base, output, dataset=None):
         protocol = frozen_protocol(repo, name)
         check_input_geometry(protocol, [r for r in encoders if r["dataset"] == name])
         protocols[name] = protocol.to_dict()
+    if targets is not None and dataset is None:
+        raise ValueError("--targets requires a single --dataset")
+    physical_targets = {
+        name: selected_physical_targets(
+            name, targets if name == dataset else None
+        )
+        for name in protocols
+    }
     verify_payloads(encoders)
     with staged_directory(output) as stage:
         (stage / "logs").mkdir()
@@ -258,6 +282,7 @@ def prepare(handoff, base, output, dataset=None):
                 encoder_policy=ENCODER_POLICY,
                 probe_settings=PROBE_SETTINGS,
                 protocols=protocols,
+                physical_targets=physical_targets,
                 encoders=encoders,
             ),
         )
@@ -304,6 +329,10 @@ def load(output):
         raise ValueError(
             "study probe settings differ from this source's probe settings"
         )
+    if set(study.get("physical_targets", {})) != set(study["protocols"]):
+        raise ValueError("study physical targets do not match its datasets")
+    for dataset, targets in study["physical_targets"].items():
+        selected_physical_targets(dataset, targets)
     roster_groups(study["encoders"])
     return study
 
@@ -397,7 +426,13 @@ def run(output, study, task):
         extracted_features(
             checkpoint, cache_root, feature_root, feature, ("train", "valid")
         )
-        fit_probes(feature, cache_root, fit, **study["probe_settings"])
+        fit_probes(
+            feature,
+            cache_root,
+            fit,
+            physical_targets=study["physical_targets"][row["dataset"]],
+            **study["probe_settings"],
+        )
         if not fitted(output, row):
             raise ValueError(f"fitting sealed no usable probe fit: {fit}")
     print(
@@ -504,6 +539,11 @@ def main():
         choices=DATASETS,
         help="freeze only one system; omit to retain the complete handoff",
     )
+    p.add_argument(
+        "--targets",
+        nargs="+",
+        help="ordered physical-target subset; requires --dataset",
+    )
     p = commands.add_parser("cache")
     p.add_argument("--dataset", required=True, choices=DATASETS)
     p.add_argument("--split", required=True, choices=SPLITS)
@@ -517,7 +557,13 @@ def main():
             p.add_argument("--output", required=True)
     args = parser.parse_args()
     if args.command == "prepare":
-        prepare(args.handoff, args.base, args.output, dataset=args.dataset)
+        prepare(
+            args.handoff,
+            args.base,
+            args.output,
+            dataset=args.dataset,
+            targets=args.targets,
+        )
         return
     output = Path(args.output).resolve()
     study = load(output)
