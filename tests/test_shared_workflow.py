@@ -389,6 +389,8 @@ class WorkflowTests(unittest.TestCase):
                     root / "fits",
                     mlp_max_steps=2,
                     mlp_min_steps=2,
+                    feature_mlp=True,
+                    attentive=False,
                     attentive_epochs=1,
                     attentive_batch_size=5,
                     attentive_min_epochs=1,

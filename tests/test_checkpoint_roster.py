@@ -556,6 +556,8 @@ class FrozenStudyTests(unittest.TestCase):
                     dict(
                         mlp_max_steps=2000,
                         mlp_min_steps=150,
+                        feature_mlp=True,
+                        attentive=False,
                         attentive_epochs=100,
                         attentive_batch_size=32,
                         attentive_min_epochs=15,

@@ -180,6 +180,13 @@ class Split:
             raise ValueError("feature/sample identity mismatch")
         return np.asarray(features[:, layer], dtype=np.float32)
 
+    def sampled(self, layer):
+        """Gather only the fixed local probe tokens without staging a full shard."""
+        shard = self.feature.array(f"token/{shard_name(layer)}")
+        rows = np.arange(len(self.positions))[:, None]
+        gathered = shard[rows, self.positions]
+        return np.asarray(gathered, dtype=np.float32).reshape(-1, gathered.shape[-1])
+
     def regime_features(self, layer):
         features = self.pooled(layer)
         return np.stack([features[ids].mean(axis=0) for ids in self.groups])
@@ -310,6 +317,8 @@ def _probe_settings(
         physical_targets=list(physical_targets),
         metadata_inputs_pooled=metadata_widths["pooled"],
         metadata_inputs_token=metadata_widths["token"],
+        feature_mlp=tuning["feature_mlp"],
+        attentive=tuning["attentive"],
         attentive_epochs=tuning["attentive_epochs"],
         attentive_batch_size=tuning["attentive_batch_size"],
         attentive_min_epochs=tuning["attentive_min_epochs"],
@@ -330,11 +339,12 @@ def _probe_settings(
         ),
         attentive_local_queries=protocol.token_samples,
         governing_targets=list(governing_names(protocol.dataset)),
-        governing_fit="joint_two_output",
+        governing_fit="joint_two_output_ridge_scalar_mlp",
         governing_standardization="train_only",
         governing_selection_metric="valid_normalized_mse",
         regime_samples=dict(
             ridge="trajectory_averaged_pooled_features",
+            mlp="trajectory_averaged_pooled_features",
             attentive="per_window_context_then_averaged_predictions",
         ),
         probe_layers=list(probe_layers),
@@ -418,6 +428,8 @@ def fit_probes(
     attentive_min_epochs=15,
     attentive_patience=10,
     physical_targets=None,
+    feature_mlp=False,
+    attentive=True,
 ):
     features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
     protocol = Protocol.from_dict(caches[0].manifest["protocol"])
@@ -435,6 +447,8 @@ def fit_probes(
         dict(
             mlp_max_steps=mlp_max_steps,
             mlp_min_steps=mlp_min_steps,
+            feature_mlp=feature_mlp,
+            attentive=attentive,
             attentive_epochs=attentive_epochs,
             attentive_batch_size=attentive_batch_size,
             attentive_min_epochs=attentive_min_epochs,
@@ -485,11 +499,21 @@ def fit_probes(
         done = {}
         for representation in REPRESENTATIONS:
             local = representation == "token"
-            context = train.shard(representation, layer, dev)
-            valid_context = valid.shard(representation, layer, dev)
+            context = train.shard(representation, layer, dev) if attentive else None
+            valid_context = (
+                valid.shard(representation, layer, dev) if attentive else None
+            )
             if local:
-                x = _sampled_tokens(context, train.positions)
-                xv = _sampled_tokens(valid_context, valid.positions)
+                x = (
+                    _sampled_tokens(context, train.positions)
+                    if attentive
+                    else train.sampled(layer)
+                )
+                xv = (
+                    _sampled_tokens(valid_context, valid.positions)
+                    if attentive
+                    else valid.sampled(layer)
+                )
             else:
                 x, xv = train.pooled(layer), valid.pooled(layer)
             ridge = fit_ridge_layer(
@@ -499,7 +523,6 @@ def fit_probes(
                 xv,
                 valid.flat_targets(representation, physical_targets),
             )
-            del x, xv
             for offset in protocol.target_offsets:
                 for target in physical_targets:
                     base = dict(
@@ -509,24 +532,36 @@ def fit_probes(
                         target=target,
                     )
                     done[plan(base, "ridge")] = ridge[f"{offset}:{target}"]
-                    done[plan(base, "attentive")] = fit_attentive_layer(
-                        layer,
-                        context,
-                        {target: train.targets[representation][offset, target]},
-                        valid_context,
-                        {target: valid.targets[representation][offset, target]},
-                        positions=train.positions if local else None,
-                        valid_positions=valid.positions if local else None,
-                        grid=train.grid if local else None,
-                        epochs=attentive_epochs,
-                        batch_size=attentive_batch_size,
-                        min_epochs=attentive_min_epochs,
-                        patience=attentive_patience,
-                    )
+                    if feature_mlp:
+                        done[plan(base, "mlp")] = fit_mlp_layer(
+                            layer,
+                            x,
+                            train.targets[representation][offset, target].reshape(-1),
+                            xv,
+                            valid.targets[representation][offset, target].reshape(-1),
+                            max_steps=mlp_max_steps,
+                            min_steps=mlp_min_steps,
+                        )
+                    if attentive:
+                        done[plan(base, "attentive")] = fit_attentive_layer(
+                            layer,
+                            context,
+                            {target: train.targets[representation][offset, target]},
+                            valid_context,
+                            {target: valid.targets[representation][offset, target]},
+                            positions=train.positions if local else None,
+                            valid_positions=valid.positions if local else None,
+                            grid=train.grid if local else None,
+                            epochs=attentive_epochs,
+                            batch_size=attentive_batch_size,
+                            min_epochs=attentive_min_epochs,
+                            patience=attentive_patience,
+                        )
                     print(
                         f"fit output {layer} {representation} offset {offset} {target}",
                         flush=True,
                     )
+            del x, xv
             if not local:
                 base = dict(
                     family="regime",
@@ -534,6 +569,8 @@ def fit_probes(
                     target_offset=0,
                     target=GOVERNING,
                 )
+                regime_x = train.regime_features(layer)
+                valid_regime_x = valid.regime_features(layer)
                 key = plan(
                     base,
                     "ridge",
@@ -542,36 +579,50 @@ def fit_probes(
                 )
                 done[key] = fit_ridge_layer(
                     layer,
-                    train.regime_features(layer),
+                    regime_x,
                     train.governing,
-                    valid.regime_features(layer),
+                    valid_regime_x,
                     valid.governing,
                     joint=True,
                 )
-                key = plan(
-                    base,
-                    "attentive",
-                    criterion="valid_normalized_mse",
-                    outputs=governing,
-                )
-                # Every real sampled window is its own training example; the
-                # trajectory's two labels are repeated across its windows and
-                # the window predictions are averaged before scoring.
-                done[key] = fit_attentive_layer(
-                    layer,
-                    context,
-                    train.governing_windows,
-                    valid_context,
-                    valid.governing,
-                    valid_groups=valid.groups,
-                    epochs=attentive_epochs,
-                    batch_size=attentive_batch_size,
-                    min_epochs=attentive_min_epochs,
-                    patience=attentive_patience,
-                    joint=True,
-                )
+                if feature_mlp:
+                    for target in governing:
+                        target_base = {**base, "target": target}
+                        done[plan(target_base, "mlp")] = fit_mlp_layer(
+                            layer,
+                            regime_x,
+                            train.governing[target],
+                            valid_regime_x,
+                            valid.governing[target],
+                            max_steps=mlp_max_steps,
+                            min_steps=mlp_min_steps,
+                        )
+                if attentive:
+                    key = plan(
+                        base,
+                        "attentive",
+                        criterion="valid_normalized_mse",
+                        outputs=governing,
+                    )
+                    # Every real sampled window is its own training example; the
+                    # trajectory's labels repeat and predictions average by trajectory.
+                    done[key] = fit_attentive_layer(
+                        layer,
+                        context,
+                        train.governing_windows,
+                        valid_context,
+                        valid.governing,
+                        valid_groups=valid.groups,
+                        epochs=attentive_epochs,
+                        batch_size=attentive_batch_size,
+                        min_epochs=attentive_min_epochs,
+                        patience=attentive_patience,
+                        joint=True,
+                    )
+                del regime_x, valid_regime_x
                 print(f"fit output {layer} governing parameters", flush=True)
-            del context, valid_context
+            if attentive:
+                del context, valid_context
         partial.publish(stage, dict(entries=done, plans=dict(plans)))
         for key, entry in done.items():
             entries[key][layer] = entry
@@ -697,6 +748,11 @@ def score_probes(feature_dir, cache_root, probe_dir, output):
                 for k, r in grouped["ridge", representation]
                 if _scores_wanted(r, layer)
             ]
+            mlp_cells = [
+                (k, r)
+                for k, r in grouped["mlp", representation]
+                if _scores_wanted(r, layer)
+            ]
             attentive_cells = [
                 (k, r)
                 for k, r in grouped["attentive", representation]
@@ -707,27 +763,33 @@ def score_probes(feature_dir, cache_root, probe_dir, output):
                 for k, r in grouped["regime", representation]
                 if _scores_wanted(r, layer)
             ]
-            if not (ridge_cells or attentive_cells or regime_cells):
+            if not (ridge_cells or mlp_cells or attentive_cells or regime_cells):
                 continue
             local = representation == "token"
-            context = test.shard(representation, layer, dev)
+            needs_context = bool(
+                attentive_cells
+                or any(r["plan"]["method"] == "attentive" for _, r in regime_cells)
+            )
+            context = (
+                test.shard(representation, layer, dev) if needs_context else None
+            )
             targets = test.flat_targets(representation)
-            if ridge_cells:
-                x = (
-                    _sampled_tokens(context, test.positions)
-                    if local
-                    else test.pooled(layer)
-                )
-                for key, result in ridge_cells:
+            feature_cells = ridge_cells + mlp_cells
+            if feature_cells:
+                x = test.sampled(layer) if local else test.pooled(layer)
+                for key, result in feature_cells:
                     base = result["plan"]["base"]
                     name = f"{base['target_offset']}:{base['target']}"
                     entry = next(
                         e for e in result["layers"] if e["layer"] == layer
                     )
+                    target_std = entry["fit"]["target_std"]
+                    if torch.is_tensor(target_std) and target_std.ndim:
+                        target_std = target_std[0]
                     scores[key][layer] = scored(
                         {base["target"]: predict(entry["fit"], x)},
                         {base["target"]: targets[name]},
-                        {base["target"]: float(entry["fit"]["target_std"][0])},
+                        {base["target"]: float(target_std)},
                         split="test",
                     )
                 del x
@@ -750,31 +812,41 @@ def score_probes(feature_dir, cache_root, probe_dir, output):
                     entry = next(e for e in result["layers"] if e["layer"] == layer)
                     fit = entry["fit"]
                     names = result["plan"]["outputs"]
-                    stds = {
-                        name: float(fit["target_std"][i])
-                        for i, name in enumerate(names)
-                    }
-                    if fit["kind"] == "ridge":
-                        values = np.asarray(predict(fit, regime_x)).reshape(
-                            len(regime_x), len(names)
-                        )
-                        predictions = {
-                            name: values[:, i] for i, name in enumerate(names)
+                    if names:
+                        stds = {
+                            name: float(fit["target_std"][i])
+                            for i, name in enumerate(names)
                         }
-                    else:
-                        # Predict every real window, then average per trajectory.
-                        predictions = attentive_predictions(
-                            fit, context, groups=test.groups
+                        if fit["kind"] == "ridge":
+                            values = np.asarray(predict(fit, regime_x)).reshape(
+                                len(regime_x), len(names)
+                            )
+                            predictions = {
+                                name: values[:, i] for i, name in enumerate(names)
+                            }
+                        else:
+                            # Predict windows, then average them per trajectory.
+                            predictions = attentive_predictions(
+                                fit, context, groups=test.groups
+                            )
+                        scores[key][layer] = scored(
+                            predictions,
+                            test.governing,
+                            stds,
+                            split="test",
+                            joint=True,
                         )
-                    scores[key][layer] = scored(
-                        predictions,
-                        test.governing,
-                        stds,
-                        split="test",
-                        joint=True,
-                    )
+                    else:
+                        name = result["plan"]["base"]["target"]
+                        scores[key][layer] = scored(
+                            {name: predict(fit, regime_x)},
+                            {name: test.governing[name]},
+                            {name: float(fit["target_std"])},
+                            split="test",
+                        )
                 del regime_x
-            del context
+            if context is not None:
+                del context
         for key, result in grouped["metadata", "pooled"] + grouped[
             "metadata", "token"
         ]:

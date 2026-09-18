@@ -1,4 +1,4 @@
-"""Reporting for the best-validation attentive analysis."""
+"""Reporting for the best-validation Ridge and MLP analysis."""
 
 import csv
 import tempfile
@@ -33,7 +33,7 @@ PROBE_SETTINGS = {
     "attentive_ffn_hidden": 96,
 }
 EXPECTED_FIGURES = {
-    "depth_attentive.pdf",
+    "depth_mlp.pdf",
     "depth_ridge.pdf",
     "governing_parameters.pdf",
     "physics.pdf",
@@ -75,7 +75,7 @@ def _physics_rows(objective, seed):
                     target_offset=offset,
                     target=target,
                 )
-                for index, method in enumerate(("ridge", "attentive")):
+                for index, method in enumerate(("ridge", "mlp")):
                     value = (
                         offset_base
                         + 0.02 * index
@@ -134,7 +134,7 @@ def _physics_rows(objective, seed):
 
 def _governing_rows(objective, seed):
     rows = []
-    for index, method in enumerate(("ridge", "attentive")):
+    for index, method in enumerate(("ridge", "mlp")):
         for position, target in enumerate(GOVERNING):
             value = 0.5 - 0.1 * index + 0.05 * position + 0.02 * seed
             normalized = 0.20 + 0.05 * index + 0.10 * position + 0.01 * seed
@@ -237,7 +237,7 @@ class ReportingOutputTests(unittest.TestCase):
                 {
                     (objective, method, target)
                     for objective in ("jepa", "mae")
-                    for method in ("ridge", "attentive")
+                    for method in ("ridge", "mlp")
                     for target in GOVERNING
                 },
             )
@@ -314,7 +314,7 @@ class ReportingOutputTests(unittest.TestCase):
             dict(
                 family="regime",
                 representation="pooled",
-                method="attentive",
+                method="mlp",
                 objective="jepa",
                 target=target,
                 checkpoint_seed=seed,
@@ -334,7 +334,7 @@ class ReportingOutputTests(unittest.TestCase):
             )
             for target in GOVERNING
         ]
-        combined = averaged_normalized_mse(raw, "jepa", "attentive", GOVERNING)
+        combined = averaged_normalized_mse(raw, "jepa", "mlp", GOVERNING)
         self.assertAlmostEqual(combined["mean"], 0.3)
         self.assertAlmostEqual(combined["std"], np.std([0.2, 0.4], ddof=1))
         self.assertEqual(combined["n"], 2)
