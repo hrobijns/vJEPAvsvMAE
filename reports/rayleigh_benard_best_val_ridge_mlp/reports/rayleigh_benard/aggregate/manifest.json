@@ -1,0 +1,192 @@
+{
+  "schema": "well-analysis-2",
+  "kind": "aggregate",
+  "result_kind": "probes",
+  "protocol": {
+    "dataset": "rayleigh_benard",
+    "frame_limit": null,
+    "n_frames": 8,
+    "target_offsets": [
+      0,
+      16,
+      24,
+      40
+    ],
+    "patch": [
+      2,
+      16,
+      16
+    ],
+    "token_samples": 64,
+    "noise_sigmas": [
+      0.0,
+      0.05,
+      0.1,
+      0.2,
+      0.5,
+      1.0
+    ],
+    "noise_seeds": [
+      0,
+      1,
+      2
+    ],
+    "targets": [
+      "enstrophy",
+      "buoyancy_gradient_energy",
+      "convective_flux",
+      "pressure_gradient_magnitude",
+      "buoyancy_laplacian_magnitude"
+    ],
+    "governing_targets": [
+      "log10_Rayleigh",
+      "Prandtl"
+    ],
+    "target_version": 2,
+    "offset_definition": "target_start_minus_context_start",
+    "probe_splits": {
+      "fit": "train",
+      "select": "valid",
+      "score": "test"
+    }
+  },
+  "caches": {
+    "train": "7c352f583c7fa567f6181b5feae77d07c41d0829d4be44f66ea58af47cbd1506",
+    "valid": "8c774d674e0ee481d50d1b9dc805c1a49aaad27ec4c0be71896105595ed06af3",
+    "test": "8023ad0b574caa44c77a01f7f6f5e015d81898f651ada3fb245d4b7c9efe828a"
+  },
+  "probe_settings": {
+    "ridge_alphas": [
+      1e-05,
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "mlp_max_steps": 2000,
+    "mlp_min_steps": 150,
+    "mlp_hidden": 128,
+    "mlp_dropout": 0.1,
+    "mlp_lr": 0.01,
+    "mlp_weight_decay": 0.0001,
+    "probe_seeds": [
+      0
+    ],
+    "mlp_predictions": "single_seed",
+    "metadata_methods": {
+      "pooled": "regime_time_mlp",
+      "token": "regime_time_position_mlp"
+    },
+    "physical_targets": [
+      "enstrophy",
+      "buoyancy_gradient_energy",
+      "convective_flux",
+      "pressure_gradient_magnitude",
+      "buoyancy_laplacian_magnitude"
+    ],
+    "metadata_inputs_pooled": 3,
+    "metadata_inputs_token": 6,
+    "feature_mlp": true,
+    "attentive": false,
+    "attentive_epochs": 100,
+    "attentive_batch_size": 32,
+    "attentive_min_epochs": 15,
+    "attentive_patience": 10,
+    "attentive_blocks": 1,
+    "attentive_heads": 8,
+    "attentive_ffn_hidden": 96,
+    "attentive_dropout": 0.0,
+    "attentive_lr": 0.001,
+    "attentive_weight_decay": 0.01,
+    "attentive_warmup_epochs": 2,
+    "attentive_schedule": "linear_warmup_inverse_sqrt",
+    "attentive_seed": 0,
+    "attentive_context": "all_input_context_tokens",
+    "attentive_queries": {
+      "pooled": "learned_global",
+      "token": "normalized_frozen_token_plus_coordinate"
+    },
+    "attentive_local_queries": 64,
+    "governing_targets": [
+      "log10_Rayleigh",
+      "Prandtl"
+    ],
+    "governing_fit": "joint_two_output_ridge_scalar_mlp",
+    "governing_standardization": "train_only",
+    "governing_selection_metric": "valid_normalized_mse",
+    "regime_samples": {
+      "ridge": "trajectory_averaged_pooled_features",
+      "mlp": "trajectory_averaged_pooled_features",
+      "attentive": "per_window_context_then_averaged_predictions"
+    },
+    "probe_layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "probe_outputs": [
+      "block_1",
+      "block_2",
+      "block_3",
+      "block_4",
+      "block_5",
+      "block_6",
+      "block_7",
+      "block_8",
+      "block_9",
+      "block_10",
+      "block_11",
+      "block_12",
+      "final_norm"
+    ],
+    "selection_metric": "valid_vrmse"
+  },
+  "roster": [
+    [
+      "jepa",
+      1
+    ],
+    [
+      "jepa_future",
+      1
+    ],
+    [
+      "mae",
+      1
+    ],
+    [
+      "mae_future",
+      1
+    ]
+  ],
+  "source_results": [
+    "2d59035aa860e7e6614412c4ac69be98b99af0b8decbd247eaec794d23bd1377",
+    "27a1d6dcb576beefb57592be073c1af956beecf87026bcfa2a4314dc56cebec3",
+    "d241b26f3ccf7ef1c28c07a398a66e9d159b601d37166311c5323af6625ac5dc",
+    "7243bc34cebd8f31f91ca25797f2f61e9fd9521e9d59a5cde4de4382e3115f2b"
+  ],
+  "scientific_unit": "checkpoint_seed",
+  "provenance": {
+    "git_commit": "713ff88585f7fd612145af8ec766063e79f371e2",
+    "code_sha256": "b77a0a5f7dc562733a943188135c5215100d1c115d3ba5eb39ce0a7b4194caca"
+  },
+  "files": {
+    "rows.json": "7a2aca6a333fe9b2a91efa3795c8afb2b344f77250e2ad1f7dbeb0c102fd1e25",
+    "summary.json": "7cb2cf9ba58f03149e20972df260767a518f0835fea5b541c4f53f6b6b571f3e",
+    "target_means.json": "74aa3cf8f5d9f5d4efb13ec2bb1ce76d50a5b6de1b224983cb4cdabcb00afb17"
+  },
+  "sha256": "bb5ae0aa7a6ae679c476bd41670305955abc799449f5c4e52553af138a494283"
+}

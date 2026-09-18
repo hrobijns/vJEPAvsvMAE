@@ -1,0 +1,21 @@
+{
+  "schema": "well-analysis-2",
+  "kind": "plots",
+  "aggregate": "bb5ae0aa7a6ae679c476bd41670305955abc799449f5c4e52553af138a494283",
+  "metric": "test_vrmse",
+  "provenance": {
+    "git_commit": "713ff88585f7fd612145af8ec766063e79f371e2",
+    "code_sha256": "b77a0a5f7dc562733a943188135c5215100d1c115d3ba5eb39ce0a7b4194caca"
+  },
+  "files": {
+    "depth_mlp.pdf": "3b2b427b29fcab3d109134cd7f831079fbd736e4701bb64e4111fad9781c3c54",
+    "depth_ridge.pdf": "261aa16072b43cd60f6c9712fbf5bfbc34e65e157048b70824d5452a898b95ac",
+    "governing_parameters.pdf": "fe57a42e6ead970afd3028a315954ca2ced68dce0606775a926b261ca1300f5b",
+    "physics.pdf": "ebd7ce86b7b2d2b717d0bd31f47a791a8ab859279afa9588e7e794354ac0c81d",
+    "physics_metadata_mlp.pdf": "4d2fbc538e44a3fdec745262a04ec0c837aa2af4cdbc473e896dbffe9099fb12",
+    "physics_persistence.pdf": "b9f385dd5941fd58456883c9b3251af6b08afef3ad99015cffa8de241a34fe62",
+    "summary.tsv": "875c61d3acaa4c55180d604fec700ada7cfe68f5a976f381f3edf761ce7a6977",
+    "target_means.json": "74aa3cf8f5d9f5d4efb13ec2bb1ce76d50a5b6de1b224983cb4cdabcb00afb17"
+  },
+  "sha256": "c71d69a80d18c3f6fa1d230128c3aff884adf8ae20060a767116b9609b74b91a"
+}

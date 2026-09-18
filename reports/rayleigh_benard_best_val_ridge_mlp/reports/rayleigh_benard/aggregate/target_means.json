@@ -1,0 +1,2562 @@
+[
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.09883359017711342,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9893001347240491,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9950237577004138,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1829.0365390319344,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.5890277014316087,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.16258500539782345,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9714321855462646,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9862924035102406,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 2118.361343966874,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.2842161871438552,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1623462837773567,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9720834562508107,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.986102166666201,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1756.1915169180763,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.2978462081875758,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.33034177154761096,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.8714279080015427,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9326860740561284,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 20925.43247481092,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.30058006072617155,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1905509661913392,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9569064784983116,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9790035859794731,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 91805.52467018494,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.1950060904352657,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5481014841625991,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6820161848582131,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8216087161710032,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 184667.6577764818,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2341401327100945,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5468347140399795,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6774472001567583,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8184576060041783,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 160758.8088168007,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2929835262249516,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5617716910958307,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6530367147498174,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8006994951287755,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 145219.96137977575,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.312307054135285,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.18576287396015112,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9589902441550215,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9791900881646118,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 13643.14811031326,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.09869774180130886,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1992972366210059,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9572393845379793,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9786690143033677,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 4030.802882234237,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.11110459820089211,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1932355642608015,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9602180382597325,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.980052990896828,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 2463.331792093388,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.14926887301620884,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.3741310236178487,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.8333145807928153,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9105442129421789,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 29070.596877357595,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.40677326203279557,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.47011002963309423,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7392270873157016,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8538825889023857,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 333833.48425759765,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.0011868942073114,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6647164548335217,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5476001505272814,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7349826583926748,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 423235.80764389003,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4181395821693825,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.667773722051049,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5401237684143669,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7255840716136023,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 418139.2660419423,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.490438880630679,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6707356050127605,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5326818719453266,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7194167431260031,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 361014.0272206921,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4980496906174188,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.08382074712628718,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9916540447900208,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9960287312483016,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1917.2490266212237,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.7811816068588517,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.11666102056985717,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9837844912549706,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9921927892676672,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 699.4846520175495,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.6031428612577155,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.10975446099180605,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9850111795129001,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9925783208344378,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 304.96267082183084,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.6995358585359093,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1883751449734808,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9599170894476264,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9800083412889959,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 4780.726646595194,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.15250835125656206,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1792057884052173,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9623190385359276,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9815399832511448,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 59554.04366887243,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.1258906656268932,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5036055421269168,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.718329639084039,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8449934747887339,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 105508.91317670836,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.1330357741388397,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5142092589572669,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7074213219341399,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8360411428374619,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 114901.52924945482,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.224027076100061,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.538133036906933,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6708189966042829,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8123897944169581,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 95860.24120828185,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2530666560941266,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.15863865754332368,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9668969523245006,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9834562660779624,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 12014.154173617146,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.3077457325903076,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.15933588492714668,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.972305808393787,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9860893548460986,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 3484.379430654629,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.3094010847201917,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1498515310440625,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9753715407619016,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9876995430501498,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1848.4494189082263,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.3823197760156648,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1992696518853567,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9558423283559054,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9776699588942968,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 5407.902000616736,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.09506094741023094,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.44081759721277525,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7729007980661327,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8755964938981894,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 316020.16190316144,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.952869706393484,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6190285407954053,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6065165073494757,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.776386976679188,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 321318.1375457108,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.354903124010542,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6183277340157849,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.603561704253542,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.77085163698589,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 305138.55377711897,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.420974384031137,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "jepa_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6276417615206719,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5873093606743539,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7587202202849884,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 263034.4261134572,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4361736173446067,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.08659727192412572,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9911306816412887,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9957484785777305,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1949.5314720701772,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.7677579345974319,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1468914855270302,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9761003902757214,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.988800667305008,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1977.7273870627935,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.38821504808559243,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.14800571033906737,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9760266835713498,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9883997932150799,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1425.9575707751262,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.3927148695546617,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.3949097432518467,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7976842153921108,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8877865578942098,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 38885.07558318033,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.3849607552132094,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.18560838485916115,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9592053664458454,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9798412778384524,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 81772.88101383757,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.1619523090999682,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5349402215117592,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6959270069616743,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8323921198404942,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 174288.99056073697,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2117407566031937,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5309959278454081,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6952512576371758,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8287222412837278,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 150854.81360217187,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2666264295617173,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5561615661009573,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6546859215663879,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8054266554800755,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 114881.21544740113,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2946571041249038,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.155773981732084,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9677114250312353,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9838169578422468,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 9843.665125033716,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.3439342328041077,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.17791699651422674,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9650357490040766,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9826423459718836,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 4452.595274944901,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.22596465997099688,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.1728524515159733,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9676640282026459,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9839682451494131,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 2801.6050853611896,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.2590776963721325,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.4036328370554042,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7916774975341887,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8842920568307641,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 39801.84956617628,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.4177000436784047,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.4422990289952614,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7694127939011957,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8732827394582184,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 334257.0410451164,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.9548230991906803,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6511885493554059,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5692910453161445,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7527619264776544,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 429965.6971372436,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.403729053958819,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6524038510289638,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5648955287761781,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7466858146557069,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 407371.5725710996,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.474304902333122,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6586548520343243,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5524195104015579,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7364096578466583,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 360672.43101306073,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4856220227067634,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.09209923624430152,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9896225149426916,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9950701647503228,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 2675.9435535711464,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.7267915566936077,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.14289520222599458,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.977754432937763,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.989087439246903,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1953.950801739639,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.4054771008915459,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.14725521357781818,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9766281602442113,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9884915998615336,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 1484.5467464256067,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.39161282212406573,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.3936904589202643,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7982530799478743,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8881163986557352,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 38976.27320859945,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.3795093415175635,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.18863485762560145,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9567829087237871,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.978682402750066,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 91637.48553242901,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.1717740040231135,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5428212883194128,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6836693689549493,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8284888522523604,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 182791.3633887412,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2203274222946625,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5313326370629226,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6924511973479262,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8261769902262446,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 144818.7562575931,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.263205521520757,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "mlp",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.5482973522889415,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.6634785814235127,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8075276203145687,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 118414.27275747058,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.2806994812411987,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.16058738466619712,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9646737808270547,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9822384928103748,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 13060.036503563777,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.33611011642177324,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.17601517956071538,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9656006154715264,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9828737201470992,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 4746.612416165453,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.2414866769951347,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.17080419185685441,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.9685493229608048,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.9843439359923412,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 2763.801691673444,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": -0.2671789640727155,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "pooled",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.4025947673114672,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7921703153103248,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8845275267590749,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 39680.85378653935,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 0.4131431574039528,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 0,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.44865244372542934,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.7647184033785795,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.8702394454146247,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 322156.73948406137,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 1.9731775775344418,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 16,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6465133972026204,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.574113122245231,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7547549822188303,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 394478.0297693939,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.3960985344633388,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 24,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6465193320523086,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.5700072123244752,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7483144833321383,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 367329.1661486613,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4636238881982386,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "objective": "mae_future",
+    "family": "physics",
+    "method": "ridge",
+    "representation": "token",
+    "target_offset": 40,
+    "sigma": null,
+    "metrics": {
+      "test_vrmse": {
+        "mean": 0.6539046079156441,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_r2": {
+        "mean": 0.557038761377963,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_pearson_r": {
+        "mean": 0.7388647354388513,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_mse": {
+        "mean": 330954.0963708007,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      },
+      "test_log_mse": {
+        "mean": 2.4773369077895864,
+        "std": null,
+        "n": 1,
+        "status": "ok"
+      }
+    }
+  }
+]

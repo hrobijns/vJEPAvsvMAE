@@ -1,0 +1,232 @@
+{
+  "provenance": {
+    "git_commit": "713ff88585f7fd612145af8ec766063e79f371e2",
+    "code_sha256": "b77a0a5f7dc562733a943188135c5215100d1c115d3ba5eb39ce0a7b4194caca"
+  },
+  "script_sha256": "d39fb99769586f4fb241df54ff3df662ad731b1d5a8a3f4572fe38c4c68be76b",
+  "base": "/workspace/well",
+  "handoff_sha256": "f581f400cf844e5bc71a1cc786df9d53594065142a5d1dcb5aa508ba1ddcd989",
+  "encoder_policy": {
+    "version": 3,
+    "roster": "minimum_pretraining_validation_loss",
+    "candidate": "best_val",
+    "downstream_checkpoint_selection": false
+  },
+  "probe_settings": {
+    "mlp_max_steps": 2000,
+    "mlp_min_steps": 150,
+    "feature_mlp": true,
+    "attentive": false,
+    "attentive_epochs": 100,
+    "attentive_min_epochs": 15,
+    "attentive_patience": 10,
+    "attentive_batch_size": 32
+  },
+  "protocols": {
+    "rayleigh_benard": {
+      "dataset": "rayleigh_benard",
+      "frame_limit": null,
+      "n_frames": 8,
+      "target_offsets": [
+        0,
+        16,
+        24,
+        40
+      ],
+      "patch": [
+        2,
+        16,
+        16
+      ],
+      "token_samples": 64,
+      "noise_sigmas": [
+        0.0,
+        0.05,
+        0.1,
+        0.2,
+        0.5,
+        1.0
+      ],
+      "noise_seeds": [
+        0,
+        1,
+        2
+      ],
+      "targets": [
+        "enstrophy",
+        "buoyancy_gradient_energy",
+        "convective_flux",
+        "pressure_gradient_magnitude",
+        "buoyancy_laplacian_magnitude"
+      ],
+      "governing_targets": [
+        "log10_Rayleigh",
+        "Prandtl"
+      ],
+      "target_version": 2,
+      "offset_definition": "target_start_minus_context_start",
+      "probe_splits": {
+        "fit": "train",
+        "select": "valid",
+        "score": "test"
+      }
+    }
+  },
+  "physical_targets": {
+    "rayleigh_benard": [
+      "enstrophy",
+      "buoyancy_gradient_energy",
+      "convective_flux",
+      "pressure_gradient_magnitude",
+      "buoyancy_laplacian_magnitude"
+    ]
+  },
+  "objectives": [
+    "jepa",
+    "mae",
+    "jepa_future",
+    "mae_future"
+  ],
+  "encoders": [
+    {
+      "dataset": "rayleigh_benard",
+      "objective": "jepa",
+      "seed": 1,
+      "candidate": "best_val",
+      "step": 100000,
+      "total_steps": 100000,
+      "checkpoint": "/workspace/vJEPAvsvMAE/checkpoints/iclr2027/seed1/rayleigh_benard/jepa/encoder_best_val.pt",
+      "checkpoint_sha256": "fde3f3c6b891dc8d3f88c3f3a1c55b4a35d5a24659d287a5c686b535681b88cb",
+      "bytes": 88377111,
+      "encoder_state_sha256": "c6cb39bf426343bcabb5524ff7af557e2cda61fac5ee64fa3419b973d6f8237e",
+      "config_sha256": "cfb75de98176b8d465788981dbfe9ffd8b82cc1e9db3f52a3cec9980ccfe00fe",
+      "training_identity": "2b53886e6a5265440b70c5e1da3504adebb7ee2fe05ef27e079ef970c3459488",
+      "training_protocol": {
+        "frame_limit": null,
+        "valid_stride": 8,
+        "batch_size": 64,
+        "total_steps": 100000
+      },
+      "spec": {
+        "n_channels": 4,
+        "n_frames": 8,
+        "height": 512,
+        "width": 128
+      },
+      "data_exposure": {
+        "eligible_train_clips": 236425,
+        "eligible_validation_clips": 33775,
+        "planned_clips": 6400000,
+        "planned_equivalent_passes": 27.069895315639208,
+        "clips_processed": 6400000,
+        "equivalent_passes": 27.069895315639208
+      },
+      "id": "rayleigh_benard_jepa_seed1_best_val_fde3f3c6b891"
+    },
+    {
+      "dataset": "rayleigh_benard",
+      "objective": "jepa_future",
+      "seed": 1,
+      "candidate": "best_val",
+      "step": 98000,
+      "total_steps": 100000,
+      "checkpoint": "/workspace/vJEPAvsvMAE/checkpoints/iclr2027/seed1/rayleigh_benard/jepa_future/encoder_best_val.pt",
+      "checkpoint_sha256": "23a78319f0a0e1c811ff1b4bd75d5ae89a77dace6153b8bb8a25bc2b39f63414",
+      "bytes": 88377111,
+      "encoder_state_sha256": "beee3f30a8d8c421e914dab1b4d0e3d77537967e7b74da938c6c3404e16ce4b2",
+      "config_sha256": "0d3a523fb9e62e0c7492546eff15270d03f9ba760d1c556d275aef7fd68695aa",
+      "training_identity": "715fe24a386622ade8cf9b6a8c894f1ecbf7d9807e4c5e661ebe8ce5ea259d3d",
+      "training_protocol": {
+        "frame_limit": null,
+        "valid_stride": 8,
+        "batch_size": 64,
+        "total_steps": 100000
+      },
+      "spec": {
+        "n_channels": 4,
+        "n_frames": 8,
+        "height": 512,
+        "width": 128
+      },
+      "data_exposure": {
+        "eligible_train_clips": 226625,
+        "eligible_validation_clips": 32375,
+        "planned_clips": 6400000,
+        "planned_equivalent_passes": 28.240485383342527,
+        "clips_processed": 6272000,
+        "equivalent_passes": 27.675675675675677
+      },
+      "id": "rayleigh_benard_jepa_future_seed1_best_val_23a78319f0a0"
+    },
+    {
+      "dataset": "rayleigh_benard",
+      "objective": "mae",
+      "seed": 1,
+      "candidate": "best_val",
+      "step": 100000,
+      "total_steps": 100000,
+      "checkpoint": "/workspace/vJEPAvsvMAE/checkpoints/iclr2027/seed1/rayleigh_benard/mae/encoder_best_val.pt",
+      "checkpoint_sha256": "179eb180c8c5e0c626e2e0585be8bc062a4b1cabbdd460335906066eff374d59",
+      "bytes": 88377047,
+      "encoder_state_sha256": "b65b669cd4c9929c5cede1c0fbdabb39e485615ecf4aa635b5e0e31a4935343b",
+      "config_sha256": "68e67d7646cb93f4dd12a60520e5678361ca3d9d4854afa00484609b10d712b2",
+      "training_identity": "3e90ca2d7fc958c4789f37f4fcc832cb226f174ce58dca173d10af6e068a71b0",
+      "training_protocol": {
+        "frame_limit": null,
+        "valid_stride": 8,
+        "batch_size": 64,
+        "total_steps": 100000
+      },
+      "spec": {
+        "n_channels": 4,
+        "n_frames": 8,
+        "height": 512,
+        "width": 128
+      },
+      "data_exposure": {
+        "eligible_train_clips": 236425,
+        "eligible_validation_clips": 33775,
+        "planned_clips": 6400000,
+        "planned_equivalent_passes": 27.069895315639208,
+        "clips_processed": 6400000,
+        "equivalent_passes": 27.069895315639208
+      },
+      "id": "rayleigh_benard_mae_seed1_best_val_179eb180c8c5"
+    },
+    {
+      "dataset": "rayleigh_benard",
+      "objective": "mae_future",
+      "seed": 1,
+      "candidate": "best_val",
+      "step": 100000,
+      "total_steps": 100000,
+      "checkpoint": "/workspace/vJEPAvsvMAE/checkpoints/iclr2027/seed1/rayleigh_benard/mae_future/encoder_best_val.pt",
+      "checkpoint_sha256": "5fa2435fbcd97cc4a1847c343212d6f97f7569eca9ee98b2246c24dd4d14573e",
+      "bytes": 88377047,
+      "encoder_state_sha256": "4e3027dbabd6e06967331d73d7abe1a8194b52f5138582da5d96fac48b0d8ffe",
+      "config_sha256": "e242cca8098c2bacbace7013a503f582e80d1c43338bc4f273a3802791fe3db7",
+      "training_identity": "4224203b164cb8773a46bf3f6af14d90922ed730364584058968e34e21c49f8d",
+      "training_protocol": {
+        "frame_limit": null,
+        "valid_stride": 8,
+        "batch_size": 64,
+        "total_steps": 100000
+      },
+      "spec": {
+        "n_channels": 4,
+        "n_frames": 8,
+        "height": 512,
+        "width": 128
+      },
+      "data_exposure": {
+        "eligible_train_clips": 226625,
+        "eligible_validation_clips": 32375,
+        "planned_clips": 6400000,
+        "planned_equivalent_passes": 28.240485383342527,
+        "clips_processed": 6400000,
+        "equivalent_passes": 28.240485383342527
+      },
+      "id": "rayleigh_benard_mae_future_seed1_best_val_5fa2435fbcd9"
+    }
+  ]
+}
