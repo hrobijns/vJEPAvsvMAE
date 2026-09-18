@@ -317,6 +317,7 @@ def _probe_settings(
         physical_targets=list(physical_targets),
         metadata_inputs_pooled=metadata_widths["pooled"],
         metadata_inputs_token=metadata_widths["token"],
+        governing_only=tuning["governing_only"],
         feature_mlp=tuning["feature_mlp"],
         attentive=tuning["attentive"],
         attentive_epochs=tuning["attentive_epochs"],
@@ -430,6 +431,7 @@ def fit_probes(
     physical_targets=None,
     feature_mlp=False,
     attentive=True,
+    governing_only=False,
 ):
     features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
     protocol = Protocol.from_dict(caches[0].manifest["protocol"])
@@ -447,6 +449,7 @@ def fit_probes(
         dict(
             mlp_max_steps=mlp_max_steps,
             mlp_min_steps=mlp_min_steps,
+            governing_only=governing_only,
             feature_mlp=feature_mlp,
             attentive=attentive,
             attentive_epochs=attentive_epochs,
@@ -499,6 +502,9 @@ def fit_probes(
         done = {}
         for representation in REPRESENTATIONS:
             local = representation == "token"
+            if governing_only and local:
+                # The governing-parameter gate reads pooled features only.
+                continue
             context = train.shard(representation, layer, dev) if attentive else None
             valid_context = (
                 valid.shard(representation, layer, dev) if attentive else None
@@ -516,14 +522,18 @@ def fit_probes(
                 )
             else:
                 x, xv = train.pooled(layer), valid.pooled(layer)
-            ridge = fit_ridge_layer(
-                layer,
-                x,
-                train.flat_targets(representation, physical_targets),
-                xv,
-                valid.flat_targets(representation, physical_targets),
+            ridge = (
+                None
+                if governing_only
+                else fit_ridge_layer(
+                    layer,
+                    x,
+                    train.flat_targets(representation, physical_targets),
+                    xv,
+                    valid.flat_targets(representation, physical_targets),
+                )
             )
-            for offset in protocol.target_offsets:
+            for offset in () if governing_only else protocol.target_offsets:
                 for target in physical_targets:
                     base = dict(
                         family="physics",
@@ -627,7 +637,9 @@ def fit_probes(
         for key, entry in done.items():
             entries[key][layer] = entry
 
-    if partial.completed("metadata"):
+    if governing_only:
+        pass
+    elif partial.completed("metadata"):
         restore("metadata")
     else:
         done = {}
@@ -666,9 +678,10 @@ def fit_probes(
         ) | {"plan": spec}
         fitted[key] = result
         rows.extend(_rows(result, spec, key))
-    rows.extend(
-        _persistence_rows(valid, protocol, protocol.dataset, physical_targets)
-    )
+    if not governing_only:
+        rows.extend(
+            _persistence_rows(valid, protocol, protocol.dataset, physical_targets)
+        )
     with staged_directory(output) as stage:
         write_json(stage / "rows.json", rows)
         torch.save(fitted, stage / "fits.pt")

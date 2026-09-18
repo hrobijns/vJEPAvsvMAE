@@ -448,30 +448,43 @@ def extracted_features(checkpoint, cache_root, feature_root, feature, splits):
             raise ValueError(f"extraction sealed no {split} features: {feature}")
 
 
-def run(output, study, task):
+def run(output, study, task, governing_only=False):
+    """Fit one frozen encoder; the gate mode fits only the governing probes."""
     row = encoder(study, task)
     cache_root, feature_root, feature, fit = encoder_paths(output, row)
+    settings = dict(study["probe_settings"], governing_only=governing_only)
+    if governing_only:
+        # A gate fit is a separate scratch artifact: it never satisfies the
+        # study's own fit requirement and never blocks the full run.
+        fit = fit.with_name(fit.name + ".governing")
     start = time.monotonic()
-    if not fitted(output, row):
+    if governing_only or not fitted(output, row):
         checkpoint = verified_checkpoint(row)
         extracted_features(
             checkpoint, cache_root, feature_root, feature, ("train", "valid")
         )
-        fit_probes(
-            feature,
-            cache_root,
-            fit,
-            physical_targets=study["physical_targets"][row["dataset"]],
-            **study["probe_settings"],
-        )
-        if not fitted(output, row):
+        if not sealed(fit, "probe_fits"):
+            fit_probes(
+                feature,
+                cache_root,
+                fit,
+                physical_targets=study["physical_targets"][row["dataset"]],
+                **settings,
+            )
+        if not governing_only and not fitted(output, row):
             raise ValueError(f"fitting sealed no usable probe fit: {fit}")
-    print(
-        json.dumps(
-            dict(encoder=row["id"], seconds=time.monotonic() - start, fit=str(fit))
-        ),
-        flush=True,
-    )
+    summary = dict(encoder=row["id"], seconds=time.monotonic() - start, fit=str(fit))
+    if governing_only:
+        summary["governing"] = [
+            {
+                "target": r["target"],
+                "selected_layer": r["selected_layer"],
+                "valid_r2": r.get("valid_r2"),
+            }
+            for r in Artifact(fit, "probe_fits").json("rows.json")
+            if r["family"] == "regime"
+        ]
+    print(json.dumps(summary), flush=True)
 
 
 def test(output, study, task):
@@ -587,6 +600,12 @@ def main():
     for name in ("run", "test"):
         p = commands.add_parser(name)
         p.add_argument("--task", required=True, type=int)
+        if name == "run":
+            p.add_argument(
+                "--governing-only",
+                action="store_true",
+                help="fit only the governing-parameter probes as a gate",
+            )
     for name in ("report", "status"):
         commands.add_parser(name)
     for name, p in commands.choices.items():
@@ -607,8 +626,10 @@ def main():
     study = load(output)
     if args.command == "cache":
         cache(output, study, args.dataset, args.split)
-    elif args.command in ("run", "test"):
-        (run if args.command == "run" else test)(output, study, args.task)
+    elif args.command == "run":
+        run(output, study, args.task, governing_only=args.governing_only)
+    elif args.command == "test":
+        test(output, study, args.task)
     else:
         (report if args.command == "report" else status)(output, study)
 
