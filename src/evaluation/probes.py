@@ -540,6 +540,15 @@ def _attentive_loss(
         )
     return float(F.mse_loss(predicted, labels))
 
+def _warmup_inverse_sqrt(step, warmup_steps):
+    """Cap-independent learning-rate multiplier for one-based optimizer updates."""
+    update = step + 1
+    return (
+        update / warmup_steps
+        if update <= warmup_steps
+        else math.sqrt(warmup_steps / update)
+    )
+
 
 def fit_attentive_layer(
     layer,
@@ -553,6 +562,8 @@ def fit_attentive_layer(
     epochs=100,
     batch_size=32,
     seed=ATTENTIVE["seed"],
+    min_epochs=1,
+    patience=None,
     valid_groups=None,
     joint=False,
 ):
@@ -579,8 +590,16 @@ def fit_attentive_layer(
         raise ValueError("attentive probes need (samples,tokens,features) context")
     if local and np.asarray(positions).shape[1] != np.asarray(valid_positions).shape[1]:
         raise ValueError("train and validation query counts differ")
-    if epochs < 1 or batch_size < 1:
-        raise ValueError("attentive training needs positive epochs and batch size")
+    if (
+        epochs < 1
+        or batch_size < 1
+        or not 1 <= min_epochs <= epochs
+        or (patience is not None and patience < 1)
+    ):
+        raise ValueError(
+            "attentive training needs positive epochs/batch/patience and "
+            "min_epochs within the epoch cap"
+        )
     queries = int(np.asarray(positions).shape[1]) if local else 1
     names, y = _attentive_stack(targets, len(context), queries)
     _, yv = _attentive_stack(
@@ -612,15 +631,14 @@ def fit_attentive_layer(
     )
     per_epoch = math.ceil(len(context) / batch_size)
     warmup = max(ATTENTIVE["warmup_epochs"] * per_epoch, 1)
-    total = max(epochs * per_epoch, warmup + 1)
     schedule = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
-        lambda step: (step + 1) / warmup
-        if step < warmup
-        else 0.5 * (1 + math.cos(math.pi * (step - warmup) / (total - warmup))),
+        lambda step: _warmup_inverse_sqrt(step, warmup),
     )
     generator = torch.Generator().manual_seed(seed)
     best, best_epoch, best_state = float("inf"), 0, None
+    valid_loss_curve = []
+    trained_epochs = 0
     for epoch in range(1, epochs + 1):
         model.train()
         order = torch.randperm(len(context), generator=generator).to(dev)
@@ -644,11 +662,19 @@ def fit_attentive_layer(
             batch_size,
             valid_groups,
         )
+        valid_loss_curve.append(loss)
+        trained_epochs = epoch
         if loss < best:
             best, best_epoch = loss, epoch
             best_state = {
                 k: v.detach().cpu().clone() for k, v in model.state_dict().items()
             }
+        if (
+            patience is not None
+            and epoch >= min_epochs
+            and epoch - best_epoch >= patience
+        ):
+            break
     if best_state is None:
         raise ValueError("attentive probe produced no finite validation epoch")
     fit = dict(
@@ -664,7 +690,15 @@ def fit_attentive_layer(
         target_mean=mean.tolist(),
         target_std=deviation.tolist(),
     )
-    return dict(layer=layer, selected_epoch=best_epoch, fit=fit) | scored(
+    return dict(
+        layer=layer,
+        selected_epoch=best_epoch,
+        selected_step=best_epoch * per_epoch,
+        trained_epochs=trained_epochs,
+        trained_steps=trained_epochs * per_epoch,
+        valid_loss_curve=valid_loss_curve,
+        fit=fit,
+    ) | scored(
         attentive_predictions(
             fit, valid_context, valid_positions, groups=valid_groups
         ),

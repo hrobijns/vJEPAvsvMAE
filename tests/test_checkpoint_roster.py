@@ -294,6 +294,7 @@ def frozen_study(module, dataset="rayleigh_benard", objectives=OBJECTIVES, seeds
         probe_settings=copy.deepcopy(module.PROBE_SETTINGS),
         protocols={dataset: module.frozen_protocol(REPO, dataset).to_dict()},
         physical_targets={dataset: module.selected_physical_targets(dataset)},
+        objectives=list(objectives),
         encoders=encoders,
     )
 
@@ -416,6 +417,13 @@ class FrozenStudyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "physical targets"):
                 self.sweep.load(output)
 
+
+            single = frozen_study(self.sweep, objectives=("jepa",))
+            self.rewrite(output, single)
+            self.assertEqual(
+                [row["objective"] for row in self.sweep.load(output)["encoders"]],
+                ["jepa"],
+            )
             milestone = copy.deepcopy(self.study)
             milestone["encoders"][0]["candidate"] = "100pct"
             self.rewrite(output, milestone)
@@ -550,6 +558,8 @@ class FrozenStudyTests(unittest.TestCase):
                         mlp_min_steps=150,
                         attentive_epochs=100,
                         attentive_batch_size=32,
+                        attentive_min_epochs=15,
+                        attentive_patience=10,
                         physical_targets=self.study["physical_targets"][
                             "rayleigh_benard"
                         ],
@@ -592,7 +602,7 @@ class FrozenStudyTests(unittest.TestCase):
             folder = output / "reports/rayleigh_benard"
             self.assertEqual(
                 aggregated,
-                [((scores, folder / "aggregate"), dict(objectives=OBJECTIVES, seeds=[1]))],
+                [((scores, folder / "aggregate"), dict(objectives=list(OBJECTIVES), seeds=[1]))],
             )
             self.assertEqual(plotted, [(folder / "aggregate", folder / "plots")])
 

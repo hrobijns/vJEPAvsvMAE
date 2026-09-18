@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +22,7 @@ from src.evaluation.probes import (
     local_queries,
     predict_attentive,
     select_layers,
+    _warmup_inverse_sqrt,
 )
 from src.evaluation.protocol import (
     Protocol,
@@ -205,6 +207,28 @@ class LocalAttentiveTests(unittest.TestCase):
             token_part.mean(-1), torch.zeros_like(token_part.mean(-1)), atol=1e-5, rtol=0
         )
         self.assertGreater(float(coordinates[index].abs().max()), 0.1)
+
+    def test_cap_independent_schedule_early_stops_on_validation(self):
+        target = self.context.float().mean((1, 2)).numpy()
+        with patch.dict(ATTENTIVE, {"lr": 0.0}):
+            entry = fit_attentive_layer(
+                0,
+                self.context,
+                {"enstrophy": target},
+                self.context,
+                {"enstrophy": target},
+                epochs=10,
+                min_epochs=3,
+                patience=2,
+                batch_size=4,
+            )
+        self.assertEqual(entry["selected_epoch"], 1)
+        self.assertEqual(entry["trained_epochs"], 3)
+        self.assertEqual(entry["selected_step"], 2)
+        self.assertEqual(entry["trained_steps"], 6)
+        self.assertEqual(len(entry["valid_loss_curve"]), 3)
+        self.assertEqual(_warmup_inverse_sqrt(3, 4), 1.0)
+        self.assertLess(_warmup_inverse_sqrt(7, 4), 1.0)
 
 
 class LeakageTests(unittest.TestCase):

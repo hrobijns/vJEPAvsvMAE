@@ -38,6 +38,7 @@ STUDY="${STUDY:-/workspace/rb_best_val}"
 HANDOFF="${HANDOFF:-$REPO/checkpoints/iclr2027/seed1}"
 DATASET="${DATASET:-rayleigh_benard}"
 TARGETS="${TARGETS:-}"
+OBJECTIVES="${OBJECTIVES:-}"
 MIN_FREE_GIB="${MIN_FREE_GIB:-80}"
 REPORT_MIN_FREE_GIB="${REPORT_MIN_FREE_GIB:-1}"
 PRUNE_FEATURES="${PRUNE_FEATURES:-0}"
@@ -153,6 +154,11 @@ if [ -n "$TARGETS" ]; then
   read -r -a target_args <<<"$TARGETS"
   target_args=(--targets "${target_args[@]}")
 fi
+objective_args=()
+if [ -n "$OBJECTIVES" ]; then
+  read -r -a objective_args <<<"$OBJECTIVES"
+  objective_args=(--objectives "${objective_args[@]}")
+fi
 if [ "$stage" = prepare ] || [ "$stage" = all ]; then
   preflight prepare
   if prepared; then
@@ -165,7 +171,7 @@ if [ "$stage" = prepare ] || [ "$stage" = all ]; then
   else
     ( cd "$REPO" && "$PYTHON" scripts/probe_sweep.py prepare \
         --handoff "$HANDOFF" --base "$BASE" --output "$STUDY" \
-        --dataset "$DATASET" "${target_args[@]}" )
+        --dataset "$DATASET" "${target_args[@]}" "${objective_args[@]}" )
     prepared || { echo "preparation produced no usable study at $STUDY" >&2; exit 1; }
   fi
 fi

@@ -312,6 +312,8 @@ def _probe_settings(
         metadata_inputs_token=metadata_widths["token"],
         attentive_epochs=tuning["attentive_epochs"],
         attentive_batch_size=tuning["attentive_batch_size"],
+        attentive_min_epochs=tuning["attentive_min_epochs"],
+        attentive_patience=tuning["attentive_patience"],
         attentive_blocks=ATTENTIVE["blocks"],
         attentive_heads=ATTENTIVE["heads"],
         attentive_ffn_hidden=ATTENTIVE["ffn_hidden"],
@@ -319,6 +321,7 @@ def _probe_settings(
         attentive_lr=ATTENTIVE["lr"],
         attentive_weight_decay=ATTENTIVE["weight_decay"],
         attentive_warmup_epochs=ATTENTIVE["warmup_epochs"],
+        attentive_schedule="linear_warmup_inverse_sqrt",
         attentive_seed=ATTENTIVE["seed"],
         attentive_context="all_input_context_tokens",
         attentive_queries=dict(
@@ -412,6 +415,8 @@ def fit_probes(
     mlp_min_steps=150,
     attentive_epochs=100,
     attentive_batch_size=32,
+    attentive_min_epochs=15,
+    attentive_patience=10,
     physical_targets=None,
 ):
     features, caches = _features_and_caches(feature_dir, cache_root, ("train", "valid"))
@@ -432,6 +437,8 @@ def fit_probes(
             mlp_min_steps=mlp_min_steps,
             attentive_epochs=attentive_epochs,
             attentive_batch_size=attentive_batch_size,
+            attentive_min_epochs=attentive_min_epochs,
+            attentive_patience=attentive_patience,
         ),
         physical_targets,
     )
@@ -513,6 +520,8 @@ def fit_probes(
                         grid=train.grid if local else None,
                         epochs=attentive_epochs,
                         batch_size=attentive_batch_size,
+                        min_epochs=attentive_min_epochs,
+                        patience=attentive_patience,
                     )
                     print(
                         f"fit output {layer} {representation} offset {offset} {target}",
@@ -557,6 +566,8 @@ def fit_probes(
                     valid_groups=valid.groups,
                     epochs=attentive_epochs,
                     batch_size=attentive_batch_size,
+                    min_epochs=attentive_min_epochs,
+                    patience=attentive_patience,
                     joint=True,
                 )
                 print(f"fit output {layer} governing parameters", flush=True)

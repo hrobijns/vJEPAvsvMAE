@@ -48,6 +48,8 @@ PROBE_SETTINGS = dict(
     mlp_max_steps=2000,
     mlp_min_steps=150,
     attentive_epochs=100,
+    attentive_min_epochs=15,
+    attentive_patience=10,
     attentive_batch_size=32,
 )
 
@@ -67,13 +69,14 @@ def selected_physical_targets(dataset, requested=None):
     return targets
 
 
-def check_objective_roster(keys):
-    """Every observed dataset/seed must contribute all compared objectives."""
+def check_objective_roster(keys, expected=OBJECTIVES):
+    """Every observed dataset/seed must contribute the compared objectives."""
+    expected = set(expected)
     objectives = defaultdict(set)
     for dataset, objective, seed in keys:
         objectives[(dataset, seed)].add(objective)
     for key, present in sorted(objectives.items()):
-        if present != set(OBJECTIVES):
+        if present != expected:
             raise ValueError(
                 f"incomplete objective roster for {key}: {sorted(present)}"
             )
@@ -114,7 +117,7 @@ def best_val_checkpoints(index):
     return rows
 
 
-def roster_groups(encoders):
+def roster_groups(encoders, objectives=OBJECTIVES):
     """The frozen roster holds exactly one best-validation encoder per run."""
     groups = {}
     for row in encoders:
@@ -137,11 +140,11 @@ def roster_groups(encoders):
         raise ValueError("study declares no encoders")
     if len({row["checkpoint_sha256"] for row in encoders}) != len(encoders):
         raise ValueError("duplicate encoder checkpoint in the frozen roster")
-    check_objective_roster(groups)
+    check_objective_roster(groups, objectives)
     return groups
 
 
-def frozen_encoders(handoff, index, dataset=None):
+def frozen_encoders(handoff, index, dataset=None, objectives=None):
     rows = best_val_checkpoints(index)
     if dataset is not None:
         available = {row["dataset"] for row in rows}
@@ -151,6 +154,15 @@ def frozen_encoders(handoff, index, dataset=None):
                 f"available datasets: {sorted(available)}"
             )
         rows = [row for row in rows if row["dataset"] == dataset]
+    if objectives is not None:
+        requested = list(objectives)
+        if (
+            not requested
+            or len(set(requested)) != len(requested)
+            or any(objective not in OBJECTIVES for objective in requested)
+        ):
+            raise ValueError(f"objectives must be a non-empty subset of {OBJECTIVES}")
+        rows = [row for row in rows if row["objective"] in requested]
     return [
         dict(
             dataset=row["dataset"],
@@ -250,12 +262,20 @@ def check_clean_source(repo):
         )
 
 
-def prepare(handoff, base, output, dataset=None, targets=None):
+def prepare(
+    handoff, base, output, dataset=None, targets=None, objectives=None
+):
     repo = Path(__file__).resolve().parents[1]
     check_clean_source(repo)
     bundle = Artifact(handoff, "encoder_handoff")
-    encoders = frozen_encoders(handoff, bundle.json("index.json"), dataset=dataset)
-    groups = roster_groups(encoders)
+    objectives = list(OBJECTIVES if objectives is None else objectives)
+    encoders = frozen_encoders(
+        handoff,
+        bundle.json("index.json"),
+        dataset=dataset,
+        objectives=objectives,
+    )
+    groups = roster_groups(encoders, objectives)
     protocols = {}
     for name in sorted({r["dataset"] for r in encoders}):
         protocol = frozen_protocol(repo, name)
@@ -283,6 +303,7 @@ def prepare(handoff, base, output, dataset=None, targets=None):
                 probe_settings=PROBE_SETTINGS,
                 protocols=protocols,
                 physical_targets=physical_targets,
+                objectives=objectives,
                 encoders=encoders,
             ),
         )
@@ -333,7 +354,15 @@ def load(output):
         raise ValueError("study physical targets do not match its datasets")
     for dataset, targets in study["physical_targets"].items():
         selected_physical_targets(dataset, targets)
-    roster_groups(study["encoders"])
+    objectives = study.get("objectives")
+    if (
+        not isinstance(objectives, list)
+        or not objectives
+        or len(set(objectives)) != len(objectives)
+        or any(objective not in OBJECTIVES for objective in objectives)
+    ):
+        raise ValueError("study objectives are invalid")
+    roster_groups(study["encoders"], objectives)
     return study
 
 
@@ -471,7 +500,7 @@ def report(output, study):
             aggregate(
                 scores,
                 folder / "aggregate",
-                objectives=OBJECTIVES,
+                objectives=study["objectives"],
                 seeds=sorted({r["seed"] for r in rows}),
             )
         if not sealed(folder / "plots", "plots"):
@@ -544,6 +573,12 @@ def main():
         nargs="+",
         help="ordered physical-target subset; requires --dataset",
     )
+    p.add_argument(
+        "--objectives",
+        nargs="+",
+        choices=OBJECTIVES,
+        help="objective subset; defaults to all compared objectives",
+    )
     p = commands.add_parser("cache")
     p.add_argument("--dataset", required=True, choices=DATASETS)
     p.add_argument("--split", required=True, choices=SPLITS)
@@ -561,6 +596,7 @@ def main():
             args.handoff,
             args.base,
             args.output,
+            objectives=args.objectives,
             dataset=args.dataset,
             targets=args.targets,
         )
