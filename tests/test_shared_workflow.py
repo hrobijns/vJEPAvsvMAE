@@ -21,7 +21,12 @@ from src.evaluation.artifacts import Artifact, seal, write_json
 from src.evaluation.cache import prepare_cache
 from src.evaluation.features import extract_features, paired_noise_batch
 from src.evaluation.pipeline import fit_probes, score_probes, evaluate_noise
-from src.evaluation.protocol import Protocol, token_indices, token_coordinates
+from src.evaluation.protocol import (
+    Protocol,
+    governing_names,
+    token_indices,
+    token_coordinates,
+)
 from src.evaluation.reporting import aggregate, plot
 from src.models.vit import build_encoder
 from src.objectives import OBJECTIVES
@@ -397,6 +402,30 @@ class WorkflowTests(unittest.TestCase):
                     attentive_patience=1,
                     physical_targets=(SYSTEMS[dataset].targets[0],),
                 )
+                # The gate fit is a separate artifact holding only the
+                # governing-parameter probes, so it can never be mistaken for,
+                # or block, the study's full fit.
+                fit_probes(
+                    features,
+                    root / "cache",
+                    root / "gate_fits",
+                    mlp_max_steps=2,
+                    mlp_min_steps=2,
+                    feature_mlp=True,
+                    attentive=False,
+                    governing_only=True,
+                    physical_targets=(SYSTEMS[dataset].targets[0],),
+                )
+                gate_rows = Artifact(root / "gate_fits", "probe_fits").json(
+                    "rows.json"
+                )
+                self.assertTrue(gate_rows)
+                self.assertEqual({r["family"] for r in gate_rows}, {"regime"})
+                self.assertEqual(
+                    {r["target"] for r in gate_rows},
+                    set(governing_names(dataset)),
+                )
+                self.assertTrue(all("valid_r2" in r for r in gate_rows))
                 self.assertFalse((root / "cache/test").exists())
                 write_well(root, dataset, "test")
                 prepare_cache(root, "test", root / "cache", protocol)
