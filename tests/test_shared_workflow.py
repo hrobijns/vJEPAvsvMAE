@@ -433,10 +433,12 @@ class WorkflowTests(unittest.TestCase):
                         (root / "plots/physics_persistence.pdf").is_file()
                     )
                     self.assertTrue((root / "plots/summary.tsv").is_file())
-                self.assertTrue((root / "aggregate/target_means.json").is_file())
-                probe_layers = Artifact(root / "fits", "probe_fits").manifest[
-                    "probe_settings"
-                ]["probe_layers"]
+                fit_manifest = Artifact(root / "fits", "probe_fits").manifest
+                probe_layers = fit_manifest["probe_settings"]["probe_layers"]
+                self.assertEqual(
+                    fit_manifest["probe_settings"]["physical_targets"],
+                    [SYSTEMS[dataset].targets[0]],
+                )
                 rows = Artifact(root / "probes", "probes").json("rows.json")
                 for row in rows:
                     if row["family"] == "physics" and row["method"] in (

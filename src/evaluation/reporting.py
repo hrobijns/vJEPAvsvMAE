@@ -428,7 +428,9 @@ def plot(aggregate_dir, output, metric="vrmse"):
     colors = {
         objective: plt.get_cmap("tab10")(i) for i, objective in enumerate(objectives)
     }
-    targets = artifact.manifest["protocol"]["targets"]
+    targets = artifact.manifest.get("probe_settings", {}).get(
+        "physical_targets", artifact.manifest["protocol"]["targets"]
+    )
     target_offsets = artifact.manifest["protocol"]["target_offsets"]
     context_frames = artifact.manifest["protocol"]["n_frames"]
     horizons = display_horizons(target_offsets, context_frames)
